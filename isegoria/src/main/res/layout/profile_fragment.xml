@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:gravity="top"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/topBackgroundNews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:paddingTop="14dp" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxHeight="100dp"
+            android:maxWidth="100dp"
+            android:src="@drawable/me" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:text="Anthony Quattrone"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:text="University of Melbourne"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="6dp" >
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:shrinkColumns="*" >
+
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+                
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+                    	               
+                    <TextView
+                        android:id="@+id/editText1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:text="100"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/profileTextSize" />
+                    
+	                <TextView
+	                    android:id="@+id/editText1"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:ems="10"
+	                    android:text="Friends"
+	                    android:textAppearance="?android:attr/textAppearanceSmall"
+	                    android:textColor="@color/white"
+	                    android:textSize="@dimen/profileTextSize" />
+
+                </LinearLayout>
+ 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+                    	               
+                    <TextView
+                        android:id="@+id/editText12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:text="100"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/grey"
+                        android:textSize="@dimen/profileTextSize" />
+                    
+	                <TextView
+	                    android:id="@+id/editText13"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:ems="10"
+	                    android:text="Friends"
+	                    android:textAppearance="?android:attr/textAppearanceSmall"
+	                    android:textColor="@color/grey"
+	                    android:textSize="@dimen/profileTextSize" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" >
+                    	               
+                    <TextView
+                        android:id="@+id/editText12"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:text="View"
+                        android:gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/profileTextSize" />
+                    
+	                <TextView
+	                    android:id="@+id/editText13"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:ems="10"
+	                    android:text="Friends"
+	                    android:gravity="center"
+	                    android:textAppearance="?android:attr/textAppearanceSmall"
+	                    android:textColor="@color/white"
+	                    android:textSize="@dimen/profileTextSize" />
+
+                </LinearLayout>
+            </TableRow>
+		</TableLayout>  
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        	
+	     <RelativeLayout
+		    android:id="@+id/relativeLayout" 
+		    android:layout_width="fill_parent" 
+		    android:layout_height="fill_parent"
+		 >
+
+		    <TextView
+		        android:id="@+id/mytextview1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:text="Badges"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textSize="@dimen/profileTextSizeLabel" />
+		
+		    <TextView
+		        android:id="@+id/mytextview2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentRight="true"
+		        android:text="Show All"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textSize="@dimen/profileTextSizeLabel" />
+	
+		    <View
+		        android:layout_width="wrap_content"
+		        android:layout_height="1dip"
+		        android:layout_alignLeft="@+id/mytextview1"
+		        android:layout_below="@+id/mytextview1"
+		        android:background="#676475" />
+
+		</RelativeLayout>
+		<RelativeLayout
+		    android:id="@+id/relativeLayout" 
+		    android:layout_width="fill_parent" 
+		    android:layout_height="fill_parent"
+		 >
+
+		    <TextView
+		        android:id="@+id/mytextview1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:text="Tasks"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textSize="@dimen/profileTextSizeLabel" />
+		
+		    <TextView
+		        android:id="@+id/mytextview2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentRight="true"
+		        android:text="Show Progress"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textSize="@dimen/profileTextSizeLabel" />
+	
+		    <View
+		        android:layout_width="wrap_content"
+		        android:layout_height="1dip"
+		        android:layout_alignLeft="@+id/mytextview1"
+		        android:layout_below="@+id/mytextview1"
+		        android:background="#676475" />
+
+		</RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

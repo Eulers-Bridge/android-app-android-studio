@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="3dp"
+        android:text="2014 University of Melbourne Student Union Election"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/Text2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="29th August 2014, Ballot opens 7:00AM"
+        android:textColor="@android:color/black"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.15"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:orientation="horizontal" >
+        
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@android:id/tabcontent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:layout_weight="1" >
+    
+	      <TextView
+	          android:id="@+id/tabTextViewContent"
+	          android:layout_width="match_parent"
+	          android:layout_height="match_parent"
+	          android:paddingLeft="10dp"
+	          android:text="Welcome to the 2014 University of Melbourne Student Union Elections!
+\n\n
+Here, you&apos;ll find a host of information on your current student council, the new candidates and the different parties they represent. You&apos;ll be able to find 
+information on your current activities, volunteer opportunities and major campaign events.
+\n\n
+Every day there will be a new poll question from yours peers to help the candidates better understand their consitituents and increase transparency within our elections.
+\n\n
+Reader, Set, Vote!" >
+
+	      </TextView>
+	 
+      </FrameLayout>
+</LinearLayout>
