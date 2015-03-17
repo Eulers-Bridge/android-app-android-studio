@@ -39,7 +39,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
-                        android:background="@drawable/white_button"
                         android:text="Change Photo"
                         android:textColor="@color/white" />
                     
@@ -49,7 +48,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
-                        android:background="@drawable/white_button"
                         android:text="Change Cover"
                         android:textColor="@color/white" />
 

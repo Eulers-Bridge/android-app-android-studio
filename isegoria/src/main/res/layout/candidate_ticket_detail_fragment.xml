@@ -140,7 +140,6 @@
 		            	     android:layout_gravity="center_vertical"
 		            	     android:layout_marginRight="10dp"
 		            	     android:layout_weight="1"
-		            	     android:background="@drawable/white_button"
 		            	     android:gravity="center_vertical"
 		            	     android:paddingRight="10dp"
 		            	     android:text="Support"
