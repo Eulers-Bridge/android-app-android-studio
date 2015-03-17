@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:gravity="top"
+    android:clickable="true"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -27,7 +28,7 @@
             android:paddingTop="6dp" >
             
         <TextView
-            android:id="@+id/textView1"
+            android:id="@+id/eventTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -96,13 +97,15 @@
 		             >       
 
 		            	 <Button
-		            	     android:id="@+id/button1"
-		            	     style="?android:attr/buttonStyleSmall"
+		            	     android:id="@+id/addToCalendar"
 		            	     android:layout_width="wrap_content"
 		            	     android:layout_height="wrap_content"
 		            	     android:layout_gravity="center_vertical"
+		            	     android:layout_marginRight="10dp"
 		            	     android:layout_weight="1"
 		            	     android:gravity="center_vertical"
+		            	     android:onClick="addToCalendar"
+		            	     android:paddingRight="10dp"
 		            	     android:text="Add to Calendar"
 		            	     android:textColor="@color/white" />
 
@@ -123,7 +126,6 @@
             android:layout_weight="1"
             android:ems="10"
             android:paddingLeft="10dp"
-            android:text="Public Lecture Theatre"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/black"
             android:textSize="@dimen/eventLocationSize" />

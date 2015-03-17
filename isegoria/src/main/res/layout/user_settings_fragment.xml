@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:gravity="top"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/topBackgroundNews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:paddingTop="14dp" >
+
+        <ImageView
+            android:id="@+id/photoImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxHeight="100dp"
+            android:maxWidth="100dp"
+            android:src="@drawable/me" />
+
+	    <LinearLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="center"
+	        android:orientation="horizontal"
+	        android:paddingTop="10dp" >
+                    	               
+                    <Button
+                        android:id="@+id/addToCalendar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/white_button"
+                        android:text="Change Photo"
+                        android:textColor="@color/white" />
+                    
+                    <Button
+                        android:id="@+id/addToCalendar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:background="@drawable/white_button"
+                        android:text="Change Cover"
+                        android:textColor="@color/white" />
+
+    	</LinearLayout> 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+	    
+        <View
+			android:layout_width="wrap_content"
+		    android:layout_height="1dip"
+		    android:background="@color/offGrey" />
+	    
+        <TextView
+            android:id="@+id/photoTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/barBackground"
+            android:ems="10"
+            android:paddingLeft="5dp"
+            android:text="Privacy Settings"
+            android:textColor="@color/barText"
+            android:textSize="18dp" >
+
+        </TextView>
+        
+        <View
+			android:layout_width="wrap_content"
+		    android:layout_height="1dip"
+		    android:background="@color/offGrey" />
+        
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:text="Single User Experience"
+            android:textSize="14sp" />
+        
+        <View
+			android:layout_width="wrap_content"
+		    android:layout_height="1dip"
+		    android:background="@color/offGrey" />
+
+	    <Switch
+	        android:id="@+id/switch2"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:paddingBottom="10dp"
+	        android:paddingLeft="10dp"
+	        android:paddingRight="10dp"
+	        android:paddingTop="10dp"
+	        android:text="Opt out of Data Collection"
+	        android:textSize="14sp" />
+	    
+        <View
+			android:layout_width="wrap_content"
+		    android:layout_height="1dip"
+		    android:background="@color/offGrey" />
+	
+	    <Switch
+	        android:id="@+id/switch3"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:paddingBottom="10dp"
+	        android:paddingLeft="10dp"
+	        android:paddingRight="10dp"
+	        android:paddingTop="10dp"
+	        android:text="Do Not Track"
+	        android:textSize="14sp" />
+	    
+        <View
+			android:layout_width="wrap_content"
+		    android:layout_height="1dip"
+		    android:background="@color/offGrey" />
+        
+        <TextView
+            android:id="@+id/photoTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/barBackground"
+            android:ems="10"
+            android:paddingLeft="5dp"
+            android:text="Credits"
+            android:textColor="@color/barText"
+            android:textSize="18dp" >
+
+        </TextView>
+    
+	</LinearLayout>
+
+    <Switch
+        android:id="@+id/Switch01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:text="About this App"
+        android:textSize="14sp" />
+
+</LinearLayout>

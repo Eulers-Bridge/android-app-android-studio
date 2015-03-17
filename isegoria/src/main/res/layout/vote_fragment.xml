@@ -31,10 +31,15 @@
         android:paddingLeft="40dp"
         android:paddingRight="40dp">
 	
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#676475" />
+	    	<Spinner
+	    	    android:id="@+id/voteLocation"
+	    	    android:layout_width="fill_parent"
+	    	    android:layout_height="40dp"
+	    	    android:layout_marginLeft="10dp"
+	    	    android:layout_marginRight="10dp"
+	    	    android:background="@color/white"
+	    	    android:gravity="center"
+	    	    android:minHeight="40dp" />
 	
 	</LinearLayout>  
 
@@ -110,8 +115,10 @@
 	        android:id="@+id/okbutton"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:background="@drawable/green_button"
+	        android:gravity="center"
 	        android:text="Create Reminder"
-	        android:gravity="center" />
+	        android:textColor="#52BB42" />
 	
 	</LinearLayout>  
 

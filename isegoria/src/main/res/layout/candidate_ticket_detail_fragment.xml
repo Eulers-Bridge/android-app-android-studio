@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:gravity="top"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/topBackgroundDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
+    >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingLeft="12dp"
+            android:paddingRight="6dp"
+            android:paddingTop="6dp" >
+            
+
+		</LinearLayout>
+                
+        <LinearLayout
+        	android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:paddingLeft="12dp" >
+        
+            <LinearLayout
+	        	android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:orientation="vertical"
+	            android:gravity="bottom"
+	            android:paddingTop="6dp"
+	            android:paddingRight="6dp" >
+
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="114dp"
+                    android:layout_height="108dp"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:src="@drawable/green_party" />
+                
+                	<LinearLayout
+			        	android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical"
+			            android:layout_gravity="center_vertical|center_horizontal"
+			            android:layout_alignParentRight="true" 
+			             >   
+
+				        <TextView
+				            android:id="@+id/textView2"
+				            android:layout_width="wrap_content"
+				            android:layout_height="wrap_content"
+				            android:layout_alignParentTop="true"
+				            android:layout_centerHorizontal="true"
+				            android:layout_gravity="center_vertical|center_horizontal"
+				            android:layout_marginTop="5dp"
+				            android:text="Greens Students"
+				            android:textColor="@color/white"
+				            android:textSize="24sp" />
+				        
+				        <TextView
+				            android:id="@+id/textView2"
+				            android:layout_width="wrap_content"
+				            android:layout_height="wrap_content"
+				            android:layout_alignParentTop="true"
+				            android:layout_centerHorizontal="true"
+				            android:layout_gravity="center_vertical|center_horizontal"
+				            android:text="University of Melbourne"
+				            android:textColor="@color/white"
+				            android:textSize="14sp" />
+
+					 </LinearLayout>
+
+	        </LinearLayout>   
+	         
+            <RelativeLayout
+			    android:id="@+id/RelativeLayout01" 
+			    android:layout_width="fill_parent" 
+			    android:layout_height="fill_parent"
+			    android:paddingTop="10dp"
+			    >
+	            <LinearLayout
+		        	android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:orientation="vertical"
+		            android:layout_alignParentLeft="true" 
+		            android:layout_gravity="center_vertical"
+		             >
+		             
+	           <TextView
+	               android:id="@+id/newsArticleTitle"
+	               android:layout_width="wrap_content"
+	               android:layout_height="wrap_content"
+	               android:layout_gravity="bottom"
+	               android:text="1240"
+	               android:textAppearance="?android:attr/textAppearanceLarge"
+	               android:textColor="@color/white"
+	               android:textSize="20sp" />
+
+   				<TextView
+   				    android:id="@+id/eventTime"
+   				    android:layout_width="wrap_content"
+   				    android:layout_height="fill_parent"
+   				    android:layout_gravity="center_vertical"
+   				    android:layout_weight="1"
+   				    android:ems="10"
+   				    android:gravity="center_vertical"
+   				    android:text="Supporters"
+   				    android:textAppearance="?android:attr/textAppearanceSmall"
+   				    android:textColor="@color/white"
+   				    android:textSize="@dimen/newsTimeSize" />
+
+		        </LinearLayout> 
+		        <LinearLayout
+		        	android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:orientation="horizontal"
+		            android:layout_gravity="center_vertical"
+		            android:layout_alignParentRight="true" 
+		             >       
+
+		            	 <Button
+		            	     android:id="@+id/addToCalendar"
+		            	     android:layout_width="wrap_content"
+		            	     android:layout_height="wrap_content"
+		            	     android:layout_gravity="center_vertical"
+		            	     android:layout_marginRight="10dp"
+		            	     android:layout_weight="1"
+		            	     android:background="@drawable/white_button"
+		            	     android:gravity="center_vertical"
+		            	     android:paddingRight="10dp"
+		            	     android:text="Support"
+		            	     android:textColor="@color/white" />
+
+		        </LinearLayout>
+		        
+
+	        </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+    
+    <LinearLayout
+    	android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+'
+       	 <View
+	     	android:layout_width="fill_parent"
+	        android:layout_height="1dip"
+	        android:paddingTop="3dp"
+	        android:background="#676475" />
+    </LinearLayout>
+    
+    	<RelativeLayout
+	         android:id="@+id/relativeLayout"
+	         android:layout_width="fill_parent"
+	         android:layout_height="wrap_content"
+	         android:background="@color/offGrey" >
+
+		    <TextView
+		        android:id="@+id/mytextview1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:text="Election Ticket"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textSize="@dimen/profileTextSizeLabel" />
+
+		    <View
+		        android:layout_width="wrap_content"
+		        android:layout_height="1dip"
+		        android:layout_alignLeft="@+id/mytextview1"
+		        android:layout_below="@+id/mytextview1"
+		        android:background="@color/offGrey" />
+
+		</RelativeLayout>
+		
+    <TableLayout
+        android:id="@+id/candidateTicketDetailTable"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:stretchColumns="0,1" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

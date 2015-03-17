@@ -2,7 +2,10 @@
 <resources>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="searchBar">#CAC9CF</color>
     <color name="grey">#8A898A</color>
+    <color name="divider">#27313D</color>
+    <color name="offGrey">#F4F4F4</color>
     <color name="lightGrey">#8694A3</color>
     <color name="darkBlue">#3C7EC9</color>
     <color name="lightBlue">#4A90E2</color>
@@ -10,4 +13,7 @@
     <color name="lightGreen">#60C353</color>
     <color name="lightRed">#FF6D65</color>
     <color name="pink">#FF65A7</color>
+    <color name="barBackground">#313E4D</color>
+    <color name="barText">#A1B2C5</color>
+    <color name="greenButtonBackground">#60C353</color>
 </resources>

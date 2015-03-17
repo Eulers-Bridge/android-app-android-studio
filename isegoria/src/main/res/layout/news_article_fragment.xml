@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:gravity="top"
+    android:clickable="true"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -11,21 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:gravity="center"
+        android:gravity="bottom"
         android:orientation="vertical"
-        android:paddingLeft="14dp"
-        android:paddingRight="14dp"
-        android:paddingTop="14dp" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:padding="3dp"
-            android:text="Anthony Quattrone"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
+        android:paddingBottom="12dp"
+    >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -33,123 +23,163 @@
             android:layout_weight="1"
             android:gravity="bottom"
             android:orientation="horizontal"
-            android:paddingLeft="6dp"
+            android:paddingLeft="12dp"
             android:paddingRight="6dp"
             android:paddingTop="6dp" >
-
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="1dip"
-                android:background="#676475" />
-        </LinearLayout>
-
-        <TableLayout
-            android:layout_width="match_parent"
+            
+        <TextView
+            android:id="@+id/newsArticleTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:shrinkColumns="*" >
-
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+            android:layout_gravity="bottom"
+            android:text="Labor pulls ahead in Nielson poll"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/white" />
+		</LinearLayout>
                 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-                    	               
-                    <TextView
-                        android:id="@+id/editText1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:text="100"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/profileTextSize" />
-                    
-	                <TextView
-	                    android:id="@+id/editText1"
-	                    android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:ems="10"
-	                    android:text="Friends"
-	                    android:textAppearance="?android:attr/textAppearanceSmall"
-	                    android:textColor="@color/white"
-	                    android:textSize="@dimen/profileTextSize" />
+        <LinearLayout
+        	android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:paddingLeft="12dp" >
+        
+            <LinearLayout
+	        	android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:orientation="vertical"
+	            android:gravity="bottom"
+	            android:paddingTop="6dp"
+	            android:paddingRight="6dp" >
+	            
+	            <View
+	            	android:layout_width="fill_parent"
+	                android:layout_height="1dip"
+	                android:background="#676475" />
+	        </LinearLayout>   
+	         
+            <RelativeLayout
+			    android:id="@+id/RelativeLayout01" 
+			    android:layout_width="fill_parent" 
+			    android:layout_height="fill_parent"
+			    android:paddingTop="10dp"
+			    >
+	            <LinearLayout
+		        	android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:orientation="horizontal"
+		            android:layout_alignParentLeft="true" 
+		            android:gravity="bottom"
+		             >  
+		             
+		             <ImageView
+		            	    android:id="@+id/newsArticleHeadView"
+		            	    android:layout_width="wrap_content"
+		            	    android:layout_height="wrap_content"
+		            	    android:layout_gravity="center_vertical"
+		            	    android:layout_weight="1"
+		            	    android:paddingRight="5dp"
+		            	    android:src="@drawable/head1" />
+		             
+			        <LinearLayout
+			        	android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical"
+			            android:gravity="bottom"
+			            android:layout_gravity="center_vertical"
+			             >       
+			                         	               
+				            <TextView
+				                android:id="@+id/photoTitle"
+				                android:layout_width="wrap_content"
+				                android:layout_height="wrap_content"
+				                android:ems="10"
+				                android:text=""
+				                android:textAppearance="?android:attr/textAppearanceSmall"
+				                android:textColor="@color/white"
+				                android:textSize="@dimen/newsArticleName" />
+				                    
+				            <TextView
+				                android:id="@+id/newsArticleDate"
+				                android:layout_width="wrap_content"
+				                android:layout_height="wrap_content"
+				                android:ems="10"
+				                android:text="Yesterday, 9:00 AM"
+				                android:textAppearance="?android:attr/textAppearanceSmall"
+				                android:textColor="@color/white"
+				                android:textSize="@dimen/newsTimeSize" />
+			      	
+			        </LinearLayout> 
+		        </LinearLayout> 
+		        <LinearLayout
+		        	android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:orientation="horizontal"
+		            android:layout_gravity="center_vertical"
+		            android:layout_alignParentRight="true" 
+		             >       
+		             
+		            	 <TextView
+		            	     android:id="@+id/newsArticleLikes"
+		            	     android:layout_width="wrap_content"
+		            	     android:layout_height="wrap_content"
+		            	     android:layout_gravity="center_vertical"
+		            	     android:layout_weight="1"
+		            	     android:ems="10"
+		            	     android:gravity="right"
+		            	     android:text="205"
+		            	     android:textAppearance="?android:attr/textAppearanceSmall"
+		            	     android:textColor="@color/white"
+		            	     android:textSize="@dimen/newsPointsSize" />
 
-                </LinearLayout>
- 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-                    	               
-                    <TextView
-                        android:id="@+id/editText12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:text="Eva Menendez"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/profileTextSizeSmall" />
-                    
-	                <TextView
-	                    android:id="@+id/editText13"
-	                    android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:ems="10"
-	                    android:text="Yesterday, 9:00 AM"
-	                    android:textAppearance="?android:attr/textAppearanceSmall"
-	                    android:textColor="@color/black"
-	                    android:textSize="@dimen/profileTextSize" />
-
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-                    	               
-                    <TextView
-                        android:id="@+id/editText12"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:text="View"
-                        android:gravity="center"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/profileTextSize" />
-                    
-	                <TextView
-	                    android:id="@+id/editText13"
-	                    android:layout_width="wrap_content"
-	                    android:layout_height="wrap_content"
-	                    android:ems="10"
-	                    android:text="Friends"
-	                    android:gravity="center"
-	                    android:textAppearance="?android:attr/textAppearanceSmall"
-	                    android:textColor="@color/white"
-	                    android:textSize="@dimen/profileTextSize" />
-
-                </LinearLayout>
-            </TableRow>
-		</TableLayout>  
+			            <ImageView
+			                android:id="@+id/starView"
+			                android:layout_width="wrap_content"
+			                android:layout_height="wrap_content"
+			                android:layout_weight="1"
+			                android:src="@drawable/stardefault" />
+			            
+			            <ImageView
+			                android:id="@+id/flagView"
+			                android:layout_width="wrap_content"
+			                android:layout_height="wrap_content"
+			                android:layout_weight="1"
+			                android:src="@drawable/flagdefault" />
+		      	
+		        </LinearLayout> 
+	        </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+                <TextView
+        android:id="@+id/textNews"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:ems="10"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:textSize="@dimen/newsArticleSize" />
+        </LinearLayout>
+    </ScrollView>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textNews"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:ems="10" >
-    </TextView>
 
 </LinearLayout>

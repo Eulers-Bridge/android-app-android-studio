@@ -4,18 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <SearchView
-        android:id="@+id/searchView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/searchBar" >
-
-    </SearchView>
-
     <TableLayout
-        android:id="@+id/candidateAllTable"
+        android:id="@+id/candidatePositionTable"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
+        android:stretchColumns="*"
          >
 
         <TableRow

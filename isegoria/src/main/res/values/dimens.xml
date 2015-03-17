@@ -6,5 +6,10 @@
     <dimen name="profileTextSize">20dp</dimen>
     <dimen name="profileTextSizeLabel">18dp</dimen>
     <dimen name="profileTextSizeSmall">10dp</dimen>
+    <dimen name="newsArticleSize">16dp</dimen>
+    <dimen name="newsTimeSize">14dp</dimen>
+    <dimen name="newsArticleName">14dp</dimen>
+    <dimen name="newsPointsSize">15dp</dimen>
+    <dimen name="eventLocationSize">16dp</dimen>
 
 </resources>
