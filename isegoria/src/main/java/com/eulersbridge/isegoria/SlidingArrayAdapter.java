@@ -49,7 +49,7 @@ public class SlidingArrayAdapter extends ArrayAdapter {
         	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.profileblue));
         }   
         else if(position == 5) {
-        	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.settings));
+        	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.profileblue));
         }   
         return currentView;
     }

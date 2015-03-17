@@ -13,10 +13,12 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 
 
 public class FeedFragment extends SherlockFragment implements TabListener {
@@ -25,6 +27,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 	private PhotosFragment photosFragment = null;
 	private EventsFragment eventsFragment = null;
 	private ViewGroup container = null;
+    private android.support.v4.widget.SwipeRefreshLayout swipeLayout;
 	
 	private boolean complete = false;
 	
@@ -40,7 +43,16 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
 
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();
+        swipeLayout =  (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.content_feed_frame);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeLayout.setRefreshing(false);
+            }
+        });
+
+
+            ((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().addTab(
 				((SherlockFragmentActivity) getActivity()).getSupportActionBar().newTab()
 	            .setText("News")

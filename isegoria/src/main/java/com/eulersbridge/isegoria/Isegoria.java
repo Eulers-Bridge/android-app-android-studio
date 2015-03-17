@@ -14,7 +14,7 @@ public class Isegoria extends Application {
 	private ArrayList<CountryInfo> countryObjects;
 	
 	public Isegoria() {
-		
+		super();
 	}
 	
 	public MainActivity getMainActivity() {

@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria;
 
-//Isegoria
 
 import java.util.ArrayList;
 
