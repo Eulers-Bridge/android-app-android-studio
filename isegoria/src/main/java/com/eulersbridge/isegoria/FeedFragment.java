@@ -43,13 +43,13 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
 
-        swipeLayout =  (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.content_feed_frame);
+       /* swipeLayout =  (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.content_feed_frame);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 swipeLayout.setRefreshing(false);
             }
-        });
+        });*/
 
 
             ((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();

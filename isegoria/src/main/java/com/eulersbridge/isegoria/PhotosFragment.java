@@ -1,18 +1,10 @@
 package com.eulersbridge.isegoria;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import com.actionbarsherlock.app.SherlockFragment;
-
-import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -20,12 +12,16 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ImageView.ScaleType;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
+import java.io.InputStream;
 
 public class PhotosFragment extends SherlockFragment {
 	private View rootView;
@@ -35,6 +31,7 @@ public class PhotosFragment extends SherlockFragment {
 	private float dpHeight;
 	
 	private boolean insertedFirstRow = false;
+    private Network network;
 	
 	public PhotosFragment() {
 		insertedFirstRow = false;
@@ -52,26 +49,17 @@ public class PhotosFragment extends SherlockFragment {
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
         MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPhotoAlbums(this);
 
 		return rootView;
 	}
 	
-	public void addPhotoAlbum(final int albumId, final String label, final String caption, final Bitmap photoAlbumThumb) {
-		try {
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					addTableRow(albumId, label, caption, photoAlbumThumb);
-				}
-			});
-		} catch(Exception e) {
-			
-		}
+	public void addPhotoAlbum(final int albumId, final String label, final String caption, String photoAlbumThumb) {
+		addTableRow(albumId, label, caption, photoAlbumThumb);
 	}
 
-	public void addTableRow(final int albumId, String label, String caption, Bitmap bitmap) {
+	public void addTableRow(final int albumId, String label, String caption, String bitmap) {
 		try {
 			TableRow tr = new TableRow(getActivity());
 			if(!insertedFirstRow) {
@@ -88,21 +76,21 @@ public class PhotosFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(100, (int)(100)));
 			view.setScaleType(ScaleType.CENTER_CROP);
-	        view.setImageBitmap(bitmap);
-			
-			LinearLayout linearLayout = new LinearLayout(getActivity());
+	        LinearLayout linearLayout = new LinearLayout(getActivity());
 			linearLayout.setOrientation(LinearLayout.VERTICAL);
 			linearLayout.setGravity(Gravity.CENTER_VERTICAL);
 			linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			linearLayout.setPadding(10, 0, 0, 0);
+
+            network.getPictureVolley(bitmap, view);
 	        
 	        final TextView textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor("#000000"));
 	        textViewArticle.setTextSize(18.0f);
 	        textViewArticle.setText(label);
 	        textViewArticle.setGravity(Gravity.LEFT);
-	        
-	        textViewArticle.setOnClickListener(new View.OnClickListener() {        
+
+	        textViewArticle.setOnClickListener(new View.OnClickListener() {
 	            @Override
 	            public void onClick(View view) {
 			    		FragmentManager fragmentManager2 = getFragmentManager();

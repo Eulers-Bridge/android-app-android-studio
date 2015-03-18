@@ -1,23 +1,10 @@
 package com.eulersbridge.isegoria;
 
-import java.util.Calendar;
-
-import com.actionbarsherlock.app.SherlockFragment;
-
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -25,15 +12,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class EventsFragment extends SherlockFragment {
 	private View rootView;
@@ -41,6 +28,8 @@ public class EventsFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private Network network;
 	
 	public EventsFragment() {
 	
@@ -56,24 +45,18 @@ public class EventsFragment extends SherlockFragment {
         dpHeight = displayMetrics.heightPixels;  
 	
         MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getEvents(this);
 
 		return rootView;
 	}
 	
-	public void addEvent(final int eventId, final String eventName, final long eventTime, final Bitmap bitmapPicture) {
-
-		getActivity().runOnUiThread(new Runnable() {
-		     @Override
-		     public void run() {
-		    	 String eventTimeStr = TimeConverter.convertTimestampToString(eventTime);
-		    	 addTableRow(eventId, bitmapPicture, false, eventName, eventTimeStr);
-		     }
-		});
+	public void addEvent(final int eventId, final String eventName, final long eventTime, final String bitmapPicture) {
+        String eventTimeStr = TimeConverter.convertTimestampToString(eventTime);
+        addTableRow(eventId, bitmapPicture, false, eventName, eventTimeStr);
 	}
 	
-	public void addTableRow(final int eventId, Bitmap bitmapPicture, boolean lastCell, String articleTitle1, String articleTime1) {
+	public void addTableRow(final int eventId, String bitmapPicture, boolean lastCell, String articleTitle1, String articleTime1) {
 		TableRow tr;
 		String colour = "#F8F8F8";
 		
@@ -97,7 +80,7 @@ public class EventsFragment extends SherlockFragment {
 		view.setColorFilter(Color.argb(125, 35, 35, 35));
 		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 3.5)));
 		view.setScaleType(ScaleType.CENTER_CROP);
-		view.setImageBitmap(bitmapPicture);
+		network.getPictureVolley(bitmapPicture, view);
 		
 		view.setOnClickListener(new View.OnClickListener() {        
             @Override

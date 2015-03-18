@@ -1,21 +1,10 @@
 package com.eulersbridge.isegoria;
 
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-import android.app.Application;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,10 +14,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -52,7 +39,8 @@ public class NewsFragment extends Fragment {
 	private int lastInstitutionId; 
 	private String lastTitle;
 	private String lastContent; 
-	private Bitmap lastPicture; 
+	private Bitmap lastPicture;
+    private String lastPictureURL;
 	private String lastLikers;
 	private long lastDate;
 	private String lastCreatorEmail; 
@@ -61,6 +49,8 @@ public class NewsFragment extends Fragment {
 	
 	private int doubleCell = 0;
 	private int articlesAdded = 0;
+
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -74,13 +64,13 @@ public class NewsFragment extends Fragment {
         this.newsFragment = this;
         
         MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getNewsArticles(this);
         
 		return rootView;
 	}
 	
-	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final Bitmap picture, final String likers, 
+	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likers,
 			final long date, final String creatorEmail, final String studentYear, final String link) {
 		articlesAdded = articlesAdded + 1;
 
@@ -91,7 +81,7 @@ public class NewsFragment extends Fragment {
 			    	 try {			    	  
 				    	 if(doubleCell == 0) {
 				    		 doubleCell = 1;
-				    		 newsFragment.addTableRow(articleId, -1, picture, null, false, false, title, TimeConverter.convertTimestampToString(date), "", "");
+				    		 newsFragment.addTableRow(articleId, -1, pictureURL, null, false, false, title, TimeConverter.convertTimestampToString(date), "", "");
 				     	 }
 				    	 else if(doubleCell == 1) {
 				    		 doubleCell = 2;
@@ -99,7 +89,7 @@ public class NewsFragment extends Fragment {
 					    	 lastInstitutionId = institutionId;
 					    	 lastTitle = title;
 					    	 lastContent = content;
-					    	 lastPicture = picture;
+					    	 lastPictureURL = pictureURL;
 					    	 lastLikers = likers;
 					    	 lastDate = date;
 					    	 lastCreatorEmail = creatorEmail;
@@ -108,7 +98,7 @@ public class NewsFragment extends Fragment {
 				    	 }
 				    	 else if(doubleCell == 2) {
 				    		 doubleCell = 0;
-				    		 newsFragment.addTableRow(lastArticleId, articleId, lastPicture, picture, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
+				    		 newsFragment.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
 				    	 }
 				     } catch(Exception e) {
 				    	 
@@ -120,7 +110,7 @@ public class NewsFragment extends Fragment {
 		}
 	}
 	
-	public void addTableRow(final int articleId1, final int articleId2, Bitmap drawable1, Bitmap drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1, 
+	public void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
 			String articleTitle2, String articleTime2) {
 		TableRow tr;
 		String colour = "#F8F8F8";
@@ -167,7 +157,7 @@ public class NewsFragment extends Fragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-			view.setImageBitmap(drawable1);
+			network.getPictureVolley(drawable1, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -226,7 +216,7 @@ public class NewsFragment extends Fragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-	        view.setImageBitmap(drawable2);
+            network.getPictureVolley(drawable2, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -270,7 +260,7 @@ public class NewsFragment extends Fragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.3)));
 			view.setScaleType(ScaleType.CENTER_CROP);
-			view.setImageBitmap(drawable1);
+			network.getPictureVolley(drawable1, view);
 
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
