@@ -25,6 +25,7 @@
             android:name="com.eulersbridge.isegoria.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
+            android:theme="@style/AppTheme"
              >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

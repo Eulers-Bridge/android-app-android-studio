@@ -1,14 +1,7 @@
 package com.eulersbridge.isegoria;
 
-import java.text.DecimalFormat;
-
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.ClipDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -18,13 +11,17 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class PollVoteFragment extends SherlockFragment {
 	private View rootView;
@@ -34,15 +31,27 @@ public class PollVoteFragment extends SherlockFragment {
 	private float dpHeight;
 	
 	private boolean insertedFirstRow = false;
-	
+
+    private int nodeId;
+    private int creatorId;
 	private String question;
 	private String answers;
+    private Network network;
+
+    private boolean voted = false;
+
+    private PollVoteFragment pollVoteFragment;
+    private ArrayList<ImageView> tickBoxes = new ArrayList<ImageView>();
+    private ArrayList<TextView> pollResults = new ArrayList<TextView>();
+    private ArrayList<ProgressBar> progressBars = new ArrayList<ProgressBar>();
 	
 	public PollVoteFragment() {
-		
+        pollVoteFragment = this;
 	}
 	
-	public void setData(String question, String answers) {
+	public void setData(int nodeId, int creatorId, String question, String answers) {
+        this.nodeId = nodeId;
+        this.creatorId = creatorId;
 		this.question = question;
 		this.answers = answers;
 	}
@@ -55,21 +64,16 @@ public class PollVoteFragment extends SherlockFragment {
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
-		
-        addTableRow(question, "Asked by Eve Menedez");
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        addTableRow(question, "");
         String[] answersSplit = answers.split(",");
-        
+
         for(int i=0; i<answersSplit.length; i++) {
-        	createProgressBars("#0000FF", answersSplit[i], 0000);
+            createProgressBars("#0000FF", answersSplit[i], 0000);
         }
-        
-        //createProgressBars("#FF0000", "Australian Labor Party", 0000);
-        //createProgressBars("#00FF00", "The Greens", 0000);
-        //createProgressBars("#000000", "Other", 0000);
-        //addTableComment("Eva Mendendez", "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore");
-        //addTableComment("Eva Mendendez", "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore");
-        //addTableComment("Eva Mendendez", "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore");
-        //addTableComment("Eva Mendendez", "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore");
 
 		return rootView;
 	}
@@ -86,7 +90,7 @@ public class PollVoteFragment extends SherlockFragment {
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
 		tr.setGravity(Gravity.TOP);
-		
+
 		ImageView view = new ImageView(getActivity());
 		//view.setColorFilter(Color.argb(125, 35, 35, 35));
 		view.setLayoutParams(new TableRow.LayoutParams(75, (int)(75)));
@@ -114,6 +118,8 @@ public class PollVoteFragment extends SherlockFragment {
         textViewArticleTime.setText(caption);
         textViewArticleTime.setPadding(0, 0, 0, 0);
         textViewArticleTime.setGravity(Gravity.LEFT);
+
+        network.getUserFullName(pollVoteFragment.getCreatorId(), textViewArticleTime, "Asked By ");
         
         linearLayout.addView(textViewArticle);
         linearLayout.addView(textViewArticleTime);
@@ -136,9 +142,10 @@ public class PollVoteFragment extends SherlockFragment {
 		tr.setLayoutParams(rowParams);
 		
 		ProgressBar pb = new ProgressBar(getActivity(), null, android.R.attr.progressBarStyleHorizontal);
-		pb.setProgress(50);
+		pb.setProgress(0);
 		pb.setMax(100);
 		pb.getProgressDrawable().setColorFilter(Color.parseColor(color), Mode.SRC_IN);
+        progressBars.add(pb);
 		
 		LinearLayout layout1 = new LinearLayout(getActivity());
 		layout1.setOrientation(LinearLayout.VERTICAL);
@@ -159,8 +166,12 @@ public class PollVoteFragment extends SherlockFragment {
         textViewVotes.setTextSize(16.0f);
         DecimalFormat formatter = new DecimalFormat("#,###");
         textViewVotes.setText(formatter.format(votes));
+        if(voted == false) {
+            textViewVotes.setText("");
+        }
         textViewVotes.setPadding(0, 0, 0, 0);
         textViewVotes.setGravity(Gravity.LEFT);
+        pollResults.add(textViewVotes);
 		
 		FrameLayout layout2 = new FrameLayout(getActivity());
 		FrameLayout.LayoutParams params1 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -173,7 +184,23 @@ public class PollVoteFragment extends SherlockFragment {
 		ImageView view = new ImageView(getActivity());
 		view.setLayoutParams(new TableRow.LayoutParams(40, (int)(40)));
 		view.setScaleType(ScaleType.CENTER_INSIDE);
-        view.setImageResource(R.drawable.tick);
+        view.setImageResource(R.drawable.tickempty);
+        tickBoxes.add(view);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int answerIndex = 0;
+                for(int i=0; i<tickBoxes.size(); i++) {
+                    tickBoxes.get(i).setImageResource(R.drawable.tickempty);
+
+                    if(tickBoxes.get(i) == view) {
+                        answerIndex = i;
+                    }
+                }
+                ((ImageView) view).setImageResource(R.drawable.tickgreen);
+                pollVoteFragment.network.answerPoll(nodeId, answerIndex, pollVoteFragment);
+            }
+        });
 		
         tr.addView(view);
 		tr.addView(layout1);
@@ -227,4 +254,17 @@ public class PollVoteFragment extends SherlockFragment {
         tr.addView(linearLayout);	
         pollTableLayout.addView(tr);
 	}
+
+    public void setPollResult(int index, int count) {
+        pollResults.get(index).setText(String.valueOf(count));
+        progressBars.get(index).setProgress(count);
+    }
+
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    public int getCreatorId() {
+        return creatorId;
+    }
 }

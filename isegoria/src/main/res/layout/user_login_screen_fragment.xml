@@ -50,7 +50,7 @@
 	                android:minHeight="40dp"
 	                android:paddingLeft="5dp"
 	                android:singleLine="true"
-	                android:text="greg.newitt@unimelb.edu.au"
+	                android:text="alan.gao@unimelb.edu.au"
 	                android:textColor="@color/grey" >
 
 	                <requestFocus />

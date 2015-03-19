@@ -4,7 +4,7 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:orientation="vertical"
-  xmlns:app="http://schemas.android.com/apk/res/com.eulersbridge.isegoria">
+  >
   
     <ScrollView
         android:id="@+id/scrollView1"

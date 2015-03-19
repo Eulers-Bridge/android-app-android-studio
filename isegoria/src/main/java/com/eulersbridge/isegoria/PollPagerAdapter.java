@@ -1,12 +1,11 @@
 package com.eulersbridge.isegoria;
 
-import java.util.List;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import java.util.List;
 
 public class PollPagerAdapter extends FragmentPagerAdapter {
 	private List<SherlockFragment> fragments;
@@ -22,8 +21,8 @@ public class PollPagerAdapter extends FragmentPagerAdapter {
 	 }
 	 
 	 @Override
-	    public CharSequence getPageTitle(int position) {
-	      return "Test";
+	 public CharSequence getPageTitle(int position) {
+	      return "Poll" + String.valueOf(position+1);
 	    }
 	 
 	 @Override
