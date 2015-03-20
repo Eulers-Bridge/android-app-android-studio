@@ -1,14 +1,11 @@
 package com.eulersbridge.isegoria;
 
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -17,19 +14,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TableRow.LayoutParams;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class CandidatePositionsFragment extends SherlockFragment {
 	private View rootView;
 	private TableLayout positionsTableLayout;
+    private Network network;
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private int lastElectionId;
+    private int lastPositionId;
+    private String lastName;
+    private String lastDesc;
+
+    boolean addRow = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -41,16 +48,33 @@ public class CandidatePositionsFragment extends SherlockFragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
-        addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, "President", "Secretary");
+        /*addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, "President", "Secretary");
         addTableRow(R.drawable.photo2, R.drawable.photo3, true, false, "Women's Officer", "LGBT Officer");
         addTableRow(R.drawable.photo4, R.drawable.photo5, true, false, "Clubs and Societies", "Environment Officer");
         addTableRow(R.drawable.photo6, R.drawable.photo7, true, false, "Welfare Officer", "Creative Arts Officer");
-        addTableRow(R.drawable.photo8, R.drawable.photo9, true, false, "Faculty Liaison", "");
+        addTableRow(R.drawable.photo8, R.drawable.photo9, true, false, "Faculty Liaison", "");*/
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getPositions(this);
         
 		return rootView;
 	}
+
+    public void addPosition(int electionId, int positionId, String name, String desc) {
+        this.lastElectionId = electionId;
+        this.lastPositionId = positionId;
+        this.lastName = name;
+        this.lastDesc = desc;
+
+        if(addRow) {
+            addRow = false;
+            addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, lastName, name);
+        }
+        addRow = true;
+    }
 	
-	public void addTableRow(int drawable1, int drawable2, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	public void addTableRow(int lastPositionId, int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 		
 		if(doubleCell) {
@@ -84,7 +108,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-	        view.setImageBitmap(decodeSampledBitmapFromResource(getResources(), drawable1, 100, 100));
+            network.findPhotoId(lastPositionId, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -128,7 +152,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-	        view.setImageBitmap(decodeSampledBitmapFromResource(getResources(),drawable2, 100, 100));
+            network.findPhotoId(positionId, view);
 	        relativeLayout.addView(view);
 	        relativeLayout.addView(textViewTitle, params1);
 	        tr.addView(relativeLayout);
@@ -152,7 +176,6 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.3)));
 			view.setScaleType(ScaleType.CENTER_CROP);
-	        view.setImageBitmap(decodeSampledBitmapFromResource(getResources(),drawable1, 100, 100));
 	        
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));

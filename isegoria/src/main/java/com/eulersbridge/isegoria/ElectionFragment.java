@@ -1,27 +1,20 @@
 package com.eulersbridge.isegoria;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Vector;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.viewpagerindicator.CirclePageIndicator;
-import com.viewpagerindicator.TabPageIndicator;
-import com.viewpagerindicator.TitlePageIndicator;
-
-
-
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.viewpagerindicator.TabPageIndicator;
+
+import java.util.List;
+import java.util.Vector;
 
 public class ElectionFragment extends SherlockFragment implements OnPageChangeListener {
 	private View rootView;
@@ -30,6 +23,8 @@ public class ElectionFragment extends SherlockFragment implements OnPageChangeLi
 	public ViewPager mViewPager;
 	public TabPageIndicator tabPageIndicator;
 	public List<SherlockFragment> fragments;
+
+    private Network network;
 	
 	public ElectionFragment() {
 
@@ -52,8 +47,8 @@ public class ElectionFragment extends SherlockFragment implements OnPageChangeLi
 		tabPageIndicator.setViewPager(mViewPager);
 		tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 		tabPageIndicator.setOnPageChangeListener(this);
-		
-		return rootView;
+
+        return rootView;
 	}
 	
 	@Override

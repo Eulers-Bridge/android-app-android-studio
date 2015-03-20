@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria;
 
-import java.util.List;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import java.util.List;
 
 public class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
 	private List<SherlockFragment> fragments;
@@ -25,13 +24,13 @@ public class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
 	 @Override
 	    public CharSequence getPageTitle(int position) {
 		 	if(position == 0) {
-		 		return "Position";
+		 		return "By Type";
 		 	}
 		 	else if(position == 1) {
-		 		return "Ticket";
+		 		return "By Ticket";
 		 	}
 		 	else if(position == 2) {
-		 		return "All";
+		 		return "List";
 		 	}
 		 	
 		 	return "";

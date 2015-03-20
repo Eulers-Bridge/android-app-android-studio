@@ -1,23 +1,19 @@
 package com.eulersbridge.isegoria;
 
-import java.lang.reflect.Field;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 public class ElectionMasterFragment extends SherlockFragment implements TabListener {
 	private View rootView;
@@ -65,7 +61,7 @@ public class ElectionMasterFragment extends SherlockFragment implements TabListe
     		if(tab.getText().equals("Election")) {
     			//electionFragment.mViewPager.setCurrentItem(2);
     			((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().popBackStack();
-    			((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.content_election_frame1, new ElectionFragment()).commitAllowingStateLoss();
+    			((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.content_election_frame1, new ElectionOverviewFragment()).commitAllowingStateLoss();
     		}
     		else if(tab.getText().equals("Candidates")) {
     			//ft.replace(R.id.content_election_frame1, candidateFragment);
