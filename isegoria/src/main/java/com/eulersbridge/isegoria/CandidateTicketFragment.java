@@ -1,7 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +9,6 @@ import android.graphics.Paint.Style;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -19,14 +16,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TableRow.LayoutParams;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class CandidateTicketFragment extends SherlockFragment {
 	private View rootView;
@@ -34,6 +31,16 @@ public class CandidateTicketFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private Network network;
+
+    private int lastTicketId;
+    private String lastName;
+    private String lastNoOfSupporters;
+    private String lastColour;
+    private String lastInformation;
+
+    private boolean added = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -46,12 +53,36 @@ public class CandidateTicketFragment extends SherlockFragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
-        addTableRow("#78BB88", "#697AB2", true, false, "Green Students", "Liberty", "1240 supporters", "1240 supporters");
-        addTableRow("#D0A86A", "#C15650", true, false, "STAR", "Young Labor", "1240 supporters", "1240 supporters");
-        addTableRow("#7A7981", "#53589A", true, true, "Young Liberal", "Socialist Alternative", "1240 supporters", "1240 supporters");
+        //addTableRow("#78BB88", "#697AB2", true, false, "Green Students", "Liberty", "1240 supporters", "1240 supporters");
+        //addTableRow("#D0A86A", "#C15650", true, false, "STAR", "Young Labor", "1240 supporters", "1240 supporters");
+        //addTableRow("#7A7981", "#53589A", true, true, "Young Liberal", "Socialist Alternative", "1240 supporters", "1240 supporters");
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getTickets(this);
         
 		return rootView;
 	}
+
+    public void addTicket(int ticketId, String name, String information, String noOfSupporters, String colour) {
+        if(added) {
+            this.addTableRow(lastColour, colour, true, false, lastName, name,
+                    lastNoOfSupporters, noOfSupporters);
+        }
+
+        lastTicketId = ticketId;
+        lastName = name;
+        lastInformation = information;
+        lastNoOfSupporters = noOfSupporters;
+        lastColour = colour;
+
+        if(added) {
+            added = false;
+        }
+        else {
+            added = true;
+        }
+    }
 	
 	public void addTableRow(String colour1, String colour2, boolean doubleCell, boolean lastCell, String title1, String title2, String supporters1, String supporters2) {
 		TableRow tr;

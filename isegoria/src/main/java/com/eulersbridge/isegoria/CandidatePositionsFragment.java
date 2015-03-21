@@ -108,7 +108,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-            network.findPhotoId(lastPositionId, view);
+            //network.findPhotoId(lastPositionId, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -152,7 +152,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-            network.findPhotoId(positionId, view);
+            network.getFirstPhoto(this.lastPositionId, view);
 	        relativeLayout.addView(view);
 	        relativeLayout.addView(textViewTitle, params1);
 	        tr.addView(relativeLayout);

@@ -1,31 +1,29 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TableRow.LayoutParams;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class CandidateAllFragment extends SherlockFragment {
 	private View rootView;
@@ -33,6 +31,8 @@ public class CandidateAllFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -48,17 +48,24 @@ public class CandidateAllFragment extends SherlockFragment {
         dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
         candidateAllTableLayout.addView(dividierView);
-        
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+
+        //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getCandidates(this);
         
 		return rootView;
 	}
+
+    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
+                             String firstName, String lastName) {
+        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+    }
 	
-	public void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition) {
+	public void addTableRow(int profileDrawable, String partyAbr,
+                            String colour, String candidateName,
+                            String candidatePosition, int positionId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -118,6 +125,8 @@ public class CandidateAllFragment extends SherlockFragment {
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.LEFT);
+
+        network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
         dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));

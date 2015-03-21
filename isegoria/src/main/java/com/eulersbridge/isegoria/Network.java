@@ -66,6 +66,8 @@ public class Network {
 	private PhotosFragment photosFragment;
 	private PhotoAlbumFragment photoAlbumFragment;
 	private PhotoViewFragment photoViewFragment;
+    private CandidateAllFragment candidateAllFragment;
+    private CandidateTicketFragment candidateTicketFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
 	private Isegoria application;
@@ -908,6 +910,158 @@ public class Network {
         mRequestQueue.add(req);
     }
 
+    public void getCandidates(final CandidateAllFragment candidateAllFragment) {
+        this.candidateAllFragment = candidateAllFragment;
+        String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        JSONObject candidateObject = response.getJSONObject(i);
+
+                        int candidateId = candidateObject.getInt("candidateId");
+                        int ticketId = candidateObject.getInt("ticketId");
+                        int positionId = candidateObject.getInt("positionId");
+                        int userId = candidateObject.getInt("userId");
+                        String familyName = candidateObject.getString("familyName");
+                        String givenName = candidateObject.getString("givenName");
+                        String policyStatement = candidateObject.getString("policyStatement");
+                        String information = candidateObject.getString("information");
+
+                        candidateAllFragment.addCandidate(userId, ticketId, positionId, candidateId,
+                                givenName, familyName);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getTickets(final CandidateTicketFragment candidateTicketFragment) {
+        this.candidateTicketFragment = candidateTicketFragment;
+        String url = SERVER_URL + "dbInterface/api/tickets/" + String.valueOf(electionId);
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        JSONObject ticketObject = response.getJSONObject(i);
+
+                        int ticketId = ticketObject.getInt("ticketId");
+                        String name = ticketObject.getString("name");
+                        String numberOfSupporters = ticketObject.getString("numberOfSupporters");
+                        String information = ticketObject.getString("information");
+                        String logo = ticketObject.getString("logo");
+                        String colour = ticketObject.getString("colour");
+
+                        candidateTicketFragment.addTicket(ticketId, name, information,
+                                numberOfSupporters, colour);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+
+    public void getPositionText(final TextView positionTextView, int positionId) {
+        String url = SERVER_URL + "dbInterface/api/position/" + String.valueOf(positionId);
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String name = response.getString("name");
+                            String description = response.getString("description");
+
+                            positionTextView.setText(name);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
     public void getPositions(final CandidatePositionsFragment candidatePositionsFragment) {
         this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "dbInterface/api/positions/" + String.valueOf(electionId);
@@ -1148,21 +1302,40 @@ public class Network {
         return output;
     }
 
-    public void findPhotoId(int id, final ImageView view) {
-        String url = SERVER_URL + "dbInterface/api/findPhotos/" + String.valueOf(id);
+    public void getFirstPhoto(int id, ImageView imageView) {
+        String url = "dbInterface/api/findPhotos/" + String.valueOf(id);
 
-        ImageRequest req = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(Bitmap bitmap) {
-                        view.setImageBitmap(bitmap);
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String fullName = "";
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }, 0, 0, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                    }
-                });
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
 
         int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
