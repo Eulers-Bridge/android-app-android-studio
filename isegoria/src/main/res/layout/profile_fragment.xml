@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/topBackgroundNews"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="300dp"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
@@ -18,20 +18,19 @@
         android:paddingTop="14dp" >
 
         <ImageView
-            android:id="@+id/photoImageView"
+            android:id="@+id/profilePic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:maxHeight="100dp"
-            android:maxWidth="100dp"
-            android:src="@drawable/me" />
+            android:maxWidth="100dp" />
 
         <TextView
-            android:id="@+id/newsArticleTitle"
+            android:id="@+id/profileName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="3dp"
-            android:text="Anthony Quattrone"
+            android:text=""
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/white" />
 
