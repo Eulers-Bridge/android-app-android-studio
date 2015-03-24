@@ -571,7 +571,7 @@ public class Network {
 
 	public void getPhotoAlbum(final PhotoAlbumFragment photoAlbumFragment, final String albumId) {
 		this.photoAlbumFragment = photoAlbumFragment;
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(albumId);
+        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(albumId) + "?pageSize=250";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {
@@ -834,14 +834,60 @@ public class Network {
                     public void onResponse(JSONArray response) {
                         try {
                            for(int i=0; i<response.length(); i++) {
+                               String ownerId = response.getJSONObject(i).getString("ownerId");
+                               String votingLocationId = response.getJSONObject(i).getString("votingLocationId");
                                String name = response.getJSONObject(i).getString("name");
-                               voteFragment.addVoteLocations(name);
+                               String information = response.getJSONObject(i).getString("information");
+
+                               voteFragment.addVoteLocations(ownerId, votingLocationId,
+                                       name, information);
                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
+        this.pollFragment = pollFragment;
+
+        String url = SERVER_URL + "dbInterface/api/votingLocation/" + pos;
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
@@ -1494,7 +1540,28 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
-	
+
+    public void getPictureVolley2(String params, final ImageView view, final int squareSize) {
+        ImageRequest req = new ImageRequest(params,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, squareSize, squareSize, true);
+                        view.setImageBitmap(bitmap);
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Volley", error.toString());
+                    }
+                });
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
 	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
 	        int reqWidth, int reqHeight) {
 	    final BitmapFactory.Options options = new BitmapFactory.Options();

@@ -30,11 +30,51 @@
         android:paddingRight="40dp">
 
         <Spinner
-            android:id="@+id/voteTime"
+            android:id="@+id/voteLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:layout_gravity="bottom" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:background="@color/white"
+        android:layout_height="10dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:orientation="horizontal"
+        >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#676475" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <DatePicker
+            android:id="@+id/datePicker1"
+            android:layout_width="wrap_content"
+            android:calendarViewShown="false"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-40dp"
+            android:layout_marginBottom="-50dp">
+        </DatePicker>
+
+        <TimePicker
+            android:id="@+id/timePicker1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="-50dp">
+        </TimePicker>
 
     </LinearLayout>
 
@@ -52,39 +92,6 @@
             android:background="#676475" />
     </LinearLayout>
 
-    <LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@android:color/white"
-	    android:orientation="horizontal"
-	    android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
-	
-	    	<Spinner
-	    	    android:id="@+id/voteLocation"
-	    	    android:layout_width="wrap_content"
-	    	    android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:layout_gravity="bottom" />
-	
-	</LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:background="@color/white"
-        android:layout_height="10dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:orientation="horizontal"
-        >
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#676475" />
-    </LinearLayout>
-
     <TextView
         android:id="@+id/Text1"
         android:layout_width="match_parent"
@@ -95,7 +102,7 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:text="Choose the location of the booth you will be voting at. \n\nDon't worry! all booths\n are listed down for you."
+        android:text="Choose the location of the booth you will be voting at.Don't worry! all booths are listed down for you."
         android:textColor="#757581"
         android:textSize="20sp" />
 

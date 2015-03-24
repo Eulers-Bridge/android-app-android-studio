@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,7 +15,6 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -31,7 +29,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
 	private float dpHeight;
 	private int photosPerRow = -1;
 	private int fitPerRow = 0;
-	private int squareSize = 100;
+	private int squareSize;
 	private int dividerPadding = 0;
 
 	private boolean insertedFirstRow = false;
@@ -56,9 +54,9 @@ public class PhotoAlbumFragment extends SherlockFragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        fitPerRow = (int) (displayMetrics.widthPixels / squareSize);
-        dividerPadding = (int) displayMetrics.widthPixels - (fitPerRow * squareSize);
-        dividerPadding = Math.abs(dividerPadding / fitPerRow);
+        squareSize = (int) (displayMetrics.widthPixels / 4) - (10/4);
+        fitPerRow = (int) 4;
+        dividerPadding = (10/4);
 
         tr = new TableRow(getActivity());
 
@@ -78,6 +76,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
             photosPerRow = photosPerRow + 1;
             if (photosPerRow == fitPerRow) {
                 photosPerRow = 0;
+                tr = new TableRow(getActivity());
                 if (!insertedFirstRow) {
                     insertedFirstRow = true;
                     tr.setPadding(dividerPadding, dividerPadding, dividerPadding, dividerPadding);
@@ -85,28 +84,18 @@ public class PhotoAlbumFragment extends SherlockFragment {
                     tr.setPadding(dividerPadding, 0, dividerPadding, dividerPadding);
                 }
                 photosAlbumTableLayout.addView(tr);
-                tr = new TableRow(getActivity());
             }
 
             ImageView view = new ImageView(getActivity());
-            view.setColorFilter(Color.argb(125, 35, 35, 35));
-            view.setAdjustViewBounds(false);
-            view.setLayoutParams(new TableRow.LayoutParams(100, (int) (100)));
-            view.setScaleType(ScaleType.CENTER);
-            //view.setScaleX(100);
-            //view.setScaleY(100);
-            network.getPictureVolley(bitmap, view);
+            view.setLayoutParams(new TableRow.LayoutParams(squareSize, (int) (squareSize)));
+            view.setScaleType(ScaleType.CENTER_CROP);
+            network.getPictureVolley2(bitmap, view, squareSize);
 
             LinearLayout linearLayout = new LinearLayout(getActivity());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setGravity(Gravity.CENTER_VERTICAL);
             linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             linearLayout.setPadding(10, 0, 0, 0);
-
-            final TextView textViewArticle = new TextView(getActivity());
-            textViewArticle.setTextColor(Color.parseColor("#000000"));
-            textViewArticle.setTextSize(18.0f);
-            textViewArticle.setGravity(Gravity.LEFT);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -123,14 +112,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
                 }
             });
 
-            TextView textViewArticleTime = new TextView(getActivity());
-            textViewArticleTime.setTextColor(Color.parseColor("#000000"));
-            textViewArticleTime.setTextSize(12.0f);
-            textViewArticleTime.setPadding(0, 0, 0, 0);
-            textViewArticleTime.setGravity(Gravity.LEFT);
 
-            linearLayout.addView(textViewArticle);
-            linearLayout.addView(textViewArticleTime);
 
             tr.addView(view);
             tr.addView(linearLayout);

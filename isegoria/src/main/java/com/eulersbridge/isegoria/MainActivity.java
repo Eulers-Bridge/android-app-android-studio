@@ -182,7 +182,11 @@ public class MainActivity extends BaseActivity {
     public void voteNext(View v) {
         switchContent(new VoteFragmentPledge());
     }
-	
+
+    public void voteDone(View v) {
+        switchContent(new VoteFragmentDone());
+    }
+
 	@Override
 	public void onSaveInstanceState(Bundle outState){
 		super.onSaveInstanceState(outState);

@@ -13,9 +13,13 @@ import android.widget.Spinner;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
+import java.util.ArrayList;
+
 public class VoteFragment extends SherlockFragment implements OnItemSelectedListener {
 	private View rootView;
 	private ArrayAdapter<String> voteLocationArrayAdapter;
+    private ArrayList<VoteLocation> voteLocationArray;
+    private Network network;
 	
 	public VoteFragment() {
 	
@@ -32,22 +36,26 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
         voteLocationArrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_layout);
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
         spinnerLocation.setAdapter(voteLocationArrayAdapter);
+        voteLocationArray = new ArrayList<VoteLocation>();
         
         MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getVoteLocations(this);
 		
 		return rootView;
 	}
 
-	public void addVoteLocations(String location) {
-        voteLocationArrayAdapter.add(location);
+	public void addVoteLocations(String ownerId, String votingLocationId,
+                                 String name, String information) {
+        VoteLocation voteLocation = new VoteLocation(ownerId, votingLocationId, name, information);
+        voteLocationArray.add(voteLocation);
+        voteLocationArrayAdapter.add(name);
 	}
 	
     public void onItemSelected(AdapterView<?> parent, View view, 
             int pos, long id) {
-
-
+       // VoteLocation voteLocation = voteLocationArray.get(pos);
+        //network.getVoteLocation(this, voteLocation.getVotingLocationId());
     }
     
     public void onNothingSelected(AdapterView<?> parent) {
