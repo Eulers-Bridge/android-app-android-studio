@@ -1,19 +1,17 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.app.ActionBar;
-
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.AdapterView.OnItemSelectedListener;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class VoteFragment extends SherlockFragment implements OnItemSelectedListener {
 	private View rootView;
@@ -31,20 +29,19 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 		
         Spinner spinnerLocation = (Spinner) rootView.findViewById(R.id.voteLocation);
         spinnerLocation.setOnItemSelectedListener(this);
-        voteLocationArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
-        voteLocationArrayAdapter.add("Test");
-        voteLocationArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        voteLocationArrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_layout);
+        voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
         spinnerLocation.setAdapter(voteLocationArrayAdapter);
         
         MainActivity mainActivity = (MainActivity) getActivity();
         Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getVoteRecords(this);
+        network.getVoteLocations(this);
 		
 		return rootView;
 	}
-	
+
 	public void addVoteLocations(String location) {
-		voteLocationArrayAdapter.add(location);
+        voteLocationArrayAdapter.add(location);
 	}
 	
     public void onItemSelected(AdapterView<?> parent, View view, 

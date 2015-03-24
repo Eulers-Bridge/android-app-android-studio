@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/Text2"
@@ -14,17 +16,45 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:paddingTop="40dp"
-        android:text="I will be voting in the next university election at"
+        android:text="Choose your vote location and time."
         android:textColor="#757581"
-        android:textSize="20sp" >
+        android:textSize="20sp" />
 
-    </TextView>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp">
 
-	<LinearLayout
+        <Spinner
+            android:id="@+id/voteTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_gravity="bottom" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:background="@color/white"
+        android:layout_height="10dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#676475" />
+    </LinearLayout>
+
+    <LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
 	    android:background="@android:color/white"
 	    android:orientation="horizontal"
 	    android:gravity="center"
@@ -33,15 +63,27 @@
 	
 	    	<Spinner
 	    	    android:id="@+id/voteLocation"
-	    	    android:layout_width="fill_parent"
-	    	    android:layout_height="40dp"
-	    	    android:layout_marginLeft="10dp"
-	    	    android:layout_marginRight="10dp"
-	    	    android:background="@color/white"
-	    	    android:gravity="center"
-	    	    android:minHeight="40dp" />
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_gravity="bottom" />
 	
-	</LinearLayout>  
+	</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:background="@color/white"
+        android:layout_height="10dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:orientation="horizontal"
+        >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#676475" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/Text1"
@@ -53,72 +95,28 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:text="And I&apos;ll set a reminder for my vote at the time of "
+        android:text="Choose the location of the booth you will be voting at. \n\nDon't worry! all booths\n are listed down for you."
         android:textColor="#757581"
         android:textSize="20sp" />
-    
-	<LinearLayout
+
+    <LinearLayout
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
-	    android:background="@android:color/white"
-	    android:orientation="horizontal"
-	    android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
-	
-    
-    <View
-	    android:layout_width="fill_parent"
-	    android:layout_height="1dip"
-	    android:background="#676475"
-	/>
-	
-	</LinearLayout>  
-
-    <TextView
-        android:id="@+id/Text3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center"
-        android:background="@android:color/white" 
-        android:inputType="textMultiLine"
-        android:textSize="14sp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Voting is the most key part of a democratic system and the best method of having your voice heard." />
-        
-    <TextView
-        android:id="@+id/Text4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center"
-        android:background="@android:color/white" 
-        android:inputType="textMultiLine"
-        android:textSize="14sp"   
-        android:paddingTop="20dp"     
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Create a reminder to vote, by selecting the date and time for your next student union election." />
-
-	  <LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_weight="1"
+        android:paddingTop="10dp"
 	    android:background="@android:color/white"
 	    android:orientation="horizontal"
 	    android:gravity="center">
 	
 	    <Button
 	        android:id="@+id/okbutton"
-	        android:layout_width="wrap_content"
+	        android:layout_width="150dp"
 	        android:layout_height="wrap_content"
 	        android:background="@drawable/green_button"
 	        android:gravity="center"
-	        android:text="Create Reminder"
-	        android:textColor="#52BB42" />
+	        android:text="Next"
+	        android:textColor="#52BB42"
+            android:layout_gravity="top"
+            android:onClick="voteNext" />
 	
 	</LinearLayout>  
 

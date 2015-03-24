@@ -1,23 +1,19 @@
 package com.eulersbridge.isegoria;
 
 
-import java.util.ArrayList;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.MenuItem;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
+import java.util.ArrayList;
 
 public class MainActivity extends BaseActivity {
 	private SherlockFragment mContent;
@@ -182,6 +178,10 @@ public class MainActivity extends BaseActivity {
 		
 		switchContent(new LoginScreenFragment());
 	}
+
+    public void voteNext(View v) {
+        switchContent(new VoteFragmentPledge());
+    }
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState){

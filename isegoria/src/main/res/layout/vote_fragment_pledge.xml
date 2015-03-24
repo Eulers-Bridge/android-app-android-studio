@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/signPad"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp">
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:background="@color/white"
+        android:layout_height="10dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:orientation="horizontal"
+        >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#676475" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/Text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:ems="10"
+        android:gravity="center"
+        android:inputType="textMultiLine"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:text="Make it official and sign on the line above to finish your democratic pledge."
+        android:textColor="#757581"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/okbutton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/green_button"
+            android:gravity="center"
+            android:text="Next"
+            android:textColor="#52BB42"
+            android:layout_gravity="top"
+            android:onClick="voteNext" />
+
+    </LinearLayout>
+
+</LinearLayout>
