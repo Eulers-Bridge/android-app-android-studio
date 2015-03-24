@@ -62,6 +62,10 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	}
 
     public void addPosition(int electionId, int positionId, String name, String desc) {
+        if(addRow) {
+            addTableRow(lastElectionId, electionId, lastPositionId, positionId, true, false, lastName, name);
+        }
+
         this.lastElectionId = electionId;
         this.lastPositionId = positionId;
         this.lastName = name;
@@ -69,12 +73,13 @@ public class CandidatePositionsFragment extends SherlockFragment {
 
         if(addRow) {
             addRow = false;
-            addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, lastName, name);
         }
-        addRow = true;
+        else {
+            addRow = true;
+        }
     }
 	
-	public void addTableRow(int lastPositionId, int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	public void addTableRow(int lastElectionId, int electionId, int lastPositionId, int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 		
 		if(doubleCell) {
@@ -108,7 +113,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			view.setColorFilter(Color.argb(125, 35, 35, 35));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-            //network.findPhotoId(lastPositionId, view);
+            network.getFirstPhoto(this.lastElectionId, this.lastPositionId, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -148,12 +153,12 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
-			view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(this.lastPositionId, view);
-	        relativeLayout.addView(view);
+			ImageView view2 = new ImageView(getActivity());
+            view2.setColorFilter(Color.argb(125, 35, 35, 35));
+            view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            view2.setScaleType(ScaleType.CENTER_CROP);
+            network.getFirstPhoto(electionId, positionId, view2);
+	        relativeLayout.addView(view2);
 	        relativeLayout.addView(textViewTitle, params1);
 	        tr.addView(relativeLayout);
 	        

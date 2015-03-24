@@ -60,10 +60,10 @@ public class CandidateAllFragment extends SherlockFragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+        addTableRow(userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
     }
 	
-	public void addTableRow(int profileDrawable, String partyAbr,
+	public void addTableRow(int userId, String partyAbr,
                             String colour, String candidateName,
                             String candidatePosition, int positionId) {
 		TableRow tr;
@@ -78,8 +78,10 @@ public class CandidateAllFragment extends SherlockFragment {
 		
 		ImageView candidateProfileView = new ImageView(getActivity());
 		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
+        candidateProfileView.setLayoutParams(layoutParams);
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
+        network.getFirstPhoto(0, userId, candidateProfileView);
 		candidateProfileView.setPadding(10, 0, 10, 0);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());

@@ -68,7 +68,7 @@ public class PollVoteFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        addTableRow(question, "");
+        addTableRow(creatorId, question, "");
         String[] answersSplit = answers.split(",");
 
         for(int i=0; i<answersSplit.length; i++) {
@@ -78,7 +78,7 @@ public class PollVoteFragment extends SherlockFragment {
 		return rootView;
 	}
 	
-	public void addTableRow(String label, String caption) {
+	public void addTableRow(int userId, String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
 		if(!insertedFirstRow) {
 			insertedFirstRow = true;
@@ -95,7 +95,7 @@ public class PollVoteFragment extends SherlockFragment {
 		//view.setColorFilter(Color.argb(125, 35, 35, 35));
 		view.setLayoutParams(new TableRow.LayoutParams(75, (int)(75)));
 		view.setScaleType(ScaleType.CENTER_CROP);
-        view.setImageResource(R.drawable.head1);
+        network.getFirstPhoto(0, creatorId, view);
 		
 		LinearLayout linearLayout = new LinearLayout(getActivity());
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -120,6 +120,7 @@ public class PollVoteFragment extends SherlockFragment {
         textViewArticleTime.setGravity(Gravity.LEFT);
 
         network.getUserFullName(pollVoteFragment.getCreatorId(), textViewArticleTime, "Asked By ");
+
         
         linearLayout.addView(textViewArticle);
         linearLayout.addView(textViewArticleTime);
@@ -222,7 +223,7 @@ public class PollVoteFragment extends SherlockFragment {
 		ImageView view = new ImageView(getActivity());
 		view.setLayoutParams(new TableRow.LayoutParams(75, (int)(75)));
 		view.setScaleType(ScaleType.CENTER_CROP);
-        view.setImageResource(R.drawable.head1);
+        //view.setImageResource(R.drawable.head1);
 		
 		LinearLayout linearLayout = new LinearLayout(getActivity());
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -245,8 +246,7 @@ public class PollVoteFragment extends SherlockFragment {
         textViewComment.setPadding(0, 0, 0, 0);
         textViewComment.setGravity(Gravity.LEFT);
         textViewComment.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
- 
-        
+
         linearLayout.addView(textViewName);
         linearLayout.addView(textViewComment);
         

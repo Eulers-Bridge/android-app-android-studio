@@ -6,13 +6,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -21,15 +19,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TableRow.LayoutParams;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 
 public class CandidateTicketDetailFragment extends SherlockFragment {
@@ -95,11 +92,11 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             public void onClick(View view) {
 		    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 		    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-		    		ProfileSimpleFragment fragment2 = new ProfileSimpleFragment();
+		    		//ProfileSimpleFragment fragment2 = new ProfileSimpleFragment();
 		    		Bundle args = new Bundle();
-		    		fragment2.setArguments(args);
+		    		//fragment2.setArguments(args);
 		    		fragmentTransaction2.addToBackStack(null);
-		    		fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
+		    		//fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
 		    		fragmentTransaction2.commit();
             }
          });

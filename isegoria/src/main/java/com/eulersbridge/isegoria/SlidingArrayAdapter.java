@@ -1,9 +1,7 @@
 package com.eulersbridge.isegoria;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -31,7 +29,7 @@ public class SlidingArrayAdapter extends ArrayAdapter {
 	
     public View getView(int position, View convertView, ViewGroup parent) {
         View currentView = super.getView(position, convertView, parent);
-        ImageView imageView = (ImageView) currentView.findViewById(R.id.photoImageView);
+        ImageView imageView = (ImageView) currentView.findViewById(R.id.profilePic);
         
         if(position == 0) {
         	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.feedblue));

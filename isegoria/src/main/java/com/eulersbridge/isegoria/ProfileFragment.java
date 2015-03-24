@@ -1,34 +1,26 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.app.ActionBar;
-
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class ProfileFragment extends SherlockFragment {
 	private View rootView;
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private Network network;
 	
 	public ProfileFragment() {
 
@@ -43,17 +35,26 @@ public class ProfileFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
-		
-		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.me);
-		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
-		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
-		backgroundLinearLayout.setBackgroundDrawable(d);
+
+        ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
+        photoImageView.setLayoutParams(layoutParams);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
+
+        TextView name = (TextView) rootView.findViewById(R.id.profileName);
+        network.getUserFullName((int) network.userId, name, "");
+
+        LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
+
+        network.getUserDP(photoImageView, backgroundLinearLayout);
 		
 		return rootView;
 	}
 	
-	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
+	public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {

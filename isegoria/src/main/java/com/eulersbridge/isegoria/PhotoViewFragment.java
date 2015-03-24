@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -8,17 +7,12 @@ import com.actionbarsherlock.app.SherlockFragment;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
 
@@ -61,7 +55,7 @@ public class PhotoViewFragment extends SherlockFragment {
 					AssetManager assetManager = getActivity().getAssets();
 					TextView photoTitle = (TextView) rootView.findViewById(R.id.photoTitle);
 					photoTitle.setText(title);
-					ImageView photoImageView = (ImageView) rootView.findViewById(R.id.photoImageView);
+					ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
 					try {
 						photoImageView.setScaleType(ScaleType.CENTER_CROP);
 						photoImageView.setImageBitmap(bitmap);

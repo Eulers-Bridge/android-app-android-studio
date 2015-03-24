@@ -2,9 +2,12 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -51,7 +54,7 @@ import java.util.Map;
 public class Network {
 	private static String SERVER_URL = "http://eulersbridge.com:8080/";
 	private static String PICTURE_URL = "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
-	private long userId;
+	public long userId;
 	private String username;
 	private String password;
 	private String email;
@@ -354,11 +357,11 @@ public class Network {
 			public void run() {
 				String response = getRequest("dbInterface/api/user/" + userEmail.replace("@", "%40") +"/");
 				try {
-					JSONObject currentArticle = new JSONObject(response);
+					JSONObject currentUser = new JSONObject(response);
 
-					String givenName = currentArticle.getString("givenName");
-					String familyName = currentArticle.getString("familyName");
-					String gender = currentArticle.getString("gender");
+					String givenName = currentUser.getString("givenName");
+					String familyName = currentUser.getString("familyName");
+					String gender = currentUser.getString("gender");
 					String name = givenName + " " + familyName;
 					Bitmap bitmapPicture = null;
 
@@ -372,6 +375,11 @@ public class Network {
 		Thread t = new Thread(r);
 		t.start();
 	}
+
+    public void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
+        this.getFirstPhoto(0, (int) userId, imageView);
+        this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
+    }
 
 	public NetworkResponse getElections() {
 		NetworkResponse networkResponse = null;
@@ -1302,17 +1310,16 @@ public class Network {
         return output;
     }
 
-    public void getFirstPhoto(int id, ImageView imageView) {
-        String url = "dbInterface/api/findPhotos/" + String.valueOf(id);
+    public void getFirstPhoto(int electionId, int positionId, final ImageView imageView) {
+        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String fullName = "";
-
-
+                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                            getFirstPhotoImage(url, imageView);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -1336,6 +1343,89 @@ public class Network {
                 return headers;
             }
         };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getFirstPhotoImage(String url, final ImageView view) {
+        ImageRequest req = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        view.setImageBitmap(bitmap);
+                        view.refreshDrawableState();
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Volley", error.toString());
+                    }
+                });
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
+        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                            getFirstPhotoImageBlur(url, imageView);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getFirstPhotoImageBlur(String url, final LinearLayout view) {
+        ImageRequest req = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
+                                ProfileFragment.fastBlur(bitmap, 25));
+                        view.setBackgroundDrawable(d);
+                    }
+                }, 0, 0, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Volley", error.toString());
+                    }
+                });
 
         int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);

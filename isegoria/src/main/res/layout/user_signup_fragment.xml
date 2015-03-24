@@ -6,229 +6,232 @@
     android:background="@drawable/tumblr_static_aphc"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal" >
-        
-	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_vertical|center_horizontal"
-	        android:orientation="vertical" >
-	
-	        <ImageView
-	            android:id="@+id/imageView1"
-	            android:layout_width="46dp"
-	            android:layout_height="46dp"
-	            android:layout_gravity="center_horizontal"
-	            android:minHeight="100dp"
-	            android:minWidth="100dp"
-	            android:src="@drawable/app_icon" />
-	        
-	            <TextView
-	                android:id="@+id/photoTitle"
-	                android:layout_width="98dp"
-	                android:layout_height="wrap_content"
-	                android:layout_gravity="center_horizontal"
-	                android:ems="10"
-	                android:text="Isegoria"
-	                android:textColor="@color/white"
-	                android:textSize="25sp" >
-	
-	    	</TextView>
+        android:id="@+id/scrollView">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal" >
 
-	            <EditText
-	                android:id="@+id/firstName"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:layout_marginTop="10dp"
-	                android:background="@color/white"
-	                android:ems="10"
-	                android:hint="First Name"
-	                android:minHeight="40dp"
-	                android:paddingLeft="5dp"
-	                android:singleLine="true"
-	                android:textColor="@color/grey" >
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:orientation="vertical" >
 
-	                <requestFocus />
-	            </EditText>
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center_horizontal"
+                    android:minHeight="100dp"
+                    android:minWidth="100dp"
+                    android:src="@drawable/app_icon" />
 
-	            <EditText
-	                android:id="@+id/lastName"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:ems="10"
-	                android:hint="Last Name"
-	                android:minHeight="40dp"
-	                android:paddingLeft="5dp"
-	                android:singleLine="true"
-	                android:textColor="@color/grey" />
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
+                    <TextView
+                        android:id="@+id/photoTitle"
+                        android:layout_width="98dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:ems="10"
+                        android:text="Isegoria"
+                        android:textColor="@color/white"
+                        android:textSize="25sp" >
 
-	            <EditText
-	                android:id="@+id/universityEmail"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:ems="10"
-	                android:hint="University Email"
-	                android:minHeight="40dp"
-	                android:paddingLeft="5dp"
-	                android:singleLine="true"
-	                android:textColor="@color/grey" >
+                </TextView>
 
-	            </EditText>
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
-	            
-	            <EditText
-	                android:id="@+id/newPassword"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:ems="10"
-	                android:hint="New Password"
-	                android:inputType="textWebPassword"
-	                android:minHeight="40dp"
-	                android:paddingLeft="5dp"
-	                android:singleLine="true"
-	                android:textColor="@color/grey" >
+                    <EditText
+                        android:id="@+id/firstName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/white"
+                        android:ems="10"
+                        android:hint="First Name"
+                        android:minHeight="40dp"
+                        android:paddingLeft="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/grey" >
 
-	            </EditText>
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />	      
-	                      
-	            <EditText
-	                android:id="@+id/confirmNewPassword"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:ems="10"
-	                android:hint="Confirm Password"
-	                android:inputType="textWebPassword"
-	                android:minHeight="40dp"
-	                android:paddingLeft="5dp"
-	                android:singleLine="true"
-	                android:textColor="@color/grey" >
+                        <requestFocus />
+                    </EditText>
 
-	            </EditText>
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
-	            
-	            <Spinner
-	                android:id="@+id/gender"
-	                android:layout_width="fill_parent"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:layout_height="40dp"
-	                android:minHeight="40dp" />
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
-	            
-	            <Spinner
-	                android:id="@+id/yearOfBirth"
-	                android:layout_width="fill_parent"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:layout_height="40dp"
-	                android:minHeight="40dp" />
-	            
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
-	            
-	            <Spinner
-	                android:id="@+id/country"
-	                android:layout_width="fill_parent"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:layout_height="40dp"
-	                android:minHeight="40dp" />
-	            	            	 
-	            <View
-	            	android:layout_width="fill_parent"
-	                android:layout_height="1dip"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="#676475" />
-	            
-	            <Spinner
-	                android:id="@+id/institution"
-	                android:layout_width="fill_parent"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:background="@color/white"
-	                android:layout_height="40dp"
-	                android:minHeight="40dp" />
-	            
-	            <Button
-	                android:id="@+id/Button01"
-	                android:layout_width="match_parent"
-	                android:layout_height="wrap_content"
-	                android:layout_marginLeft="10dp"
-	                android:layout_marginRight="10dp"
-	                android:layout_marginTop="10dp"
-	                android:background="#4E8DDC"
-	                android:minHeight="40dip"
-	                android:onClick="userSignupNext"
-	                android:text="Next"
-	                android:textColor="@color/white"
-	                android:textStyle="bold" />
-	
-	    </LinearLayout>
-	</LinearLayout>
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
 
+                    <EditText
+                        android:id="@+id/lastName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:ems="10"
+                        android:hint="Last Name"
+                        android:minHeight="40dp"
+                        android:paddingLeft="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/grey" />
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <EditText
+                        android:id="@+id/universityEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:ems="10"
+                        android:hint="University Email"
+                        android:minHeight="40dp"
+                        android:paddingLeft="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/grey" >
+
+                    </EditText>
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <EditText
+                        android:id="@+id/newPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:ems="10"
+                        android:hint="New Password"
+                        android:inputType="textWebPassword"
+                        android:minHeight="40dp"
+                        android:paddingLeft="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/grey" >
+
+                    </EditText>
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <EditText
+                        android:id="@+id/confirmNewPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:ems="10"
+                        android:hint="Confirm Password"
+                        android:inputType="textWebPassword"
+                        android:minHeight="40dp"
+                        android:paddingLeft="5dp"
+                        android:singleLine="true"
+                        android:textColor="@color/grey" >
+
+                    </EditText>
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <Spinner
+                        android:id="@+id/gender"
+                        android:layout_width="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:layout_height="40dp"
+                        android:minHeight="40dp" />
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <Spinner
+                        android:id="@+id/yearOfBirth"
+                        android:layout_width="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:layout_height="40dp"
+                        android:minHeight="40dp" />
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <Spinner
+                        android:id="@+id/country"
+                        android:layout_width="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:layout_height="40dp"
+                        android:minHeight="40dp" />
+
+                    <View
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dip"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="#676475" />
+
+                    <Spinner
+                        android:id="@+id/institution"
+                        android:layout_width="fill_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/white"
+                        android:layout_height="40dp"
+                        android:minHeight="40dp" />
+
+                    <Button
+                        android:id="@+id/Button01"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="#4E8DDC"
+                        android:minHeight="40dip"
+                        android:onClick="userSignupNext"
+                        android:text="Next"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
