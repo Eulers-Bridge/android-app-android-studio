@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/actionbarsherlock" />
+            <option value="$PROJECT_DIR$/dateSlider" />
             <option value="$PROJECT_DIR$/isegoria" />
             <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/viewpagerlibrary" />

@@ -2,6 +2,8 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
@@ -269,7 +271,8 @@ public class Network {
                                 int institutionId = currentArticle.getInt("institutionId");
                                 String title = currentArticle.getString("title");
                                 String content = currentArticle.getString("content");
-                                String picture = currentArticle.getString("picture");
+                                JSONArray photos = currentArticle.getJSONArray("photos");
+                                String picture = photos.getJSONObject(0).getString("url");
                                 picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
                                 Bitmap bitmapPicture = null;
 
@@ -421,7 +424,8 @@ public class Network {
                                     int institutionId = currentEvent.getInt("institutionId");
                                     String name = currentEvent.getString("name");
                                     String description = currentEvent.getString("description");
-                                    String picture = currentEvent.getString("picture");
+                                    JSONArray photos = currentEvent.getJSONArray("photos");
+                                    String picture = photos.getJSONObject(0).getString("url");
                                     picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
                                     Bitmap bitmapPicture;
 
@@ -586,7 +590,7 @@ public class Network {
                                 int nodeId = currentAlbum.getInt("nodeId");
                                 String title = currentAlbum.getString("title");
                                 String description = currentAlbum.getString("description");
-                                String thumbNailUrl = currentAlbum.getString("thumbNailUrl");
+                                String thumbNailUrl = currentAlbum.getString("url");
 
                                 photoAlbumFragment.addPhotoThumb(thumbNailUrl, String.valueOf(nodeId));
                             }
@@ -1545,9 +1549,9 @@ public class Network {
         ImageRequest req = new ImageRequest(params,
                 new Response.Listener<Bitmap>() {
                     @Override
-                    public void onResponse(Bitmap bitmap) {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, squareSize, squareSize, true);
-                        view.setImageBitmap(bitmap);
+                    public void onResponse(Bitmap srcBmp) {
+                        view.setImageBitmap(srcBmp);
+                        //view.setScaleType(ImageView.ScaleType.FIT_XY);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {
@@ -1560,6 +1564,29 @@ public class Network {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
+    }
+
+    public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+
+        float xScale = (float) newWidth / sourceWidth;
+        float yScale = (float) newHeight / sourceHeight;
+        float scale = Math.max(xScale, yScale);
+
+        float scaledWidth = scale * sourceWidth;
+        float scaledHeight = scale * sourceHeight;
+
+        float left = (newWidth - scaledWidth) / 2;
+        float top = (newHeight - scaledHeight) / 2;
+
+        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
+
+        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
+        Canvas canvas = new Canvas(dest);
+        canvas.drawBitmap(source, null, targetRect, null);
+
+        return dest;
     }
 
 	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,

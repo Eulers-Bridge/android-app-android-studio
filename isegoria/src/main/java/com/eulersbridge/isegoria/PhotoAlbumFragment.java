@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -86,10 +87,18 @@ public class PhotoAlbumFragment extends SherlockFragment {
                 photosAlbumTableLayout.addView(tr);
             }
 
+            LinearLayout viewLinearLayout = new LinearLayout(getActivity());
+            viewLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            viewLinearLayout.setBackgroundColor(Color.parseColor("#000000"));
+
             ImageView view = new ImageView(getActivity());
-            view.setLayoutParams(new TableRow.LayoutParams(squareSize, (int) (squareSize)));
+            //view.setColorFilter(Color.argb(125, 35, 35, 35));
+            view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
             view.setScaleType(ScaleType.CENTER_CROP);
+            view.setBackgroundColor(Color.parseColor("#000000"));
             network.getPictureVolley2(bitmap, view, squareSize);
+
+            viewLinearLayout.addView(view);
 
             LinearLayout linearLayout = new LinearLayout(getActivity());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -114,7 +123,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
 
 
 
-            tr.addView(view);
+            tr.addView(viewLinearLayout);
             tr.addView(linearLayout);
         } catch(Exception e) {
 
