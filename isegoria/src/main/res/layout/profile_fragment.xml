@@ -38,13 +38,13 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:gravity="center" >
 
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dip"
-                android:background="#676475" />
+                android:background="#838a8a8a" />
         </LinearLayout>
 
         <TextView
@@ -53,12 +53,13 @@
             android:layout_height="wrap_content"
             android:text="University of Melbourne"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:paddingBottom="3dp" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:gravity="center"
             android:orientation="horizontal"
         >
@@ -66,19 +67,23 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dip"
-                android:background="#676475" />
+                android:background="#838a8a8a" />
         </LinearLayout>
     </LinearLayout>
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#838a8a8a" />
+
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="6dp"
-         >
+        android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="6dp"
+            android:paddingLeft="10dp"
             android:orientation="vertical" >
 
         <TextView
@@ -87,9 +92,11 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:text="100"
+            android:textStyle="bold"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/black"
-            android:textSize="@dimen/profileTextSize" />
+            android:textSize="@dimen/profileTextSize"
+            android:paddingTop="2dp" />
 
         <TextView
             android:id="@+id/friendsTitle"
@@ -99,9 +106,18 @@
             android:text="FRIENDS"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/grey"
-            android:textSize="@dimen/profileTextSize" />
+            android:textSize="12dp"
+            android:paddingBottom="2dp" />
 
          </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="#838a8a8a"
+            android:orientation="vertical" >
+
+           </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -115,9 +131,11 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:text="100"
+                android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
-                android:textSize="@dimen/profileTextSize" />
+                android:textSize="@dimen/profileTextSize"
+                android:paddingTop="2dp" />
 
             <TextView
                 android:id="@+id/editText133"
@@ -127,9 +145,19 @@
                 android:text="GROUPS"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/grey"
-                android:textSize="@dimen/profileTextSize" />
+                android:textSize="12dp"
+                android:paddingBottom="2dp" />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="#838a8a8a"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -142,9 +170,11 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:text="100"
+                android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
-                android:textSize="@dimen/profileTextSize" />
+                android:textSize="@dimen/profileTextSize"
+                android:paddingTop="2dp" />
 
             <TextView
                 android:id="@+id/editText1333"
@@ -154,10 +184,16 @@
                 android:text="REWARDS"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/grey"
-                android:textSize="@dimen/profileTextSize" />
+                android:textSize="12dp"
+                android:paddingBottom="2dp" />
 
         </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:background="#838a8a8a" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -165,7 +201,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:paddingBottom="10dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -175,20 +212,19 @@
             android:gravity="center_horizontal"
             android:orientation="vertical" >
 
-        <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height
-                ="wrap_content"
-            android:progressDrawable="@drawable/progress_circle"
-            android:id="@+id/progressBar"/>
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:id="@+id/donut_progress1"
+                xmlns:custom="http://schemas.android.com/apk/lib/com.github.lzyzsd"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                custom:donut_progress="30" />
 
             <TextView
                 android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="EXP Level"
-                android:textSize="20dp"
+                android:textSize="14dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/grey" />
         </LinearLayout>
@@ -201,21 +237,23 @@
             android:gravity="center_horizontal"
             android:orientation="vertical" >
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"/>
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:id="@+id/donut_progress2"
+                xmlns:custom="http://schemas.android.com/apk/lib/com.github.lzyzsd"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                custom:donut_progress="30"/>
 
             <TextView
                 android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Badges"
-                android:textSize="20dp"
+                android:textSize="14dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/grey" />
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -225,18 +263,19 @@
             android:gravity="center_horizontal"
             android:orientation="vertical" >
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"/>
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:id="@+id/donut_progress3"
+                xmlns:custom="http://schemas.android.com/apk/lib/com.github.lzyzsd"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                custom:donut_progress="30"/>
 
             <TextView
                 android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tasks"
-                android:textSize="20dp"
+                android:textSize="14dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/grey" />
         </LinearLayout>
@@ -249,18 +288,19 @@
             android:gravity="center_horizontal"
             android:orientation="vertical" >
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"/>
+            <com.github.lzyzsd.circleprogress.DonutProgress
+                android:id="@+id/donut_progress4"
+                xmlns:custom="http://schemas.android.com/apk/lib/com.github.lzyzsd"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                custom:donut_progress="30"/>
 
             <TextView
                 android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Events"
-                android:textSize="20dp"
+                android:textSize="14dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/grey" />
         </LinearLayout>
@@ -270,12 +310,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:background="#838a8a8a" />
         <RelativeLayout
             android:id="@+id/relativeLayout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:background="#80a7a7a7" >
+            android:background="#64d3d3d3" >
 
             <TextView
                 android:id="@+id/mytextview1"
@@ -286,7 +329,10 @@
                 android:paddingRight="10dp"
                 android:text="Tasks"
                 android:textColor="#ff575757"
-                android:textSize="@dimen/profileTextSizeLabel" />
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp" />
 
             <TextView
                 android:id="@+id/mytextview2"
@@ -297,7 +343,10 @@
                 android:paddingRight="10dp"
                 android:text="Show Progress"
                 android:textColor="#ff0781ff"
-                android:textSize="@dimen/profileTextSizeLabel" />
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp" />
 
 
         </RelativeLayout>
@@ -311,6 +360,6 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dip"
-            android:background="#676475" />
+            android:background="#838a8a8a" />
     </LinearLayout>
 </LinearLayout>

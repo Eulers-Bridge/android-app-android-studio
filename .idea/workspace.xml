@@ -22,21 +22,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41dfd9c5-8b36-4112-a3d9-64b057531419" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dateSlider/dateSlider.iml" />
-      <change type="DELETED" beforePath="E:\Users\Anthony\Android studioProjects\android-app-android-studio\.idea\libraries\actionbarsherlock_4_4_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="E:\Users\Anthony\Android studioProjects\android-app-android-studio\.idea\libraries\support_annotations_22_0_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="E:\Users\Anthony\Android studioProjects\android-app-android-studio\.idea\libraries\support_v4_18_0_0.xml" afterPath="" />
-      <change type="DELETED" beforePath="E:\Users\Anthony\Android studioProjects\android-app-android-studio\.idea\libraries\support_v4_22_0_0.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/AndroidManifest.xml" afterPath="$PROJECT_DIR$/isegoria/src/main/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java" afterPath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/PhotoAlbumFragment.java" afterPath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/PhotoAlbumFragment.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/circleprogress_1_1_0.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/isegoria/src/main/res/drawable/custom_progress_background.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java" afterPath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java" afterPath="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/android-app-android-studio.iml" afterPath="$PROJECT_DIR$/android-app-android-studio.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/res/values/dimens.xml" afterPath="$PROJECT_DIR$/isegoria/src/main/res/values/dimens.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/build.gradle" afterPath="$PROJECT_DIR$/isegoria/build.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/isegoria.iml" afterPath="$PROJECT_DIR$/isegoria/isegoria.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml" afterPath="$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/settings.gradle" afterPath="$PROJECT_DIR$/settings.gradle" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Isegoria.iws" />
@@ -60,15 +53,65 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Network.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Network.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.22990654" vertical-offset="8734" max-vertical-offset="25942">
+            <state vertical-scroll-proportion="0.0" vertical-offset="8655" max-vertical-offset="25942">
               <caret line="592" column="81" selection-start-line="592" selection-start-column="81" selection-end-line="592" selection-end-column="81" />
               <folding>
                 <element signature="e#64975#65264#0" expanded="true" />
                 <element signature="e#65245#65246#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="profile_fragment.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml">
+          <provider selected="true" editor-type-id="android-designer">
+            <state />
+          </provider>
+          <provider editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-15.678572" vertical-offset="2247" max-vertical-offset="6290">
+              <caret line="158" column="23" selection-start-line="158" selection-start-column="23" selection-end-line="158" selection-end-column="23" />
+              <folding>
+                <element signature="e#3358#3382#0" expanded="true" />
+                <element signature="e#4718#4742#0" expanded="true" />
+                <element signature="e#6118#6142#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProfileFragment.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="376" max-vertical-offset="4420">
+              <caret line="62" column="56" selection-start-line="62" selection-start-column="56" selection-end-line="62" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isegoria/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="27" max-vertical-offset="680">
+              <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="candidate_position_fragment.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/candidate_position_fragment.xml">
+          <provider selected="true" editor-type-id="android-designer">
+            <state />
+          </provider>
+          <provider editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="748">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -86,9 +129,12 @@
       <file leaf-file-name="NewsFragment.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2137" max-vertical-offset="5474">
-              <caret line="156" column="12" selection-start-line="156" selection-start-column="12" selection-end-line="156" selection-end-column="61" />
-              <folding />
+            <state vertical-scroll-proportion="-7.107143" vertical-offset="2453" max-vertical-offset="5542">
+              <caret line="178" column="56" selection-start-line="178" selection-start-column="56" selection-end-line="178" selection-end-column="56" />
+              <folding>
+                <element signature="e#6346#6988#0" expanded="true" />
+                <element signature="e#6975#6976#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1526,6 +1572,11 @@
                 <option name="name" value="prepareComAndroidSupportSupportV42200Library" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="description" value="Prepare com.github.lzyzsd:circleprogress:1.1.0" />
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/isegoria" />
+                <option name="name" value="prepareComGithubLzyzsdCircleprogress110Library" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/isegoria" />
                 <option name="name" value="prepareDebugAndroidTestDependencies" />
               </ExternalTaskPojo>
@@ -2567,7 +2618,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="9988271873150" />
+        <entry key="$PROJECT_DIR$" value="9988283038789" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -2898,6 +2949,7 @@
                             <option value="$APPLICATION_HOME_DIR$/gradle/m2repository/commons-codec/commons-codec/1.4/commons-codec-1.4.jar" />
                             <option value="$PROJECT_DIR$/../../AppData/Local/Android/Sdk2/extras/android/m2repository/com/android/support/support-v4/22.0.0/support-v4-22.0.0.aar" />
                             <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mcxiaoke.volley/library/1.0.15/9093a362d18c5f81f58e49d86dece57d9b6e1cb7/library-1.0.15.jar" />
+                            <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.lzyzsd/circleprogress/1.1.0/3f48628d74bb32d1e365a0ea2c80ab2ed1ee8e2/circleprogress-1.1.0.aar" />
                             <option value="$PROJECT_DIR$/../../AppData/Local/Android/Sdk2/extras/android/m2repository/com/android/support/support-annotations/22.0.0/support-annotations-22.0.0.jar" />
                           </list>
                         </option>
@@ -3141,7 +3193,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/feed_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/EventsFragment.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/news_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/events_fragment.xml" />
@@ -3163,7 +3214,6 @@
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/CandidateAllFragment.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/profile_simple_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/CandidateTicketDetailFragment.java" />
-        <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/user_signup_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/drawable/progress.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/drawable/border_set.xml" />
@@ -3182,16 +3232,18 @@
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/vote_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/photo_album_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/PhotosFragment.java" />
-        <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/MainActivity.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/res/values/dimens.xml" />
-        <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml" />
         <option value="$PROJECT_DIR$/isegoria/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/viewpagerlibrary/src/main/res/values/vpi__attrs.xml" />
         <option value="$PROJECT_DIR$/viewpagerlibrary/src/main/java/com/viewpagerindicator/CirclePageIndicator.java" />
-        <option value="$PROJECT_DIR$/isegoria/build.gradle" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/PhotoAlbumFragment.java" />
         <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java" />
+        <option value="$PROJECT_DIR$/isegoria/src/main/res/drawable/custom_progress_background.xml" />
+        <option value="$PROJECT_DIR$/isegoria/build.gradle" />
+        <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java" />
+        <option value="$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java" />
+        <option value="$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml" />
       </list>
     </option>
   </component>
@@ -3643,6 +3695,24 @@
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="drawable" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidResFolderTypeNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Isegoria" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="isegoria" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="java" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidSourceTypeNode" />
             </PATH_ELEMENT>
@@ -3968,7 +4038,11 @@
       <created>1427185744826</created>
       <updated>1427185744826</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="* Fixed photos now">
+      <created>1427416172844</created>
+      <updated>1427416172844</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -3987,7 +4061,7 @@
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288889" sideWeight="0.30810234" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288889" sideWeight="0.49946696" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3288889" sideWeight="0.69189763" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3288889" sideWeight="0.69189763" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15831557" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2496318" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -4065,7 +4139,8 @@
     <MESSAGE value="* Started noew profile page" />
     <MESSAGE value="* Started adding vote pledge, signature is signing" />
     <MESSAGE value="* Started getting photos working" />
-    <option name="LAST_COMMIT_MESSAGE" value="* Started getting photos working" />
+    <MESSAGE value="* Fixed photos now" />
+    <option name="LAST_COMMIT_MESSAGE" value="* Fixed photos now" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -4114,13 +4189,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java</url>
-          <line>47</line>
+          <line>43</line>
           <properties />
           <option name="timeStamp" value="74" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java</url>
-          <line>42</line>
+          <line>39</line>
           <properties />
           <option name="timeStamp" value="75" />
         </line-breakpoint>
@@ -4156,41 +4231,15 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java</url>
-          <line>597</line>
-          <properties />
-          <option name="timeStamp" value="92" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java</url>
           <line>322</line>
           <properties />
           <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java</url>
-          <line>587</line>
-          <properties />
-          <option name="timeStamp" value="102" />
         </line-breakpoint>
       </breakpoints>
       <option name="time" value="103" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/drawable/border_set.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="425">
-          <caret line="11" column="43" selection-start-line="11" selection-start-column="43" selection-end-line="11" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/drawable/progress_circle.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11805555" vertical-offset="0" max-vertical-offset="576">
-          <caret line="4" column="10" selection-start-line="4" selection-start-column="10" selection-end-line="4" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/candidate_all_fragment.xml">
       <provider editor-type-id="android-designer">
         <state />
@@ -4259,14 +4308,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-5.935764" vertical-offset="3487" max-vertical-offset="4063">
           <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.1459854" vertical-offset="107" max-vertical-offset="4250">
-          <caret line="23" column="4" selection-start-line="22" selection-start-column="28" selection-end-line="23" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -4448,26 +4489,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml">
-      <provider selected="true" editor-type-id="android-designer">
-        <state />
-      </provider>
-      <provider editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.071429" vertical-offset="4919" max-vertical-offset="5457">
-          <caret line="301" column="0" selection-start-line="301" selection-start-column="0" selection-end-line="301" selection-end-column="0" />
-          <folding>
-            <element signature="e#3185#3209#0" expanded="true" />
-            <element signature="e#3571#3595#0" expanded="true" />
-            <element signature="e#4219#4243#0" expanded="true" />
-            <element signature="e#4640#4664#0" expanded="true" />
-            <element signature="e#5287#5311#0" expanded="true" />
-            <element signature="e#5711#5735#0" expanded="true" />
-            <element signature="e#10720#10749#0" expanded="true" />
-            <element signature="e#11193#11222#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/values-sw720dp-land/dimens.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="576">
@@ -4543,22 +4564,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.95644283" vertical-offset="0" max-vertical-offset="663">
-          <caret line="31" column="47" selection-start-line="31" selection-start-column="47" selection-end-line="31" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/values/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="576">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/values/string.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="629">
@@ -4583,14 +4588,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2137" max-vertical-offset="5474">
-          <caret line="156" column="12" selection-start-line="156" selection-start-column="12" selection-end-line="156" selection-end-column="61" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/PhotosFragment.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="459" max-vertical-offset="2652">
@@ -4609,11 +4606,80 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/Network.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.22990654" vertical-offset="8734" max-vertical-offset="25942">
+        <state vertical-scroll-proportion="0.0" vertical-offset="8655" max-vertical-offset="25942">
           <caret line="592" column="81" selection-start-line="592" selection-start-column="81" selection-end-line="592" selection-end-column="81" />
           <folding>
             <element signature="e#64975#65264#0" expanded="true" />
             <element signature="e#65245#65246#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/drawable/custom_progress_background.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2924312" vertical-offset="0" max-vertical-offset="872">
+          <caret line="15" column="37" selection-start-line="15" selection-start-column="37" selection-end-line="15" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/candidate_position_fragment.xml">
+      <provider selected="true" editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="748">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/values/styles.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="576">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="27" max-vertical-offset="680">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/ProfileFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="376" max-vertical-offset="4420">
+          <caret line="62" column="56" selection-start-line="62" selection-start-column="56" selection-end-line="62" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/java/com/eulersbridge/isegoria/NewsFragment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.107143" vertical-offset="2453" max-vertical-offset="5542">
+          <caret line="178" column="56" selection-start-line="178" selection-start-column="56" selection-end-line="178" selection-end-column="56" />
+          <folding>
+            <element signature="e#6346#6988#0" expanded="true" />
+            <element signature="e#6975#6976#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isegoria/src/main/res/layout/profile_fragment.xml">
+      <provider selected="true" editor-type-id="android-designer">
+        <state />
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-15.678572" vertical-offset="2247" max-vertical-offset="6290">
+          <caret line="158" column="23" selection-start-line="158" selection-start-column="23" selection-end-line="158" selection-end-column="23" />
+          <folding>
+            <element signature="e#3358#3382#0" expanded="true" />
+            <element signature="e#4718#4742#0" expanded="true" />
+            <element signature="e#6118#6142#0" expanded="true" />
           </folding>
         </state>
       </provider>
