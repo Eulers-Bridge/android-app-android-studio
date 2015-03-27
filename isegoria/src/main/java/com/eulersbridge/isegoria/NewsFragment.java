@@ -176,6 +176,7 @@ public class NewsFragment extends Fragment {
 	        relativeLayout.addView(view);
 	        relativeLayout.addView(textViewArticle, params1);
 	        relativeLayout.addView(textViewArticleTime, params2);
+            relativeLayout.setBackgroundColor(Color.GRAY);
 	        tr.addView(relativeLayout);
 	        
 			relativeLayout = new RelativeLayout(getActivity());

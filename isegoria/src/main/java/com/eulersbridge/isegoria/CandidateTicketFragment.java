@@ -66,7 +66,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 
     public void addTicket(int ticketId, String name, String information, String noOfSupporters, String colour) {
         if(added) {
-            this.addTableRow(lastColour, colour, true, false, lastName, name,
+            this.addTableRow(lastTicketId, ticketId, lastColour, colour, true, false, lastName, name,
                     lastNoOfSupporters, noOfSupporters);
         }
 
@@ -84,7 +84,7 @@ public class CandidateTicketFragment extends SherlockFragment {
         }
     }
 	
-	public void addTableRow(String colour1, String colour2, boolean doubleCell, boolean lastCell, String title1, String title2, String supporters1, String supporters2) {
+	public void addTableRow(final int lastTicketId, final int ticketId, String colour1, String colour2, boolean doubleCell, boolean lastCell, String title1, String title2, String supporters1, String supporters2) {
 		TableRow tr;
 		
 		if(doubleCell) {
@@ -134,6 +134,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
+                        args.putInt("TicketId", lastTicketId);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.replace(R.id.content_frame, fragment2);
@@ -199,6 +200,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
+                        args.putInt("TicketId", ticketId);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.replace(R.id.content_frame, fragment2);

@@ -95,7 +95,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
             //view.setColorFilter(Color.argb(125, 35, 35, 35));
             view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
             view.setScaleType(ScaleType.CENTER_CROP);
-            view.setBackgroundColor(Color.parseColor("#000000"));
+            view.setBackgroundColor(Color.GRAY);
             network.getPictureVolley2(bitmap, view, squareSize);
 
             viewLinearLayout.addView(view);

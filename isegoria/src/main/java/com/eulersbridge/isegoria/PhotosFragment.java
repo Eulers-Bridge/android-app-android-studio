@@ -75,6 +75,7 @@ public class PhotosFragment extends SherlockFragment {
 			ImageView view = new ImageView(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(100, (int)(100)));
 			view.setScaleType(ScaleType.CENTER_CROP);
+            view.setBackgroundColor(Color.GRAY);
 	        LinearLayout linearLayout = new LinearLayout(getActivity());
 			linearLayout.setOrientation(LinearLayout.VERTICAL);
 			linearLayout.setGravity(Gravity.CENTER_VERTICAL);

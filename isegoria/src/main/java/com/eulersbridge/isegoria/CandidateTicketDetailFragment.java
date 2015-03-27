@@ -35,16 +35,18 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
-	
-	public CandidateTicketDetailFragment() {
-	
-	}
+
+    private String code;
+    private String colour;
+
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
 		Bundle bundle = this.getArguments();
 		int backgroundDrawableResource = R.drawable.me;
+        int ticketId = bundle.getInt("TicketId");
 		
 		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
 
@@ -58,12 +60,38 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
 		backgroundLinearLayout.setBackgroundDrawable(d);
 		
-		addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+		//addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getTicketDetail(this, ticketId);
+
+        ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
+        network.getFirstPhoto(0, ticketId, partyDetailLogo);
+
 		
 		return rootView;
 	}
+
+    public void updateInformation(int ticketId, int electionId, String name, String code, String information, int numberOfSupporters, String colour) {
+        TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
+        TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+
+        partyDetailName.setText(name);
+        partyDetailSupporters.setText(String.valueOf(numberOfSupporters));
+
+        this.code = code;
+        this.colour = colour;
+
+        network.getTicketCandidates(this, ticketId);
+    }
+
+    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
+                             String firstName, String lastName) {
+        addTableRow(userId, code, colour, firstName + " " + lastName, "", userId);
+    }
 	
-	public void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition) {
+	public void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -75,10 +103,12 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		tr.setPadding(0, 10, 0, 10);
 		
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(80, 80));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
 		candidateProfileView.setPadding(10, 0, 10, 0);
+
+        network.getFirstPhoto(0, userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 
@@ -86,7 +116,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
-		
+
 		candidateProfileImage.setOnClickListener(new View.OnClickListener() {        
             @Override
             public void onClick(View view) {

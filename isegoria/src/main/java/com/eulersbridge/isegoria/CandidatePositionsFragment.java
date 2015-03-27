@@ -79,7 +79,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
         }
     }
 	
-	public void addTableRow(int lastElectionId, int electionId, int lastPositionId, int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	public void addTableRow(int lastElectionId, int electionId, final int lastPositionId, final int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 		
 		if(doubleCell) {
@@ -117,14 +117,15 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-			    		CandidatePositionFragment fragment2 = new CandidatePositionFragment();
-			    		Bundle args = new Bundle();
-			    		fragment2.setArguments(args);
-			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
-			    		fragmentTransaction2.commit();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidatePositionFragment fragment2 = new CandidatePositionFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("PositionId", positionId);
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
+                    fragmentTransaction2.commit();
 	            }
 	         });
 	        relativeLayout.addView(view);
@@ -158,6 +159,20 @@ public class CandidatePositionsFragment extends SherlockFragment {
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
             network.getFirstPhoto(electionId, positionId, view2);
+            view2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidatePositionFragment fragment2 = new CandidatePositionFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("PositionId", positionId);
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
+                    fragmentTransaction2.commit();
+                }
+            });
 	        relativeLayout.addView(view2);
 	        relativeLayout.addView(textViewTitle, params1);
 	        tr.addView(relativeLayout);

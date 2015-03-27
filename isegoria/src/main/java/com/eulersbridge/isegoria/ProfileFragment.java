@@ -2,8 +2,10 @@ package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +23,6 @@ public class ProfileFragment extends SherlockFragment {
 	private float dpHeight;
 
     private Network network;
-	
-	public ProfileFragment() {
-
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -43,16 +41,58 @@ public class ProfileFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-
         TextView name = (TextView) rootView.findViewById(R.id.profileName);
         network.getUserFullName((int) network.userId, name, "");
 
         LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-
         network.getUserDP(photoImageView, backgroundLinearLayout);
+
+        com.github.lzyzsd.circleprogress.DonutProgress donutProgress1 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress1);
+        donutProgress1.setProgress(30);
+        donutProgress1.setFinishedStrokeColor(Color.GREEN);
+
+        com.github.lzyzsd.circleprogress.DonutProgress donutProgress2 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress2);
+        donutProgress1.setProgress(30);
+        donutProgress2.setFinishedStrokeColor(Color.YELLOW);
+
+        com.github.lzyzsd.circleprogress.DonutProgress donutProgress3 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress3);
+        donutProgress1.setProgress(30);
+        donutProgress2.setFinishedStrokeColor(Color.RED);
+
+        com.github.lzyzsd.circleprogress.DonutProgress donutProgress4 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress4);
+        donutProgress1.setProgress(30);
+        donutProgress2.setFinishedStrokeColor(Color.BLUE);
+
+        network.getTasks(this);
 		
 		return rootView;
 	}
+
+    public void addTask(long taskId, String action, long xpValue) {
+        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.tasksLayout);
+
+        LinearLayout taskLayout = new LinearLayout(getActivity());
+        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 65));
+        //taskLayout.setBackgroundColor(Color.BLACK);
+
+        TextView taskLabel = new TextView(getActivity());
+        taskLabel.setGravity(Gravity.CENTER_VERTICAL);
+        taskLabel.setPadding(45, 10, 0, 0);
+        taskLabel.setText(action);
+        taskLayout.addView(taskLabel);
+
+        View divider = new View(getActivity());
+        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
+
+        tasksLinearLayout.addView(divider);
+        tasksLinearLayout.addView(taskLayout);
+
+        divider = new View(getActivity());
+        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
+        tasksLinearLayout.addView(divider);
+    }
 	
 	public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);

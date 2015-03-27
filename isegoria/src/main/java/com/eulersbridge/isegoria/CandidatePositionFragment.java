@@ -1,30 +1,26 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TableRow.LayoutParams;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
 
 public class CandidatePositionFragment extends SherlockFragment {
 	private View rootView;
@@ -32,26 +28,35 @@ public class CandidatePositionFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
-	
-	public CandidatePositionFragment() {
 
-	}
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
 		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.candidatePositionTable);
+        Bundle bundle = this.getArguments();
+        int positionId = bundle.getInt("PositionId");
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
-        addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+        //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getCandidatesPosition(this, positionId);
 		
 		return rootView;
 	}
+
+    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
+                             String firstName, String lastName) {
+        addTableRow(ticketId, userId, "", "", firstName + " " + lastName, "", userId);
+    }
 	
-	public void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition) {
+	public void addTableRow(int ticketId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -63,16 +68,18 @@ public class CandidatePositionFragment extends SherlockFragment {
 		tr.setPadding(0, 10, 0, 10);
 		
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(80, 80));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
+		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
 		candidateProfileView.setPadding(10, 0, 10, 0);
+        network.getFirstPhoto(0, userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
+
 		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
@@ -81,13 +88,8 @@ public class CandidatePositionFragment extends SherlockFragment {
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
-		
-        RectShape rect = new RectShape();
-        ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
-        Paint paint = rectShapeDrawable.getPaint();
-        paint.setColor(Color.parseColor(colour));
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setStrokeWidth(5);	     
+
+        network.getTicketLabel(textViewParty, ticketId);
         
 		LinearLayout partyLayout = new LinearLayout(getActivity());
 		partyLayout.setOrientation(LinearLayout.VERTICAL);
@@ -95,7 +97,6 @@ public class CandidatePositionFragment extends SherlockFragment {
         		80, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-		partyLayout.setBackgroundDrawable(rectShapeDrawable);
 		partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());
