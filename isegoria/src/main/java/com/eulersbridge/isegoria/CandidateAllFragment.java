@@ -60,10 +60,10 @@ public class CandidateAllFragment extends SherlockFragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+        addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
     }
 	
-	public void addTableRow(int userId, String partyAbr,
+	public void addTableRow(int ticketId, int userId, String partyAbr,
                             String colour, String candidateName,
                             String candidatePosition, int positionId) {
 		TableRow tr;
@@ -97,6 +97,8 @@ public class CandidateAllFragment extends SherlockFragment {
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
+
+        network.getTicketLabel(textViewParty, ticketId);
 		
         RectShape rect = new RectShape();
         ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
@@ -111,7 +113,7 @@ public class CandidateAllFragment extends SherlockFragment {
         		80, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-		partyLayout.setBackgroundDrawable(rectShapeDrawable);
+		//partyLayout.setBackgroundDrawable(rectShapeDrawable);
 		partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());

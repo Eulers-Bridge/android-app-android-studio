@@ -1,24 +1,20 @@
 package com.eulersbridge.isegoria;
 
-import java.text.DateFormat.Field;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.ActionBar.TabListener;
-
-
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.FragmentManager;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 
 public class FeedFragment extends SherlockFragment implements TabListener {
@@ -28,8 +24,10 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 	private EventsFragment eventsFragment = null;
 	private ViewGroup container = null;
     private android.support.v4.widget.SwipeRefreshLayout swipeLayout;
-	
-	private boolean complete = false;
+    private ViewPager mPager;
+    private ActionBar bar;
+
+    private boolean complete = false;
 	
 	public FeedFragment () {
 		newsFragment = new NewsFragment();
@@ -43,14 +41,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
 
-       /* swipeLayout =  (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.content_feed_frame);
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeLayout.setRefreshing(false);
-            }
-        });*/
-
+        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
 
             ((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().addTab(
@@ -66,10 +57,23 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 	            .setText("Events")
 	            .setTabListener(this));
 	    
-		ActionBar bar = ((SherlockFragmentActivity) getActivity()).getSupportActionBar();
+		bar = ((SherlockFragmentActivity) getActivity()).getSupportActionBar();
 		bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3C7EC9")));
 		bar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 		bar.setSplitBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
+
+        ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                bar.setSelectedNavigationItem(position);
+            }
+        };
+        mPager = (ViewPager) rootView.findViewById(R.id.feedPager);
+        mPager.setOnPageChangeListener(ViewPagerListener);
+
+        FeedViewPagerAdapter viewpageradapter = new FeedViewPagerAdapter(fm);
+        mPager.setAdapter(viewpageradapter);
 		
 		complete = true;
 		return rootView;
@@ -79,22 +83,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction ft) {    	
     	try {
-
-	    	if(tab.getText().equals("News")) {
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().popBackStack();
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.content_feed_frame, newsFragment).commit();
-	    		//ft.replace(R.id.content_feed_frame, newsFragment);
-	    	}
-	    	else if(tab.getText().equals("Photos")) {
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().popBackStack();
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.content_feed_frame, photosFragment).commit();
-	    		//ft.replace(R.id.content_feed_frame, photosFragment);
-	    	}
-	    	else if(tab.getText().equals("Events")) {
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().popBackStack();
-	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.content_feed_frame, eventsFragment).commit();
-	    		//ft.replace(R.id.content_feed_frame, eventsFragment);
-	    	}
+            mPager.setCurrentItem(tab.getPosition());
     	} catch(Exception e) {
     		
     	}
@@ -106,7 +95,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-    	try {
+    	/*try {
 	    	if(tab.getText().equals("News")) {
 	    		((SherlockFragmentActivity) getActivity()).getSupportFragmentManager().beginTransaction().remove(newsFragment).commit();
 	    	}
@@ -118,6 +107,6 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 	    	}
     	} catch(Exception e) {
     		
-    	}
+    	}*/
     }
 }

@@ -152,14 +152,23 @@
 	        android:background="#676475" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/eventDetails"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:textSize="@dimen/newsArticleSize" />
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView6" >
+
+        <TextView
+            android:id="@+id/eventDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            android:textSize="@dimen/newsArticleSize" />
+
+    </ScrollView>
+
+
 </LinearLayout>

@@ -1,42 +1,25 @@
 package com.eulersbridge.isegoria;
 
 
-import java.io.InputStream;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-import android.app.ActionBar;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
-import android.graphics.Typeface;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.ScaleDrawable;
+
+import java.io.InputStream;
 
 public class NewsArticleFragment extends Fragment {
 	private View rootView;
@@ -44,10 +27,8 @@ public class NewsArticleFragment extends Fragment {
 	private float dpHeight;
 	private Isegoria isegoria;
 	private int articleId;
-	
-	public NewsArticleFragment() {
-		
-	}
+
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -57,7 +38,10 @@ public class NewsArticleFragment extends Fragment {
 		
 		isegoria.getNetwork().getNewsArticle(this, bundle.getInt("ArticleId"));
 		articleId = bundle.getInt("ArticleId");
-		
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
 		return rootView;
 	}
 	
@@ -69,7 +53,7 @@ public class NewsArticleFragment extends Fragment {
 		this.articleId = articleId;
 	}
 
-	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture) {
+	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture, final String email) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -110,7 +94,10 @@ public class NewsArticleFragment extends Fragment {
 						public void onClick(View view) {
 							starView.setImageResource(R.drawable.star);
 						}
-					});				
+					});
+
+                    //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
+                    //network.getFirstPhotoImage(email, headShotImageView);
 				}
 			});
 		} catch(Exception e) {

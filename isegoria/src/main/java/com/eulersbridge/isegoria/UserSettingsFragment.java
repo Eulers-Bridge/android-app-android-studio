@@ -1,37 +1,25 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import android.app.ActionBar;
-
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class UserSettingsFragment extends SherlockFragment {
 	private View rootView;
 	
 	private float dpWidth;
 	private float dpHeight;
-	
-	public UserSettingsFragment() {
 
-	}
+    private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -42,12 +30,16 @@ public class UserSettingsFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
-		
-		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.me);
-		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
-		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
-		backgroundLinearLayout.setBackgroundDrawable(d);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
+        photoImageView.setLayoutParams(layoutParams);
+
+        LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
+        network.getUserDP(photoImageView, backgroundLinearLayout);
 		
 		return rootView;
 	}

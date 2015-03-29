@@ -332,7 +332,8 @@ public class Network {
 					String title = currentArticle.getString("title");
 					String likes = currentArticle.getString("likes");
 					String content = currentArticle.getString("content");
-					String picture = currentArticle.getString("picture");
+                    JSONArray photos = currentArticle.getJSONArray("photos");
+                    String picture = photos.getJSONObject(0).getString("url");
 					String email = currentArticle.getString("creatorEmail");
 					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 					Bitmap bitmapPicture = getPicture(picture);
@@ -344,7 +345,7 @@ public class Network {
 					String studentYear = "";
 					String link = null;
 
-					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture);
+					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture, email);
 					getUser(newsArticleFragment, email);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -493,7 +494,8 @@ public class Network {
 					String name = currentEvent.getString("name");
 					String location = currentEvent.getString("location");
 					String description = currentEvent.getString("description");
-					String picture = currentEvent.getString("picture");
+                    JSONArray photos = currentEvent.getJSONArray("photos");
+                    String picture = photos.getJSONObject(0).getString("url");
 					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 					Bitmap bitmapPicture;
 
@@ -1664,6 +1666,46 @@ public class Network {
 
     public void getFirstPhoto(int electionId, int positionId, final ImageView imageView) {
         String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                            getFirstPhotoImage(url, imageView);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getFirstPhoto(String email, final ImageView imageView) {
+        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(email) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {

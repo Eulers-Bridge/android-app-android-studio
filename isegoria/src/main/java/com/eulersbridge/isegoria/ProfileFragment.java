@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,24 +49,37 @@ public class ProfileFragment extends SherlockFragment {
         LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
-        com.github.lzyzsd.circleprogress.DonutProgress donutProgress1 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress1);
-        donutProgress1.setProgress(30);
-        donutProgress1.setFinishedStrokeColor(Color.GREEN);
-
-        com.github.lzyzsd.circleprogress.DonutProgress donutProgress2 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress2);
-        donutProgress1.setProgress(30);
-        donutProgress2.setFinishedStrokeColor(Color.YELLOW);
-
-        com.github.lzyzsd.circleprogress.DonutProgress donutProgress3 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress3);
-        donutProgress1.setProgress(30);
-        donutProgress2.setFinishedStrokeColor(Color.RED);
-
-        com.github.lzyzsd.circleprogress.DonutProgress donutProgress4 = (com.github.lzyzsd.circleprogress.DonutProgress) rootView.findViewById(R.id.donut_progress4);
-        donutProgress1.setProgress(30);
-        donutProgress2.setFinishedStrokeColor(Color.BLUE);
-
         network.getTasks(this);
-		
+
+        final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
+        showProgressButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                TaskDetailProgressFragment fragment2 = new TaskDetailProgressFragment();
+                Bundle args = new Bundle();
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.add(android.R.id.content, fragment2);
+                fragmentTransaction2.commit();
+            }
+        });
+
+        CircularSeekBar circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
+        CircularSeekBar circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
+        CircularSeekBar circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
+        CircularSeekBar circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
+
+        circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
+        circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
+        circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
+
+        circularSeekBar1.setProgress(30);
+        circularSeekBar2.setProgress(30);
+        circularSeekBar3.setProgress(30);
+        circularSeekBar4.setProgress(30);
+
 		return rootView;
 	}
 
@@ -72,14 +87,33 @@ public class ProfileFragment extends SherlockFragment {
         LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.tasksLayout);
 
         LinearLayout taskLayout = new LinearLayout(getActivity());
+        taskLayout.setGravity(Gravity.LEFT);
         taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 65));
-        //taskLayout.setBackgroundColor(Color.BLACK);
+
+        LinearLayout.LayoutParams layoutParams =
+                new LinearLayout.LayoutParams(100,
+                        100);
+        ImageView iconImage = new ImageView(getActivity());
+        iconImage.setScaleType(ImageView.ScaleType.FIT_XY);
+        iconImage.setLayoutParams(layoutParams);
+        iconImage.setPadding(5, 0, 0, 0);
+        //iconImage.setBackgroundColor(Color.BLACK);
+
+        network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
-        taskLabel.setPadding(45, 10, 0, 0);
+        taskLabel.setPadding(15, 10, 0, 0);
+
+        TextView xpLabel = new TextView(getActivity());
+        xpLabel.setGravity(Gravity.RIGHT);
+        xpLabel.setPadding(0, 10, 0, 0);
+        xpLabel.setText(String.valueOf(xpValue) + " XP");
+
+        taskLayout.addView(iconImage);
         taskLabel.setText(action);
         taskLayout.addView(taskLabel);
+        taskLayout.addView(xpLabel);
 
         View divider = new View(getActivity());
         divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));

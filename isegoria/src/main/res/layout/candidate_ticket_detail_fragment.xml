@@ -46,12 +46,13 @@
 	            android:paddingRight="6dp" >
 
                 <ImageView
-                    android:id="@+id/imageView1"
+                    android:id="@+id/partyDetailLogo"
                     android:layout_width="114dp"
                     android:layout_height="108dp"
+                    android:adjustViewBounds="true"
                     android:layout_gravity="center_vertical|center_horizontal"
-                    android:src="@drawable/green_party" />
-                
+                    android:scaleType="fitCenter" />
+
                 	<LinearLayout
 			        	android:layout_width="match_parent"
 			            android:layout_height="wrap_content"
@@ -61,14 +62,14 @@
 			             >   
 
 				        <TextView
-				            android:id="@+id/textView2"
+				            android:id="@+id/partyNameDetail"
 				            android:layout_width="wrap_content"
 				            android:layout_height="wrap_content"
 				            android:layout_alignParentTop="true"
 				            android:layout_centerHorizontal="true"
 				            android:layout_gravity="center_vertical|center_horizontal"
 				            android:layout_marginTop="5dp"
-				            android:text="Greens Students"
+				            android:text=""
 				            android:textColor="@color/white"
 				            android:textSize="24sp" />
 				        
@@ -102,11 +103,11 @@
 		             >
 		             
 	           <TextView
-	               android:id="@+id/newsArticleTitle"
+	               android:id="@+id/partyDetailSupporters"
 	               android:layout_width="wrap_content"
 	               android:layout_height="wrap_content"
 	               android:layout_gravity="bottom"
-	               android:text="1240"
+	               android:text=""
 	               android:textAppearance="?android:attr/textAppearanceLarge"
 	               android:textColor="@color/white"
 	               android:textSize="20sp" />
@@ -188,7 +189,13 @@
 		        android:background="@color/offGrey" />
 
 		</RelativeLayout>
-		
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView3"
+     >
+
     <TableLayout
         android:id="@+id/candidateTicketDetailTable"
         android:layout_width="match_parent"
@@ -218,5 +225,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
         </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"></TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+
+        </TableRow>
     </TableLayout>
+    </ScrollView>
 </LinearLayout>

@@ -53,10 +53,10 @@ public class CandidatePositionFragment extends SherlockFragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(ticketId, userId, "", "", firstName + " " + lastName, "", userId);
+        addTableRow(ticketId, positionId, userId, "", "", firstName + " " + lastName, "", userId);
     }
 	
-	public void addTableRow(int ticketId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
+	public void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -80,7 +80,6 @@ public class CandidatePositionFragment extends SherlockFragment {
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
 
-		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(12.0f);
@@ -112,6 +111,8 @@ public class CandidatePositionFragment extends SherlockFragment {
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.LEFT);
+
+        network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
         dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
