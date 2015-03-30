@@ -1,16 +1,13 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
-
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockListFragment;
 
 public class SlidingMenuItems extends ListFragment {
 	
@@ -18,7 +15,7 @@ public class SlidingMenuItems extends ListFragment {
 	SherlockFragment electionFragment = new ElectionMasterFragment();
 	SherlockFragment pollFragment = new PollFragment();
 	SherlockFragment voteFragment = new VoteFragment();
-	SherlockFragment profileFragment = new ProfileFragment();
+	SherlockFragment profileViewPagerFragment = new ProfileViewPagerFragment();
 	SherlockFragment userSettingsFragment = new UserSettingsFragment();
 	
 	@Override
@@ -52,7 +49,7 @@ public class SlidingMenuItems extends ListFragment {
 			newContent = voteFragment;
 			break;
 		case 4:
-			newContent = profileFragment;
+			newContent = profileViewPagerFragment;
 			break;
 		case 5:
 			newContent = userSettingsFragment;

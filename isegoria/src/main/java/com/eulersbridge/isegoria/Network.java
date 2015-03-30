@@ -76,6 +76,7 @@ public class Network {
     private CandidateTicketFragment candidateTicketFragment;
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private CandidatePositionFragment candidatePositionFragment;
+    private TaskDetailProgressFragment taskDetailProgressFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
 	private Isegoria application;
@@ -388,7 +389,12 @@ public class Network {
         this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
     }
 
-	public NetworkResponse getElections() {
+    public void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
+        this.getFirstPhoto(0, (int) profileId, imageView);
+        this.getFirstPhotoBlur(0, (int) profileId, backgroundLinearLayout);
+    }
+
+    public NetworkResponse getElections() {
 		NetworkResponse networkResponse = null;
 
 		return networkResponse;
@@ -1482,6 +1488,103 @@ public class Network {
                         long xpValue = taskObject.getLong("xpValue");
 
                         profileFragment.addTask(taskId, action, xpValue);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getTasks(final ContactProfileFragment contactProfileFragment) {
+        String url = SERVER_URL + "dbInterface/api/tasks/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        JSONObject taskObject = response.getJSONObject(i);
+
+                        long taskId = taskObject.getLong("taskId");
+                        String action = taskObject.getString("action");
+                        long xpValue = taskObject.getLong("xpValue");
+
+                        contactProfileFragment.addTask(taskId, action, xpValue);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getRemainingTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
+        this.taskDetailProgressFragment = taskDetailProgressFragment;
+        String url = SERVER_URL + "dbInterface/api/tasks/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        JSONObject taskObject = response.getJSONObject(i);
+
+                        long taskId = taskObject.getLong("taskId");
+                        String action = taskObject.getString("action");
+                        long xpValue = taskObject.getLong("xpValue");
+
+                        taskDetailProgressFragment.addRemainingTask(taskId, action, xpValue);
                     }
 
                 } catch (Exception e) {

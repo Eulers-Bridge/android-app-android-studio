@@ -91,7 +91,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         addTableRow(userId, code, colour, firstName + " " + lastName, "", userId);
     }
 	
-	public void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
+	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -117,19 +117,20 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
 
-		candidateProfileImage.setOnClickListener(new View.OnClickListener() {        
+        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-		    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-		    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-		    		//ProfileSimpleFragment fragment2 = new ProfileSimpleFragment();
-		    		Bundle args = new Bundle();
-		    		//fragment2.setArguments(args);
-		    		fragmentTransaction2.addToBackStack(null);
-		    		//fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
-		    		fragmentTransaction2.commit();
+                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                ContactProfileFragment fragment2 = new ContactProfileFragment();
+                Bundle args = new Bundle();
+                args.putInt("ProfileId", profileDrawable);
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.replace(android.R.id.content, fragment2);
+                fragmentTransaction2.commit();
             }
-         });
+        });
 		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));

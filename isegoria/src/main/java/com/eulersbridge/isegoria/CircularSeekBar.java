@@ -49,6 +49,9 @@ public class CircularSeekBar extends View {
 	 */
 	private final float DPTOPX_SCALE = getResources().getDisplayMetrics().density;
 
+    private String topLine = "";
+    private String bottomLine = "";
+
 	/**
 	 * Minimum touch target size in DP. 48dp is the Android design recommendation
 	 */
@@ -569,7 +572,21 @@ public class CircularSeekBar extends View {
 
 		canvas.drawPath(mCirclePath, mCircleFillPaint);
 
-        //canvas.drawText("23", mCircleWidth/2, m);
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(34);
+        paint.setFakeBoldText(true);
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        canvas.drawText("23", -20, 4, paint);
+
+        paint = new Paint();
+        paint.setColor(Color.parseColor("#8A898A"));
+        paint.setTextSize(14);
+        paint.setFakeBoldText(true);
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        canvas.drawText("38 LEFT", -26, 24, paint);
 
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius + mPointerHaloWidth, mPointerHaloPaint);
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius, mPointerPaint);
@@ -852,7 +869,23 @@ public class CircularSeekBar extends View {
 		return true;
 	}
 
-	private void init(AttributeSet attrs, int defStyle) {
+    public String getTopLine() {
+        return topLine;
+    }
+
+    public void setTopLine(String topLine) {
+        this.topLine = topLine;
+    }
+
+    public String getBottomLine() {
+        return bottomLine;
+    }
+
+    public void setBottomLine(String bottomLine) {
+        this.bottomLine = bottomLine;
+    }
+
+    private void init(AttributeSet attrs, int defStyle) {
 		final TypedArray attrArray = getContext().obtainStyledAttributes(attrs, R.styleable.CircularSeekBar, defStyle, 0);
 		initAttributes(attrArray);
 		attrArray.recycle();

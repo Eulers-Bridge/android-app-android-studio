@@ -18,39 +18,47 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class ProfileFragment extends SherlockFragment {
-	private View rootView;
-	
-	private float dpWidth;
-	private float dpHeight;
+/**
+ * Created by Anthony on 30/03/2015.
+ */
+public class ContactProfileFragment extends SherlockFragment {
+    private View rootView;
+
+    private float dpWidth;
+    private float dpHeight;
+
+    private int profileId;
 
     private ViewPager mPager;
     private Network network;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		getActivity().getActionBar().removeAllTabs();
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        getActivity().getActionBar().removeAllTabs();
 
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+        Bundle bundle = this.getArguments();
+        profileId = (int) bundle.getInt("ProfileId");
+
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
         MainActivity mainActivity = (MainActivity) getActivity();
-        //network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
 
         TextView name = (TextView) rootView.findViewById(R.id.profileName);
-        //network.getUserFullName((int) network.userId, name, "");
+        network.getUserFullName(profileId, name, "");
 
         LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-        //network.getUserDP(photoImageView, backgroundLinearLayout);
+        network.getUserDP(profileId, photoImageView, backgroundLinearLayout);
 
-        //network.getTasks(this);
+        network.getTasks(this);
 
         final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
         showProgressButton.setOnClickListener(new View.OnClickListener() {
@@ -74,8 +82,8 @@ public class ProfileFragment extends SherlockFragment {
         circularSeekBar3.setProgress(30);
         circularSeekBar4.setProgress(30);
 
-		return rootView;
-	}
+        return rootView;
+    }
 
     public void setViewPager(ViewPager mPager) {
         this.mPager = mPager;
@@ -138,8 +146,8 @@ public class ProfileFragment extends SherlockFragment {
         divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
         tasksLinearLayout.addView(divider);
     }
-	
-	public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {
+
+    public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {

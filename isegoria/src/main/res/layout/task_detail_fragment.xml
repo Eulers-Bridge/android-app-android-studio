@@ -6,5 +6,89 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/taskProgressLayout" />
+        android:id="@+id/taskProgressLayout" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#838a8a8a" />
+                <RelativeLayout
+                    android:id="@+id/relativeLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#64d3d3d3" >
+
+                    <TextView
+                        android:id="@+id/mytextview1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="Completed"
+                        android:textColor="#ff575757"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/completedTasksLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#838a8a8a" />
+                <RelativeLayout
+                    android:id="@+id/relativeLayout2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#64d3d3d3" >
+
+                    <TextView
+                        android:id="@+id/mytextview2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="Remaining"
+                        android:textColor="#ff575757"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/remainingTasksLayout"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

@@ -9,6 +9,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -63,7 +65,7 @@ public class CandidateAllFragment extends SherlockFragment {
         addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
     }
 	
-	public void addTableRow(int ticketId, int userId, String partyAbr,
+	public void addTableRow(int ticketId, final int userId, String partyAbr,
                             String colour, String candidateName,
                             String candidatePosition, int positionId) {
 		TableRow tr;
@@ -89,6 +91,20 @@ public class CandidateAllFragment extends SherlockFragment {
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
+        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                ContactProfileFragment fragment2 = new ContactProfileFragment();
+                Bundle args = new Bundle();
+                args.putInt("ProfileId", userId);
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.replace(android.R.id.content, fragment2);
+                fragmentTransaction2.commit();
+            }
+        });
 		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));

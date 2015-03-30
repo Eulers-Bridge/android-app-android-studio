@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -56,7 +58,7 @@ public class CandidatePositionFragment extends SherlockFragment {
         addTableRow(ticketId, positionId, userId, "", "", firstName + " " + lastName, "", userId);
     }
 	
-	public void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
+	public void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -79,6 +81,20 @@ public class CandidatePositionFragment extends SherlockFragment {
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
 		candidateProfileImage.setPadding(10, 0, 10, 0);
+        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                ContactProfileFragment fragment2 = new ContactProfileFragment();
+                Bundle args = new Bundle();
+                args.putInt("ProfileId", userId);
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.replace(android.R.id.content, fragment2);
+                fragmentTransaction2.commit();
+            }
+        });
 
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
