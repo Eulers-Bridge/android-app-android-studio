@@ -686,7 +686,7 @@ public class CircularSeekBar extends View {
     @Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// Convert coordinates to our internal coordinate system
-		float x = event.getX() - getWidth() / 2;
+		/*float x = event.getX() - getWidth() / 2;
 		float y = event.getY() - getHeight() / 2;
 
 		// Get the distance from the center of the circle in terms of x and y
@@ -864,7 +864,7 @@ public class CircularSeekBar extends View {
 
 		if (event.getAction() == MotionEvent.ACTION_MOVE && getParent() != null) {
 			getParent().requestDisallowInterceptTouchEvent(true);
-		}
+		}*/
 
 		return true;
 	}
