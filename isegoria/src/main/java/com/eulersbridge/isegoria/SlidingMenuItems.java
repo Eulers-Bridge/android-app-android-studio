@@ -15,6 +15,7 @@ public class SlidingMenuItems extends ListFragment {
 	SherlockFragment electionFragment = new ElectionMasterFragment();
 	SherlockFragment pollFragment = new PollFragment();
 	SherlockFragment voteFragment = new VoteFragment();
+    SherlockFragment findAddContactFragment = new FindAddContactFragment();
 	SherlockFragment profileViewPagerFragment = new ProfileViewPagerFragment();
 	SherlockFragment userSettingsFragment = new UserSettingsFragment();
 	
@@ -48,10 +49,13 @@ public class SlidingMenuItems extends ListFragment {
 		case 3:
 			newContent = voteFragment;
 			break;
-		case 4:
+        case 4:
+            newContent = findAddContactFragment;
+            break;
+		case 5:
 			newContent = profileViewPagerFragment;
 			break;
-		case 5:
+		case 6:
 			newContent = userSettingsFragment;
 			break;
 		}

@@ -42,11 +42,14 @@ public class SlidingArrayAdapter extends ArrayAdapter {
         }
         else if(position == 3) {
         	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.voteblue));
-        } 
+        }
         else if(position == 4) {
+            imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.profileblue));
+        }
+        else if(position == 5) {
         	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.profileblue));
         }   
-        else if(position == 5) {
+        else if(position == 6) {
         	imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.profileblue));
         }   
         return currentView;

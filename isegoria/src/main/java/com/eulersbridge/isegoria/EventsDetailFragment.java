@@ -1,30 +1,21 @@
 package com.eulersbridge.isegoria;
 
-import java.util.Calendar;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Paint.Align;
-import android.graphics.Paint.Style;
-import android.graphics.Rect;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.provider.CalendarContract.Events;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,15 +24,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.ScaleDrawable;
+
+import java.util.Calendar;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
@@ -52,10 +41,14 @@ public class EventsDetailFragment extends Fragment {
 	private long timestamp;
 	private String eventTitle;
 	private String eventDesc;
+
+    private TableLayout eventContactTableLayout;
+    private Network network;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
+        eventContactTableLayout = (TableLayout) rootView.findViewById(R.id.eventDetailsTableLayout);
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
@@ -72,6 +65,9 @@ public class EventsDetailFragment extends Fragment {
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
         isegoria.getNetwork().getEventDetails(this, bundle.getInt("EventId"));
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
 		
 		return rootView;
 	}
@@ -122,6 +118,155 @@ public class EventsDetailFragment extends Fragment {
         intent.putExtra("description", eventDesc);
         isegoria.getMainActivity().startActivity(intent);
 	}
+
+    public void addCandidate(String email) {
+        TableRow tr;
+
+        tr = new TableRow(getActivity());
+        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        tr.setLayoutParams(rowParams);
+        tr.setPadding(10, 10, 0, 10);
+
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+
+        TextView contactTextView = new TextView(getActivity());
+        contactTextView.setTypeface(null, Typeface.BOLD);
+        contactTextView.setText("Organizer: " + email);
+        layout.addView(contactTextView);
+        tr.addView(layout);
+
+        eventContactTableLayout.addView(tr);
+    }
+
+    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
+                             String firstName, String lastName) {
+        addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+    }
+
+    public void addTableRow(int ticketId, final int userId, String partyAbr,
+                            String colour, String candidateName,
+                            String candidatePosition, int positionId) {
+        TableRow tr;
+
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+
+        tr = new TableRow(getActivity());
+        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        tr.setLayoutParams(rowParams);
+        tr.setPadding(0, 10, 0, 10);
+
+        ImageView candidateProfileView = new ImageView(getActivity());
+        candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
+        candidateProfileView.setLayoutParams(layoutParams);
+        candidateProfileView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        network.getFirstPhoto(0, userId, candidateProfileView);
+        candidateProfileView.setPadding(10, 0, 10, 0);
+
+        ImageView candidateProfileImage = new ImageView(getActivity());
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
+        candidateProfileImage.setPadding(10, 0, 10, 0);
+        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                ContactProfileFragment fragment2 = new ContactProfileFragment();
+                Bundle args = new Bundle();
+                args.putInt("ProfileId", userId);
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.replace(android.R.id.content, fragment2);
+                fragmentTransaction2.commit();
+            }
+        });
+
+        TextView textViewParty = new TextView(getActivity());
+        textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
+        textViewParty.setTextSize(12.0f);
+        textViewParty.setText(partyAbr);
+        textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        textViewParty.setGravity(Gravity.CENTER);
+        textViewParty.setTypeface(null, Typeface.BOLD);
+
+        network.getTicketLabel(textViewParty, ticketId);
+
+        RectShape rect = new RectShape();
+        ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
+        Paint paint = rectShapeDrawable.getPaint();
+        paint.setColor(Color.parseColor(colour));
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setStrokeWidth(5);
+
+        LinearLayout partyLayout = new LinearLayout(getActivity());
+        partyLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                80, 40);
+        params.gravity = Gravity.CENTER_VERTICAL;
+        partyLayout.setLayoutParams(params);
+        //partyLayout.setBackgroundDrawable(rectShapeDrawable);
+        partyLayout.addView(textViewParty);
+
+        TextView textViewCandidate = new TextView(getActivity());
+        textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
+        textViewCandidate.setTextSize(16.0f);
+        textViewCandidate.setText(candidateName);
+        textViewCandidate.setPadding(10, 0, 10, 0);
+        textViewCandidate.setGravity(Gravity.LEFT);
+
+        TextView textViewPosition = new TextView(getActivity());
+        textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
+        textViewPosition.setTextSize(12.0f);
+        textViewPosition.setText(candidatePosition);
+        textViewPosition.setPadding(10, 0, 10, 0);
+        textViewPosition.setGravity(Gravity.LEFT);
+
+        network.getPositionText(textViewPosition, positionId);
+
+        View dividierView = new View(getActivity());
+        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setBackgroundColor(Color.parseColor("#676475"));
+
+        RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
+        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
+        relLayoutMaster.setLayoutParams(relLayoutMasterParam);
+
+        RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+
+        RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+        LinearLayout linLayout = new LinearLayout(getActivity());
+        linLayout.setOrientation(LinearLayout.VERTICAL);
+        TableRow.LayoutParams linLayoutParam = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        linLayout.addView(textViewCandidate);
+        linLayout.addView(textViewPosition);
+
+        LinearLayout linLayout2 = new LinearLayout(getActivity());
+        linLayout2.setOrientation(LinearLayout.VERTICAL);
+        TableRow.LayoutParams linLayoutParam2 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        linLayout2.addView(candidateProfileImage);
+        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setLayoutParams(relativeParamsRight);
+
+        layout.addView(candidateProfileView);
+        layout.addView(partyLayout);
+        layout.addView(linLayout);
+        layout.setLayoutParams(relativeParamsLeft);
+
+        relLayoutMaster.addView(layout);
+        relLayoutMaster.addView(linLayout2);
+
+        tr.addView(relLayoutMaster);
+
+        eventContactTableLayout.addView(tr);
+        eventContactTableLayout.addView(dividierView);
+    }
 
 	public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {

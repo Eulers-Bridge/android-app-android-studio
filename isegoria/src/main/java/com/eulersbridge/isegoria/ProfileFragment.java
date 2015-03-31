@@ -42,15 +42,15 @@ public class ProfileFragment extends SherlockFragment {
         photoImageView.setLayoutParams(layoutParams);
 
         MainActivity mainActivity = (MainActivity) getActivity();
-        //network = mainActivity.getIsegoriaApplication().getNetwork();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
 
         TextView name = (TextView) rootView.findViewById(R.id.profileName);
-        //network.getUserFullName((int) network.userId, name, "");
+        network.getUserFullName((int) network.userId, name, "");
 
         LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-        //network.getUserDP(photoImageView, backgroundLinearLayout);
+        network.getUserDP(photoImageView, backgroundLinearLayout);
 
-        //network.getTasks(this);
+        network.getTasks(this);
 
         final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
         showProgressButton.setOnClickListener(new View.OnClickListener() {

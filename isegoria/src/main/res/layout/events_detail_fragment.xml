@@ -157,6 +157,11 @@
         android:layout_height="match_parent"
         android:id="@+id/scrollView6" >
 
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/eventDetails"
             android:layout_width="match_parent"
@@ -168,6 +173,14 @@
             android:paddingTop="10dp"
             android:textSize="@dimen/newsArticleSize" />
 
+            <TableLayout
+                android:id="@+id/eventDetailsTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+            </TableLayout>
+        </LinearLayout>
     </ScrollView>
 
 

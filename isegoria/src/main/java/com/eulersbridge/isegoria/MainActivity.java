@@ -59,7 +59,8 @@ public class MainActivity extends BaseActivity {
 		//setSlidingActionBarEnabled(true);
 		getSlidingMenu().setSlidingEnabled(false);
 		
-		switchContent(new ProfileFragment());
+		//switchContent(new LoginScreenFragment());
+        switchContent(new PersonalityQuestionsFragment());
 	}
 	
 	public Isegoria getIsegoriaApplication() {

@@ -68,6 +68,7 @@ public class Network {
 	private UserSignupFragment userSignupFragment;
 	private EventsDetailFragment eventDetailFragment;
     private ElectionOverviewFragment electionOverviewFragment;
+    private EventsDetailFragment eventsDetailFragment;
     private CandidatePositionsFragment candidatePositionsFragment;
 	private PhotosFragment photosFragment;
 	private PhotoAlbumFragment photoAlbumFragment;
@@ -77,6 +78,8 @@ public class Network {
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private CandidatePositionFragment candidatePositionFragment;
     private TaskDetailProgressFragment taskDetailProgressFragment;
+    private ProfileBadgesFragment profileBadgesFragment;
+    private FindAddContactFragment findAddContactFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
 	private Isegoria application;
@@ -406,11 +409,94 @@ public class Network {
 		return networkResponse;
 	}
 
-	public NetworkResponse getUsers() {
-		NetworkResponse networkResponse = null;
+	public void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
-		return networkResponse;
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String givenName = response.getString("givenName");
+                    String familyName = response.getString("familyName");
+                    String gender = response.getString("gender");
+                    String email = response.getString("email");
+                    String nationality = response.getString("nationality");
+
+                    findAddContactFragment.addUser(givenName, familyName, email, "The University of Melbourne");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
 	}
+
+    public void addFriend(String email, final FindAddContactFragment findAddContactFragment) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/contact/" + String.valueOf(email) + "/";
+
+        HashMap<String, Integer> params = new HashMap<String, Integer>();
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            findAddContactFragment.showAddedDialog();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
 
 	public NetworkResponse getCountrys() {
 		NetworkResponse networkResponse = null;
@@ -518,7 +604,8 @@ public class Network {
 						date = currentEvent.getLong("created");
 						date = TimeConverter.convertTimestampTimezone(date);
 					}
-					String creatorEmail = "";
+					String organizerEmail = currentEvent.getString("organizerEmail");
+                    findContact(organizerEmail, eventsDetailFragment);
 					String studentYear = "";
 					String link = null;
 
@@ -532,6 +619,48 @@ public class Network {
 		Thread t = new Thread(r);
 		t.start();
 	}
+
+    public void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
+        this.eventsDetailFragment = eventsDetailFragment;
+       String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jObject) {
+                        try {
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+                eventsDetailFragment.addCandidate(email);
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
 
 	public void getPhotoAlbums(final PhotosFragment photosFragment) {
 		this.photosFragment = photosFragment;
@@ -634,6 +763,57 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
+
+    public void getProfileBadges(final ProfileBadgesFragment profileBadgesFragment) {
+        this.profileBadgesFragment = profileBadgesFragment;
+        String url = SERVER_URL + "dbInterface/api/badges/26";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jObject) {
+                        try {
+                            JSONArray jArray = jObject.getJSONArray("badges");
+
+                            for (int i=0; i<jArray.length(); i++) {
+                                JSONObject currentAlbum = jArray.getJSONObject(i);
+
+                                int nodeId = currentAlbum.getInt("nodeId");
+                                String title = currentAlbum.getString("title");
+                                String description = currentAlbum.getString("description");
+                                String thumbNailUrl = currentAlbum.getString("url");
+
+                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, String.valueOf(nodeId));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
 
 	public void getPhoto(final PhotoViewFragment photoViewFragment, final String photoId) {
 		this.photoViewFragment = photoViewFragment;

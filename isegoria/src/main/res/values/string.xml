@@ -21,6 +21,7 @@
         <item>Election</item>
         <item>Poll</item>
         <item>Vote</item>
+        <item>Friends</item>
         <item>Profile</item>
         <item>Settings</item>
     </string-array>
