@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center_horizontal"
+            android:paddingBottom="10dp"
             android:weightSum="1"
             android:paddingTop="5dp">
 
@@ -39,7 +40,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar1"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -56,8 +57,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar2"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -74,8 +74,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar3"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -92,8 +91,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar4"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -110,8 +108,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar5"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -128,8 +125,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar6"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -146,8 +142,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar7"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -164,8 +159,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar8"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -182,8 +176,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar9"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 
@@ -200,8 +193,7 @@
             <com.eulersbridge.isegoria.PersonalitySliderBar
                 android:id="@+id/personalitySliderBar10"
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:background="#ffff22da"
+                android:layout_height="75dp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp" />
 

@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class PersonalityQuestionsFragment extends SherlockFragment {
     private View rootView;
-    private ViewPager mPager;
+    private NonSwipeableViewPager mPager;
     private ProfilePagerAdapter mPagerAdapter;
 
     @Override
@@ -36,7 +36,7 @@ public class PersonalityQuestionsFragment extends SherlockFragment {
             }
         };
 
-        mPager = (ViewPager) rootView.findViewById(R.id.personalityViewPagerFragment);
+        mPager = (NonSwipeableViewPager) rootView.findViewById(R.id.personalityViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
         PersonalityScreen1Fragment personalityScreen1Fragment = new PersonalityScreen1Fragment();
