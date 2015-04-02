@@ -29,6 +29,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class FindAddContactFragment extends SherlockFragment {
     private View rootView;
     private TableLayout usersAllTableLayout;
+    private TableLayout friendsAllTableLayout;
 
     private float dpWidth;
     private float dpHeight;
@@ -45,6 +46,7 @@ public class FindAddContactFragment extends SherlockFragment {
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         usersAllTableLayout = (TableLayout) rootView.findViewById(R.id.usersAllTable);
+        friendsAllTableLayout = (TableLayout) rootView.findViewById(R.id.friendsAllTableLayout);
 
         dpWidth = displayMetrics.widthPixels;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -56,6 +58,7 @@ public class FindAddContactFragment extends SherlockFragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.findFriends(this);
 
         searchFriendsView = (SearchView) rootView.findViewById(R.id.searchFriendsView);
         searchFriendsView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -78,10 +81,14 @@ public class FindAddContactFragment extends SherlockFragment {
     }
 
     public void addUser(String firstName, String lastName, final String email, String institution) {
-        addTableRow(firstName + " " + lastName, email, institution);
+        addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution);
     }
 
-    public void addTableRow(String name, final String email, String institution) {
+    public void addFriend(String firstName, String lastName, final String email, String institution) {
+        addTableRow(friendsAllTableLayout, firstName + " " + lastName, email, institution);
+    }
+
+    public void addTableRow(TableLayout tableLayout, String name, final String email, String institution) {
         TableRow tr;
 
         LinearLayout layout = new LinearLayout(getActivity());
@@ -174,8 +181,8 @@ public class FindAddContactFragment extends SherlockFragment {
 
         tr.addView(relLayoutMaster);
 
-        usersAllTableLayout.addView(tr);
-        usersAllTableLayout.addView(dividierView);
+        tableLayout.addView(tr);
+        tableLayout.addView(dividierView);
     }
 
     public void showAddedDialog() {

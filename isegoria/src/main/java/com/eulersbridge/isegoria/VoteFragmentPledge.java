@@ -10,6 +10,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -18,9 +19,10 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class VoteFragmentPledge extends SherlockFragment implements OnItemSelectedListener {
     private View rootView;
     private ArrayAdapter<String> voteLocationArrayAdapter;
+    private NonSwipeableViewPager mPager;
 
-    public VoteFragmentPledge() {
-
+    public void setViewPager(NonSwipeableViewPager mPager) {
+        this.mPager = mPager;
     }
 
     @Override
@@ -37,15 +39,15 @@ public class VoteFragmentPledge extends SherlockFragment implements OnItemSelect
         mSignature.setBackgroundColor(Color.WHITE);
         mContent.addView(mSignature, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 
+        Button voteNextButton = (Button) rootView.findViewById(R.id.voteNextButton);
+        voteNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPager.setCurrentItem(2);
+            }
+        });
+
         return rootView;
     }
 
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 }

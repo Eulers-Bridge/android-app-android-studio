@@ -121,7 +121,6 @@ public class PollVoteFragment extends SherlockFragment {
 
         network.getUserFullName(pollVoteFragment.getCreatorId(), textViewArticleTime, "Asked By ");
 
-        
         linearLayout.addView(textViewArticle);
         linearLayout.addView(textViewArticleTime);
         

@@ -106,7 +106,7 @@ public class NewsFragment extends Fragment {
 			     }
 			});
 		} catch(Exception e) {
-			
+			e.printStackTrace();
 		}
 	}
 	

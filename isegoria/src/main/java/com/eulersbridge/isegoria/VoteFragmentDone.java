@@ -13,10 +13,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class VoteFragmentDone extends SherlockFragment implements OnItemSelectedListener {
     private View rootView;
-
-    public VoteFragmentDone() {
-
-    }
+    private NonSwipeableViewPager mPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -25,6 +22,10 @@ public class VoteFragmentDone extends SherlockFragment implements OnItemSelected
         getActivity().getActionBar().removeAllTabs();
 
         return rootView;
+    }
+
+    public void setViewPager(NonSwipeableViewPager mPager) {
+        this.mPager = mPager;
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,

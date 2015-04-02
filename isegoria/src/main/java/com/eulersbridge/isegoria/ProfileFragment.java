@@ -53,12 +53,12 @@ public class ProfileFragment extends SherlockFragment {
         network.getTasks(this);
 
         final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
-        showProgressButton.setOnClickListener(new View.OnClickListener() {
+     /*   showProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mPager.setCurrentItem(1);
             }
-        });
+        });*/
 
         CircularSeekBar circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
         CircularSeekBar circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);

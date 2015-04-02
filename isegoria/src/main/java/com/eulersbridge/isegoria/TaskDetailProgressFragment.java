@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +39,11 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getRemainingTasks(this);
+
+        ProgressBar pb = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        pb.setProgress(50);
+        pb.setMax(100);
+        pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
         return rootView;
     }

@@ -409,9 +409,58 @@ public class Network {
 		return networkResponse;
 	}
 
+    public void findFriends(final FindAddContactFragment findAddContactFragment) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray friends) {
+                try {
+                    for(int i=0; i<friends.length(); i++) {
+                        JSONObject response = friends.getJSONObject(i);
+
+                        String givenName = response.getString("givenName");
+                        String familyName = response.getString("familyName");
+                        String gender = response.getString("gender");
+                        String email = response.getString("email");
+                        String nationality = response.getString("nationality");
+
+                        findAddContactFragment.addFriend(givenName, familyName, email, "The University of Melbourne");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
 	public void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
@@ -477,16 +526,17 @@ public class Network {
             }
         }) {
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
+        @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            HashMap<String, String> headers = new HashMap<String, String>();
+            String credentials = username + ":" + password;
+            String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
+            headers.put("Authorization", "Basic " + base64EncodedCredentials);
+            headers.put("Accept", "application/json");
+            headers.put("Content-type", "application/json; charset=utf-8");
+
+            return headers;
             }
         };
 
@@ -498,11 +548,53 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-	public NetworkResponse getCountrys() {
-		NetworkResponse networkResponse = null;
+    public void addVoteReminder(String location, long date) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/voteReminder";
 
-		return networkResponse;
-	}
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("location", location);
+        params.put("date", String.valueOf(date));
+        params.put("electionId", String.valueOf(electionId));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
 
 	public void getEvents(final EventsFragment eventsFragment) {
         String url = SERVER_URL + "dbInterface/api/events/26/";
@@ -622,7 +714,7 @@ public class Network {
 
     public void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
         this.eventsDetailFragment = eventsDetailFragment;
-       String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {
@@ -852,11 +944,11 @@ public class Network {
 					JSONArray jArray = jObject.getJSONArray("photoAlbums");
 					
 					for (int i=0; i<jArray.length(); i++) {
-						JSONObject currentAlbum = jArray.getJSONObject(i);
+						JSONObject currentVoteRecord = jArray.getJSONObject(i);
 						
-						int nodeId = currentAlbum.getInt("nodeId");
-						String name = currentAlbum.getString("name");
-						String description = currentAlbum.getString("description");
+						int nodeId = currentVoteRecord.getInt("nodeId");
+						String name = currentVoteRecord.getString("name");
+						String description = currentVoteRecord.getString("description");
 						//String responseBitmap = getRequest("dbInterface/api/photos/" + String.valueOf(nodeId));
 						//JSONObject responseJSON = new JSONObject(responseBitmap);
 						//String pictureURL = responseJSON.getString("url");
@@ -1152,6 +1244,56 @@ public class Network {
             return headers;
         }
     };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getLatestElection(final VoteFragment voteFragment) {
+        this.voteFragment = voteFragment;
+        String url = SERVER_URL + "dbInterface/api/elections/26";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    JSONObject electionObject = response.getJSONObject(0);
+
+                    int electionId = electionObject.getInt("electionId");
+                    network.electionId = electionId;
+
+                    long startVoting = electionObject.getLong("startVoting");
+                    long endVoting = electionObject.getLong("endVoting");
+
+                    voteFragment.datePicker.setMinDate(startVoting);
+                    voteFragment.datePicker.setMaxDate(endVoting);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
 
         int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1947,7 +2089,7 @@ public class Network {
         return output;
     }
 
-    public void getFirstPhoto(int electionId, int positionId, final ImageView imageView) {
+    public void getFirstPhoto(int electionId, final int positionId, final ImageView imageView) {
         String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,

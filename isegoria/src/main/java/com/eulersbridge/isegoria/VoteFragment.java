@@ -2,13 +2,17 @@ package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -19,11 +23,12 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 	private View rootView;
 	private ArrayAdapter<String> voteLocationArrayAdapter;
     private ArrayList<VoteLocation> voteLocationArray;
+
+    public DatePicker datePicker;
+    public TimePicker timePicker;
+
+    private ViewPager mPager;
     private Network network;
-	
-	public VoteFragment() {
-	
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -37,13 +42,29 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
         spinnerLocation.setAdapter(voteLocationArrayAdapter);
         voteLocationArray = new ArrayList<VoteLocation>();
+
+        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker1);
+        timePicker = (TimePicker) rootView.findViewById(R.id.timePicker1);
+
+        Button voteOkButton = (Button) rootView.findViewById(R.id.voteOkButton);
+        voteOkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mPager.setCurrentItem(1);
+            }
+        });
         
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getVoteLocations(this);
-		
+        network.getLatestElection(this);
+
 		return rootView;
 	}
+
+    public void setViewPager(ViewPager mPager) {
+        this.mPager = mPager;
+    }
 
 	public void addVoteLocations(String ownerId, String votingLocationId,
                                  String name, String information) {
