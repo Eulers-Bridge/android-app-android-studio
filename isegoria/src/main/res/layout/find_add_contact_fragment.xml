@@ -17,88 +17,67 @@
         android:layout_height="wrap_content"
         android:id="@+id/scrollView2"
         android:layout_column="1">
-        <TableLayout
-            android:id="@+id/usersAllTable"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            >
+            android:layout_height="wrap_content">
 
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
+            <TableLayout
+                android:id="@+id/usersAllTable"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                >
+                <TableRow
+                    android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                </TableRow>
+            </TableLayout>
 
-            <TableRow
-                android:id="@+id/tableRow2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#838a8a8a" />
+                <RelativeLayout
+                    android:id="@+id/relativeLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#64d3d3d3" >
 
-            <TableRow
-                android:id="@+id/tableRow3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
+                    <TextView
+                        android:id="@+id/mytextview1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="Current Friends"
+                        android:textColor="#ff575757"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp" />
 
-            <TableRow
-                android:id="@+id/tableRow4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
 
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
+                </RelativeLayout>
+            </LinearLayout>
 
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
+            <TableLayout
+                android:id="@+id/friendsAllTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                >
+                <TableRow
+                    android:id="@+id/tableRow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                </TableRow>
+            </TableLayout>
 
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-            </TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"></TableRow>
-
-            <TableRow
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-            </TableRow>
-        </TableLayout>
+        </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

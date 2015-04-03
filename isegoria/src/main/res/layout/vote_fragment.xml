@@ -115,15 +115,14 @@
 	    android:gravity="center">
 	
 	    <Button
-	        android:id="@+id/okbutton"
+	        android:id="@+id/voteOkButton"
 	        android:layout_width="150dp"
 	        android:layout_height="wrap_content"
 	        android:background="@drawable/green_button"
 	        android:gravity="center"
 	        android:text="Next"
 	        android:textColor="#52BB42"
-            android:layout_gravity="top"
-            android:onClick="voteNext" />
+            android:layout_gravity="top" />
 	
 	</LinearLayout>  
 

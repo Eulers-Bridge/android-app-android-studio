@@ -64,7 +64,7 @@ public class ContactProfileFragment extends SherlockFragment {
         showProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mPager.setCurrentItem(1);
+//                mPager.setCurrentItem(1);
             }
         });
 

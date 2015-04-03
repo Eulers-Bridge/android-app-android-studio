@@ -30,6 +30,8 @@ public class ElectionMasterFragment extends SherlockFragment implements TabListe
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
 		rootView = inflater.inflate(R.layout.election_master_layout, container, false);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().hide();
 		
 		electionFragment = new ElectionFragment();
 		candidateFragment = new CandidateFragment();

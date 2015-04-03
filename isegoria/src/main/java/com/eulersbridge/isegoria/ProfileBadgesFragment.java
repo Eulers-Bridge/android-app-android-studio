@@ -95,7 +95,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
             view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
             view.setScaleType(ScaleType.CENTER_CROP);
             view.setBackgroundColor(Color.GRAY);
-            network.getPictureVolley2(bitmap, view, squareSize);
+            //network.getPictureVolley2(bitmap, view, squareSize);
 
             viewLinearLayout.addView(view);
 
@@ -115,7 +115,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
                     args.putString("PhotoName", (String) String.valueOf(photoPath));
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.replace(android.R.id.content, fragment2);
+                   //fragmentTransaction2.replace(android.R.id.content, fragment2);
                     fragmentTransaction2.commit();
                 }
             });

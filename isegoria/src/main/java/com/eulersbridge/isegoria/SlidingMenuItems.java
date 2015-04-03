@@ -38,25 +38,25 @@ public class SlidingMenuItems extends ListFragment {
 		SherlockFragment newContent = null;
 		switch (position) {
 		case 0:
-			newContent = feedFragment;
+			newContent = new FeedFragment();
 			break;
 		case 1:
-			newContent = electionFragment;
+			newContent = new ElectionMasterFragment();
 			break;
 		case 2:
-			newContent = pollFragment;
+			newContent = new PollFragment();
 			break;
 		case 3:
-			newContent = voteViewPagerFragment;
+			newContent = new VoteViewPagerFragment();
 			break;
         case 4:
-            newContent = findAddContactFragment;
+            newContent = new FindAddContactFragment();
             break;
 		case 5:
-			newContent = profileViewPagerFragment;
+			newContent = new ProfileViewPagerFragment();
 			break;
 		case 6:
-			newContent = userSettingsFragment;
+			newContent = new UserSettingsFragment();
 			break;
 		}
 		if (newContent != null)

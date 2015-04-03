@@ -1,9 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import java.io.InputStream;
-
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,8 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.ImageView.ScaleType;
+import android.widget.TextView;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
+import java.io.InputStream;
 
 public class PhotoViewFragment extends SherlockFragment {
 	private View rootView;
@@ -25,9 +25,7 @@ public class PhotoViewFragment extends SherlockFragment {
 	private DisplayMetrics displayMetrics;
 	private String photoPath;
 
-	public PhotoViewFragment() {
-
-	}
+    private Bitmap imageBitmap;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -38,14 +36,16 @@ public class PhotoViewFragment extends SherlockFragment {
 		
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
-        
-        MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPhoto(this, photoPath);
+        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+        addPhoto("", imageBitmap);
 
 		return rootView;
 	}
+
+    public void setImageBitmap(Bitmap bitmap) {
+        this.imageBitmap = bitmap;
+    }
 	
 	public void addPhoto(final String title, final Bitmap bitmap) {
 		try {

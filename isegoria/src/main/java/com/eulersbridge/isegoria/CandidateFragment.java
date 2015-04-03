@@ -1,37 +1,25 @@
 package com.eulersbridge.isegoria;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Vector;
-
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.viewpagerindicator.CirclePageIndicator;
-import com.viewpagerindicator.TabPageIndicator;
-import com.viewpagerindicator.TitlePageIndicator;
-
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.viewpagerindicator.TabPageIndicator;
+
+import java.util.List;
+import java.util.Vector;
 
 public class CandidateFragment extends SherlockFragment {
 	private View rootView;
 	private boolean loaded = false;
 	private CandidatePagerAdapter candidatePagerAdapter;
 	public List<SherlockFragment> fragments;
-	
-	public CandidateFragment() {
-
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   

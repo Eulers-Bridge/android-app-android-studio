@@ -36,6 +36,8 @@ public class PhotoAlbumFragment extends SherlockFragment {
 	private boolean insertedFirstRow = false;
 	private String photoAlbumName = "";
 
+    private PhotoViewPagerFragment photoViewPagerFragment;
+
     private Network network;
 
 	public PhotoAlbumFragment() {
@@ -60,6 +62,8 @@ public class PhotoAlbumFragment extends SherlockFragment {
         dividerPadding = (10/4);
 
         tr = new TableRow(getActivity());
+
+        photoViewPagerFragment = new PhotoViewPagerFragment();
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -96,7 +100,6 @@ public class PhotoAlbumFragment extends SherlockFragment {
             view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
             view.setScaleType(ScaleType.CENTER_CROP);
             view.setBackgroundColor(Color.GRAY);
-            network.getPictureVolley2(bitmap, view, squareSize);
 
             viewLinearLayout.addView(view);
 
@@ -105,6 +108,14 @@ public class PhotoAlbumFragment extends SherlockFragment {
             linearLayout.setGravity(Gravity.CENTER_VERTICAL);
             linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             linearLayout.setPadding(10, 0, 0, 0);
+
+            PhotoViewFragment fragment2 = new PhotoViewFragment();
+            Bundle args = new Bundle();
+            args.putString("PhotoName", (String) String.valueOf(photoPath));
+            fragment2.setArguments(args);
+
+            final int index = photoViewPagerFragment.addFragment(fragment2);
+            network.getPictureVolley2(bitmap, view, squareSize, fragment2);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -116,7 +127,8 @@ public class PhotoAlbumFragment extends SherlockFragment {
                     args.putString("PhotoName", (String) String.valueOf(photoPath));
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.replace(android.R.id.content, fragment2);
+                    fragmentTransaction2.replace(android.R.id.content, photoViewPagerFragment);
+                    photoViewPagerFragment.setPosition(index);
                     fragmentTransaction2.commit();
                 }
             });

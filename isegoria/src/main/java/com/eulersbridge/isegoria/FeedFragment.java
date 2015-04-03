@@ -28,18 +28,16 @@ public class FeedFragment extends SherlockFragment implements TabListener {
     private ActionBar bar;
 
     private boolean complete = false;
-	
-	public FeedFragment () {
-		newsFragment = new NewsFragment();
-		photosFragment = new PhotosFragment();
-		eventsFragment = new EventsFragment();
-	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.feed_fragment, container, false);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
+
+        newsFragment = new NewsFragment();
+        photosFragment = new PhotosFragment();
+        eventsFragment = new EventsFragment();
 
         FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
 

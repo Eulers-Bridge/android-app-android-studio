@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.viewpagerindicator.TabPageIndicator;
@@ -33,6 +34,7 @@ public class ElectionFragment extends SherlockFragment implements OnPageChangeLi
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.election_fragment, container, false);
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
 		fragments = new Vector<SherlockFragment>();
         fragments.add((SherlockFragment) SherlockFragment.instantiate(getActivity(), ElectionOverviewFragment.class.getName()));

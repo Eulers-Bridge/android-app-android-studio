@@ -2273,13 +2273,13 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getPictureVolley2(String params, final ImageView view, final int squareSize) {
+    public void getPictureVolley2(String params, final ImageView view, final int squareSize, final PhotoViewFragment fragment) {
         ImageRequest req = new ImageRequest(params,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap srcBmp) {
                         view.setImageBitmap(srcBmp);
-                        //view.setScaleType(ImageView.ScaleType.FIT_XY);
+                        fragment.setImageBitmap(srcBmp);
                     }
                 }, 0, 0, null,
                 new Response.ErrorListener() {

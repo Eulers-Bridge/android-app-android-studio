@@ -13,14 +13,21 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import java.util.ArrayList;
 
-public class VoteViewPagerFragment extends SherlockFragment  {
+public class PhotoViewPagerFragment extends SherlockFragment  {
     private View rootView;
-    private NonSwipeableViewPager mPager;
-    private ProfilePagerAdapter mPagerAdapter;
+    private ViewPager mPager;
+    private PhotoPagerAdapter mPagerAdapter;
+
+    private ArrayList<SherlockFragment> fragmentList;
+    private int position;
+
+    public PhotoViewPagerFragment() {
+        fragmentList = new ArrayList<SherlockFragment>();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
+        rootView = inflater.inflate(R.layout.photo_view_pager_fragment, container, false);
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
@@ -32,28 +39,23 @@ public class VoteViewPagerFragment extends SherlockFragment  {
             }
         };
 
-        ArrayList<SherlockFragment> fragmentList = new ArrayList<SherlockFragment>();
-
-        mPager = (NonSwipeableViewPager) rootView.findViewById(R.id.voteViewPagerFragment);
+        mPager = (ViewPager) rootView.findViewById(R.id.photoViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
-        VoteFragment voteFragment = new VoteFragment();
-        VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();
-        VoteFragmentDone voteFragmentDone = new VoteFragmentDone();
-
-        voteFragment.setViewPager(mPager);
-        voteFragmentPledge.setViewPager(mPager);
-        voteFragmentDone.setViewPager(mPager);
-
-        ProfileFragment profileFragment = new ProfileFragment();
-        profileFragment.setViewPager(mPager);
-        fragmentList.add(voteFragment);
-        fragmentList.add(voteFragmentPledge);
-        fragmentList.add(voteFragmentDone);
-
-        mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
+        mPagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
         mPager.setAdapter(mPagerAdapter);
 
+        mPager.setCurrentItem(this.position);
+
         return rootView;
+    }
+
+    public int addFragment(SherlockFragment fragment) {
+        fragmentList.add(fragment);
+        return fragmentList.size()-1;
+    }
+
+    public void setPosition(int pos) {
+        this.position = pos;
     }
 }

@@ -3,10 +3,61 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#64d3d3d3"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:orientation="vertical"
+            android:paddingTop="5dp">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
+
+            <TextView
+                android:id="@+id/mytextview1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Level 12"
+                android:textColor="#ff575757"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:paddingBottom="2dp" />
+
+            <TextView
+                android:id="@+id/mytextview2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="2640 out of 4000 XP till the next level!"
+                android:textColor="#ff575757"
+                android:textSize="12dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/taskProgressLayout" >
+        android:id="@+id/taskProgressLayout"
+        android:fillViewport="false">
 
         <LinearLayout
             android:orientation="vertical"
