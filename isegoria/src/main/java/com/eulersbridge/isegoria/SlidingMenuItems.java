@@ -11,14 +11,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 
 public class SlidingMenuItems extends ListFragment {
 	
-	SherlockFragment feedFragment = new FeedFragment();
-	SherlockFragment electionFragment = new ElectionMasterFragment();
-	SherlockFragment pollFragment = new PollFragment();
-	SherlockFragment voteViewPagerFragment = new VoteViewPagerFragment();
-    SherlockFragment findAddContactFragment = new FindAddContactFragment();
-	SherlockFragment profileViewPagerFragment = new ProfileViewPagerFragment();
-	SherlockFragment userSettingsFragment = new UserSettingsFragment();
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.list, null);

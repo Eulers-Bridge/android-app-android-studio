@@ -29,6 +29,7 @@ public class EventsFragment extends SherlockFragment {
 	private float dpWidth;
 	private float dpHeight;
 
+    private EventsDetailFragment fragment2;
     private Network network;
 	
 	public EventsFragment() {
@@ -85,14 +86,14 @@ public class EventsFragment extends SherlockFragment {
 		view.setOnClickListener(new View.OnClickListener() {        
             @Override
             public void onClick(View view) {
-		    		FragmentManager fragmentManager2 = getFragmentManager();
+		    		FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 		    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-		    		EventsDetailFragment fragment2 = new EventsDetailFragment();
+		    		fragment2 = new EventsDetailFragment();
 		    		Bundle args = new Bundle();
 		    		args.putInt("EventId", eventId);
 		    		fragment2.setArguments(args);
-		    		fragmentTransaction2.addToBackStack(null);
-		    		fragmentTransaction2.replace(android.R.id.content, fragment2);
+		    		fragmentTransaction2.add(R.id.eventsFrameLayout, fragment2);
+                    fragmentTransaction2.addToBackStack("");
 		    		fragmentTransaction2.commit();
             }
          });

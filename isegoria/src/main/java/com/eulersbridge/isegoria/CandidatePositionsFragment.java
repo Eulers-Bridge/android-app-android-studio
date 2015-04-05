@@ -117,14 +117,14 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                     Bundle args = new Bundle();
                     args.putInt("PositionId", positionId);
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
                     fragmentTransaction2.commit();
 	            }
 	         });
@@ -162,14 +162,14 @@ public class CandidatePositionsFragment extends SherlockFragment {
             view2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                     Bundle args = new Bundle();
                     args.putInt("PositionId", positionId);
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.replace(R.id.content_election_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
                     fragmentTransaction2.commit();
                 }
             });

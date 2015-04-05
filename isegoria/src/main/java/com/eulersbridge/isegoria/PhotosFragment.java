@@ -93,14 +93,14 @@ public class PhotosFragment extends SherlockFragment {
 	        textViewArticle.setOnClickListener(new View.OnClickListener() {
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
 			    		Bundle args = new Bundle();
 			    		args.putString("Album", (String) String.valueOf(albumId));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(android.R.id.content, fragment2);
+			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	       });
@@ -108,14 +108,14 @@ public class PhotosFragment extends SherlockFragment {
 	       view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
 			    		Bundle args = new Bundle();
 			    		args.putString("Album", (String) String.valueOf(albumId));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(android.R.id.content, fragment2);
+			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });

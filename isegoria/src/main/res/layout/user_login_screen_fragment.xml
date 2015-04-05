@@ -14,17 +14,20 @@
 
         
 	    <LinearLayout
-	        android:layout_width="match_parent"
+	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="center_vertical|center_horizontal"
-	        android:orientation="vertical" >
+	        android:orientation="vertical"
+            android:weightSum="1">
 	
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/app_icon" />
+            android:src="@drawable/welcome"
+            android:paddingTop="20dp"
+            android:layout_weight="0.76" />
 	        
 	            <TextView
 	                android:id="@+id/photoTitle"

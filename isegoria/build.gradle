@@ -30,4 +30,5 @@ dependencies {
     compile project(':viewpagerlibrary')
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.mcxiaoke.volley:library:1.0.+'
+    compile 'com.sothree.slidinguppanel:library:3.0.0'
 }

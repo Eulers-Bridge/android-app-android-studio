@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -22,7 +21,9 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-public class NewsFragment extends Fragment {
+import com.actionbarsherlock.app.SherlockFragment;
+
+public class NewsFragment extends SherlockFragment {
 	private View rootView;
 	private TableLayout newsTableLayout;
 	
@@ -53,7 +54,7 @@ public class NewsFragment extends Fragment {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		rootView = inflater.inflate(R.layout.news_fragment, container, false);
@@ -161,14 +162,14 @@ public class NewsFragment extends Fragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
 			    		args.putInt("ArticleId", articleId1);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(android.R.id.content, fragment2);
+                        fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });
@@ -221,14 +222,14 @@ public class NewsFragment extends Fragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
 			    		args.putInt("ArticleId", articleId2);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(android.R.id.content, fragment2);
+			    		fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });
@@ -266,14 +267,14 @@ public class NewsFragment extends Fragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
 			    		args.putInt("ArticleId", articleId1);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.add(android.R.id.content, fragment2);
+                        fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });

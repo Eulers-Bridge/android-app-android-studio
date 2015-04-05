@@ -47,7 +47,6 @@ public class CandidateTicketFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
-		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
 		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -130,14 +129,14 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", lastTicketId);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(R.id.content_frame, fragment2);
+			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });
@@ -196,14 +195,14 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-			    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", ticketId);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.replace(R.id.content_frame, fragment2);
+			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
 			    		fragmentTransaction2.commit();
 	            }
 	         });

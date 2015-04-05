@@ -23,7 +23,7 @@ public class VoteViewPagerFragment extends SherlockFragment  {
         rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
+        FragmentManager fm = getChildFragmentManager();
 
         ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
             @Override

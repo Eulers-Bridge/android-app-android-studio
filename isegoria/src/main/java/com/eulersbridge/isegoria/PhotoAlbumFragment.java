@@ -120,14 +120,14 @@ public class PhotoAlbumFragment extends SherlockFragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getFragmentManager();
+                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     PhotoViewFragment fragment2 = new PhotoViewFragment();
                     Bundle args = new Bundle();
                     args.putString("PhotoName", (String) String.valueOf(photoPath));
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.replace(android.R.id.content, photoViewPagerFragment);
+                    fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);
                     photoViewPagerFragment.setPosition(index);
                     fragmentTransaction2.commit();
                 }

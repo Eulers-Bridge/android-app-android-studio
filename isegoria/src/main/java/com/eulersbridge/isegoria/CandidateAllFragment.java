@@ -94,14 +94,14 @@ public class CandidateAllFragment extends SherlockFragment {
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getFragmentManager();
+                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
                 args.putInt("ProfileId", userId);
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
+                fragmentTransaction2.replace(R.id.candidate_frame1, fragment2);
                 fragmentTransaction2.commit();
             }
         });

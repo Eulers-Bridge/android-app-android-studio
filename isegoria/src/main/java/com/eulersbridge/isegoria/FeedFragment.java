@@ -3,12 +3,12 @@ package com.eulersbridge.isegoria;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.app.FragmentManager;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -19,9 +19,6 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class FeedFragment extends SherlockFragment implements TabListener {
 	private View rootView;
-	private NewsFragment newsFragment = null;
-	private PhotosFragment photosFragment = null;
-	private EventsFragment eventsFragment = null;
 	private ViewGroup container = null;
     private android.support.v4.widget.SwipeRefreshLayout swipeLayout;
     private ViewPager mPager;
@@ -35,13 +32,9 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
 
-        newsFragment = new NewsFragment();
-        photosFragment = new PhotosFragment();
-        eventsFragment = new EventsFragment();
+        FragmentManager fm = getChildFragmentManager();
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
-
-            ((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();
+        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().removeAllTabs();
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().addTab(
 				((SherlockFragmentActivity) getActivity()).getSupportActionBar().newTab()
 	            .setText("News")
@@ -67,11 +60,14 @@ public class FeedFragment extends SherlockFragment implements TabListener {
                 bar.setSelectedNavigationItem(position);
             }
         };
-        mPager = (ViewPager) rootView.findViewById(R.id.feedPager);
-        mPager.setOnPageChangeListener(ViewPagerListener);
+
+        mPager = (android.support.v4.view.ViewPager) rootView.findViewById(R.id.feedViewPagerFragment);
 
         FeedViewPagerAdapter viewpageradapter = new FeedViewPagerAdapter(fm);
         mPager.setAdapter(viewpageradapter);
+        mPager.setOnPageChangeListener(ViewPagerListener);
+
+        mPager.setCurrentItem(0);
 		
 		complete = true;
 		return rootView;
@@ -83,7 +79,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
     	try {
             mPager.setCurrentItem(tab.getPosition());
     	} catch(Exception e) {
-    		
+    		e.printStackTrace();
     	}
     }
 	

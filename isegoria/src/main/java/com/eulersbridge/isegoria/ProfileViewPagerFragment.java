@@ -24,7 +24,7 @@ public class ProfileViewPagerFragment extends SherlockFragment  {
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
+        FragmentManager fm = getChildFragmentManager();
 
         ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
             @Override

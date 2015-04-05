@@ -44,7 +44,7 @@ public class PollVoteFragment extends SherlockFragment {
     private ArrayList<ImageView> tickBoxes = new ArrayList<ImageView>();
     private ArrayList<TextView> pollResults = new ArrayList<TextView>();
     private ArrayList<ProgressBar> progressBars = new ArrayList<ProgressBar>();
-	
+
 	public PollVoteFragment() {
         pollVoteFragment = this;
 	}

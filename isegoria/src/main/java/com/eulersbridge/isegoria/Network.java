@@ -82,7 +82,12 @@ public class Network {
     private FindAddContactFragment findAddContactFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
+    private PollVoteFragment pollVoteFragment;
 	private Isegoria application;
+
+    private String loginGivenName = "";
+    private String loginFamilyName = "";
+    private String loginEmail = "";
 
     private int electionId;
 
@@ -117,6 +122,11 @@ public class Network {
 
                     userId = jObject.getLong("userId");
 
+                    JSONObject jUser = jObject.getJSONObject("user");
+                    loginGivenName = jUser.getString("givenName");
+                    loginFamilyName = jUser.getString("familyName");
+                    loginEmail = jUser.getString("email");
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 					application.getMainActivity().runOnUiThread(new Runnable() {
@@ -130,12 +140,6 @@ public class Network {
 
 		Thread t = new Thread(r);
 		t.start();
-	}
-
-	public NetworkResponse logout() {
-		NetworkResponse networkResponse = null;
-
-		return networkResponse;
 	}
 
 	public void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
@@ -273,24 +277,28 @@ public class Network {
                             JSONArray jArray = response.getJSONArray("articles");
 
                             for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentArticle = jArray.getJSONObject(i);
-                                int articleId = currentArticle.getInt("articleId");
-                                int institutionId = currentArticle.getInt("institutionId");
-                                String title = currentArticle.getString("title");
-                                String content = currentArticle.getString("content");
-                                JSONArray photos = currentArticle.getJSONArray("photos");
-                                String picture = photos.getJSONObject(0).getString("url");
-                                picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-                                Bitmap bitmapPicture = null;
+                                try {
+                                    JSONObject currentArticle = jArray.getJSONObject(i);
+                                    int articleId = currentArticle.getInt("articleId");
+                                    int institutionId = currentArticle.getInt("institutionId");
+                                    String title = currentArticle.getString("title");
+                                    String content = currentArticle.getString("content");
+                                    JSONArray photos = currentArticle.getJSONArray("photos");
+                                    String picture = photos.getJSONObject(0).getString("url");
+                                    picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
+                                    Bitmap bitmapPicture = null;
 
-                                String likers = null;
-                                long date = currentArticle.getLong("date");
-                                date = TimeConverter.convertTimestampTimezone(date);
-                                String creatorEmail = "";
-                                String studentYear = "";
-                                String link = null;
+                                    String likers = null;
+                                    long date = currentArticle.getLong("date");
+                                    date = TimeConverter.convertTimestampTimezone(date);
+                                    String creatorEmail = "";
+                                    String studentYear = "";
+                                    String link = null;
 
-                                newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likers, date, creatorEmail, studentYear, link);
+                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likers, date, creatorEmail, studentYear, link);
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1063,6 +1071,101 @@ public class Network {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
+    }
+
+    public void getPollComments(final int pollId, final PollVoteFragment pollVoteFragment) {
+        this.pollVoteFragment = pollVoteFragment;
+        String url = SERVER_URL + "dbInterface/api/comments/" + String.valueOf(pollId) + "/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        int targetId = response.getJSONObject(i).getInt("targetId");
+                        int commentId = response.getJSONObject(i).getInt("commentId");
+                        String userName = response.getJSONObject(i).getString("userName");
+                        String userEmail = response.getJSONObject(i).getString("userEmail");
+                        String content = response.getJSONObject(i).getString("content");
+
+                        pollVoteFragment.addTableComment(userName, content);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void postPollComment(final int pollId, final PollFragment pollFragment) {
+        this.pollFragment = pollFragment;
+        String url = SERVER_URL + "dbInterface/api/comment";
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("targetId", String.valueOf(pollId));
+        params.put("userName", (this.loginGivenName + " " + this.loginFamilyName));
+        params.put("userEmail", this.loginEmail);
+        params.put("content", (this.pollFragment.getCommentsField().getText().toString()));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String test = "";
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
     }
 
     public void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
