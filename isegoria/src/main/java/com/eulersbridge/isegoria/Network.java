@@ -61,6 +61,7 @@ public class Network {
 	private String username;
 	private String password;
 	private String email;
+    private boolean hasPersonality;
     private boolean loginAccountVerified;
 
     private Network network;
@@ -130,10 +131,16 @@ public class Network {
                         loginFamilyName = jUser.getString("familyName");
                         loginEmail = jUser.getString("email");
                         loginAccountVerified = jUser.getBoolean("accountVerified");
+                        hasPersonality = false;
 
                         if (loginAccountVerified) {
                             application.setLoggedIn(true);
-                            application.setFeedFragment();
+                            if(hasPersonality) {
+                                application.setFeedFragment();
+                            }
+                            else {
+                                application.setPersonality();
+                            }
                         } else {
                             application.setVerification();
                         }
@@ -1272,6 +1279,55 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
+    public void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
+                                  float emotionalStability, float openess) {
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/personality";
+
+        HashMap<String, Float> params = new HashMap<String, Float>();
+        params.put("extroversion", extroversion);
+        params.put("agreeableness", agreeableness);
+        params.put("conscientiousness", conscientiousness);
+        params.put("emotionalStability", emotionalStability);
+        params.put("openess", openess);
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            application.setFeedFragment();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
     public void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
         this.pollFragment = pollFragment;
         String url = SERVER_URL + "dbInterface/api/poll/" + String.valueOf(pollId) + "/answer";
@@ -1959,6 +2015,52 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
+
+    public void addVoteReminder(long date, String location) {
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(loginEmail) + "/voteReminder";
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("location", location);
+        params.put("date", String.valueOf(date));
+        params.put("electionId", String.valueOf(network.electionId));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
 
     public void getUserFullName(int userId, final TextView textView, final String params) {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/";

@@ -52,7 +52,17 @@ public class Isegoria extends Application {
             }
         });
     }
-	
+
+    public void setPersonality() {
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.hideDialog();
+                mainActivity.switchContent(new PersonalityQuestionsFragment());
+            }
+        });
+    }
+
 	public void signupSucceded() {
 		mainActivity.showSignupSucceded();
 	}

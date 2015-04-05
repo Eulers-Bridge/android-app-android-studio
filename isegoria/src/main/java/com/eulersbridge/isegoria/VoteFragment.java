@@ -24,6 +24,7 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 	private ArrayAdapter<String> voteLocationArrayAdapter;
     private ArrayList<VoteLocation> voteLocationArray;
 
+    public Spinner spinnerLocation;
     public DatePicker datePicker;
     public TimePicker timePicker;
 
@@ -36,7 +37,7 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		getActivity().getActionBar().removeAllTabs();
 		
-        Spinner spinnerLocation = (Spinner) rootView.findViewById(R.id.voteLocation);
+        spinnerLocation = (Spinner) rootView.findViewById(R.id.voteLocation);
         spinnerLocation.setOnItemSelectedListener(this);
         voteLocationArrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.spinner_layout);
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
@@ -81,5 +82,29 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
     
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    public DatePicker getDatePicker() {
+        return datePicker;
+    }
+
+    public void setDatePicker(DatePicker datePicker) {
+        this.datePicker = datePicker;
+    }
+
+    public TimePicker getTimePicker() {
+        return timePicker;
+    }
+
+    public void setTimePicker(TimePicker timePicker) {
+        this.timePicker = timePicker;
+    }
+
+    public Spinner getSpinnerLocation() {
+        return spinnerLocation;
+    }
+
+    public void setSpinnerLocation(Spinner spinnerLocation) {
+        this.spinnerLocation = spinnerLocation;
     }
 }

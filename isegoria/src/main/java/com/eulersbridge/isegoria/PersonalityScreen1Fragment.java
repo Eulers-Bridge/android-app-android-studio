@@ -17,12 +17,15 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 public class PersonalityScreen1Fragment extends SherlockFragment {
     private View rootView;
 
+    private Network network;
     private ViewPager mPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.personality_screen1_fragment, container, false);
 
+        final MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
         FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
 
         final Button takePersonalityButton = (Button) rootView.findViewById(R.id.takePersonalityButton);
@@ -30,6 +33,13 @@ public class PersonalityScreen1Fragment extends SherlockFragment {
             @Override
             public void onClick(View view) {
                 mPager.setCurrentItem(1);
+            }
+        });
+
+        Button skipPersonalityQuestions = (Button) rootView.findViewById(R.id.skipPersonality);
+        skipPersonalityQuestions.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mainActivity.getIsegoriaApplication().setFeedFragment();
             }
         });
 

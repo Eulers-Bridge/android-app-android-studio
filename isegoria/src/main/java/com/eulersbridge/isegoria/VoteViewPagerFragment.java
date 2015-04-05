@@ -51,6 +51,8 @@ public class VoteViewPagerFragment extends SherlockFragment  {
         fragmentList.add(voteFragmentPledge);
         fragmentList.add(voteFragmentDone);
 
+        voteFragmentPledge.setVoteFragment(voteFragment);
+
         mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
         mPager.setAdapter(mPagerAdapter);
 
