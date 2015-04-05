@@ -28,6 +28,8 @@ public class NewsArticleFragment extends Fragment {
 	private Isegoria isegoria;
 	private int articleId;
 
+    private boolean setLiked = false;
+
     private Network network;
 
 	@Override
@@ -42,10 +44,20 @@ public class NewsArticleFragment extends Fragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
+        network.getNewsArticleLiked(this);
+
 		return rootView;
 	}
-	
-	public int getArticleId() {
+
+    public boolean isSetLiked() {
+        return setLiked;
+    }
+
+    public void setSetLiked(boolean setLiked) {
+        this.setLiked = setLiked;
+    }
+
+    public int getArticleId() {
 		return articleId;
 	}
 

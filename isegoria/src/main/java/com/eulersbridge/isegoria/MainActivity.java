@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class MainActivity extends BaseActivity {
 	private SherlockFragment mContent;
 	private Isegoria application;
-	private ProgressDialog dialog;
+	public ProgressDialog dialog;
 	
 	private String firstName;
 	private String lastName; 

@@ -1,8 +1,8 @@
 package com.eulersbridge.isegoria;
 
-import java.util.ArrayList;
-
 import android.app.Application;
+
+import java.util.ArrayList;
 
 public class Isegoria extends Application {
 	private MainActivity mainActivity;
@@ -42,6 +42,16 @@ public class Isegoria extends Application {
 		     }
 		});
 	}
+
+    public void setVerification() {
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.hideDialog();
+                mainActivity.switchContent(new EmailVerificationFragment());
+            }
+        });
+    }
 	
 	public void signupSucceded() {
 		mainActivity.showSignupSucceded();

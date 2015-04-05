@@ -61,6 +61,7 @@ public class Network {
 	private String username;
 	private String password;
 	private String email;
+    private boolean loginAccountVerified;
 
     private Network network;
 	private NewsFragment newsFragment;
@@ -79,6 +80,7 @@ public class Network {
     private CandidatePositionFragment candidatePositionFragment;
     private TaskDetailProgressFragment taskDetailProgressFragment;
     private ProfileBadgesFragment profileBadgesFragment;
+    private EmailVerificationFragment emailVerificationFragment;
     private FindAddContactFragment findAddContactFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
@@ -116,18 +118,27 @@ public class Network {
 			public void run() {
 				String response = getRequest("dbInterface/api/login");
 				try {
-					JSONObject jObject = new JSONObject(response);
-					application.setLoggedIn(true);
-					application.setFeedFragment();
+                    if(response.startsWith("HTTP Status 401 - User is disabled")) {
+                        application.setVerification();
+                    }
+                    else {
+                        JSONObject jObject = new JSONObject(response);
+                        userId = jObject.getLong("userId");
 
-                    userId = jObject.getLong("userId");
+                        JSONObject jUser = jObject.getJSONObject("user");
+                        loginGivenName = jUser.getString("givenName");
+                        loginFamilyName = jUser.getString("familyName");
+                        loginEmail = jUser.getString("email");
+                        loginAccountVerified = jUser.getBoolean("accountVerified");
 
-                    JSONObject jUser = jObject.getJSONObject("user");
-                    loginGivenName = jUser.getString("givenName");
-                    loginFamilyName = jUser.getString("familyName");
-                    loginEmail = jUser.getString("email");
-
-				} catch (JSONException e) {
+                        if (loginAccountVerified) {
+                            application.setLoggedIn(true);
+                            application.setFeedFragment();
+                        } else {
+                            application.setVerification();
+                        }
+                    }
+                } catch (JSONException e) {
 					e.printStackTrace();
 					application.getMainActivity().runOnUiThread(new Runnable() {
 						public void run() {
@@ -405,18 +416,6 @@ public class Network {
         this.getFirstPhotoBlur(0, (int) profileId, backgroundLinearLayout);
     }
 
-    public NetworkResponse getElections() {
-		NetworkResponse networkResponse = null;
-
-		return networkResponse;
-	}
-
-	public NetworkResponse getPolls() {
-		NetworkResponse networkResponse = null;
-
-		return networkResponse;
-	}
-
     public void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
@@ -671,6 +670,42 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
+
+    public void verifyEmail(final EmailVerificationFragment emailVerificationFragment) {
+        this.emailVerificationFragment = emailVerificationFragment;
+        String url = SERVER_URL + "dbInterface/api/emailVerification/" + String.valueOf(username) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jObject) {
+                        String test = ":)";
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
 
 	public void getEventDetails(final EventsDetailFragment eventsDetailFragment, final int eventId) {
 		this.eventDetailFragment = eventsDetailFragment;
@@ -961,6 +996,54 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
+
+    public void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
+        this.photoViewFragment = photoViewFragment;
+        String url = SERVER_URL + "dbInterface/api/newsArticle/likes/"
+                + String.valueOf(newsArticleFragment.getArticleId());
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    for(int i=0; i<response.length(); i++) {
+                        int targetId = response.getJSONObject(i).getInt("targetId");
+                        int commentId = response.getJSONObject(i).getInt("commentId");
+                        String userName = response.getJSONObject(i).getString("userName");
+                        String userEmail = response.getJSONObject(i).getString("userEmail");
+                        String content = response.getJSONObject(i).getString("content");
+
+                        pollVoteFragment.addTableComment(userName, content);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
 	
 	public void getVoteRecords(final VoteFragment voteFragment) {
 		this.voteFragment = voteFragment;
