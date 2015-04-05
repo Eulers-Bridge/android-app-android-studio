@@ -72,11 +72,11 @@ public class PhotoAlbumFragment extends SherlockFragment {
 		return rootView;
 	}
 
-	public void addPhotoThumb(final String bitmap, final String photoId) {
+	public void addPhotoThumb(final String bitmap, final int photoId) {
 		addTableRow(bitmap, photoId);
 	}
 
-	public void addTableRow(String bitmap, final String photoPath) {
+	public void addTableRow(String bitmap, final int photoPath) {
         try {
             photosPerRow = photosPerRow + 1;
             if (photosPerRow == fitPerRow) {
@@ -111,7 +111,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
 
             PhotoViewFragment fragment2 = new PhotoViewFragment();
             Bundle args = new Bundle();
-            args.putString("PhotoName", (String) String.valueOf(photoPath));
+            args.putInt("PhotoId", photoPath);
             fragment2.setArguments(args);
 
             final int index = photoViewPagerFragment.addFragment(fragment2);

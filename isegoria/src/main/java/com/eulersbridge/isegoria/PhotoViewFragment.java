@@ -23,8 +23,9 @@ public class PhotoViewFragment extends SherlockFragment {
 	private float dpHeight;
 	
 	private DisplayMetrics displayMetrics;
-	private String photoPath;
+	private int photoPath;
 
+    private Network network;
     private Bitmap imageBitmap;
 	
 	@Override
@@ -32,7 +33,7 @@ public class PhotoViewFragment extends SherlockFragment {
 		rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
 		getActivity().setTitle("Isegoria");
 		Bundle bundle = this.getArguments();
-		photoPath = (String) bundle.getString("PhotoName");
+		photoPath = (int) bundle.getInt("PhotoId");
 		
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -40,11 +41,25 @@ public class PhotoViewFragment extends SherlockFragment {
 
         addPhoto("", imageBitmap);
 
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getPhoto(this, photoPath);
+
 		return rootView;
 	}
 
     public void setImageBitmap(Bitmap bitmap) {
         this.imageBitmap = bitmap;
+    }
+
+    public void setData(String title, long date) {
+        String dateStr = TimeConverter.convertTimestampToString(date);
+
+        TextView photoTileTextView = (TextView) rootView.findViewById(R.id.photoTitle);
+        TextView photoDateTextView = (TextView) rootView.findViewById(R.id.photoDate);
+
+        photoTileTextView.setText(title);
+        photoDateTextView.setText(dateStr);
     }
 	
 	public void addPhoto(final String title, final Bitmap bitmap) {

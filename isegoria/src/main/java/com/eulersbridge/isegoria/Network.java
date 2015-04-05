@@ -832,7 +832,7 @@ public class Network {
                                 String description = currentAlbum.getString("description");
                                 String thumbNailUrl = currentAlbum.getString("url");
 
-                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, String.valueOf(nodeId));
+                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, nodeId);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -883,7 +883,7 @@ public class Network {
                                 String description = currentAlbum.getString("description");
                                 String thumbNailUrl = currentAlbum.getString("url");
 
-                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, String.valueOf(nodeId));
+                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, nodeId);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -915,30 +915,51 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-	public void getPhoto(final PhotoViewFragment photoViewFragment, final String photoId) {
+	public void getPhoto(final PhotoViewFragment photoViewFragment, final int photoId) {
 		this.photoViewFragment = photoViewFragment;
+        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId);
 
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("dbInterface/api/photo/" + String.valueOf(photoId));
-				try {
-					JSONObject jObject = new JSONObject(response);
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            int nodeId = response.getInt("nodeId");
+                            String title = response.getString("title");
+                            String description = response.getString("description");
+                            long date = response.getLong("date");
+                            date = TimeConverter.convertTimestampTimezone(date);
+                            String url = response.getString("url");
 
-					int nodeId = jObject.getInt("nodeId");
-					String title = jObject.getString("title");
-					String description = jObject.getString("description");
-					String url = jObject.getString("url");
-						
-					Bitmap bitmapPicture = getPicture(url);
-					photoViewFragment.addPhoto(title, bitmapPicture);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		
-		Thread t = new Thread(r);
-		t.start();
+                            photoViewFragment.setData(title, date);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
 	}
 	
 	public void getVoteRecords(final VoteFragment voteFragment) {
