@@ -125,10 +125,13 @@ public class CandidateAllFragment extends SherlockFragment {
 	}
 
     public void addAllRows() {
-        candidateAllTableLayout.removeAllViews();
-
-        for(int i=0; i<rows.size(); i++) {
-            candidateAllTableLayout.addView(rows.get(i));
+        try {
+            candidateAllTableLayout.removeAllViews();
+            for (int i = 0; i < rows.size(); i++) {
+                candidateAllTableLayout.addView(rows.get(i));
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 

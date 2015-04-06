@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,6 +96,8 @@ public class Network {
     private int electionId;
 
     private RequestQueue mRequestQueue;
+
+    private ArrayList<Integer> userTickets = new ArrayList<Integer>();
 
 	public Network(Isegoria application) {
         this.network = this;
@@ -1514,6 +1517,52 @@ public class Network {
         mRequestQueue.add(req);
     }
 
+    public void getUserSupportedTickets() {
+        this.electionOverviewFragment = electionOverviewFragment;
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/support/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    userTickets.clear();
+                    for(int i=0; i<response.length(); i++) {
+                        JSONObject currentObject = response.getJSONObject(i);
+
+                        int ticketId = currentObject.getInt("ticketId");
+                        userTickets.add(new Integer(ticketId));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
     public void getLatestElection(final VoteFragment voteFragment) {
         this.voteFragment = voteFragment;
         String url = SERVER_URL + "dbInterface/api/elections/26";
@@ -2065,8 +2114,55 @@ public class Network {
 
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
         HashMap<String, String> params = new HashMap<String, String>();
+        userTickets.add(new Integer(ticketId));
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
+    public void unsupportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
+        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
+
+        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
+        HashMap<String, String> params = new HashMap<String, String>();
+        userTickets.remove(new Integer(ticketId));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2645,6 +2741,14 @@ public class Network {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
+    }
+
+    public ArrayList<Integer> getUserTickets() {
+        return userTickets;
+    }
+
+    public void setUserTickets(ArrayList<Integer> userTickets) {
+        this.userTickets = userTickets;
     }
 
     public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {

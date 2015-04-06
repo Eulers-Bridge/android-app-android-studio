@@ -74,13 +74,28 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
         ticketSupportButton = (Button) rootView.findViewById(R.id.supportButton);
+
+        if(network.getUserTickets().contains(new Integer(ticketId))) {
+            ticketSupportButton.setText("Unsupport");
+        }
+
         ticketSupportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                network.supportTicket(ticketId, candidateTicketDetailFragment);
-                TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
-                String value = String.valueOf(partyDetailSupporters.getText());
-                partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value)+1));
+                if(ticketSupportButton.getText().equals("Support")) {
+                    network.supportTicket(ticketId, candidateTicketDetailFragment);
+                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    String value = String.valueOf(partyDetailSupporters.getText());
+                    partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
+                    ticketSupportButton.setText("Unsupport");
+                }
+                else if(ticketSupportButton.getText().equals("Unsupport")) {
+                    network.unsupportTicket(ticketId, candidateTicketDetailFragment);
+                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    String value = String.valueOf(partyDetailSupporters.getText());
+                    partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
+                    ticketSupportButton.setText("Support");
+                }
             }
         });
 

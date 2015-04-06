@@ -59,6 +59,7 @@ public class CandidateTicketFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getTickets(this);
+        network.getUserSupportedTickets();
         
 		return rootView;
 	}
