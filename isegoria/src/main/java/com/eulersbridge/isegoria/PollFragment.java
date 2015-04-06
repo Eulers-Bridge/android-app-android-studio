@@ -1,18 +1,23 @@
 package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
@@ -28,6 +33,7 @@ public class PollFragment extends SherlockFragment {
     private Network network;
 
     private EditText commentsField;
+    private boolean expanded = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -50,15 +56,60 @@ public class PollFragment extends SherlockFragment {
 
         slidingUpPanelLayout = (com.sothree.slidinguppanel.SlidingUpPanelLayout)
                 rootView.findViewById(R.id.sliding_layout);
-        //slidingUpPanelLayout.setTouchEnabled(false);
+        slidingUpPanelLayout.setTouchEnabled(false);
+        slidingUpPanelLayout.setEnabled(false);
+        SlidingUpPanelLayout.PanelSlideListener panelListener = new SlidingUpPanelLayout.PanelSlideListener(){
+            public void onPanelCollapsed(View arg0) {
+
+            }
+            public void onPanelHidden(View arg0) {
+
+            }
+            public void onPanelAnchored(View arg0) {
+
+            }
+            public void onPanelExpanded(View arg0) {
+
+            }
+            public void onPanelSlide(View arg0, float value) {
+
+            }
+        };
+        slidingUpPanelLayout.setPanelSlideListener(panelListener);
 
         commentsField = (EditText) rootView.findViewById(R.id.commentsField);
+        LinearLayout commentsLayout = (LinearLayout) rootView.findViewById(R.id.commentsLayout);
+
+        commentsLayout.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    if (expanded == false) {
+                        expanded = true;
+                        slidingUpPanelLayout.setPanelHeight(600);
+                        commentsField.setFocusableInTouchMode(true);
+                        commentsField.requestFocus();
+                        InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.showSoftInput(commentsField, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+                return true;
+            }
+        });
 
         Button postButton = (Button) rootView.findViewById(R.id.postButton);
         postButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 PollVoteFragment pollVoteFragment = ((PollVoteFragment) fragments.get(mViewPager.getCurrentItem()));
-                network.postPollComment(pollVoteFragment.getNodeId(), pollFragment);
+                String comment = (pollFragment.getCommentsField().getText().toString());
+
+                if(!comment.trim().equals("")) {
+                    network.postPollComment(pollVoteFragment.getNodeId(), comment, pollFragment);
+                    collapseBarSlideDown();
+
+                    pollVoteFragment.addTableComment((pollFragment.network.getLoginGivenName()
+                            + " " + pollFragment.network.getLoginFamilyName()), comment);
+                    pollFragment.getCommentsField().setText("");
+                }
             }
         });
 		
@@ -67,6 +118,22 @@ public class PollFragment extends SherlockFragment {
 
     public EditText getCommentsField() {
         return commentsField;
+    }
+
+    public void collapseBar(MotionEvent ev) {
+        if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            collapseBarSlideDown();
+        }
+    }
+
+    public void collapseBarSlideDown() {
+        if (expanded == true) {
+            expanded = false;
+            slidingUpPanelLayout.setPanelHeight(100);
+            commentsField.setFocusableInTouchMode(false);
+            InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     public void setCommentsField(EditText commentsField) {

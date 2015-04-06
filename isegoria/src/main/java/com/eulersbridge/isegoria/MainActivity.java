@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -14,6 +17,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
 	private SherlockFragment mContent;
@@ -62,6 +66,19 @@ public class MainActivity extends BaseActivity {
 		switchContent(new LoginScreenFragment());
         //switchContent(new PersonalityQuestionsFragment());
 	}
+
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        FragmentManager fm = getSupportFragmentManager();
+        List<Fragment> fragments = fm.getFragments();
+        Fragment lastFragment = fragments.get(1);
+
+        if(lastFragment instanceof PollFragment) {
+            PollFragment pollFragment = (PollFragment) lastFragment;
+            pollFragment.collapseBar(ev);
+        }
+
+        return super.dispatchTouchEvent(ev);
+    }
 	
 	public Isegoria getIsegoriaApplication() {
 		return application;

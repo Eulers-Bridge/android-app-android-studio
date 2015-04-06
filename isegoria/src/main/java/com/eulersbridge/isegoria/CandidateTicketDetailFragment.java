@@ -18,6 +18,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -32,6 +33,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 public class CandidateTicketDetailFragment extends SherlockFragment {
 	private View rootView;
 	private TableLayout candidateTicketDetialTableLayout;
+    private Button ticketSupportButton;
 	
 	private float dpWidth;
 	private float dpHeight;
@@ -39,6 +41,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
     private String code;
     private String colour;
 
+    private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private Network network;
 
 	@Override
@@ -46,7 +49,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
 		Bundle bundle = this.getArguments();
 		int backgroundDrawableResource = R.drawable.me;
-        int ticketId = bundle.getInt("TicketId");
+        final int ticketId = bundle.getInt("TicketId");
 		
 		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
 
@@ -59,17 +62,24 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
 		backgroundLinearLayout.setBackgroundDrawable(d);
-		
-		//addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getTicketDetail(this, ticketId);
+        network.getTicketDetail(ticketId, candidateTicketDetailFragment);
 
         ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
-		
+        candidateTicketDetailFragment = this;
+
+        ticketSupportButton = (Button) rootView.findViewById(R.id.ticketSupportButton);
+        ticketSupportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                network.supportTicket(ticketId, candidateTicketDetailFragment);
+            }
+        });
+
 		return rootView;
 	}
 

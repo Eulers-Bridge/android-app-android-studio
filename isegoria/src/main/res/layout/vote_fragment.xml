@@ -6,124 +6,136 @@
     android:background="@android:color/white"
     android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/Text2"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="textMultiLine"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Choose your vote location and time."
-        android:textColor="#757581"
-        android:textSize="20sp" />
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView9">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
-
-        <Spinner
-            android:id="@+id/voteLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_gravity="bottom" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:background="@color/white"
-        android:layout_height="10dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:orientation="horizontal"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:background="@android:color/white"
         >
+            <TextView
+                android:id="@+id/Text2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="textMultiLine"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:text="Choose your vote location and time."
+                android:textColor="#757581"
+                android:textSize="20sp" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#676475" />
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+                <Spinner
+                    android:id="@+id/voteLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:layout_gravity="bottom" />
 
-        <DatePicker
-            android:id="@+id/datePicker1"
-            android:layout_width="wrap_content"
-            android:calendarViewShown="false"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-40dp"
-            android:layout_marginBottom="-50dp">
-        </DatePicker>
+            </LinearLayout>
 
-        <TimePicker
-            android:id="@+id/timePicker1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="-50dp">
-        </TimePicker>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="10dp"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:orientation="horizontal"
+                >
 
-    </LinearLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#676475" />
+            </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:background="@color/white"
-        android:layout_height="10dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dip"
-            android:background="#676475" />
-    </LinearLayout>
+                <DatePicker
+                    android:id="@+id/datePicker1"
+                    android:layout_width="wrap_content"
+                    android:calendarViewShown="false"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-40dp"
+                    android:layout_marginBottom="-50dp">
+                </DatePicker>
 
-    <TextView
-        android:id="@+id/Text1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:gravity="center"
-        android:inputType="textMultiLine"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Choose the location of the booth you will be voting at.Don't worry! all booths are listed down for you."
-        android:textColor="#757581"
-        android:textSize="20sp" />
+                <TimePicker
+                    android:id="@+id/timePicker1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-50dp">
+                </TimePicker>
 
-    <LinearLayout
-	    android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-	    android:background="@android:color/white"
-	    android:orientation="horizontal"
-	    android:gravity="center">
-	
-	    <Button
-	        android:id="@+id/voteOkButton"
-	        android:layout_width="150dp"
-	        android:layout_height="wrap_content"
-	        android:background="@drawable/green_button"
-	        android:gravity="center"
-	        android:text="Next"
-	        android:textColor="#52BB42"
-            android:layout_gravity="top" />
-	
-	</LinearLayout>  
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="10dp"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#676475" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/Text1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="textMultiLine"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:text="Choose the location of the booth you will be voting at.Don't worry! all booths are listed down for you."
+                android:textColor="#757581"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:background="@android:color/white"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/voteOkButton"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/green_button"
+                    android:gravity="center"
+                    android:text="Next"
+                    android:textColor="#52BB42"
+                    android:layout_gravity="top" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

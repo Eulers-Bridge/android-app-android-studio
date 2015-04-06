@@ -25,21 +25,28 @@ public class PersonalityScreen2Fragment extends SherlockFragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
         FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
-        PersonalitySliderBar personalitySliderBar1 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar1);
-        PersonalitySliderBar personalitySliderBar2 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar2);
-        PersonalitySliderBar personalitySliderBar3 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar3);
-        PersonalitySliderBar personalitySliderBar4 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar4);
-        PersonalitySliderBar personalitySliderBar5 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar5);
-        PersonalitySliderBar personalitySliderBar6 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar6);
-        PersonalitySliderBar personalitySliderBar7 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar7);
-        PersonalitySliderBar personalitySliderBar8 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar8);
-        PersonalitySliderBar personalitySliderBar9 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar9);
-        PersonalitySliderBar personalitySliderBar10 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar10);
+        final PersonalitySliderBar personalitySliderBar1 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar1);
+        final PersonalitySliderBar personalitySliderBar2 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar2);
+        final PersonalitySliderBar personalitySliderBar3 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar3);
+        final PersonalitySliderBar personalitySliderBar4 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar4);
+        final PersonalitySliderBar personalitySliderBar5 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar5);
+        final PersonalitySliderBar personalitySliderBar6 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar6);
+        final PersonalitySliderBar personalitySliderBar7 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar7);
+        final PersonalitySliderBar personalitySliderBar8 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar8);
+        final PersonalitySliderBar personalitySliderBar9 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar9);
+        final PersonalitySliderBar personalitySliderBar10 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar10);
 
         Button donePersonalityQuestions = (Button) rootView.findViewById(R.id.donePersonalityQuestions);
         donePersonalityQuestions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                network.answerPersonality(4.0f, 4.0f, 4.0f, 4.0f, 4.0f);
+                float extraversion = (personalitySliderBar1.getScore() + (8-personalitySliderBar6.getScore()))/2;
+                float agreeableness = (personalitySliderBar7.getScore() + (8-personalitySliderBar2.getScore()))/2;
+                float conscientiousness = (personalitySliderBar3.getScore() + (8-personalitySliderBar8.getScore()))/2;
+                float emotionalStability = (personalitySliderBar9.getScore() + (8-personalitySliderBar4.getScore()))/2;
+                float opennesstoExperiences = (personalitySliderBar5.getScore() + (10-personalitySliderBar6.getScore()))/2;
+
+                network.answerPersonality(extraversion, agreeableness, conscientiousness,
+                        emotionalStability, opennesstoExperiences);
             }
         });
 

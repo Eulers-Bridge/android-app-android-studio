@@ -23,6 +23,8 @@ public class PersonalitySliderBar extends View {
     private String answer = "Niether";
     private ArrayList<PersonalityPoint> points = new ArrayList<PersonalityPoint>();
 
+    private int score;
+
     public PersonalitySliderBar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -125,19 +127,30 @@ public class PersonalitySliderBar extends View {
     public void snapToPoint(int x, int y) {
         int currentDistance = 1000;
         PersonalityPoint currentPoint = null;
+        int index = -1;
 
         for(int i=0; i<points.size(); i++) {
             PersonalityPoint point = points.get(i);
 
             if(Math.abs(point.getX() - x) < currentDistance) {
                 currentPoint = point;
+                index = i;
                 currentDistance = Math.abs(point.getX() - x);
             }
         }
 
+        setScore(index+1);
         this.x = currentPoint.getX();
         this.answer = currentPoint.getAnswer();
         invalidate();
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     @Override

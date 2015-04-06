@@ -77,11 +77,11 @@ public class Network {
 	private PhotoViewFragment photoViewFragment;
     private CandidateAllFragment candidateAllFragment;
     private CandidateTicketFragment candidateTicketFragment;
-    private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private CandidatePositionFragment candidatePositionFragment;
     private TaskDetailProgressFragment taskDetailProgressFragment;
     private ProfileBadgesFragment profileBadgesFragment;
     private EmailVerificationFragment emailVerificationFragment;
+    private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private FindAddContactFragment findAddContactFragment;
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
@@ -1231,7 +1231,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void postPollComment(final int pollId, final PollFragment pollFragment) {
+    public void postPollComment(final int pollId, String comment, final PollFragment pollFragment) {
         this.pollFragment = pollFragment;
         String url = SERVER_URL + "dbInterface/api/comment";
 
@@ -1239,7 +1239,7 @@ public class Network {
         params.put("targetId", String.valueOf(pollId));
         params.put("userName", (this.loginGivenName + " " + this.loginFamilyName));
         params.put("userEmail", this.loginEmail);
-        params.put("content", (this.pollFragment.getCommentsField().getText().toString()));
+        params.put("content", comment);
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -1816,8 +1816,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getTicketDetail(final CandidateTicketDetailFragment candidateTicketDetailFragment,
-                                int ticketId) {
+    public void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
         this.candidateTicketFragment = candidateTicketFragment;
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId);
 
@@ -1825,16 +1824,7 @@ public class Network {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    int ticketId = response.getInt("ticketId");
-                    int electionId = response.getInt("electionId");
-                    String name = response.getString("name");
-                    String code = response.getString("code");
-                    String colour = response.getString("colour");
-                    String information = response.getString("information");
-                    int numberOfSupporters = response.getInt("numberOfSupporters");
-
-                    candidateTicketDetailFragment.updateInformation(ticketId, electionId, name,
-                            code, information, numberOfSupporters, colour);
+                    //
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1845,7 +1835,6 @@ public class Network {
                 Log.d("Volley", error.toString());
             }
         }) {
-
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
@@ -2061,6 +2050,50 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
+    public void supportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
+        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
+
+        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail);
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
 
     public void getUserFullName(int userId, final TextView textView, final String params) {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/";
@@ -2266,34 +2299,32 @@ public class Network {
 		Thread t = new Thread(r);
 		t.start();		
 	}
-	
-	public NetworkResponse getForums() {
-		NetworkResponse networkResponse = null;
-		
-		return networkResponse;
-	}
-	
-	public NetworkResponse getCandidates() {
-		NetworkResponse networkResponse = null;
-		
-		return networkResponse;
-	}
 
-	public NetworkResponse getTickets() {
-		NetworkResponse networkResponse = null;
-		
-		return networkResponse;
-	}
+    public String getLoginGivenName() {
+        return loginGivenName;
+    }
 
-	public NetworkResponse getPositions() {
-		NetworkResponse networkResponse = null;
-		
-		return networkResponse;
-	}
-	
-	
-	
-	public String getRequest(String params) {
+    public void setLoginGivenName(String loginGivenName) {
+        this.loginGivenName = loginGivenName;
+    }
+
+    public String getLoginFamilyName() {
+        return loginFamilyName;
+    }
+
+    public void setLoginFamilyName(String loginFamilyName) {
+        this.loginFamilyName = loginFamilyName;
+    }
+
+    public String getLoginEmail() {
+        return loginEmail;
+    }
+
+    public void setLoginEmail(String loginEmail) {
+        this.loginEmail = loginEmail;
+    }
+
+    public String getRequest(String params) {
         StringBuffer stringBuffer = new StringBuffer();
         BufferedReader bufferedReader = null;
         

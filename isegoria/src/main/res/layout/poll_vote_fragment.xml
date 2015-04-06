@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pollLinearLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
@@ -52,23 +53,28 @@
                 android:background="@color/barBackground"
                 android:paddingBottom="3dp" >
 
-                <TextView
-                    android:id="@+id/newsArticleTitle"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:paddingLeft="10dp"
-                    android:text="Enter a Comment"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/commentsField"
+                <LinearLayout
+                    android:id="@+id/commentsLayout"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                />
+                    android:layout_height="fill_parent"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true">
+
+                    <EditText
+                        android:id="@+id/commentsField"
+                        android:focusableInTouchMode="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:paddingLeft="10dp"
+                        android:hint="Enter a Comment"
+                        android:textColor="@color/white"
+                        android:background="#00000000"
+                        />
+
+                    </LinearLayout>
 
                 <Button
                     android:id="@+id/postButton"
