@@ -42,10 +42,25 @@ public class TaskDetailProgressFragment extends SherlockFragment {
 
         ProgressBar pb = (ProgressBar) rootView.findViewById(R.id.progressBar);
         pb.setProgress(50);
-        pb.setMax(100);
+        pb.setMax(1000);
         pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
         return rootView;
+    }
+
+    public void setLevel(long totalXp) {
+        final TextView taskLevelField = (TextView) rootView.findViewById(R.id.taskLevelField);
+        final TextView taskLevelDesc = (TextView) rootView.findViewById(R.id.taskLevelDesc);
+
+        int level = ((int)totalXp / 1000) + 1;
+
+        int nextLevelPoints = (int) totalXp + 500;
+        nextLevelPoints = nextLevelPoints / 1000;
+        nextLevelPoints = nextLevelPoints * 1000;
+
+        taskLevelField.setText("Level " + String.valueOf(level));
+        taskLevelDesc.setText(String.valueOf(totalXp) + " out of "
+                + String.valueOf(nextLevelPoints) + " XP till the next level!");
     }
 
     public void addCompletedTask(long taskId, String action, long xpValue) {
@@ -107,7 +122,7 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     }
 
     public void addRemainingTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.completedTasksLayout);
+        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.remainingTasksLayout);
 
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
         taskLayout.setGravity(Gravity.LEFT);

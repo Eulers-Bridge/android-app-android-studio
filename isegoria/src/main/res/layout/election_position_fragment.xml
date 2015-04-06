@@ -31,8 +31,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:layout_alignLeft="@+id/mytextview1"
-            android:layout_below="@+id/mytextview1"
+            android:layout_alignLeft="@+id/taskLevelField"
+            android:layout_below="@+id/taskLevelField"
             android:background="@color/grey"
             android:paddingTop="10dp" />
 

@@ -2196,7 +2196,7 @@ public class Network {
     }
 
     public void getTasks(final ContactProfileFragment contactProfileFragment) {
-        String url = SERVER_URL + "dbInterface/api/tasks/";
+        String url = SERVER_URL + "dbInterface/api/tasks/complete";
 
         JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
@@ -2251,6 +2251,7 @@ public class Network {
             @Override
             public void onResponse(JSONArray response) {
                 try {
+                    long totalXp = 0;
                     for(int i=0; i<response.length(); i++) {
                         JSONObject taskObject = response.getJSONObject(i);
 
@@ -2258,9 +2259,11 @@ public class Network {
                         String action = taskObject.getString("action");
                         long xpValue = taskObject.getLong("xpValue");
 
+                        totalXp = totalXp + xpValue;
                         taskDetailProgressFragment.addRemainingTask(taskId, action, xpValue);
                     }
 
+                    taskDetailProgressFragment.setLevel(totalXp);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

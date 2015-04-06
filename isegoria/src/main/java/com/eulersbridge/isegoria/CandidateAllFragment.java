@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
@@ -27,17 +28,25 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import java.util.ArrayList;
+
 public class CandidateAllFragment extends SherlockFragment {
 	private View rootView;
 	private TableLayout candidateAllTableLayout;
+    private SearchView searchViewCandidatesAll;
+    private ArrayList<String> firstnames = new ArrayList<String>();
+    private ArrayList<String> lastnames = new ArrayList<String>();
+    private ArrayList<TableRow> rows = new ArrayList<TableRow>();
 	
 	private float dpWidth;
 	private float dpHeight;
 
+    private CandidateAllFragment candidateAllFragment;
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        candidateAllFragment = this;
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false);
@@ -54,18 +63,85 @@ public class CandidateAllFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getCandidates(this);
+
+        searchViewCandidatesAll = (SearchView) rootView.findViewById(R.id.searchViewCandidatesAll);
+        searchViewCandidatesAll.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String query) {
+                addAllRows();
+                if(query.length() != 0) {
+                    int cnt = 0;
+                    for(int i=0; i<rows.size(); i++) {
+                        View view = rows.get(i);
+                        if (view instanceof TableRow) {
+                            try {
+                                TableRow row = (TableRow) view;
+                                String firstname = firstnames.get(i);
+                                String lastname = lastnames.get(i);
+
+                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                    candidateAllTableLayout.removeView(row);
+                                }
+                                cnt = cnt + 1;
+                            } catch(Exception e) {}
+                        }
+                    }
+                    candidateAllFragment.rootView.invalidate();
+
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                addAllRows();
+                if(query.length() != 0) {
+                    int cnt = 0;
+                    for(int i=0; i<rows.size(); i++) {
+                        View view = rows.get(i);
+                        if (view instanceof TableRow) {
+                            try {
+                                TableRow row = (TableRow) view;
+                                String firstname = firstnames.get(i);
+                                String lastname = lastnames.get(i);
+
+                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                    candidateAllTableLayout.removeView(row);
+                                }
+                                cnt = cnt + 1;
+                            } catch(Exception e) {}
+                        }
+                    }
+                    candidateAllFragment.rootView.invalidate();
+
+                    return true;
+                }
+                return false;
+            }
+        });
         
 		return rootView;
 	}
 
+    public void addAllRows() {
+        candidateAllTableLayout.removeAllViews();
+
+        for(int i=0; i<rows.size(); i++) {
+            candidateAllTableLayout.addView(rows.get(i));
+        }
+    }
+
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+        addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId,
+                firstName, lastName);
     }
 	
 	public void addTableRow(int ticketId, final int userId, String partyAbr,
                             String colour, String candidateName,
-                            String candidatePosition, int positionId) {
+                            String candidatePosition, int positionId,
+                            String firstName, String lastName) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -185,6 +261,9 @@ public class CandidateAllFragment extends SherlockFragment {
         
 		candidateAllTableLayout.addView(tr);
 		candidateAllTableLayout.addView(dividierView);
+        firstnames.add(firstName);
+        lastnames.add(lastName);
+        rows.add(tr);
 	}
 	
 	public static int calculateInSampleSize(
