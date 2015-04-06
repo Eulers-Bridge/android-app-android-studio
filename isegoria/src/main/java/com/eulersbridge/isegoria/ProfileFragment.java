@@ -52,13 +52,13 @@ public class ProfileFragment extends SherlockFragment {
 
         network.getTasks(this);
 
-        final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
-       /* showProgressButton.setOnClickListener(new View.OnClickListener() {
+        final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
+        showProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mPager.setCurrentItem(1);
             }
-        });*/
+        });
 
         final TextView personalityTestButton = (TextView) rootView.findViewById(R.id.personalityTestButton);
         personalityTestButton.setOnClickListener(new View.OnClickListener() {

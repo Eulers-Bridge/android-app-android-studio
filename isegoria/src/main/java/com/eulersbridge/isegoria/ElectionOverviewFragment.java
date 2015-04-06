@@ -20,6 +20,8 @@ public class ElectionOverviewFragment extends SherlockFragment {
     private TextView electionTitle;
     private TextView electionProcess;
     private TextView electionDate;
+    private TextView overviewTextField;
+    private TextView processTextField;
     private int electionId;
 
     private Network network;
@@ -34,6 +36,8 @@ public class ElectionOverviewFragment extends SherlockFragment {
         electionTitle = (TextView) rootView.findViewById(R.id.electionTitle);
         electionDate = (TextView) rootView.findViewById(R.id.electionDate);
         electionProcess = (TextView) rootView.findViewById(R.id.electionProcess);
+        overviewTextField = (TextView) rootView.findViewById(R.id.overviewTextField);
+        processTextField = (TextView) rootView.findViewById(R.id.processTextField);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -49,6 +53,8 @@ public class ElectionOverviewFragment extends SherlockFragment {
                                String process) {
         this.electionId = electionId;
 
+        overviewTextField.setText("Overview");
+        processTextField.setText("Process");
         electionTitle.setText(title);
         electionIntroduction.setText(introduction);
         electionDate.setText(date);

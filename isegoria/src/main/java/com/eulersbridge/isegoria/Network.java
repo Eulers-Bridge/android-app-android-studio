@@ -1394,7 +1394,9 @@ public class Network {
 
                                voteFragment.addVoteLocations(ownerId, votingLocationId,
                                        name, information);
-                           }
+                            }
+
+                            voteFragment.showAll();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -34,6 +34,8 @@ import java.util.Calendar;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
+    private View eventDivider1;
+    private View eventDivider2;
 	private float dpWidth;
 	private float dpHeight;
 	private DisplayMetrics displayMetrics;
@@ -41,6 +43,7 @@ public class EventsDetailFragment extends Fragment {
 	private long timestamp;
 	private String eventTitle;
 	private String eventDesc;
+    private Button addToCalendar;
 
     private TableLayout eventContactTableLayout;
     private Network network;
@@ -52,8 +55,8 @@ public class EventsDetailFragment extends Fragment {
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
-		Button button = (Button) rootView.findViewById(R.id.addToCalendar);
-			button.setOnClickListener(new OnClickListener() {
+		addToCalendar = (Button) rootView.findViewById(R.id.addToCalendar);
+        addToCalendar.setOnClickListener(new OnClickListener() {
 				@Override
 			    public void onClick(View v) {
 					addToCalendar(v);
@@ -62,7 +65,10 @@ public class EventsDetailFragment extends Fragment {
 
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+        eventDivider1 = (View) rootView.findViewById(R.id.eventDivider1);
+        eventDivider2 = (View) rootView.findViewById(R.id.eventDivider2);
         
         isegoria.getNetwork().getEventDetails(this, bundle.getInt("EventId"));
 
@@ -94,12 +100,19 @@ public class EventsDetailFragment extends Fragment {
 					
 					TextView eventLocationLine1 = (TextView) rootView.findViewById(R.id.eventLocationLine1);
 					eventLocationLine1.setText(location);
+
+                    TextView eventLocationLine2 = (TextView) rootView.findViewById(R.id.eventLocationLine2);
 					
 					TextView eventsTextField = (TextView) rootView.findViewById(R.id.eventDetails);
 					eventsTextField.setText(content);
 					
 					eventTitle = title;
 					eventDesc = content;
+
+                    addToCalendar.setVisibility(ViewGroup.VISIBLE);
+                    eventDivider1.setVisibility(ViewGroup.VISIBLE);
+                    eventDivider2.setVisibility(ViewGroup.VISIBLE);
+                    eventLocationLine2.setVisibility(ViewGroup.VISIBLE);
 				}
 			});
 		} catch(Exception e) {

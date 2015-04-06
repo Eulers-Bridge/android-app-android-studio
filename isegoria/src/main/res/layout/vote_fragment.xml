@@ -18,7 +18,7 @@
             android:background="@android:color/white"
         >
             <TextView
-                android:id="@+id/Text2"
+                android:id="@+id/voteFragmentTitle1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
@@ -29,7 +29,8 @@
                 android:paddingRight="40dp"
                 android:text="Choose your vote location and time."
                 android:textColor="#757581"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="invisible" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -45,7 +46,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
-                    android:layout_gravity="bottom" />
+                    android:layout_gravity="bottom"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
@@ -61,7 +63,9 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
-                    android:background="#676475" />
+                    android:background="#676475"
+                    android:id="@+id/voteDivider1"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <LinearLayout
@@ -77,14 +81,16 @@
                     android:calendarViewShown="false"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-40dp"
-                    android:layout_marginBottom="-50dp">
+                    android:layout_marginBottom="-50dp"
+                    android:visibility="invisible">
                 </DatePicker>
 
                 <TimePicker
                     android:id="@+id/timePicker1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="-50dp">
+                    android:layout_marginBottom="-50dp"
+                    android:visibility="invisible">
                 </TimePicker>
 
             </LinearLayout>
@@ -100,11 +106,13 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
-                    android:background="#676475" />
+                    android:background="#676475"
+                    android:id="@+id/voteDivider2"
+                    android:visibility="invisible" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/Text1"
+                android:id="@+id/voteText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
@@ -115,7 +123,8 @@
                 android:paddingRight="40dp"
                 android:text="Choose the location of the booth you will be voting at.Don't worry! all booths are listed down for you."
                 android:textColor="#757581"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="invisible" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -133,7 +142,8 @@
                     android:gravity="center"
                     android:text="Next"
                     android:textColor="#52BB42"
-                    android:layout_gravity="top" />
+                    android:layout_gravity="top"
+                    android:visibility="invisible" />
 
             </LinearLayout>
         </LinearLayout>

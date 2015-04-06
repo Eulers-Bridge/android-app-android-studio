@@ -29,7 +29,6 @@
         android:inputType="textMultiLine"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="29th August 2014, Ballot opens 7:00AM"
         android:textColor="@android:color/black"
         android:textSize="14sp" />
 
@@ -45,9 +44,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Overview"
             android:paddingLeft="10dp"
-            android:id="@+id/textView3" />
+            android:id="@+id/overviewTextField" />
 
 	      <TextView
 	          android:id="@+id/electionIntroduction"
@@ -62,9 +60,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Process"
             android:paddingLeft="10dp"
-            android:id="@+id/textView4"
+            android:id="@+id/processTextField"
             />
 
         <TextView

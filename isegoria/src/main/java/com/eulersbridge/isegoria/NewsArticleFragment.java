@@ -23,13 +23,14 @@ import java.io.InputStream;
 
 public class NewsArticleFragment extends Fragment {
 	private View rootView;
+    private View newsArticleDivider;
+    private ImageView newsArticleAuthorImage;
 	private float dpWidth;
 	private float dpHeight;
 	private Isegoria isegoria;
 	private int articleId;
 
     private boolean setLiked = false;
-
     private Network network;
 
 	@Override
@@ -43,8 +44,10 @@ public class NewsArticleFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-
         network.getNewsArticleLiked(this);
+
+        newsArticleDivider = (View) rootView.findViewById(R.id.newsArticleDivider);
+        newsArticleAuthorImage = (ImageView) rootView.findViewById(R.id.newsArticleAuthorImage);
 
 		return rootView;
 	}
@@ -110,6 +113,9 @@ public class NewsArticleFragment extends Fragment {
 
                     //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
                     //network.getFirstPhotoImage(email, headShotImageView);
+
+                    newsArticleDivider.setVisibility(ViewGroup.VISIBLE);
+                    newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
 				}
 			});
 		} catch(Exception e) {

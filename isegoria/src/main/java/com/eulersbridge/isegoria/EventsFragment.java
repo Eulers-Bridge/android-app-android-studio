@@ -49,13 +49,13 @@ public class EventsFragment extends SherlockFragment {
         swipeContainerEvents.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                eventsFragment.clearTable();
+                network.getEvents(eventsFragment);
                 swipeContainerEvents.setRefreshing(true);
                 ( new android.os.Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeContainerEvents.setRefreshing(false);
-                        eventsFragment.clearTable();
-                        network.getEvents(eventsFragment);
                     }
                 }, 7000);
             }

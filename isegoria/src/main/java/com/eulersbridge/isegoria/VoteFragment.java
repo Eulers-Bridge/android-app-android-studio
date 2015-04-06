@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -25,6 +26,10 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
     private ArrayList<VoteLocation> voteLocationArray;
 
     public Spinner spinnerLocation;
+    private TextView voteFragmentTitle1;
+    private View voteDivider1;
+    private View voteDivider2;
+    private TextView voteText;
     public DatePicker datePicker;
     public TimePicker timePicker;
 
@@ -46,6 +51,10 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 
         datePicker = (DatePicker) rootView.findViewById(R.id.datePicker1);
         timePicker = (TimePicker) rootView.findViewById(R.id.timePicker1);
+        voteDivider1 = (View) rootView.findViewById(R.id.voteDivider1);
+        voteDivider2 = (View) rootView.findViewById(R.id.voteDivider1);
+        voteFragmentTitle1 = (TextView) rootView.findViewById(R.id.voteFragmentTitle1);
+        voteText = (TextView) rootView.findViewById(R.id.voteText);
 
         Button voteOkButton = (Button) rootView.findViewById(R.id.voteOkButton);
         voteOkButton.setOnClickListener(new View.OnClickListener() {
@@ -106,5 +115,14 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
 
     public void setSpinnerLocation(Spinner spinnerLocation) {
         this.spinnerLocation = spinnerLocation;
+    }
+
+    public void showAll() {
+        datePicker.setVisibility(ViewGroup.VISIBLE);
+        timePicker.setVisibility(ViewGroup.VISIBLE);
+        voteDivider1.setVisibility(ViewGroup.VISIBLE);
+        voteDivider2.setVisibility(ViewGroup.VISIBLE);
+        voteFragmentTitle1.setVisibility(ViewGroup.VISIBLE);
+        voteText.setVisibility(ViewGroup.VISIBLE);
     }
 }

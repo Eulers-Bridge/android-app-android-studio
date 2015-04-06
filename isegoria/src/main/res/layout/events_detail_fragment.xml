@@ -51,12 +51,14 @@
 	            android:orientation="vertical"
 	            android:gravity="bottom"
 	            android:paddingTop="6dp"
-	            android:paddingRight="6dp" >
+	            android:paddingRight="6dp"
+                android:visibility="invisible">
 	            
 	            <View
 	            	android:layout_width="fill_parent"
 	                android:layout_height="1dip"
-	                android:background="#676475" />
+	                android:background="#676475"
+                    android:id="@+id/eventDivider1" />
 	        </LinearLayout>   
 	         
             <RelativeLayout
@@ -107,7 +109,8 @@
 		            	     android:onClick="addToCalendar"
 		            	     android:paddingRight="10dp"
 		            	     android:text="Add to Calendar"
-		            	     android:textColor="@color/white" />
+		            	     android:textColor="@color/white"
+                             android:visibility="invisible" />
 
 		        </LinearLayout> 
 	        </RelativeLayout>
@@ -143,13 +146,17 @@
 			android:text="The University of Melbourne, Victoria 3010"
 			android:textAppearance="?android:attr/textAppearanceSmall"
 			android:textColor="@color/black"
-			android:textSize="@dimen/newsTimeSize" />
+			android:textSize="@dimen/newsTimeSize"
+            android:visibility="invisible" />
         
        	 <View
 	     	android:layout_width="fill_parent"
 	        android:layout_height="1dip"
 	        android:paddingTop="3dp"
-	        android:background="#676475" />
+	        android:background="#676475"
+             android:nestedScrollingEnabled="false"
+             android:id="@+id/eventDivider2"
+             android:visibility="invisible" />
     </LinearLayout>
 
     <ScrollView

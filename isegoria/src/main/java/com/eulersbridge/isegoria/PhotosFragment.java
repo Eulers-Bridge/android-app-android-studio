@@ -57,13 +57,13 @@ public class PhotosFragment extends SherlockFragment {
             @Override
             public void onRefresh() {
                 swipeContainerPhotos.setRefreshing(true);
+                photosFragment.clearTable();
+                network.getPhotoAlbums(photosFragment);
                 ( new android.os.Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         insertedFirstRow = false;
                         swipeContainerPhotos.setRefreshing(false);
-                        photosFragment.clearTable();
-                        network.getPhotoAlbums(photosFragment);
                     }
                 }, 7000);
             }

@@ -65,13 +65,13 @@ public class NewsFragment extends SherlockFragment {
         swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                newsFragment.clearTable();
+                network.getNewsArticles(newsFragment);
                 swipeContainerNews.setRefreshing(true);
                 ( new android.os.Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeContainerNews.setRefreshing(false);
-                        newsFragment.clearTable();
-                        network.getNewsArticles(newsFragment);
                     }
                 }, 7000);
             }
