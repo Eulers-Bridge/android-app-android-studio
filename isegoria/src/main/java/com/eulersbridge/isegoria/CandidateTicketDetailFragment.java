@@ -41,17 +41,20 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
     private String code;
     private String colour;
 
+    private TextView partyDetailSupporters;
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        candidateTicketDetailFragment = this;
 		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
 		Bundle bundle = this.getArguments();
 		int backgroundDrawableResource = R.drawable.me;
         final int ticketId = bundle.getInt("TicketId");
 		
 		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
+        partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -70,20 +73,22 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
-        candidateTicketDetailFragment = this;
-
         ticketSupportButton = (Button) rootView.findViewById(R.id.ticketSupportButton);
         ticketSupportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 network.supportTicket(ticketId, candidateTicketDetailFragment);
+                TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                String value = String.valueOf(partyDetailSupporters.getText());
+                partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value)+1));
             }
         });
 
 		return rootView;
 	}
 
-    public void updateInformation(int ticketId, int electionId, String name, String code, String information, int numberOfSupporters, String colour) {
+    public void updateInformation(int ticketId, int electionId, String name, String code,
+                                  String information, int numberOfSupporters, String colour) {
         TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
         TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
 
@@ -94,6 +99,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         this.colour = colour;
 
         network.getTicketCandidates(this, ticketId);
+        rootView.invalidate();
     }
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,

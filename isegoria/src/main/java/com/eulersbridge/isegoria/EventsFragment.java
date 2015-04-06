@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,25 +26,40 @@ import com.actionbarsherlock.app.SherlockFragment;
 public class EventsFragment extends SherlockFragment {
 	private View rootView;
 	private TableLayout newsTableLayout;
+    private EventsFragment eventsFragment;
 	
 	private float dpWidth;
 	private float dpHeight;
 
     private EventsDetailFragment fragment2;
+    private android.support.v4.widget.SwipeRefreshLayout swipeContainerEvents;
     private Network network;
-	
-	public EventsFragment() {
-	
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		rootView = inflater.inflate(R.layout.events_fragment, container, false);
 		newsTableLayout = (TableLayout) rootView.findViewById(R.id.eventsTableLayout);
+        eventsFragment = this;
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels;  
+        dpHeight = displayMetrics.heightPixels;
+
+        swipeContainerEvents = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerEvents);
+        swipeContainerEvents.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeContainerEvents.setRefreshing(true);
+                ( new android.os.Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeContainerEvents.setRefreshing(false);
+                        eventsFragment.clearTable();
+                        network.getEvents(eventsFragment);
+                    }
+                }, 7000);
+            }
+        });
 	
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -51,6 +67,10 @@ public class EventsFragment extends SherlockFragment {
 
 		return rootView;
 	}
+
+    public void clearTable() {
+        newsTableLayout.removeAllViews();
+    }
 	
 	public void addEvent(final int eventId, final String eventName, final long eventTime, final String bitmapPicture) {
         String eventTimeStr = TimeConverter.convertTimestampToString(eventTime);

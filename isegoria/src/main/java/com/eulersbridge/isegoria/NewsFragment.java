@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -51,6 +52,7 @@ public class NewsFragment extends SherlockFragment {
 	private int doubleCell = 0;
 	private int articlesAdded = 0;
 
+    private android.support.v4.widget.SwipeRefreshLayout swipeContainerNews;
     private Network network;
 
 	@Override
@@ -59,6 +61,21 @@ public class NewsFragment extends SherlockFragment {
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		rootView = inflater.inflate(R.layout.news_fragment, container, false);
 		newsTableLayout = (TableLayout) rootView.findViewById(R.id.newsTableLayout);
+        swipeContainerNews = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerNews);
+        swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeContainerNews.setRefreshing(true);
+                ( new android.os.Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeContainerNews.setRefreshing(false);
+                        newsFragment.clearTable();
+                        network.getNewsArticles(newsFragment);
+                    }
+                }, 7000);
+            }
+        });
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
@@ -70,6 +87,10 @@ public class NewsFragment extends SherlockFragment {
         
 		return rootView;
 	}
+
+    public void clearTable() {
+        newsTableLayout.removeAllViews();
+    }
 	
 	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likers,
 			final long date, final String creatorEmail, final String studentYear, final String link) {

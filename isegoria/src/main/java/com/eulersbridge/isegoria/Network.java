@@ -1817,14 +1817,24 @@ public class Network {
     }
 
     public void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketFragment = candidateTicketFragment;
+        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId);
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    //
+                    int ticketId = response.getInt("ticketId");
+                    int electionId = response.getInt("electionId");
+                    int numberOfSupporters = response.getInt("numberOfSupporters");
+                    String name = response.getString("name");
+                    String code = response.getString("code");
+                    String colour = response.getString("colour");
+                    String information = response.getString("information");
+                    String logo = response.getString("logo");
+
+                    candidateTicketDetailFragment.updateInformation(ticketId, electionId, name, code,
+                            information, numberOfSupporters, colour);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -2053,7 +2063,7 @@ public class Network {
     public void supportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
 
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail);
+        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
         HashMap<String, String> params = new HashMap<String, String>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),

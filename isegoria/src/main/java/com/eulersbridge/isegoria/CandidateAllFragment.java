@@ -51,8 +51,6 @@ public class CandidateAllFragment extends SherlockFragment {
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
         candidateAllTableLayout.addView(dividierView);
 
-        //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
-
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getCandidates(this);

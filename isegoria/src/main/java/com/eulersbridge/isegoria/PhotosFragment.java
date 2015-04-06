@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,6 +32,8 @@ public class PhotosFragment extends SherlockFragment {
 	private float dpHeight;
 	
 	private boolean insertedFirstRow = false;
+    private PhotosFragment photosFragment;
+    private android.support.v4.widget.SwipeRefreshLayout swipeContainerPhotos;
     private Network network;
 	
 	public PhotosFragment() {
@@ -41,12 +44,30 @@ public class PhotosFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.photos_fragment, container, false);
 		getActivity().setTitle("Isegoria");
+        photosFragment = this;
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		photosTableLayout = (TableLayout) rootView.findViewById(R.id.photosTableLayout);
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+        swipeContainerPhotos = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerPhotos);
+        swipeContainerPhotos.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeContainerPhotos.setRefreshing(true);
+                ( new android.os.Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        insertedFirstRow = false;
+                        swipeContainerPhotos.setRefreshing(false);
+                        photosFragment.clearTable();
+                        network.getPhotoAlbums(photosFragment);
+                    }
+                }, 7000);
+            }
+        });
         
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -54,6 +75,10 @@ public class PhotosFragment extends SherlockFragment {
 
 		return rootView;
 	}
+
+    public void clearTable() {
+        photosTableLayout.removeAllViews();
+    }
 	
 	public void addPhotoAlbum(final int albumId, final String label, final String caption, String photoAlbumThumb) {
 		addTableRow(albumId, label, caption, photoAlbumThumb);
