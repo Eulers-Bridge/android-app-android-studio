@@ -73,7 +73,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
-        ticketSupportButton = (Button) rootView.findViewById(R.id.ticketSupportButton);
+        ticketSupportButton = (Button) rootView.findViewById(R.id.supportButton);
         ticketSupportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

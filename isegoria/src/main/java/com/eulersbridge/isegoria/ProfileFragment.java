@@ -41,7 +41,7 @@ public class ProfileFragment extends SherlockFragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
         TextView name = (TextView) rootView.findViewById(R.id.profileName);
@@ -59,6 +59,14 @@ public class ProfileFragment extends SherlockFragment {
                 mPager.setCurrentItem(1);
             }
         });*/
+
+        final TextView personalityTestButton = (TextView) rootView.findViewById(R.id.personalityTestButton);
+        personalityTestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.getIsegoriaApplication().setPersonality();
+            }
+        });
 
         CircularSeekBar circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
         CircularSeekBar circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);

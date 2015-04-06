@@ -3,12 +3,15 @@ package com.eulersbridge.isegoria;
 import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -19,6 +22,7 @@ public class UserSettingsFragment extends SherlockFragment {
 	private float dpWidth;
 	private float dpHeight;
 
+    private MainActivity mainActivity;
     private Network network;
 
 	@Override
@@ -31,7 +35,7 @@ public class UserSettingsFragment extends SherlockFragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
         ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
@@ -40,6 +44,22 @@ public class UserSettingsFragment extends SherlockFragment {
 
         LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
         network.getUserDP(photoImageView, backgroundLinearLayout);
+
+        final TextView aboutThisAppButton = (TextView) rootView.findViewById(R.id.aboutThisAppButton);
+        aboutThisAppButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                AboutScreenFragment fragment2 = new AboutScreenFragment();
+                Bundle args = new Bundle();
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.add(R.id.content_frame, fragment2);
+                fragmentTransaction2.commit();
+            }
+        });
+
 		
 		return rootView;
 	}

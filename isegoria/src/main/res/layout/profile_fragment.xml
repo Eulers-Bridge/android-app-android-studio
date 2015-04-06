@@ -62,13 +62,23 @@
             android:layout_weight="0"
             android:gravity="center"
             android:orientation="horizontal"
-        >
+            android:id="@+id/textView2">
 
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="1dip"
                 android:background="#838a8a8a" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/personalityTestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Complete Personality Test"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#ff059aff"
+            android:paddingBottom="3dp"
+            android:textSize="16dp" />
     </LinearLayout>
 
     <View
@@ -337,7 +347,7 @@
                 android:paddingBottom="2dp" />
 
             <TextView
-                android:id="@+id/takePersonalityButton"
+                android:id="@+id/aboutThisAppButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

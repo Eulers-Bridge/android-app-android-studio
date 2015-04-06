@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
+    android:id="@+id/settingsFrame"
     android:gravity="top"
     android:orientation="vertical" >
 
@@ -137,15 +138,14 @@
     
 	</LinearLayout>
 
-    <Switch
-        android:id="@+id/Switch01"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
         android:text="About this App"
-        android:textSize="14sp" />
+        android:id="@+id/aboutThisAppButton"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp" />
 
 </LinearLayout>
