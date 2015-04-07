@@ -34,7 +34,7 @@
 	        android:paddingTop="10dp" >
                     	               
                     <Button
-                        android:id="@+id/addToCalendar"
+                        android:id="@+id/changePhotoButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -73,18 +73,7 @@
 			android:layout_width="wrap_content"
 		    android:layout_height="1dip"
 		    android:background="@color/offGrey" />
-        
-        <Switch
-            android:id="@+id/switch1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp"
-            android:text="Single User Experience"
-            android:textSize="14sp" />
-        
+
         <View
 			android:layout_width="wrap_content"
 		    android:layout_height="1dip"
@@ -98,7 +87,7 @@
 	        android:paddingLeft="10dp"
 	        android:paddingRight="10dp"
 	        android:paddingTop="10dp"
-	        android:text="Opt out of Data Collection"
+	        android:text="Opt Out of Data Collection"
 	        android:textSize="14sp" />
 	    
         <View
@@ -114,7 +103,7 @@
 	        android:paddingLeft="10dp"
 	        android:paddingRight="10dp"
 	        android:paddingTop="10dp"
-	        android:text="Do Not Track"
+	        android:text="Do not Track"
 	        android:textSize="14sp" />
 	    
         <View

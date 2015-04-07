@@ -69,6 +69,10 @@ public class VoteFragment extends SherlockFragment implements OnItemSelectedList
         network.getVoteLocations(this);
         network.getLatestElection(this);
 
+        if(network.isReminderSet()) {
+            mPager.setCurrentItem(2);
+        }
+
 		return rootView;
 	}
 

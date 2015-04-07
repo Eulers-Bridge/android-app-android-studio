@@ -1,7 +1,10 @@
 package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +20,8 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class UserSettingsFragment extends SherlockFragment {
+    private static final int PICK_IMAGE = 1;
+
 	private View rootView;
 	
 	private float dpWidth;
@@ -60,9 +65,35 @@ public class UserSettingsFragment extends SherlockFragment {
             }
         });
 
-		
+        final TextView changePhotoButton = (TextView) rootView.findViewById(R.id.changePhotoButton);
+        changePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+            }
+        });
+
 		return rootView;
 	}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == PICK_IMAGE && data != null && data.getData() != null) {
+            Uri _uri = data.getData();
+
+            //User had pick an image.
+            Cursor cursor = getActivity().getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
+            cursor.moveToFirst();
+
+            //Link to the image
+            final String imageFilePath = cursor.getString(0);
+            cursor.close();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 	
 	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
