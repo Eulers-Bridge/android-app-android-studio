@@ -197,7 +197,7 @@ public class PollVoteFragment extends SherlockFragment {
 		
 		ImageView view = new ImageView(getActivity());
 		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
-		view.setScaleType(ScaleType.CENTER_CROP);
+		view.setScaleType(ScaleType.CENTER_INSIDE);
         view.setImageResource(R.drawable.tickempty);
         tickBoxes.add(view);
         view.setOnClickListener(new View.OnClickListener() {
