@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,12 +81,18 @@ public class PollVoteFragment extends SherlockFragment {
 	
 	public void addTableRow(int userId, String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
+
+        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)  6.666666667, getResources().getDisplayMetrics());
+        int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)   50.0000, getResources().getDisplayMetrics());
+
 		if(!insertedFirstRow) {
 			insertedFirstRow = true;
-			tr.setPadding(10, 10, 0, 10);
+			tr.setPadding(paddingMargin1, paddingMargin1, 0, paddingMargin1);
 		}
 		else {
-			tr.setPadding(10, 0, 0, 10);
+			tr.setPadding(paddingMargin1, 0, 0, paddingMargin1);
 		}
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
@@ -93,7 +100,7 @@ public class PollVoteFragment extends SherlockFragment {
 
 		ImageView view = new ImageView(getActivity());
 		//view.setColorFilter(Color.argb(125, 35, 35, 35));
-		view.setLayoutParams(new TableRow.LayoutParams(75, (int)(75)));
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
 		view.setScaleType(ScaleType.CENTER_CROP);
         network.getFirstPhoto(0, creatorId, view);
 		
@@ -101,20 +108,20 @@ public class PollVoteFragment extends SherlockFragment {
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		linearLayout.setGravity(Gravity.CENTER_VERTICAL);
 		linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		linearLayout.setPadding(10, 0, 0, 0);
+		linearLayout.setPadding(paddingMargin1, 0, 0, 0);
         
         TextView textViewArticle = new TextView(getActivity());
         textViewArticle.setSingleLine(false);
         textViewArticle.setTextColor(Color.parseColor("#000000"));
         textViewArticle.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        textViewArticle.setTextSize(18.0f);
+        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
         textViewArticle.setText(label);
         textViewArticle.setGravity(Gravity.LEFT);
         
         TextView textViewArticleTime = new TextView(getActivity());
         textViewArticleTime.setTextColor(Color.parseColor("#000000"));
         textViewArticleTime.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        textViewArticleTime.setTextSize(12.0f);
+        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewArticleTime.setText(caption);
         textViewArticleTime.setPadding(0, 0, 0, 0);
         textViewArticleTime.setGravity(Gravity.LEFT);
@@ -131,39 +138,46 @@ public class PollVoteFragment extends SherlockFragment {
 	
 	public void createProgressBars(String color, String party, int votes) {
 		TableRow tr = new TableRow(getActivity());
+        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)  6.666666667, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)   20.00000, getResources().getDisplayMetrics());
+        int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)    26.666666667, getResources().getDisplayMetrics());
+
 		if(!insertedFirstRow) {
 			insertedFirstRow = true;
-			tr.setPadding(10, 10, 0, 10);
+			tr.setPadding(paddingMargin1, paddingMargin1, 0, paddingMargin1);
 		}
 		else {
-			tr.setPadding(10, 0, 0, 10);
+			tr.setPadding(paddingMargin1, 0, 0, paddingMargin1);
 		}
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
 		
 		ProgressBar pb = new ProgressBar(getActivity(), null, android.R.attr.progressBarStyleHorizontal);
 		pb.setProgress(0);
-		pb.setMax(100);
+		pb.setMax(1000);
 		pb.getProgressDrawable().setColorFilter(Color.parseColor(color), Mode.SRC_IN);
         progressBars.add(pb);
 		
 		LinearLayout layout1 = new LinearLayout(getActivity());
 		layout1.setOrientation(LinearLayout.VERTICAL);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		layout1.setPadding(10, 0, 30, 0);
+		layout1.setPadding(paddingMargin1, 0, paddingMargin2, 0);
 		layout1.setGravity(Gravity.CENTER_VERTICAL);
 		layout1.addView(pb, params);
 		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setSingleLine(false);
         textViewParty.setTextColor(Color.parseColor("#000000"));
-        textViewParty.setTextSize(16.0f);
+        textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewParty.setText(party);
         textViewParty.setGravity(Gravity.RIGHT);
         
         TextView textViewVotes = new TextView(getActivity());
         textViewVotes.setTextColor(Color.parseColor("#000000"));
-        textViewVotes.setTextSize(16.0f);
+        textViewVotes.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         DecimalFormat formatter = new DecimalFormat("#,###");
         textViewVotes.setText(formatter.format(votes));
         if(voted == false) {
@@ -182,8 +196,8 @@ public class PollVoteFragment extends SherlockFragment {
 		layout1.addView(layout2, params1);
 		
 		ImageView view = new ImageView(getActivity());
-		view.setLayoutParams(new TableRow.LayoutParams(40, (int)(40)));
-		view.setScaleType(ScaleType.CENTER_INSIDE);
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
+		view.setScaleType(ScaleType.CENTER_CROP);
         view.setImageResource(R.drawable.tickempty);
         tickBoxes.add(view);
         view.setOnClickListener(new View.OnClickListener() {
@@ -209,18 +223,24 @@ public class PollVoteFragment extends SherlockFragment {
 	
 	public void addTableComment(String name, String comment) {
 		TableRow tr = new TableRow(getActivity());
+
+        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)  6.666666667, getResources().getDisplayMetrics());
+        int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)   50.0000, getResources().getDisplayMetrics());
+
 		if(!insertedFirstRow) {
 			insertedFirstRow = true;
-			tr.setPadding(10, 10, 0, 10);
+			tr.setPadding(paddingMargin1, paddingMargin1, 0, paddingMargin1);
 		}
 		else {
-			tr.setPadding(10, 0, 0, 10);
+			tr.setPadding(paddingMargin1, 0, 0, paddingMargin1);
 		}
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
 		
 		ImageView view = new ImageView(getActivity());
-		view.setLayoutParams(new TableRow.LayoutParams(75, (int)(75)));
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
 		view.setScaleType(ScaleType.CENTER_CROP);
         //view.setImageResource(R.drawable.head1);
 		
@@ -228,19 +248,19 @@ public class PollVoteFragment extends SherlockFragment {
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
 		linearLayout.setGravity(Gravity.TOP);
 		linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		linearLayout.setPadding(10, 0, 0, 0);
+		linearLayout.setPadding(paddingMargin1, 0, 0, 0);
         
         TextView textViewName = new TextView(getActivity());
         textViewName.setSingleLine(false);
         textViewName.setTextColor(Color.parseColor("#000000"));
-        textViewName.setTextSize(18.0f);
+        textViewName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
         textViewName.setText(name);
         textViewName.setGravity(Gravity.LEFT);
         textViewName.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         
         TextView textViewComment = new TextView(getActivity());
         textViewComment.setTextColor(Color.parseColor("#000000"));
-        textViewComment.setTextSize(12.0f);
+        textViewComment.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewComment.setText(comment);
         textViewComment.setPadding(0, 0, 0, 0);
         textViewComment.setGravity(Gravity.LEFT);

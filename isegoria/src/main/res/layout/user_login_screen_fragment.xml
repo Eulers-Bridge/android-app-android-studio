@@ -55,8 +55,6 @@
 	                android:singleLine="true"
 	                android:text="greg.newitt@unimelb.edu.au"
 	                android:textColor="@color/grey" >
-
-	                <requestFocus />
 	            </EditText>
 	            
 	            <View
@@ -80,8 +78,6 @@
 	                android:singleLine="true"
 	                android:text="test123"
 	                android:textColor="@color/grey" >
-
-	                <requestFocus />
 	            </EditText>
 
 	            <Button

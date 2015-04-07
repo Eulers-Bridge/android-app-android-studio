@@ -1019,21 +1019,21 @@ public class Network {
 
     public void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
         this.photoViewFragment = photoViewFragment;
-        String url = SERVER_URL + "dbInterface/api/newsArticle/likes/"
-                + String.valueOf(newsArticleFragment.getArticleId());
+        String url = SERVER_URL + "dbInterface/api/newsArticle/"
+                + String.valueOf(newsArticleFragment.getArticleId()) + "/likes";
 
         JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 try {
                     for(int i=0; i<response.length(); i++) {
-                        int targetId = response.getJSONObject(i).getInt("targetId");
-                        int commentId = response.getJSONObject(i).getInt("commentId");
-                        String userName = response.getJSONObject(i).getString("userName");
-                        String userEmail = response.getJSONObject(i).getString("userEmail");
-                        String content = response.getJSONObject(i).getString("content");
+                        String familyName = response.getJSONObject(i).getString("familyName");
+                        String email = response.getJSONObject(i).getString("email");
+                        String givenName = response.getJSONObject(i).getString("givenName");
 
-                        pollVoteFragment.addTableComment(userName, content);
+                        if(email.equals(loginEmail)) {
+                            newsArticleFragment.setSetLiked(true);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2272,6 +2272,96 @@ public class Network {
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
         HashMap<String, String> params = new HashMap<String, String>();
         userTickets.remove(new Integer(ticketId));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
+    public void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
+        this.newsArticleFragment = newsArticleFragment;
+
+        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
+    public void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
+        this.newsArticleFragment = newsArticleFragment;
+
+        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/unlikedBy/" + String.valueOf(loginEmail) + "/";
+        HashMap<String, String> params = new HashMap<String, String>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {

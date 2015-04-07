@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -85,7 +86,9 @@ public class PollFragment extends SherlockFragment {
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                     if (expanded == false) {
                         expanded = true;
-                        slidingUpPanelLayout.setPanelHeight(600);
+                        int sliderHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                                (float) 400, getResources().getDisplayMetrics());
+                        slidingUpPanelLayout.setPanelHeight(sliderHeight);
                         commentsField.setFocusableInTouchMode(true);
                         commentsField.requestFocus();
                         InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(Context.INPUT_METHOD_SERVICE);

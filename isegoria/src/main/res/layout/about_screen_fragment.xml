@@ -122,7 +122,9 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:gravity="center|center_vertical|center_horizontal"
+                android:layout_gravity="center">
 
                 <LinearLayout
                     android:orientation="vertical"

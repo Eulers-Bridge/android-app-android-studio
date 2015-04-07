@@ -30,6 +30,7 @@ public class NewsArticleFragment extends Fragment {
 	private float dpHeight;
 	private Isegoria isegoria;
 	private int articleId;
+    private NewsArticleFragment newsArticleFragment;
 
     private boolean setLiked = false;
     private Network network;
@@ -37,6 +38,7 @@ public class NewsArticleFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.news_article_fragment, container, false);
+        newsArticleFragment = this;
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
@@ -58,7 +60,15 @@ public class NewsArticleFragment extends Fragment {
     }
 
     public void setSetLiked(boolean setLiked) {
+        final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
         this.setLiked = setLiked;
+
+        if(setLiked == false) {
+            starView.setImageResource(R.drawable.star);
+        }
+        else {
+            starView.setImageResource(R.drawable.stardefault);
+        }
     }
 
     public int getArticleId() {
@@ -116,7 +126,16 @@ public class NewsArticleFragment extends Fragment {
 					flagView.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View view) {
-							starView.setImageResource(R.drawable.star);
+                            if(setLiked == false) {
+                                setLiked = true;
+                                starView.setImageResource(R.drawable.star);
+                                network.likeArticle(articleId, newsArticleFragment);
+                            }
+                            else {
+                                setLiked = false;
+                                starView.setImageResource(R.drawable.stardefault);
+                                network.unlikeArticle(articleId, newsArticleFragment);
+                            }
 						}
 					});
 
