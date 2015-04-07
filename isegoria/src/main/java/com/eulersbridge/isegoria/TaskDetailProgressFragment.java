@@ -40,6 +40,7 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getRemainingTasks(this);
+        network.getCompletedTasks(this);
 
         ProgressBar pb = (ProgressBar) rootView.findViewById(R.id.progressBar);
         pb.setProgress(50);
