@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,7 +51,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
         
         /*addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, "President", "Secretary");
         addTableRow(R.drawable.photo2, R.drawable.photo3, true, false, "Women's Officer", "LGBT Officer");
-        addTableRow(R.drawable.photo4, R.drawable.photo5, true, false, "Clubs and Societies", "Environment Officer");
+        addTableRow(R.drawable.photo4, R.drawable.photopaddingMargin, true, false, "Clubs and Societies", "Environment Officer");
         addTableRow(R.drawable.photo6, R.drawable.photo7, true, false, "Welfare Officer", "Creative Arts Officer");
         addTableRow(R.drawable.photo8, R.drawable.photo9, true, false, "Faculty Liaison", "");*/
 
@@ -81,6 +82,17 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	
 	public void addTableRow(int lastElectionId, int electionId, final int lastPositionId, final int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
+
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.2, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 90, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 23.333, getResources().getDisplayMetrics());
+        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 83.33, getResources().getDisplayMetrics());
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 170, getResources().getDisplayMetrics());
 		
 		if(doubleCell) {
 			tr = new TableRow(getActivity());
@@ -88,15 +100,15 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)(dpHeight / 2.3)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
-	        textViewTitle.setTextSize(16.0f);
+	        textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
 	        textViewTitle.setText(title1);
 	        textViewTitle.setPadding(10, 0, 10, 0);
 	        textViewTitle.setGravity(Gravity.CENTER);
@@ -110,7 +122,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
+			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
             network.getFirstPhoto(this.lastElectionId, this.lastPositionId, view);
@@ -133,15 +145,15 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        tr.addView(relativeLayout);
 	        
 			relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)(dpHeight / 2.3)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, 0);
 			
 	        textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
-	        textViewTitle.setTextSize(16.0f);
+	        textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
 	        textViewTitle.setText(title2);
 	        textViewTitle.setPadding(10, 0, 10, 0);
 	        textViewTitle.setGravity(Gravity.CENTER);
@@ -155,7 +167,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view2 = new ImageView(getActivity());
-            view2.setColorFilter(Color.argb(125, 35, 35, 35));
+            view2.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
             network.getFirstPhoto(electionId, positionId, view2);
@@ -185,21 +197,21 @@ public class CandidatePositionsFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.3)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.3)));
+			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
+			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			view.setScaleType(ScaleType.CENTER_CROP);
 	        
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
-	        textViewTitle.setTextSize(20.0f);
+	        textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20.0f);
 	        textViewTitle.setText(title1);
 	        textViewTitle.setGravity(Gravity.CENTER);
 	        

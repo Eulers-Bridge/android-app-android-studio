@@ -17,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,8 +85,11 @@ public class EventsDetailFragment extends Fragment {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+                    int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            (float) 200, getResources().getDisplayMetrics());
+
 					LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-					backgroundLinearLayout.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.7);
+					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					//Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
 					//Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
@@ -200,7 +204,7 @@ public class EventsDetailFragment extends Fragment {
 
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
-        textViewParty.setTextSize(12.0f);
+        textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewParty.setText(partyAbr);
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
@@ -226,14 +230,14 @@ public class EventsDetailFragment extends Fragment {
 
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
-        textViewCandidate.setTextSize(16.0f);
+        textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(10, 0, 10, 0);
         textViewCandidate.setGravity(Gravity.LEFT);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
-        textViewPosition.setTextSize(12.0f);
+        textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.LEFT);

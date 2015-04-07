@@ -78,7 +78,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#ff059aff"
             android:paddingBottom="3dp"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:paddingTop="3dp" />
     </LinearLayout>
 
     <View

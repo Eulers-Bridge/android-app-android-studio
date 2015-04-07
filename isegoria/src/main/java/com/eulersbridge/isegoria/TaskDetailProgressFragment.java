@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,9 +67,16 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     public void addCompletedTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.completedTasksLayout);
 
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 43.33333333, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.333333333, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 10, getResources().getDisplayMetrics());
+
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
         taskLayout.setGravity(Gravity.LEFT);
-        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 65));
+        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
         LinearLayout rightLayout = new LinearLayout(getActivity());
@@ -81,22 +89,22 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         rightLayout.setLayoutParams(lp);
 
         LinearLayout.LayoutParams layoutParams =
-                new LinearLayout.LayoutParams(65, 65);
+                new LinearLayout.LayoutParams(paddingMargin, paddingMargin);
         ImageView iconImage = new ImageView(getActivity());
         iconImage.setScaleType(ImageView.ScaleType.FIT_XY);
         iconImage.setLayoutParams(layoutParams);
-        iconImage.setPadding(5, 0, 0, 0);
+        iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
         network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
-        taskLabel.setPadding(15, 15, 0, 0);
+        taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
         xpLabel.setGravity(Gravity.RIGHT);
-        xpLabel.setPadding(0, 15, 15, 0);
+        xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 
         taskLabel.setText(action);
@@ -124,9 +132,16 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     public void addRemainingTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.remainingTasksLayout);
 
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 43.33333333, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.333333333, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 10, getResources().getDisplayMetrics());
+
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
         taskLayout.setGravity(Gravity.LEFT);
-        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 65));
+        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
         LinearLayout rightLayout = new LinearLayout(getActivity());
@@ -139,22 +154,22 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         rightLayout.setLayoutParams(lp);
 
         LinearLayout.LayoutParams layoutParams =
-                new LinearLayout.LayoutParams(65, 65);
+                new LinearLayout.LayoutParams(paddingMargin, paddingMargin);
         ImageView iconImage = new ImageView(getActivity());
         iconImage.setScaleType(ImageView.ScaleType.FIT_XY);
         iconImage.setLayoutParams(layoutParams);
-        iconImage.setPadding(5, 0, 0, 0);
+        iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
         network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
-        taskLabel.setPadding(15, 15, 0, 0);
+        taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
         xpLabel.setGravity(Gravity.RIGHT);
-        xpLabel.setPadding(0, 15, 15, 0);
+        xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 
         taskLabel.setText(action);

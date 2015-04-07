@@ -39,6 +39,7 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -572,17 +573,23 @@ public class CircularSeekBar extends View {
 
 		canvas.drawPath(mCirclePath, mCircleFillPaint);
 
+        int textSize1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 22.66666667, getResources().getDisplayMetrics());
+
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(34);
+        paint.setTextSize(textSize1);
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
         canvas.drawText("23", -20, 4, paint);
 
+        int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 9.333333333, getResources().getDisplayMetrics());
+
         paint = new Paint();
         paint.setColor(Color.parseColor("#8A898A"));
-        paint.setTextSize(14);
+        paint.setTextSize(textSize2);
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);

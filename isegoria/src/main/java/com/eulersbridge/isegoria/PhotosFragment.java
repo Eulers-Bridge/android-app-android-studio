@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -87,31 +88,37 @@ public class PhotosFragment extends SherlockFragment {
 	public void addTableRow(final int albumId, String label, String caption, String bitmap) {
 		try {
 			TableRow tr = new TableRow(getActivity());
+
+            int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) 6.666666667, getResources().getDisplayMetrics());
+            int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) 66.66666667, getResources().getDisplayMetrics());
+
 			if(!insertedFirstRow) {
 				insertedFirstRow = true;
-				tr.setPadding(10, 10, 0, 10);
+				tr.setPadding(paddingMargin, paddingMargin, 0, paddingMargin);
 			}
 			else {
-				tr.setPadding(10, 0, 0, 10);
+				tr.setPadding(paddingMargin, 0, 0, paddingMargin);
 			}
 			TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
 			tr.setLayoutParams(rowParams);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setLayoutParams(new TableRow.LayoutParams(100, (int)(100)));
+			view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
 			view.setScaleType(ScaleType.CENTER_CROP);
             view.setBackgroundColor(Color.GRAY);
 	        LinearLayout linearLayout = new LinearLayout(getActivity());
 			linearLayout.setOrientation(LinearLayout.VERTICAL);
 			linearLayout.setGravity(Gravity.CENTER_VERTICAL);
 			linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			linearLayout.setPadding(10, 0, 0, 0);
+			linearLayout.setPadding(paddingMargin, 0, 0, 0);
 
             network.getPictureVolley(bitmap, view);
 	        
 	        final TextView textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor("#000000"));
-	        textViewArticle.setTextSize(18.0f);
+	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
 	        textViewArticle.setText(label);
 	        textViewArticle.setGravity(Gravity.LEFT);
 
@@ -147,7 +154,7 @@ public class PhotosFragment extends SherlockFragment {
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
 	        textViewArticleTime.setTextColor(Color.parseColor("#000000"));
-	        textViewArticleTime.setTextSize(12.0f);
+	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
 	        textViewArticleTime.setText(caption);
 	        textViewArticleTime.setPadding(0, 0, 0, 0);
 	        textViewArticleTime.setGravity(Gravity.LEFT);

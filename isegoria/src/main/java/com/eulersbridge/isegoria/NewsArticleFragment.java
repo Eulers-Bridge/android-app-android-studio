@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -75,12 +76,20 @@ public class NewsArticleFragment extends Fragment {
 				public void run() {
 					DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 					dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-			        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+			        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+                    int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            (float) 83.33333333, getResources().getDisplayMetrics());
+                    int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            (float) 23.33333333, getResources().getDisplayMetrics());
+
+                    int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            (float) 250, getResources().getDisplayMetrics());
 					
 					LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-					backgroundLinearLayout.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.7);
+					backgroundLinearLayout.getLayoutParams().height = (int) (imageHeight);
 					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
-					d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
+					d.setColorFilter(Color.argb(paddingMargin, paddingMargin2, paddingMargin2, paddingMargin2), Mode.DARKEN);
 					backgroundLinearLayout.setBackgroundDrawable(d);
 					
 					TextView newsTitle = (TextView) rootView.findViewById(R.id.newsArticleTitle);

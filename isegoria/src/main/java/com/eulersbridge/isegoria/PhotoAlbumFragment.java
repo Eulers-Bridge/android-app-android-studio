@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,6 +58,9 @@ public class PhotoAlbumFragment extends SherlockFragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 6.666666667, getResources().getDisplayMetrics());
+
         squareSize = (int) (displayMetrics.widthPixels / 4) - (10/4);
         fitPerRow = (int) 4;
         dividerPadding = (10/4);
@@ -78,6 +82,9 @@ public class PhotoAlbumFragment extends SherlockFragment {
 
 	public void addTableRow(String bitmap, final int photoPath) {
         try {
+            int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) 6.666666667, getResources().getDisplayMetrics());
+
             photosPerRow = photosPerRow + 1;
             if (photosPerRow == fitPerRow) {
                 photosPerRow = 0;
@@ -107,7 +114,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setGravity(Gravity.CENTER_VERTICAL);
             linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            linearLayout.setPadding(10, 0, 0, 0);
+            linearLayout.setPadding(paddingMargin, 0, 0, 0);
 
             PhotoViewFragment fragment2 = new PhotoViewFragment();
             Bundle args = new Bundle();

@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -136,6 +137,17 @@ public class NewsFragment extends SherlockFragment {
 			String articleTitle2, String articleTime2) {
 		TableRow tr;
 		String colour = "#F8F8F8";
+
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.2, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 90, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 35, getResources().getDisplayMetrics());
+        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 83.33, getResources().getDisplayMetrics());
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 170, getResources().getDisplayMetrics());
 		
 		if(doubleCell) {
 			tr = new TableRow(getActivity());
@@ -143,11 +155,11 @@ public class NewsFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)(dpHeight / 2.5)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 
 			if(drawable1 == null) {
 				colour = "#000000";
@@ -155,16 +167,16 @@ public class NewsFragment extends SherlockFragment {
 			
 	        TextView textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(16.0f);
+	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
 	        textViewArticle.setText(articleTitle1);
 	        textViewArticle.setPadding(10, 0, 10, 0);
 	        textViewArticle.setGravity(Gravity.CENTER);
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
 	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(12.0f);
+	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
 	        textViewArticleTime.setText(articleTime1);
-	        textViewArticleTime.setPadding(0, 135, 0, 0);
+	        textViewArticleTime.setPadding(0, paddingMargin2, 0, 0);
 	        textViewArticleTime.setGravity(Gravity.CENTER);
 	        
 	        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
@@ -176,7 +188,7 @@ public class NewsFragment extends SherlockFragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
+			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
 			network.getPictureVolley(drawable1, view);
@@ -202,11 +214,11 @@ public class NewsFragment extends SherlockFragment {
 	        tr.addView(relativeLayout);
 	        
 			relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)(dpHeight / 2.5)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, 0);
 			
 			colour = "#F8F8F8";
 			if(drawable2 == null) {
@@ -215,16 +227,16 @@ public class NewsFragment extends SherlockFragment {
 			
 	        textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(16.0f);
+	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
 	        textViewArticle.setText(articleTitle2);
 	        textViewArticle.setPadding(10, 0, 10, 0);
 	        textViewArticle.setGravity(Gravity.CENTER);
 	        
 	        textViewArticleTime = new TextView(getActivity());
 	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(12.0f);
+	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
 	        textViewArticleTime.setText(articleTime2);
-	        textViewArticleTime.setPadding(0, 135, 0, 0);
+	        textViewArticleTime.setPadding(0, paddingMargin2, 0, 0);
 	        textViewArticleTime.setGravity(Gravity.CENTER);
 	        
 	        params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
@@ -236,7 +248,7 @@ public class NewsFragment extends SherlockFragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
 			
 			view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
+			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
             network.getPictureVolley(drawable2, view);
@@ -272,16 +284,16 @@ public class NewsFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.5)));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
 			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 5);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(5, 5, 5, 0);
+				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(125, 35, 35, 35));
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(dpHeight / 2.3)));
+			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
+			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)imageHeight));
 			view.setScaleType(ScaleType.CENTER_CROP);
 			network.getPictureVolley(drawable1, view);
 
@@ -302,13 +314,13 @@ public class NewsFragment extends SherlockFragment {
 	        
 	        TextView textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(20.0f);
+	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
 	        textViewArticle.setText(articleTitle1);
 	        textViewArticle.setGravity(Gravity.CENTER);
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
 	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(12.0f);
+	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
 	        textViewArticleTime.setText(articleTime1);
 	        textViewArticleTime.setPadding(0, 100, 0, 0);
 	        textViewArticleTime.setGravity(Gravity.CENTER);

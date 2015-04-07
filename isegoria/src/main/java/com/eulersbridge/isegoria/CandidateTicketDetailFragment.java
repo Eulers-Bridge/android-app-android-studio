@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -124,6 +125,9 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 	
 	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
 		TableRow tr;
+
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 6.666666667, getResources().getDisplayMetrics());
 		
 		LinearLayout layout = new LinearLayout(getActivity());
 		layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -131,13 +135,15 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		tr = new TableRow(getActivity());
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
-		tr.setPadding(0, 10, 0, 10);
-		
+		tr.setPadding(0, paddingMargin3, 0, paddingMargin3);
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 53.33333333, getResources().getDisplayMetrics());
+        
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(80, 80));
+		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(imageHeight, imageHeight));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
-		candidateProfileView.setPadding(10, 0, 10, 0);
+		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
+		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
         network.getFirstPhoto(0, userId, candidateProfileView);
 		
@@ -145,8 +151,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 
 				Gravity.RIGHT));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
-		candidateProfileImage.setPadding(10, 0, 10, 0);
+		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageHeight, imageHeight));
+		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,7 +171,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
-        textViewParty.setTextSize(12.0f);
+        textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
         textViewParty.setText(partyAbr);
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
@@ -181,7 +187,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		LinearLayout partyLayout = new LinearLayout(getActivity());
 		partyLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-        		80, 40);
+        		imageHeight, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
 		partyLayout.setBackgroundDrawable(rectShapeDrawable);
@@ -189,16 +195,16 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
-        textViewCandidate.setTextSize(16.0f);
+        textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
         textViewCandidate.setText(candidateName);
-        textViewCandidate.setPadding(10, 0, 10, 0);
+        textViewCandidate.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewCandidate.setGravity(Gravity.LEFT);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
-        textViewPosition.setTextSize(12.0f);
+        textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
         textViewPosition.setText(candidatePosition);
-        textViewPosition.setPadding(10, 0, 10, 0);
+        textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.LEFT);
         
         View dividierView = new View(getActivity());

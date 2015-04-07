@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 
 import com.actionbarsherlock.view.Menu;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -38,7 +39,9 @@ public class BaseActivity extends SlidingFragmentActivity {
 		SlidingMenu sm = getSlidingMenu();
 		sm.setShadowWidth(5);
 		//sm.setShadowDrawable(R.drawable.shadow);
-		sm.setBehindOffset(300);
+        int offset = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 200, getResources().getDisplayMetrics());
+		sm.setBehindOffset(offset);
 		sm.setFadeDegree(0.35f);
 		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
 		setSlidingActionBarEnabled(true);

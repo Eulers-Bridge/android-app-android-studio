@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,24 +64,29 @@ public class CandidatePositionFragment extends SherlockFragment {
 		
 		LinearLayout layout = new LinearLayout(getActivity());
 		layout.setOrientation(LinearLayout.HORIZONTAL);
+
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 6.5, getResources().getDisplayMetrics());
+        int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 53, getResources().getDisplayMetrics());
 		
 		tr = new TableRow(getActivity());
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
-		tr.setPadding(0, 10, 0, 10);
+		tr.setPadding(0, paddingMargin, 0, paddingMargin);
 		
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(80, 80));
+		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, 80, 80));
-		candidateProfileView.setPadding(10, 0, 10, 0);
+		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
+		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
         network.getFirstPhoto(0, userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
-		candidateProfileImage.setPadding(10, 0, 10, 0);
+		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
+		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,27 +111,30 @@ public class CandidatePositionFragment extends SherlockFragment {
         textViewParty.setTypeface(null, Typeface.BOLD);
 
         network.getTicketLabel(textViewParty, ticketId);
+
+        int imageSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 27, getResources().getDisplayMetrics());
         
 		LinearLayout partyLayout = new LinearLayout(getActivity());
 		partyLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-        		80, 40);
+        		imageSize, imageSize2);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
 		partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
-        textViewCandidate.setTextSize(16.0f);
+        textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
         textViewCandidate.setText(candidateName);
-        textViewCandidate.setPadding(10, 0, 10, 0);
+        textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewCandidate.setGravity(Gravity.LEFT);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
-        textViewPosition.setTextSize(12.0f);
+        textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.0f);
         textViewPosition.setText(candidatePosition);
-        textViewPosition.setPadding(10, 0, 10, 0);
+        textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.LEFT);
 
         network.getPositionText(textViewPosition, positionId);
