@@ -80,15 +80,19 @@ public class FindAddContactFragment extends SherlockFragment {
         return rootView;
     }
 
-    public void addUser(String firstName, String lastName, final String email, String institution) {
-        addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution);
+    public void clearSearchResults() {
+        usersAllTableLayout.removeAllViews();
     }
 
-    public void addFriend(String firstName, String lastName, final String email, String institution) {
-        addTableRow(friendsAllTableLayout, firstName + " " + lastName, email, institution);
+    public void addUser(String firstName, String lastName, final String email, String institution, String url) {
+        addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution, url);
     }
 
-    public void addTableRow(TableLayout tableLayout, String name, final String email, String institution) {
+    public void addFriend(String firstName, String lastName, final String email, String institution, String url) {
+        addTableRow(friendsAllTableLayout, firstName + " " + lastName, email, institution, url);
+    }
+
+    public void addTableRow(TableLayout tableLayout, String name, final String email, String institution, String url) {
         TableRow tr;
 
         LinearLayout layout = new LinearLayout(getActivity());
@@ -106,6 +110,7 @@ public class FindAddContactFragment extends SherlockFragment {
         candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
         //network.getFirstPhoto(0, userId, candidateProfileView);
         candidateProfileView.setPadding(10, 0, 10, 0);
+        network.getPictureVolley(url, candidateProfileView);
 
         final ImageView candidateProfileImage = new ImageView(getActivity());
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));

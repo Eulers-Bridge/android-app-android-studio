@@ -13,6 +13,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
+import com.amazonaws.mobileconnectors.s3.transfermanager.Upload;
+import com.amazonaws.regions.Regions;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
@@ -47,6 +51,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -377,15 +382,14 @@ public class Network {
 					String email = currentArticle.getString("creatorEmail");
 					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 					Bitmap bitmapPicture = getPicture(picture);
+                    boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
 
 					String likers = currentArticle.getString("likes");
 					long date = currentArticle.getLong("date");
 					date = TimeConverter.convertTimestampTimezone(date);
-					String creatorEmail = "";
-					String studentYear = "";
 					String link = null;
 
-					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture, email);
+					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture, email, inappropriateContent);
 					getUser(newsArticleFragment, email);
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -410,9 +414,23 @@ public class Network {
 					String familyName = currentUser.getString("familyName");
 					String gender = currentUser.getString("gender");
 					String name = givenName + " " + familyName;
-					Bitmap bitmapPicture = null;
 
-					newsArticleFragment.populateUserContent(name, bitmapPicture);
+                    JSONArray photos = currentUser.getJSONArray("photos");
+
+                    int index=0;
+                    for(int i=0; i<photos.length(); i++) {
+                        JSONObject currentObject = photos.getJSONObject(i);
+                        String currentSeq = currentObject.getString("sequence");
+
+                        if(currentSeq.equals("0")) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    String photoURL = (currentUser.getJSONArray("photos").getJSONObject(index).getString("url"));
+
+					newsArticleFragment.populateUserContent(name, photoURL);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -449,8 +467,10 @@ public class Network {
                         String gender = response.getString("gender");
                         String email = response.getString("email");
                         String nationality = response.getString("nationality");
+                        JSONObject profilePhoto = response.getJSONObject("profilePhoto");
+                        String profilePhotoURL = profilePhoto.getString("url");
 
-                        findAddContactFragment.addFriend(givenName, familyName, email, "The University of Melbourne");
+                        findAddContactFragment.addFriend(givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -484,6 +504,7 @@ public class Network {
 
 	public void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
+        this.findAddContactFragment.clearSearchResults();
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -496,7 +517,10 @@ public class Network {
                     String email = response.getString("email");
                     String nationality = response.getString("nationality");
 
-                    findAddContactFragment.addUser(givenName, familyName, email, "The University of Melbourne");
+                    JSONObject profilePhoto = response.getJSONObject("profilePhoto");
+                    String profilePhotoURL = profilePhoto.getString("url");
+
+                    findAddContactFragment.addUser(givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -2799,7 +2823,20 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                            JSONArray photos = response.getJSONArray("photos");
+
+                            int index=0;
+                            for(int i=0; i<photos.length(); i++) {
+                                JSONObject currentObject = photos.getJSONObject(i);
+                                String currentSeq = currentObject.getString("sequence");
+
+                                if(currentSeq.equals("0")) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+
+                            String url = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
                             getFirstPhotoImage(url, imageView);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -2839,7 +2876,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            int nodeId = response.getInt("nodeId");
+                            int nodeId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
                             userDPId = nodeId;
                             String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
 
@@ -2943,7 +2980,20 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                            JSONArray photos = response.getJSONArray("photos");
+
+                            int index=0;
+                            for(int i=0; i<photos.length(); i++) {
+                                JSONObject currentObject = photos.getJSONObject(i);
+                                String currentSeq = currentObject.getString("sequence");
+
+                                if(currentSeq.equals("0")) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+
+                            String url = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
                             getFirstPhotoImageBlur(url, imageView);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -3091,6 +3141,88 @@ public class Network {
         canvas.drawBitmap(source, null, targetRect, null);
 
         return dest;
+    }
+
+    public void s3Upload(final File file) {
+        Runnable r = new Runnable() {
+            public void run() {
+                CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                        application.getApplicationContext(), // Context,
+                        "715927704730",
+                        "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
+                        "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
+                         "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
+                        Regions.US_EAST_1 // Region
+                );
+
+                try {
+                    TransferManager transferManager = new TransferManager(credentialsProvider);
+                    long timestamp = System.currentTimeMillis() / 1000L;
+                    String filename = String.valueOf(userId) + "_" + String.valueOf(timestamp) + "_" + file.getName();
+                    Upload upload = transferManager.upload("isegoriauserpics", filename, file);
+                    upload.waitForUploadResult();
+                    updateDisplayPicturePhoto("https://s3.amazonaws.com/isegoriauserpics/" + filename);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    public void updateDisplayPicturePhoto(String pictureURL) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/photo";
+        long timestamp = System.currentTimeMillis() / 1000L;
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("url", pictureURL);
+        params.put("thumbNailUrl", pictureURL);
+        params.put("title", "Profile Picture");
+        params.put("description", "Profile Picture");
+        params.put("date", String.valueOf(timestamp));
+        params.put("ownerId", String.valueOf(userId));
+        params.put("sequence", String.valueOf("0"));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String result = response.toString();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
     }
 
 	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,

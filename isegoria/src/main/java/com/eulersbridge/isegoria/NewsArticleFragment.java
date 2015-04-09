@@ -79,7 +79,7 @@ public class NewsArticleFragment extends Fragment {
 		this.articleId = articleId;
 	}
 
-	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture, final String email) {
+	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture, final String email, final boolean inappropriateContent) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -121,6 +121,10 @@ public class NewsArticleFragment extends Fragment {
 							flagView.setImageResource(R.drawable.flag);
 						}
 					});
+
+                    if(inappropriateContent) {
+                        flagView.setImageResource(R.drawable.flagdefault);
+                    }
 	
 					final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
 					flagView.setOnClickListener(new OnClickListener() {
@@ -151,7 +155,7 @@ public class NewsArticleFragment extends Fragment {
 		}
 	}
 	
-	public void populateUserContent(final String name, final Bitmap picture) {
+	public void populateUserContent(final String name, final String photoURL) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -163,6 +167,9 @@ public class NewsArticleFragment extends Fragment {
 		} catch(Exception e) {
 			
 		}
+
+        ImageView newsArticleAuthorImage = (ImageView) rootView.findViewById(R.id.newsArticleAuthorImage);
+        network.getPictureVolley(photoURL, newsArticleAuthorImage);
 	}
 
 	public static int calculateInSampleSize(

@@ -1,11 +1,16 @@
 package com.eulersbridge.isegoria;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -19,13 +24,19 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
+import java.io.File;
+
 public class UserSettingsFragment extends SherlockFragment {
     private static final int PICK_IMAGE = 1;
+    public final static int REQ_CODE_PICK_IMAGE = 1;
 
 	private View rootView;
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private ImageView photoImageView;
+    private LinearLayout backgroundLinearLayout;
 
     private MainActivity mainActivity;
     private Network network;
@@ -42,12 +53,13 @@ public class UserSettingsFragment extends SherlockFragment {
 
         mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
+        network.getUserDPId();
 
-        ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
+        photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
-        LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
+        backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
         final TextView aboutThisAppButton = (TextView) rootView.findViewById(R.id.aboutThisAppButton);
@@ -76,23 +88,45 @@ public class UserSettingsFragment extends SherlockFragment {
             }
         });
 
+       // network.s3Auth();
+
 		return rootView;
 	}
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == PICK_IMAGE && data != null && data.getData() != null) {
-            Uri _uri = data.getData();
+    public void onActivityResult(int requestCode, int resultCode,
+                                    Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-            //User had pick an image.
-            Cursor cursor = getActivity().getContentResolver().query(_uri, new String[] { android.provider.MediaStore.Images.ImageColumns.DATA }, null, null, null);
-            cursor.moveToFirst();
+        switch(requestCode) {
+            case REQ_CODE_PICK_IMAGE:
+                if(resultCode == Activity.RESULT_OK){
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-            //Link to the image
-            final String imageFilePath = cursor.getString(0);
-            cursor.close();
+                    Cursor cursor = getSherlockActivity().getContentResolver().query(
+                            selectedImage, filePathColumn, null, null, null);
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    String filePath = cursor.getString(columnIndex);
+                    cursor.close();
+
+                    File file = new File(filePath);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), options);
+                    photoImageView.setImageBitmap(bitmap);
+
+                    Drawable d = new BitmapDrawable(mainActivity.getResources(),
+                            ProfileFragment.fastBlur(bitmap, 25));
+                    backgroundLinearLayout.setBackgroundDrawable(d);
+
+                    network.s3Upload(file);
+
+
+                }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 	
 	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
