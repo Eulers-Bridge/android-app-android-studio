@@ -30,6 +30,7 @@ public class FindAddContactFragment extends SherlockFragment {
     private View rootView;
     private TableLayout usersAllTableLayout;
     private TableLayout friendsAllTableLayout;
+    private TableLayout pendingTableLayout;
 
     private float dpWidth;
     private float dpHeight;
@@ -47,6 +48,7 @@ public class FindAddContactFragment extends SherlockFragment {
         ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         usersAllTableLayout = (TableLayout) rootView.findViewById(R.id.usersAllTable);
         friendsAllTableLayout = (TableLayout) rootView.findViewById(R.id.friendsAllTableLayout);
+        pendingTableLayout = (TableLayout) rootView.findViewById(R.id.friendsPendingTableLayout);
 
         dpWidth = displayMetrics.widthPixels;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -59,6 +61,7 @@ public class FindAddContactFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.findFriends(this);
+        network.findPendingContacts(this);
 
         searchFriendsView = (SearchView) rootView.findViewById(R.id.searchFriendsView);
         searchFriendsView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -85,16 +88,23 @@ public class FindAddContactFragment extends SherlockFragment {
     }
 
     public void addUser(String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution, url);
+        addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution, url, 1);
         LinearLayout searchResultsLinearLayout = (LinearLayout) rootView.findViewById(R.id.searchResultsLinearLayout);
         searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
     public void addFriend(String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(friendsAllTableLayout, firstName + " " + lastName, email, institution, url);
+        addTableRow(friendsAllTableLayout, firstName + " " + lastName, email, institution, url, 2);
     }
 
-    public void addTableRow(TableLayout tableLayout, String name, final String email, String institution, String url) {
+    public void addPendingFriend(String firstName, String lastName, final String email, String institution, String url) {
+        addTableRow(pendingTableLayout, firstName + " " + lastName, email, institution, url, 3);
+    }
+
+    // 1 = Search
+    // 2 = Current Contact
+    // 3 = Pending Contact
+    public void addTableRow(TableLayout tableLayout, String name, final String email, String institution, String url, int type) {
         TableRow tr;
 
         LinearLayout layout = new LinearLayout(getActivity());
@@ -175,7 +185,9 @@ public class FindAddContactFragment extends SherlockFragment {
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
         LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        linLayout2.addView(candidateProfileImage);
+        if(type == 1) {
+            linLayout2.addView(candidateProfileImage);
+        }
         linLayout2.setGravity(Gravity.RIGHT);
         linLayout2.setLayoutParams(relativeParamsRight);
 

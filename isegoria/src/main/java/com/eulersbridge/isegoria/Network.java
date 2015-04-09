@@ -94,10 +94,15 @@ public class Network {
     private PollVoteFragment pollVoteFragment;
 	private Isegoria application;
     private boolean reminderSet = false;
+    private boolean trackingOff;
+    private boolean optOutDataCollection;
 
     private String loginGivenName = "";
     private String loginFamilyName = "";
     private String loginEmail = "";
+    private String loginGender = "";
+    private String loginNationality = "";
+    private String loginYearOfBirth = "";
 
     private String voteReminderLocation;
     private long voteReminderDate;
@@ -106,7 +111,6 @@ public class Network {
     private int userDPId;
 
     private RequestQueue mRequestQueue;
-
     private ArrayList<Integer> userTickets = new ArrayList<Integer>();
 
 	public Network(Isegoria application) {
@@ -145,6 +149,12 @@ public class Network {
                         loginEmail = jUser.getString("email");
                         loginAccountVerified = jUser.getBoolean("accountVerified");
                         hasPersonality = jUser.getBoolean("hasPersonality");
+                        trackingOff = jUser.getBoolean("trackingOff");
+                        optOutDataCollection = jUser.getBoolean("optOutDataCollection");
+
+                        loginGender = jUser.getString("gender");
+                        loginNationality = jUser.getString("nationality");
+                        loginYearOfBirth = jUser.getString("yearOfBirth");
 
                         if (loginAccountVerified) {
                             application.setLoggedIn(true);
@@ -453,7 +463,7 @@ public class Network {
 
     public void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf(loginEmail) + "/";
 
         JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
@@ -505,7 +515,7 @@ public class Network {
 	public void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         this.findAddContactFragment.clearSearchResults();
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(query) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
@@ -551,6 +561,54 @@ public class Network {
         mRequestQueue.add(req);
 	}
 
+    public void findContactPending(String query, final FindAddContactFragment findAddContactFragment) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(query) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String givenName = response.getString("givenName");
+                    String familyName = response.getString("familyName");
+                    String gender = response.getString("gender");
+                    String email = response.getString("email");
+                    String nationality = response.getString("nationality");
+
+                    JSONObject profilePhoto = response.getJSONObject("profilePhoto");
+                    String profilePhotoURL = profilePhoto.getString("url");
+
+                    findAddContactFragment.addPendingFriend(givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
     public void addFriend(String email, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/contact/" + String.valueOf(email) + "/";
@@ -594,6 +652,49 @@ public class Network {
         mRequestQueue.add(req);
 
         Log.d("VolleyRequest", req.toString());
+    }
+
+    public void findPendingContacts(final FindAddContactFragment findAddContactFragment) {
+        this.findAddContactFragment = findAddContactFragment;
+        String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
+
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray friends) {
+                try {
+                    for(int i=0; i<friends.length(); i++) {
+                        JSONObject response = friends.getJSONObject(i);
+                        String contactDetails = response.getString("contactDetails");
+                        network.findContactPending(contactDetails, findAddContactFragment);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
     }
 
     public void addVoteReminder(String location, long date) {
@@ -801,7 +902,7 @@ public class Network {
 
     public void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
         this.eventsDetailFragment = eventsDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf("greg.newitt@unimelb.edu.au") + "/";
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {
@@ -3165,6 +3266,22 @@ public class Network {
         this.voteReminderLocation = voteReminderLocation;
     }
 
+    public boolean isOptOutDataCollection() {
+        return optOutDataCollection;
+    }
+
+    public void setOptOutDataCollection(boolean optOutDataCollection) {
+        this.optOutDataCollection = optOutDataCollection;
+    }
+
+    public boolean isTrackingOff() {
+        return trackingOff;
+    }
+
+    public void setTrackingOff(boolean trackingOff) {
+        this.trackingOff = trackingOff;
+    }
+
     public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
         int sourceWidth = source.getWidth();
         int sourceHeight = source.getHeight();
@@ -3237,6 +3354,60 @@ public class Network {
                     public void onResponse(JSONObject response) {
                         try {
                             String result = response.toString();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
+    public void updateUserDetails() {
+        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/";
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("email", loginEmail);
+        params.put("givenName", loginGivenName);
+        params.put("familyName", loginFamilyName);
+        params.put("gender", loginGender);
+        params.put("nationality", loginNationality);
+        params.put("yearOfBirth", loginYearOfBirth);
+        params.put("accountVerified", String.valueOf(loginAccountVerified));
+        params.put("institutionId", "26");
+        params.put("trackingOff", String.valueOf(this.isTrackingOff()));
+        params.put("optOutDataCollection", String.valueOf(this.optOutDataCollection));
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String responseString = response.toString();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

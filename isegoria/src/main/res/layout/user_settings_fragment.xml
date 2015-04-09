@@ -80,7 +80,7 @@
 		    android:background="@color/offGrey" />
 
 	    <Switch
-	        android:id="@+id/switch2"
+	        android:id="@+id/optOutDataCollectionSwitch"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:paddingBottom="10dp"
@@ -96,7 +96,7 @@
 		    android:background="@color/offGrey" />
 	
 	    <Switch
-	        android:id="@+id/switch3"
+	        android:id="@+id/doNotTrackSwitch"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:paddingBottom="10dp"

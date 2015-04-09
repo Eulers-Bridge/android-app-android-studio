@@ -17,9 +17,12 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -37,6 +40,9 @@ public class UserSettingsFragment extends SherlockFragment {
 
     private ImageView photoImageView;
     private LinearLayout backgroundLinearLayout;
+
+    private Switch doNotTrackSwitch;
+    private Switch optOutDataCollectionSwitch;
 
     private MainActivity mainActivity;
     private Network network;
@@ -58,6 +64,30 @@ public class UserSettingsFragment extends SherlockFragment {
         photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
+
+        doNotTrackSwitch = (Switch) rootView.findViewById(R.id.doNotTrackSwitch);
+        doNotTrackSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                network.setTrackingOff(isChecked);
+                //network.updateUserDetails();
+            }
+        });
+        optOutDataCollectionSwitch = (Switch) rootView.findViewById(R.id.optOutDataCollectionSwitch);
+        optOutDataCollectionSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                network.setOptOutDataCollection(isChecked);
+                //network.updateUserDetails();
+            }
+        });
+
+        if(network.isOptOutDataCollection()) {
+            doNotTrackSwitch.setChecked(true);
+        }
+        if(network.isTrackingOff()) {
+            optOutDataCollectionSwitch.setChecked(true);
+        }
 
         backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
         network.getUserDP(photoImageView, backgroundLinearLayout);
