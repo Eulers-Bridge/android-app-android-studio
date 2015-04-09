@@ -110,7 +110,7 @@ public class PollFragment extends SherlockFragment {
                     collapseBarSlideDown();
 
                     pollVoteFragment.addTableComment((pollFragment.network.getLoginGivenName()
-                            + " " + pollFragment.network.getLoginFamilyName()), comment);
+                            + " " + pollFragment.network.getLoginFamilyName()), comment, network.getLoginEmail());
                     pollFragment.getCommentsField().setText("");
                 }
             }

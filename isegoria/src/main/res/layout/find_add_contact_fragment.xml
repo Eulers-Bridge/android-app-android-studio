@@ -17,10 +17,45 @@
         android:layout_height="wrap_content"
         android:id="@+id/scrollView2"
         android:layout_column="1">
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/searchResultsLinearLayout"
+                android:visibility="gone">
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#838a8a8a" />
+                <RelativeLayout
+                    android:id="@+id/relativeLayoutSearchResults"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#64d3d3d3" >
+
+                    <TextView
+                        android:id="@+id/taskLevelFieldSearchResults"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="Search Results"
+                        android:textColor="#ff575757"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp" />
+
+
+                </RelativeLayout>
+            </LinearLayout>
 
             <TableLayout
                 android:id="@+id/usersAllTable"
@@ -29,6 +64,50 @@
                 >
                 <TableRow
                     android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+                </TableRow>
+            </TableLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dip"
+                    android:background="#838a8a8a" />
+                <RelativeLayout
+                    android:id="@+id/relativeLayoutPending"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="#64d3d3d3" >
+
+                    <TextView
+                        android:id="@+id/taskLevelFieldPending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text="Pending Friend Requests"
+                        android:textColor="#ff575757"
+                        android:textSize="16dp"
+                        android:textStyle="bold"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp" />
+
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <TableLayout
+                android:id="@+id/friendsPendingTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                >
+                <TableRow
+                    android:id="@+id/tableRow2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" >
                 </TableRow>

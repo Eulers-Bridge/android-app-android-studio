@@ -221,7 +221,7 @@ public class PollVoteFragment extends SherlockFragment {
 		pollTableLayout.addView(tr);
 	}
 	
-	public void addTableComment(String name, String comment) {
+	public void addTableComment(String name, String comment, String email) {
 		TableRow tr = new TableRow(getActivity());
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -243,6 +243,7 @@ public class PollVoteFragment extends SherlockFragment {
 		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
 		view.setScaleType(ScaleType.CENTER_CROP);
         //view.setImageResource(R.drawable.head1);
+        network.findContactPhoto(email, view);
 		
 		LinearLayout linearLayout = new LinearLayout(getActivity());
 		linearLayout.setOrientation(LinearLayout.VERTICAL);

@@ -86,6 +86,8 @@ public class FindAddContactFragment extends SherlockFragment {
 
     public void addUser(String firstName, String lastName, final String email, String institution, String url) {
         addTableRow(usersAllTableLayout, firstName + " " + lastName, email, institution, url);
+        LinearLayout searchResultsLinearLayout = (LinearLayout) rootView.findViewById(R.id.searchResultsLinearLayout);
+        searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
     public void addFriend(String firstName, String lastName, final String email, String institution, String url) {

@@ -841,6 +841,50 @@ public class Network {
         mRequestQueue.add(req);
     }
 
+    public void findContactPhoto(final String email, final ImageView imageView) {
+        this.eventsDetailFragment = eventsDetailFragment;
+        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jObject) {
+                        try {
+                            JSONObject photo = jObject.getJSONObject("profilePhoto");
+
+                            String url = photo.getString("url");
+                            getFirstPhotoImage(url, imageView);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
 	public void getPhotoAlbums(final PhotosFragment photosFragment) {
 		this.photosFragment = photosFragment;
         String url = SERVER_URL + "dbInterface/api/photoAlbums/7449";
@@ -1237,7 +1281,7 @@ public class Network {
                         String userEmail = response.getJSONObject(i).getString("userEmail");
                         String content = response.getJSONObject(i).getString("content");
 
-                        pollVoteFragment.addTableComment(userName, content);
+                        pollVoteFragment.addTableComment(userName, content, userEmail);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
