@@ -52,11 +52,17 @@ public class PhotoViewFragment extends SherlockFragment {
         this.imageBitmap = bitmap;
     }
 
-    public void setData(String title, long date) {
+    public void setData(String title, long date, final boolean inappropriateContent) {
         String dateStr = TimeConverter.convertTimestampToString(date);
 
         TextView photoTileTextView = (TextView) rootView.findViewById(R.id.photoTitle);
         TextView photoDateTextView = (TextView) rootView.findViewById(R.id.photoDate);
+
+        ImageView flagged = (ImageView) rootView.findViewById(R.id.photoFlag);
+
+        if(!inappropriateContent) {
+            flagged.setImageResource(R.drawable.flag);
+        }
 
         photoTileTextView.setText(title);
         photoDateTextView.setText(dateStr);

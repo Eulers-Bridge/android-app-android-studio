@@ -717,7 +717,7 @@ public class Network {
 
     public void verifyEmail(final EmailVerificationFragment emailVerificationFragment) {
         this.emailVerificationFragment = emailVerificationFragment;
-        String url = SERVER_URL + "dbInterface/api/emailVerification/" + String.valueOf(username) + "/";
+        String url = SERVER_URL + "dbInterface/api/emailVerification/" + String.valueOf(username) + "/resend";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {
@@ -1009,8 +1009,9 @@ public class Network {
                             long date = response.getLong("date");
                             date = TimeConverter.convertTimestampTimezone(date);
                             String url = response.getString("url");
+                            boolean inappropriateContent = response.getBoolean("inappropriateContent");
 
-                            photoViewFragment.setData(title, date);
+                            photoViewFragment.setData(title, date, inappropriateContent);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
