@@ -578,7 +578,7 @@ public class CircularSeekBar extends View implements Runnable {
                         invalidate();
                     }
                 });
-                Thread.sleep(10);
+                Thread.sleep(15);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

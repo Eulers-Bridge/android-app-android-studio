@@ -1288,22 +1288,18 @@ public class Network {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jArray) {
                         try {
-                            JSONArray jArray = jObject.getJSONArray("badges");
-
                             for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentAlbum = jArray.getJSONObject(i);
+                                JSONObject currentBadge = jArray.getJSONObject(i);
 
-                                int nodeId = currentAlbum.getInt("nodeId");
-                                String title = currentAlbum.getString("title");
-                                String description = currentAlbum.getString("description");
-                                String thumbNailUrl = currentAlbum.getString("url");
-
-                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, nodeId);
+                                int badgeId = currentBadge.getInt("badgeId");
+                                //String title = currentBadge.getString("level");
+                                String description = currentBadge.getString("description");
+                                String name = currentBadge.getString("name");
+                                profileBadgesFragment.addBadge(badgeId, name, description);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
