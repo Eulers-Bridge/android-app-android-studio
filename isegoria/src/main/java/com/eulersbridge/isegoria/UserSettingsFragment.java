@@ -70,7 +70,7 @@ public class UserSettingsFragment extends SherlockFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 network.setTrackingOff(isChecked);
-                //network.updateUserDetails();
+                network.updateUserDetails();
             }
         });
         optOutDataCollectionSwitch = (Switch) rootView.findViewById(R.id.optOutDataCollectionSwitch);
@@ -78,7 +78,7 @@ public class UserSettingsFragment extends SherlockFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 network.setOptOutDataCollection(isChecked);
-                //network.updateUserDetails();
+                network.updateUserDetails();
             }
         });
 
