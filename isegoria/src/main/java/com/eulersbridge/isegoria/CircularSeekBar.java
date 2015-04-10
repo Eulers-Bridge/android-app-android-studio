@@ -27,6 +27,7 @@
 
 package com.eulersbridge.isegoria;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.BlurMaskFilter;
@@ -43,7 +44,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class CircularSeekBar extends View {
+public class CircularSeekBar extends View implements Runnable {
 
 	/**
 	 * Used to scale the dp units to pixels
@@ -238,6 +239,7 @@ public class CircularSeekBar extends View {
 	 * Progress value that this CircularSeekBar is representing.
 	 */
 	private int mProgress;
+    private int finalMProgress;
 
 	/**
 	 * If true, then the user can specify the X and Y radii.
@@ -358,6 +360,8 @@ public class CircularSeekBar extends View {
 	 * Listener.
 	 */
 	private OnCircularSeekBarChangeListener mOnCircularSeekBarChangeListener;
+
+    private CircularSeekBar circularSeekBar;
 
 	/**
 	 * Initialize the CircularSeekBar with the attributes from the XML style.
@@ -547,6 +551,7 @@ public class CircularSeekBar extends View {
 	 * Initialize the {@code Path} objects with the appropriate values.
 	 */
 	private void initPaths() {
+        circularSeekBar = this;
 		mCirclePath = new Path();
 		mCirclePath.addArc(mCircleRectF, mStartAngle, mTotalCircleDegrees);
 
@@ -560,6 +565,25 @@ public class CircularSeekBar extends View {
 	private void initRects() {
 		mCircleRectF.set(-mCircleWidth, -mCircleHeight, mCircleWidth, mCircleHeight);
 	}
+
+    public void run() {
+        while(mProgress < finalMProgress) {
+            mProgress = mProgress + 1;
+            recalculateAll();
+            try {
+                 mainActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        invalidate();
+                    }
+                });
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -575,6 +599,10 @@ public class CircularSeekBar extends View {
 
         int textSize1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 22.66666667, getResources().getDisplayMetrics());
+        int x = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) -13.333333333, getResources().getDisplayMetrics());
+        int y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)  2.666666667, getResources().getDisplayMetrics());
 
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
@@ -582,10 +610,15 @@ public class CircularSeekBar extends View {
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
-        canvas.drawText("23", -20, 4, paint);
+        canvas.drawText("23", x, y, paint);
 
         int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 9.333333333, getResources().getDisplayMetrics());
+
+        x = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) -17.333333333, getResources().getDisplayMetrics());
+        y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)   16.000000000, getResources().getDisplayMetrics());
 
         paint = new Paint();
         paint.setColor(Color.parseColor("#8A898A"));
@@ -593,7 +626,7 @@ public class CircularSeekBar extends View {
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
-        canvas.drawText("38 LEFT", -26, 24, paint);
+        canvas.drawText("38 LEFT", x, y, paint);
 
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius + mPointerHaloWidth, mPointerHaloPaint);
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius, mPointerPaint);
@@ -617,15 +650,18 @@ public class CircularSeekBar extends View {
 	 * @param progress The progress to set the CircularSeekBar to.
 	 */
 	public void setProgress(int progress) {
-        if (mProgress != progress) {
+        finalMProgress = progress;
+        mProgress = 0;
+
+      /*  if (mProgress != progress) {
             mProgress = progress;
             if (mOnCircularSeekBarChangeListener != null) {
                 mOnCircularSeekBarChangeListener.onProgressChanged(this, progress, false);
-            }
+            }*/
 
             recalculateAll();
             invalidate();
-        }
+        //}
     }
 
     public void animateProgress(final int progress) {
@@ -918,18 +954,25 @@ public class CircularSeekBar extends View {
 		initPaints();
 	}
 
+    private Activity mainActivity;
+
 	public CircularSeekBar(Context context) {
 		super(context);
+
+        mainActivity = (Activity) context;
+
 		init(null, 0);
 	}
 
 	public CircularSeekBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
+        mainActivity = (Activity) context;
 		init(attrs, 0);
 	}
 
 	public CircularSeekBar(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+        mainActivity = (Activity) context;
 		init(attrs, defStyle);
 	}
 

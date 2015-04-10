@@ -1286,7 +1286,7 @@ public class Network {
 
     public void getProfileBadges(final ProfileBadgesFragment profileBadgesFragment) {
         this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "dbInterface/api/badges/26";
+        String url = SERVER_URL + "dbInterface/api/badges";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
                 new Response.Listener<JSONObject>() {

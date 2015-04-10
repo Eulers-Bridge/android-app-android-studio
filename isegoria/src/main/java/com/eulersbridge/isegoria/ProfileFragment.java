@@ -95,6 +95,15 @@ public class ProfileFragment extends SherlockFragment {
         circularSeekBar3.setProgress(30);
         circularSeekBar4.setProgress(30);
 
+        Thread t1 = new Thread(circularSeekBar1);
+        t1.start();
+        Thread t2 = new Thread(circularSeekBar2);
+        t2.start();
+        Thread t3 = new Thread(circularSeekBar3);
+        t3.start();
+        Thread t4 = new Thread(circularSeekBar4);
+        t4.start();
+
 		return rootView;
 	}
 
