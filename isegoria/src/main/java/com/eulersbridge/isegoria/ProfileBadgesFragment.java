@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -74,11 +75,18 @@ public class ProfileBadgesFragment extends SherlockFragment {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float)  6.666666667, getResources().getDisplayMetrics());
+            int textSize1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float)  8.0, getResources().getDisplayMetrics());
+            int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float)  6.0, getResources().getDisplayMetrics());
+            int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float)  70.0, getResources().getDisplayMetrics());
 
             photosPerRow = photosPerRow + 1;
             if (photosPerRow == fitPerRow) {
                 photosPerRow = 0;
                 tr = new TableRow(getActivity());
+
                 if (!insertedFirstRow) {
                     insertedFirstRow = true;
                     tr.setPadding(dividerPadding, dividerPadding, dividerPadding, dividerPadding);
@@ -89,12 +97,15 @@ public class ProfileBadgesFragment extends SherlockFragment {
             }
 
             LinearLayout viewLinearLayout = new LinearLayout(getActivity());
-            viewLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+            viewLinearLayout.setLayoutParams(new TableRow.LayoutParams(imageSize, (int) (imageSize)));
+            //viewLinearLayout.setGravity(Gravity.CENTER);
             //viewLinearLayout.setBackgroundColor(Color.parseColor("#000000"));
 
             ImageView view = new ImageView(getActivity());
             //view.setColorFilter(Color.argb(125, 35, 35, 35));
-            view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, (int) (imageSize), 1.0f);
+            layoutParams.gravity = Gravity.CENTER;
+            view.setLayoutParams(layoutParams);
             view.setScaleType(ScaleType.CENTER_CROP);
             //view.setBackgroundColor(Color.GRAY);
             network.getFirstPhoto((int) badgeId, (int) badgeId, view);
@@ -102,16 +113,27 @@ public class ProfileBadgesFragment extends SherlockFragment {
             viewLinearLayout.addView(view);
 
             LinearLayout linearLayout = new LinearLayout(getActivity());
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setGravity(Gravity.CENTER_VERTICAL);
-            linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            layoutParams = new TableRow.LayoutParams(squareSize, squareSize);
+            layoutParams.gravity = Gravity.CENTER;
+            linearLayout.setLayoutParams(layoutParams);
             linearLayout.setPadding(paddingMargin, 0, 0, 0);
 
             TextView nameTextView = new TextView(getActivity());
             nameTextView.setText(name);
+            nameTextView.setGravity(Gravity.CENTER);
+            nameTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            nameTextView.setTextSize(textSize1);
+
+            TextView descTextView = new TextView(getActivity());
+            descTextView.setText(description);
+            descTextView.setGravity(Gravity.CENTER);
+            descTextView.setTextSize(textSize2);
 
             linearLayout.addView(viewLinearLayout);
             linearLayout.addView(nameTextView);
+            linearLayout.addView(descTextView);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
