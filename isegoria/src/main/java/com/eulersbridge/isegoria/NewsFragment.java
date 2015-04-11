@@ -146,6 +146,8 @@ public class NewsFragment extends SherlockFragment {
                 (float) 35, getResources().getDisplayMetrics());
         int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 83.33, getResources().getDisplayMetrics());
+        int paddingMargin5 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float)  6.666666667, getResources().getDisplayMetrics());
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 170, getResources().getDisplayMetrics());
 		
@@ -169,7 +171,7 @@ public class NewsFragment extends SherlockFragment {
 	        textViewArticle.setTextColor(Color.parseColor(colour));
 	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
 	        textViewArticle.setText(articleTitle1);
-	        textViewArticle.setPadding(10, 0, 10, 0);
+	        textViewArticle.setPadding(paddingMargin5, 0, paddingMargin5, 0);
 	        textViewArticle.setGravity(Gravity.CENTER);
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
@@ -229,7 +231,7 @@ public class NewsFragment extends SherlockFragment {
 	        textViewArticle.setTextColor(Color.parseColor(colour));
 	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
 	        textViewArticle.setText(articleTitle2);
-	        textViewArticle.setPadding(10, 0, 10, 0);
+	        textViewArticle.setPadding(paddingMargin5, 0, paddingMargin5, 0);
 	        textViewArticle.setGravity(Gravity.CENTER);
 	        
 	        textViewArticleTime = new TextView(getActivity());
