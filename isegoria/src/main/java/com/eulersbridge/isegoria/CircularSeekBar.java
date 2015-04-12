@@ -51,9 +51,6 @@ public class CircularSeekBar extends View implements Runnable {
 	 */
 	private final float DPTOPX_SCALE = getResources().getDisplayMetrics().density;
 
-    private String topLine = "";
-    private String bottomLine = "";
-
 	/**
 	 * Minimum touch target size in DP. 48dp is the Android design recommendation
 	 */
@@ -362,6 +359,8 @@ public class CircularSeekBar extends View implements Runnable {
 	private OnCircularSeekBarChangeListener mOnCircularSeekBarChangeListener;
 
     private CircularSeekBar circularSeekBar;
+    private String topLine = "";
+    private String bottomLine = "";
 
 	/**
 	 * Initialize the CircularSeekBar with the attributes from the XML style.
@@ -610,7 +609,7 @@ public class CircularSeekBar extends View implements Runnable {
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
-        canvas.drawText("23", x, y, paint);
+        canvas.drawText(topLine, x, y, paint);
 
         int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 9.333333333, getResources().getDisplayMetrics());
@@ -626,7 +625,7 @@ public class CircularSeekBar extends View implements Runnable {
         paint.setFakeBoldText(true);
         paint.setAntiAlias(true);
         paint.setDither(true);
-        canvas.drawText("38 LEFT", x, y, paint);
+        canvas.drawText(bottomLine, x, y, paint);
 
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius + mPointerHaloWidth, mPointerHaloPaint);
 		//canvas.drawCircle(mPointerPositionXY[0], mPointerPositionXY[1], mPointerRadius, mPointerPaint);
@@ -937,6 +936,7 @@ public class CircularSeekBar extends View implements Runnable {
 
     public void setTopLine(String topLine) {
         this.topLine = topLine;
+        invalidate();
     }
 
     public String getBottomLine() {
@@ -945,6 +945,7 @@ public class CircularSeekBar extends View implements Runnable {
 
     public void setBottomLine(String bottomLine) {
         this.bottomLine = bottomLine;
+        invalidate();
     }
 
     private void init(AttributeSet attrs, int defStyle) {
@@ -1185,12 +1186,13 @@ public class CircularSeekBar extends View implements Runnable {
 		}
 	}
 
-	/**
+    /**
 	 * Get the current max of the CircularSeekBar.
 	 * @return Synchronized integer value of the max.
 	 */
 	public synchronized int getMax() {
 		return mMax;
 	}
+
 
 }

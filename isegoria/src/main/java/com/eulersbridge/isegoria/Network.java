@@ -659,21 +659,19 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getDashboardStats(ProfileFragment profileFragment) {
-        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45") + "/";
+    public void getDashboardStats(final ProfileFragment profileFragment) {
+        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45");
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray jArray) {
                 try {
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    JSONObject response = jArray.getJSONObject(0);
 
-                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
-                    String profilePhotoURL = profilePhoto.getString("url");
+                    int numOfCompTasks = response.getInt("numOfCompTasks");
+                    int numOfCompBadges = response.getInt("numOfCompBadges");
+
+                    profileFragment.updateStats(numOfCompTasks, numOfCompBadges);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2292,7 +2290,14 @@ public class Network {
                         String numberOfSupporters = ticketObject.getString("numberOfSupporters");
                         String information = ticketObject.getString("information");
                         String logo = ticketObject.getString("logo");
-                        String colour = ticketObject.getString("colour");
+                        String colour;
+
+                        if(ticketObject.isNull("colour")) {
+                            colour = "#000000";
+                        }
+                        else {
+                            colour = ticketObject.getString("colour");
+                        }
 
                         candidateTicketFragment.addTicket(ticketId, name, information,
                                 numberOfSupporters, colour);

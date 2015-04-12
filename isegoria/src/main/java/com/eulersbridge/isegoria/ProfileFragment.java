@@ -27,6 +27,11 @@ public class ProfileFragment extends SherlockFragment {
 	private float dpWidth;
 	private float dpHeight;
 
+    CircularSeekBar circularSeekBar1;
+    CircularSeekBar circularSeekBar2;
+    CircularSeekBar circularSeekBar3;
+    CircularSeekBar circularSeekBar4;
+
     private ViewPager mPager;
     private Network network;
 
@@ -82,19 +87,19 @@ public class ProfileFragment extends SherlockFragment {
             }
         });
 
-        CircularSeekBar circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
-        CircularSeekBar circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
-        CircularSeekBar circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
-        CircularSeekBar circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
+        circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
+        circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
+        circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
+        circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
 
         circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
-        circularSeekBar1.setProgress(30);
-        circularSeekBar2.setProgress(30);
-        circularSeekBar3.setProgress(30);
-        circularSeekBar4.setProgress(30);
+        circularSeekBar1.setProgress(0);
+        circularSeekBar2.setProgress(0);
+        circularSeekBar3.setProgress(2);
+        circularSeekBar4.setProgress(0);
 
         Thread t1 = new Thread(circularSeekBar1);
         t1.start();
@@ -107,6 +112,11 @@ public class ProfileFragment extends SherlockFragment {
 
 		return rootView;
 	}
+
+    public void updateStats(int numOfCompTasks, int numOfCompBadges) {
+        circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
+        circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
+    }
 
     public void setViewPager(ViewPager mPager) {
         this.mPager = mPager;
