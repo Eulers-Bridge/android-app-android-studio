@@ -7,6 +7,12 @@
     android:clickable="true"
     android:orientation="vertical" >
 
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView6" >
+
     <LinearLayout
         android:id="@+id/topBackgroundNews"
         android:layout_width="match_parent"
@@ -159,10 +165,6 @@
              android:visibility="invisible" />
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView6" >
 
         <LinearLayout
             android:orientation="vertical"

@@ -659,6 +659,52 @@ public class Network {
         mRequestQueue.add(req);
     }
 
+    public void getDashboardStats(ProfileFragment profileFragment) {
+        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45") + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    String givenName = response.getString("givenName");
+                    String familyName = response.getString("familyName");
+                    String gender = response.getString("gender");
+                    String email = response.getString("email");
+                    String nationality = response.getString("nationality");
+
+                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
+                    String profilePhotoURL = profilePhoto.getString("url");
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
     public void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";

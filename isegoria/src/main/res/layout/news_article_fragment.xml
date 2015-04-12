@@ -7,6 +7,19 @@
     android:clickable="true"
     android:orientation="vertical" >
 
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent" >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:gravity="top"
+            android:clickable="true"
+            android:orientation="vertical" >
+
     <LinearLayout
         android:id="@+id/topBackgroundNews"
         android:layout_width="match_parent"
@@ -156,11 +169,6 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent" >
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
@@ -176,14 +184,13 @@
         android:paddingTop="10dp"
         android:textSize="@dimen/newsArticleSize" />
         </LinearLayout>
-    </ScrollView>
-
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
     </LinearLayout>
+    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -110,6 +110,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
             //view.setBackgroundColor(Color.GRAY);
             network.getFirstPhoto((int) badgeId, (int) badgeId, view);
 
+            viewLinearLayout.setPadding(0, 0, 0, paddingMargin);
             viewLinearLayout.addView(view);
 
             LinearLayout linearLayout = new LinearLayout(getActivity());

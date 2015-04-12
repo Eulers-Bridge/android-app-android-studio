@@ -57,6 +57,7 @@ public class ProfileFragment extends SherlockFragment {
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
+        network.getDashboardStats(this);
 
         final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
         showProgressButton.setOnClickListener(new View.OnClickListener() {

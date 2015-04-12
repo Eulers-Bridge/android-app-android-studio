@@ -62,7 +62,7 @@
             android:layout_weight="0"
             android:gravity="center"
             android:orientation="horizontal"
-            android:id="@+id/textView2">
+            >
 
             <View
                 android:layout_width="fill_parent"

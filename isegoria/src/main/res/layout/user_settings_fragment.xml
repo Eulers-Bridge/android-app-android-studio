@@ -60,12 +60,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/barBackground"
+            android:background="#64d3d3d3"
             android:ems="10"
             android:paddingLeft="5dp"
             android:text="Privacy Settings"
-            android:textColor="@color/barText"
-            android:textSize="18dp" >
+            android:textStyle="bold"
+            android:textColor="#ff575757"
+            android:textSize="16dp" >
 
         </TextView>
         
@@ -116,12 +117,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/barBackground"
+            android:background="#64d3d3d3"
             android:ems="10"
             android:paddingLeft="5dp"
+            android:textStyle="bold"
             android:text="Credits"
-            android:textColor="@color/barText"
-            android:textSize="18dp" >
+            android:textColor="#ff575757"
+            android:textSize="16dp" >
 
         </TextView>
     

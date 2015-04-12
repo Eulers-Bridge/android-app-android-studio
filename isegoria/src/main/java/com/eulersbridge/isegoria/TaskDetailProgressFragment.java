@@ -60,6 +60,9 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         nextLevelPoints = nextLevelPoints / 1000;
         nextLevelPoints = nextLevelPoints * 1000;
 
+        if(nextLevelPoints == 0)
+            nextLevelPoints = 1000;
+
         taskLevelField.setText("Level " + String.valueOf(level));
         taskLevelDesc.setText(String.valueOf(totalXp) + " out of "
                 + String.valueOf(nextLevelPoints) + " XP till the next level!");
