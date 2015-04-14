@@ -29,7 +29,6 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.apache.http.HttpEntity;
@@ -317,7 +316,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray jArray = response.getJSONArray("articles");
+                            JSONArray jArray = response.getJSONArray("foundObjects");
 
                             for (int i=0; i<jArray.length(); i++) {
                                 try {
@@ -465,18 +464,19 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray friends) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<friends.length(); i++) {
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
                         try {
-                            JSONObject response = friends.getJSONObject(i);
+                            JSONObject resp = jArray.getJSONObject(i);
 
-                            int userId = response.getInt("userId");
-                            boolean acceptedBoolean = response.getBoolean("accepted");
+                            int userId = resp.getInt("userId");
+                            boolean acceptedBoolean = resp.getBoolean("accepted");
                             if(acceptedBoolean == true) {
-                                String contactDetails = response.getString("contactDetails");
+                                String contactDetails = resp.getString("contactDetails");
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
                             }
                         } catch (Exception e) {
@@ -513,17 +513,18 @@ public class Network {
         mRequestQueue.add(req);
 
         url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/contactRequests";
-        req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray friends) {
+            public void onResponse(JSONObject response) {
                 try {
+                    JSONArray friends = response.getJSONArray("foundObjects");
                     for(int i=0; i<friends.length(); i++) {
                         try {
-                            JSONObject response = friends.getJSONObject(i);
+                            JSONObject resp = friends.getJSONObject(i);
 
-                            int userId = response.getInt("userId");
-                            boolean acceptedBoolean = response.getBoolean("accepted");
-                            String contactDetails = response.getString("contactDetails");
+                            int userId = resp.getInt("userId");
+                            boolean acceptedBoolean = resp.getBoolean("accepted");
+                            String contactDetails = resp.getString("contactDetails");
 
                             if(acceptedBoolean == true) {
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
@@ -662,14 +663,15 @@ public class Network {
     public void getDashboardStats(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45");
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray jArray) {
+            public void onResponse(JSONObject response) {
                 try {
-                    JSONObject response = jArray.getJSONObject(0);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    JSONObject currentObject = jArray.getJSONObject(0);
 
-                    int numOfCompTasks = response.getInt("numOfCompTasks");
-                    int numOfCompBadges = response.getInt("numOfCompBadges");
+                    int numOfCompTasks = currentObject.getInt("numOfCompTasks");
+                    int numOfCompBadges = currentObject.getInt("numOfCompBadges");
 
                     profileFragment.updateStats(numOfCompTasks, numOfCompBadges);
 
@@ -891,19 +893,20 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray friends) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<friends.length(); i++) {
-                        JSONObject response = friends.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject currentObject = jArray.getJSONObject(i);
 
-                        int nodeId = response.getInt("nodeId");
-                        int userId = response.getInt("userId");
+                        int nodeId = currentObject.getInt("nodeId");
+                        int userId = currentObject.getInt("userId");
                         //boolean acceptedContact = response.getBoolean("accepted");
                        // boolean rejectedContact = response.getBoolean("rejected");
-                        if(response.isNull("accepted") && response.isNull("rejected")) {
-                            String contactDetails = response.getString("contactDetails");
+                        if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
+                            String contactDetails = currentObject.getString("contactDetails");
                             network.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
                         }
                     }
@@ -1332,10 +1335,11 @@ public class Network {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray jArray) {
+            public void onResponse(JSONObject response) {
                         try {
+                            JSONArray jArray = response.getJSONArray("foundObjects");
                             for (int i=0; i<jArray.length(); i++) {
                                 JSONObject currentBadge = jArray.getJSONObject(i);
 
@@ -1428,14 +1432,15 @@ public class Network {
         String url = SERVER_URL + "dbInterface/api/newsArticle/"
                 + String.valueOf(newsArticleFragment.getArticleId()) + "/likes";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        String familyName = response.getJSONObject(i).getString("familyName");
-                        String email = response.getJSONObject(i).getString("email");
-                        String givenName = response.getJSONObject(i).getString("givenName");
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        String familyName = jArray.getJSONObject(i).getString("familyName");
+                        String email = jArray.getJSONObject(i).getString("email");
+                        String givenName = jArray.getJSONObject(i).getString("givenName");
 
                         if(email.equals(loginEmail)) {
                             newsArticleFragment.setSetLiked(true);
@@ -1607,16 +1612,17 @@ public class Network {
         this.pollVoteFragment = pollVoteFragment;
         String url = SERVER_URL + "dbInterface/api/comments/" + String.valueOf(pollId) + "/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        int targetId = response.getJSONObject(i).getInt("targetId");
-                        int commentId = response.getJSONObject(i).getInt("commentId");
-                        String userName = response.getJSONObject(i).getString("userName");
-                        String userEmail = response.getJSONObject(i).getString("userEmail");
-                        String content = response.getJSONObject(i).getString("content");
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        int targetId = jArray.getJSONObject(i).getInt("targetId");
+                        int commentId = jArray.getJSONObject(i).getInt("commentId");
+                        String userName = jArray.getJSONObject(i).getString("userName");
+                        String userEmail = jArray.getJSONObject(i).getString("userEmail");
+                        String content = jArray.getJSONObject(i).getString("content");
 
                         pollVoteFragment.addTableComment(userName, content, userEmail);
                     }
@@ -1798,15 +1804,16 @@ public class Network {
         this.pollFragment = pollFragment;
 
         String url = SERVER_URL + "dbInterface/api/votingLocations/26";
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         try {
-                           for(int i=0; i<response.length(); i++) {
-                               String ownerId = response.getJSONObject(i).getString("ownerId");
-                               String votingLocationId = response.getJSONObject(i).getString("votingLocationId");
-                               String name = response.getJSONObject(i).getString("name");
-                               String information = response.getJSONObject(i).getString("information");
+                           JSONArray jArray = response.getJSONArray("foundObjects");
+                           for(int i=0; i<jArray.length(); i++) {
+                               String ownerId = jArray.getJSONObject(i).getString("ownerId");
+                               String votingLocationId = jArray.getJSONObject(i).getString("votingLocationId");
+                               String name = jArray.getJSONObject(i).getString("name");
+                               String information = jArray.getJSONObject(i).getString("information");
 
                                voteFragment.addVoteLocations(ownerId, votingLocationId,
                                        name, information);
@@ -1887,11 +1894,12 @@ public class Network {
     public void getLatestElection() {
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    JSONObject electionObject = response.getJSONObject(0);
+                    JSONArray foundObject = response.getJSONArray("foundObjects");
+                    JSONObject electionObject = foundObject.getJSONObject(0);
 
                     int electionId = electionObject.getInt("electionId");
                     network.electionId = electionId;
@@ -1932,11 +1940,12 @@ public class Network {
         this.electionOverviewFragment = electionOverviewFragment;
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         try {
-                            JSONObject electionObject = response.getJSONObject(0);
+                            JSONArray jArray = response.getJSONArray("foundObjects");
+                            JSONObject electionObject = jArray.getJSONObject(0);
 
                             int electionId = electionObject.getInt("electionId");
                             network.electionId = electionId;
@@ -1983,13 +1992,14 @@ public class Network {
         this.electionOverviewFragment = electionOverviewFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/support/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
+                    JSONArray jArray = response.getJSONArray("foundObjects");
                     userTickets.clear();
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject currentObject = response.getJSONObject(i);
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject currentObject = jArray.getJSONObject(i);
 
                         int ticketId = currentObject.getInt("ticketId");
                         userTickets.add(new Integer(ticketId));
@@ -2029,11 +2039,12 @@ public class Network {
         this.voteFragment = voteFragment;
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    JSONObject electionObject = response.getJSONObject(0);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    JSONObject electionObject = jArray.getJSONObject(0);
 
                     int electionId = electionObject.getInt("electionId");
                     network.electionId = electionId;
@@ -2079,11 +2090,12 @@ public class Network {
         this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/26";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    JSONObject candidateObject = response.getJSONObject(0);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    JSONObject candidateObject = jArray.getJSONObject(0);
 
 
                 } catch (Exception e) {
@@ -2121,12 +2133,13 @@ public class Network {
         this.candidateAllFragment = candidateAllFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject candidateObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject candidateObject = jArray.getJSONObject(i);
 
                         int candidateId = candidateObject.getInt("candidateId");
                         int ticketId = candidateObject.getInt("ticketId");
@@ -2176,12 +2189,13 @@ public class Network {
         this.candidatePositionFragment = candidatePositionFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject candidateObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject candidateObject = jArray.getJSONObject(i);
 
                         int candidateId = candidateObject.getInt("candidateId");
                         int ticketId = candidateObject.getInt("ticketId");
@@ -2278,12 +2292,13 @@ public class Network {
         this.candidateTicketFragment = candidateTicketFragment;
         String url = SERVER_URL + "dbInterface/api/tickets/" + String.valueOf(electionId);
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject ticketObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject ticketObject = jArray.getJSONObject(i);
 
                         int ticketId = ticketObject.getInt("ticketId");
                         String name = ticketObject.getString("name");
@@ -2387,12 +2402,13 @@ public class Network {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject candidateObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject candidateObject = jArray.getJSONObject(i);
 
                         int candidateId = candidateObject.getInt("candidateId");
                         int ticketId = candidateObject.getInt("ticketId");
@@ -2489,12 +2505,13 @@ public class Network {
         this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "dbInterface/api/positions/" + String.valueOf(electionId);
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject positionObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject positionObject = jArray.getJSONObject(i);
 
                         int electionId = positionObject.getInt("electionId");
                         int positionId = positionObject.getInt("positionId");
@@ -2582,12 +2599,13 @@ public class Network {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/voteReminders/";
         HashMap<String, String> params = new HashMap<String, String>();
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject voteReminder = response.getJSONObject(i);
+                    JSONArray foundObjects = response.getJSONArray("foundObjects");
+                    for(int i=0; i<foundObjects.length(); i++) {
+                        JSONObject voteReminder = foundObjects.getJSONObject(i);
 
                         int voteElectionId = voteReminder.getInt("electionId");
                         long timestamp = voteReminder.getLong("timestamp");
@@ -2860,12 +2878,13 @@ public class Network {
     public void getTasks(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "dbInterface/api/tasks/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject taskObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject taskObject = jArray.getJSONObject(i);
 
                         long taskId = taskObject.getLong("taskId");
                         String action = taskObject.getString("action");
@@ -2908,12 +2927,14 @@ public class Network {
     public void getTasks(final ContactProfileFragment contactProfileFragment) {
         String url = SERVER_URL + "dbInterface/api/tasks/complete";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject taskObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject taskObject = jArray.getJSONObject(i);
 
                         long taskId = taskObject.getLong("taskId");
                         String action = taskObject.getString("action");
@@ -2957,13 +2978,14 @@ public class Network {
         this.taskDetailProgressFragment = taskDetailProgressFragment;
         String url = SERVER_URL + "dbInterface/api/tasks/complete/"+String.valueOf(userId) + "?pageSize=20";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
                     long totalXp = 0;
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject taskObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject taskObject = jArray.getJSONObject(i);
 
                         long taskId = taskObject.getLong("taskId");
                         String action = taskObject.getString("action");
@@ -3009,13 +3031,14 @@ public class Network {
         this.taskDetailProgressFragment = taskDetailProgressFragment;
         String url = SERVER_URL + "dbInterface/api/tasks/remaining/"+String.valueOf(userId) + "?pageSize=20";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
                     long totalXp = 0;
-                    for(int i=0; i<response.length(); i++) {
-                        JSONObject taskObject = response.getJSONObject(i);
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject taskObject = jArray.getJSONObject(i);
 
                         long taskId = taskObject.getLong("taskId");
                         String action = taskObject.getString("action");

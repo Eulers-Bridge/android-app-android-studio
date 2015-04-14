@@ -151,12 +151,12 @@
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:text="100"
                         android:textStyle="bold"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/black"
                         android:textSize="@dimen/profileTextSize"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="2dp"
+                        android:text="0" />
 
                     <TextView
                         android:id="@+id/editText133"
@@ -190,7 +190,7 @@
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:text="100"
+                        android:text="0"
                         android:textStyle="bold"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/black"

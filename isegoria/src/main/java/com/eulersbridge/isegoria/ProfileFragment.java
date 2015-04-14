@@ -96,10 +96,10 @@ public class ProfileFragment extends SherlockFragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
-        circularSeekBar1.setProgress(0);
-        circularSeekBar2.setProgress(0);
-        circularSeekBar3.setProgress(2);
-        circularSeekBar4.setProgress(0);
+        circularSeekBar1.setProgress(30);
+        circularSeekBar2.setProgress(30);
+        circularSeekBar3.setProgress(30);
+        circularSeekBar4.setProgress(30);
 
         Thread t1 = new Thread(circularSeekBar1);
         t1.start();
