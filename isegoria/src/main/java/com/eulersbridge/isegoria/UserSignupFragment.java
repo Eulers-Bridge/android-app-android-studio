@@ -1,12 +1,7 @@
 package com.eulersbridge.isegoria;
 
-import java.util.ArrayList;
-
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.app.ActionBar;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +9,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import com.actionbarsherlock.app.SherlockFragment;
+
+import java.util.ArrayList;
 
 public class UserSignupFragment extends SherlockFragment implements OnItemSelectedListener {
 	private View rootView;
@@ -63,8 +62,14 @@ public class UserSignupFragment extends SherlockFragment implements OnItemSelect
         
         Spinner spinnerYearOfBirth = (Spinner) rootView.findViewById(R.id.yearOfBirth);
         spinnerYearOfBirthArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+        int cnt = 0;
         for(int i=1900; i<=2014; i++) {
         	spinnerYearOfBirthArrayAdapter.add(String.valueOf(i));
+
+            if(i == 1990) {
+                spinnerYearOfBirth.setSelection(cnt);
+            }
+            cnt = cnt + 1;
         }
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerYearOfBirth.setAdapter(spinnerYearOfBirthArrayAdapter);

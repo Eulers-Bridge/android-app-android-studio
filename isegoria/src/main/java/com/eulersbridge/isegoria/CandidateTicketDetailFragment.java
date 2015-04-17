@@ -41,6 +41,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 
     private String code;
     private String colour;
+    String partyColour = "";
+    String partyLogo = "";
 
     private TextView partyDetailSupporters;
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
@@ -55,6 +57,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         final int ticketId = bundle.getInt("TicketId");
         final String ticketName = bundle.getString("TicketName");
         final int noOfSupporters = bundle.getInt("NoOfSupporters");
+        partyColour = bundle.getString("Colour");
+        partyLogo = bundle.getString("Logo");
 
 		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
         partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
@@ -172,7 +176,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
-        textViewParty.setText(partyAbr);
+        textViewParty.setText(partyLogo);
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
@@ -180,7 +184,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         RectShape rect = new RectShape();
         ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
         Paint paint = rectShapeDrawable.getPaint();
-        paint.setColor(Color.parseColor(colour));
+        paint.setColor(Color.parseColor(partyColour));
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setStrokeWidth(5);	     
         

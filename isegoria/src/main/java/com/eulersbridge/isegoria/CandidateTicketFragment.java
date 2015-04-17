@@ -40,8 +40,10 @@ public class CandidateTicketFragment extends SherlockFragment {
     private String lastNoOfSupporters;
     private String lastColour;
     private String lastInformation;
+    private String lastLogo;
 
     private boolean added = false;
+    private int addedCounter = 0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -51,11 +53,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
-        
-        //addTableRow("#78BB88", "#697AB2", true, false, "Green Students", "Liberty", "1240 supporters", "1240 supporters");
-        //addTableRow("#D0A86A", "#C1paddingMargin6paddingMargin0", true, false, "STAR", "Young Labor", "1240 supporters", "1240 supporters");
-        //addTableRow("#7A7981", "#paddingMargin3paddingMargin89A", true, true, "Young Liberal", "Socialist Alternative", "1240 supporters", "1240 supporters");
+        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -65,10 +63,12 @@ public class CandidateTicketFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void addTicket(int ticketId, String name, String information, String noOfSupporters, String colour) {
+    public void addTicket(int ticketId, String name, String information, String noOfSupporters,
+                          String colour, String logo, int numberOfParties) {
+        addedCounter = addedCounter + 1;
         if(added) {
             this.addTableRow(lastTicketId, ticketId, lastColour, colour, true, false, lastName, name,
-                    lastNoOfSupporters, noOfSupporters);
+                    lastNoOfSupporters, noOfSupporters, lastLogo, logo);
         }
 
         lastTicketId = ticketId;
@@ -76,6 +76,7 @@ public class CandidateTicketFragment extends SherlockFragment {
         lastInformation = information;
         lastNoOfSupporters = noOfSupporters;
         lastColour = colour;
+        lastLogo = logo;
 
         if(added) {
             added = false;
@@ -83,9 +84,16 @@ public class CandidateTicketFragment extends SherlockFragment {
         else {
             added = true;
         }
+
+        if(numberOfParties == addedCounter && (numberOfParties % 2) != 0) {
+            this.addTableRowOneSquare(ticketId, colour, name, noOfSupporters, logo);
+        }
     }
 	
-	public void addTableRow(final int lastTicketId, final int ticketId, String colour1, String colour2, boolean doubleCell, boolean lastCell, final String title1, final String title2, final String supporters1, final String supporters2) {
+	public void addTableRow(final int lastTicketId, final int ticketId, final String colour1,
+                            final String colour2, boolean doubleCell, boolean lastCell,
+                            final String title1, final String title2, final String supporters1,
+                            final String supporters2, final String logo1, final String logo2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -148,7 +156,10 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", lastTicketId);
                         args.putString("TicketName", title1);
+                        args.putString("Colour", colour1);
                         args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
+                        args.putString("Logo", logo1);
+
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
@@ -216,7 +227,9 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", ticketId);
                         args.putString("TicketName", title2);
+                        args.putString("Colour", colour2);
                         args.putInt("NoOfSupporters", Integer.parseInt(supporters2));
+                        args.putString("Logo", logo2);
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
@@ -267,7 +280,91 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        positionsTableLayout.addView(tr);
 		}
 	}
-	
+
+    public void addTableRowOneSquare(final int ticketId, final String colour1, final String title1,
+                                     final String supporters1, final String logo1) {
+        TableRow tr;
+
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.2, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 90, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 6.666666667, getResources().getDisplayMetrics());
+        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 83.33, getResources().getDisplayMetrics());
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 170, getResources().getDisplayMetrics());
+
+            tr = new TableRow(getActivity());
+            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
+            tr.setLayoutParams(rowParams);
+
+            RelativeLayout relativeLayout = new RelativeLayout(getActivity());
+            relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)imageHeight));
+            ((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
+
+            TextView textViewTitle = new TextView(getActivity());
+            textViewTitle.setTextColor(Color.parseColor("#3A3F43"));
+            textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+            textViewTitle.setText(title1);
+            textViewTitle.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+            textViewTitle.setGravity(Gravity.CENTER);
+
+            TextView textViewTitleSuport1 = new TextView(getActivity());
+            textViewTitleSuport1.setTextColor(Color.parseColor(colour1));
+            textViewTitleSuport1.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+            textViewTitleSuport1.setText(supporters1);
+            textViewTitleSuport1.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+            textViewTitleSuport1.setGravity(Gravity.CENTER);
+
+            RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
+            params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
+
+            RectShape rect = new RectShape();
+            ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
+            Paint paint = rectShapeDrawable.getPaint();
+            paint.setColor(Color.parseColor(colour1));
+            paint.setStyle(Style.STROKE);
+            paint.setStrokeWidth(paddingMargin);
+
+            View view = new View(getActivity());
+            view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            view.setBackgroundDrawable(rectShapeDrawable);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("TicketId", lastTicketId);
+                    args.putString("TicketName", title1);
+                    args.putString("Colour", colour1);
+                    args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
+                    args.putString("Logo", logo1);
+
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.commit();
+                }
+            });
+
+            LinearLayout linLayout = new LinearLayout(getActivity());
+            linLayout.setOrientation(LinearLayout.VERTICAL);
+            LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            linLayout.addView(textViewTitle);
+            linLayout.addView(textViewTitleSuport1);
+
+            relativeLayout.addView(view);
+            relativeLayout.addView(linLayout, params1);
+            tr.addView(relativeLayout);
+
+            positionsTableLayout.addView(tr);
+    }
+
 	public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image

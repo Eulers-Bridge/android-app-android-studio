@@ -2319,7 +2319,7 @@ public class Network {
                         }
 
                         candidateTicketFragment.addTicket(ticketId, name, information,
-                                numberOfSupporters, colour);
+                                numberOfSupporters, colour, logo, jArray.length());
                     }
 
                 } catch (Exception e) {
@@ -2370,10 +2370,10 @@ public class Network {
                         String givenName = currentObject.getString("givenName");
                         String familyName = currentObject.getString("familyName");
                         String name = givenName + " " + familyName;
-                        String code = currentObject.getString("code");
-                        String colour = currentObject.getString("colour");
-                        String information = currentObject.getString("information");
-                        String logo = currentObject.getString("logo");
+                        String code = "";
+                        String colour = "#000000";
+                        String information = "";
+                        String logo = "";
 
                         candidateTicketDetailFragment.updateInformation(ticketId,
                                 network.electionId, name, code, information, colour);
