@@ -27,6 +27,10 @@ public class ProfileFragment extends SherlockFragment {
 	private float dpWidth;
 	private float dpHeight;
 
+    private TextView friendsNumTextView;
+    private TextView groupNumTextView;
+    private TextView rewardsNumTextView;
+
     CircularSeekBar circularSeekBar1;
     CircularSeekBar circularSeekBar2;
     CircularSeekBar circularSeekBar3;
@@ -54,6 +58,10 @@ public class ProfileFragment extends SherlockFragment {
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        friendsNumTextView = (TextView) rootView.findViewById(R.id.friendsNum);
+        groupNumTextView = (TextView) rootView.findViewById(R.id.groupNum);
+        rewardsNumTextView = (TextView) rootView.findViewById(R.id.rewardsNum);
 
         TextView name = (TextView) rootView.findViewById(R.id.profileName);
         network.getUserFullName((int) network.userId, name, "");
@@ -96,6 +104,19 @@ public class ProfileFragment extends SherlockFragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
+		return rootView;
+	}
+
+    public void updateStats(int numOfContacts, int numOfCompBadges, int numOfCompTasks,
+                            int totalBadges, int totalTasks) {
+        friendsNumTextView.setText(String.valueOf(numOfContacts));
+        groupNumTextView.setText(String.valueOf("0"));
+        rewardsNumTextView.setText(String.valueOf("0"));
+        circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
+        circularSeekBar2.setBottomLine("/" + String.valueOf(totalBadges));
+        circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
+        circularSeekBar3.setBottomLine("PER DAY");
+
         circularSeekBar1.setProgress(30);
         circularSeekBar2.setProgress(30);
         circularSeekBar3.setProgress(30);
@@ -109,13 +130,6 @@ public class ProfileFragment extends SherlockFragment {
         t3.start();
         Thread t4 = new Thread(circularSeekBar4);
         t4.start();
-
-		return rootView;
-	}
-
-    public void updateStats(int numOfCompTasks, int numOfCompBadges) {
-        circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
-        circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
     }
 
     public void setViewPager(ViewPager mPager) {

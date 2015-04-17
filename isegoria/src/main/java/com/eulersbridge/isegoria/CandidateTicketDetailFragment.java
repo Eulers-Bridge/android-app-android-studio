@@ -53,7 +53,9 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		Bundle bundle = this.getArguments();
 		int backgroundDrawableResource = R.drawable.me;
         final int ticketId = bundle.getInt("TicketId");
-		
+        final String ticketName = bundle.getString("TicketName");
+        final int noOfSupporters = bundle.getInt("NoOfSupporters");
+
 		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
         partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
 
@@ -100,17 +102,15 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             }
         });
 
+        TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
+        partyDetailSupporters.setText(String.valueOf(noOfSupporters));
+        partyDetailName.setText(ticketName);
+
 		return rootView;
 	}
 
     public void updateInformation(int ticketId, int electionId, String name, String code,
-                                  String information, int numberOfSupporters, String colour) {
-        TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
-        TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
-
-        partyDetailName.setText(name);
-        partyDetailSupporters.setText(String.valueOf(numberOfSupporters));
-
+                                  String information, String colour) {
         this.code = code;
         this.colour = colour;
 

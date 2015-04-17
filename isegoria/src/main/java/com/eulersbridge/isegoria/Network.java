@@ -670,10 +670,14 @@ public class Network {
                     JSONArray jArray = response.getJSONArray("foundObjects");
                     JSONObject currentObject = jArray.getJSONObject(0);
 
-                    int numOfCompTasks = currentObject.getInt("numOfCompTasks");
+                    int numOfContacts = currentObject.getInt("numOfContacts");
                     int numOfCompBadges = currentObject.getInt("numOfCompBadges");
+                    int numOfCompTasks = currentObject.getInt("numOfCompTasks");
+                    int totalBadges = currentObject.getInt("totalBadges");
+                    int totalTasks = currentObject.getInt("totalTasks");
 
-                    profileFragment.updateStats(numOfCompTasks, numOfCompBadges);
+                    profileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
+                            totalBadges, totalTasks);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -999,7 +1003,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject jObject) {
                             try {
-                                JSONArray jArray = jObject.getJSONArray("events");
+                                JSONArray jArray = jObject.getJSONArray("foundObjects");
 
                                 for (int i=0; i<jArray.length(); i++) {
                                     JSONObject currentEvent = jArray.getJSONObject(i);
@@ -1238,7 +1242,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject jObject) {
                         try {
-                            JSONArray jArray = jObject.getJSONArray("photoAlbums");
+                            JSONArray jArray = jObject.getJSONArray("foundObjects");
 
                             for (int i=0; i<jArray.length(); i++) {
                                 JSONObject currentAlbum = jArray.getJSONObject(i);
@@ -2187,7 +2191,7 @@ public class Network {
 
     public void getCandidatesPosition(final CandidatePositionFragment candidatePositionFragment, final int selectedPositionId) {
         this.candidatePositionFragment = candidatePositionFragment;
-        String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
+        String url = SERVER_URL + "dbInterface/api/position/" + String.valueOf(selectedPositionId) + "/candidates";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
@@ -2351,23 +2355,29 @@ public class Network {
 
     public void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId);
+        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/candidates";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    int ticketId = response.getInt("ticketId");
-                    int electionId = response.getInt("electionId");
-                    int numberOfSupporters = response.getInt("numberOfSupporters");
-                    String name = response.getString("name");
-                    String code = response.getString("code");
-                    String colour = response.getString("colour");
-                    String information = response.getString("information");
-                    String logo = response.getString("logo");
+                    JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    candidateTicketDetailFragment.updateInformation(ticketId, electionId, name, code,
-                            information, numberOfSupporters, colour);
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject currentObject = jArray.getJSONObject(i);
+
+                        int ticketId = currentObject.getInt("ticketId");
+                        String givenName = currentObject.getString("givenName");
+                        String familyName = currentObject.getString("familyName");
+                        String name = givenName + " " + familyName;
+                        String code = currentObject.getString("code");
+                        String colour = currentObject.getString("colour");
+                        String information = currentObject.getString("information");
+                        String logo = currentObject.getString("logo");
+
+                        candidateTicketDetailFragment.updateInformation(ticketId,
+                                network.electionId, name, code, information, colour);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -2400,7 +2410,7 @@ public class Network {
 
     public void getTicketCandidates(final CandidateTicketDetailFragment candidateTicketDetailFragment, final int selectedTickedId) {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
+        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override

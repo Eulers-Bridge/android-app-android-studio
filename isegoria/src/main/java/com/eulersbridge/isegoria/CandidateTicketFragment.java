@@ -85,7 +85,7 @@ public class CandidateTicketFragment extends SherlockFragment {
         }
     }
 	
-	public void addTableRow(final int lastTicketId, final int ticketId, String colour1, String colour2, boolean doubleCell, boolean lastCell, String title1, String title2, String supporters1, String supporters2) {
+	public void addTableRow(final int lastTicketId, final int ticketId, String colour1, String colour2, boolean doubleCell, boolean lastCell, final String title1, final String title2, final String supporters1, final String supporters2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -147,6 +147,8 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", lastTicketId);
+                        args.putString("TicketName", title1);
+                        args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
@@ -213,6 +215,8 @@ public class CandidateTicketFragment extends SherlockFragment {
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
                         args.putInt("TicketId", ticketId);
+                        args.putString("TicketName", title2);
+                        args.putInt("NoOfSupporters", Integer.parseInt(supporters2));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);

@@ -108,11 +108,10 @@
                     android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/photoTitle"
+                    android:id="@+id/friendsNum"
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:text="100"
                     android:textStyle="bold"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/black"
@@ -147,7 +146,7 @@
                     android:orientation="vertical" >
 
                     <TextView
-                        android:id="@+id/editText122"
+                        android:id="@+id/groupNum"
                         android:layout_width="90dp"
                         android:layout_height="wrap_content"
                         android:ems="10"
@@ -155,8 +154,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/black"
                         android:textSize="@dimen/profileTextSize"
-                        android:paddingTop="2dp"
-                        android:text="0" />
+                        android:paddingTop="2dp" />
 
                     <TextView
                         android:id="@+id/editText133"
@@ -186,11 +184,10 @@
                     android:orientation="vertical" >
 
                     <TextView
-                        android:id="@+id/editText122"
+                        android:id="@+id/rewardsNum"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:text="0"
                         android:textStyle="bold"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/black"
@@ -229,15 +226,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     xmlns:app="http://schemas.android.com/apk/res/com.eulersbridge.isegoria.CircularSeekBar"
-                    android:paddingLeft="6dp"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
                     android:orientation="vertical" >
 
                     <com.eulersbridge.isegoria.CircularSeekBar
                         android:id="@+id/circularSeekBar1"
-                        android:layout_width="90dp"
-                        android:layout_height="90dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         circle_color="#64d3d3d3"
                         circle_progress_color="#00FF00"
                     />
@@ -261,8 +257,8 @@
 
                     <com.eulersbridge.isegoria.CircularSeekBar
                         android:id="@+id/circularSeekBar2"
-                        android:layout_width="90dp"
-                        android:layout_height="90dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         circle_color="#64d3d3d3"
                         circle_progress_color="#00FF00"
                         />
@@ -287,8 +283,8 @@
 
                     <com.eulersbridge.isegoria.CircularSeekBar
                         android:id="@+id/circularSeekBar3"
-                        android:layout_width="90dp"
-                        android:layout_height="90dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         circle_color="#64d3d3d3"
                         circle_progress_color="#00FF00"
                         />
@@ -312,8 +308,8 @@
 
                     <com.eulersbridge.isegoria.CircularSeekBar
                         android:id="@+id/circularSeekBar4"
-                        android:layout_width="90dp"
-                        android:layout_height="90dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         circle_color="#64d3d3d3"
                         circle_progress_color="#00FF00"
                         />
