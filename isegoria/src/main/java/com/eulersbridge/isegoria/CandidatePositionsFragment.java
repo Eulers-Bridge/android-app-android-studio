@@ -38,6 +38,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
     private String lastDesc;
 
     boolean addRow = false;
+    private int addedPositionsCount = 0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -62,7 +63,9 @@ public class CandidatePositionsFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void addPosition(int electionId, int positionId, String name, String desc) {
+    public void addPosition(int electionId, int positionId, String name,
+                            String desc, int noOfPositions) {
+        addedPositionsCount = addedPositionsCount + 1;
         if(addRow) {
             addTableRow(lastElectionId, electionId, lastPositionId, positionId, true, false, lastName, name);
         }
@@ -77,6 +80,10 @@ public class CandidatePositionsFragment extends SherlockFragment {
         }
         else {
             addRow = true;
+        }
+
+        if(noOfPositions == addedPositionsCount) {
+            this.addTableRowOneSquare(electionId, positionId, name, desc);
         }
     }
 	
@@ -230,6 +237,70 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        positionsTableLayout.addView(tr);
 		}
 	}
+
+    public void addTableRowOneSquare(int electionId, final int positionId,
+                                     String title1, String desc1) {
+        TableRow tr;
+
+        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 3.2, getResources().getDisplayMetrics());
+        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 90, getResources().getDisplayMetrics());
+        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 23.333, getResources().getDisplayMetrics());
+        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 83.33, getResources().getDisplayMetrics());
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 170, getResources().getDisplayMetrics());
+
+            tr = new TableRow(getActivity());
+            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
+            tr.setLayoutParams(rowParams);
+
+            RelativeLayout relativeLayout = new RelativeLayout(getActivity());
+            relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
+            ((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
+
+            TextView textViewTitle = new TextView(getActivity());
+            textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
+            textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+            textViewTitle.setText(title1);
+            textViewTitle.setPadding(10, 0, 10, 0);
+            textViewTitle.setGravity(Gravity.CENTER);
+
+            RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
+            params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
+
+            RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            params2.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
+            params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
+
+            ImageView view = new ImageView(getActivity());
+            view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
+            view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+            view.setScaleType(ScaleType.CENTER_CROP);
+            network.getFirstPhoto(this.lastElectionId, this.lastPositionId, view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidatePositionFragment fragment2 = new CandidatePositionFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("PositionId", positionId);
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.commit();
+                }
+            });
+            relativeLayout.addView(view);
+            relativeLayout.addView(textViewTitle, params1);
+            tr.addView(relativeLayout);
+
+            positionsTableLayout.addView(tr);
+    }
 	
 	public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {

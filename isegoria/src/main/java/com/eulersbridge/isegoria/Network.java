@@ -2528,7 +2528,8 @@ public class Network {
                         String name = positionObject.getString("name");
                         String desc = positionObject.getString("description");
 
-                        candidatePositionsFragment.addPosition(electionId, positionId, name, desc);
+                        candidatePositionsFragment.addPosition(electionId, positionId,
+                                name, desc, jArray.length());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

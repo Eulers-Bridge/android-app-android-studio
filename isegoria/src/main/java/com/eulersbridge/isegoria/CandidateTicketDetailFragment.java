@@ -161,7 +161,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getChildFragmentManager();
+                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
