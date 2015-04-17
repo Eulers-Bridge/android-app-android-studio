@@ -72,13 +72,13 @@ public class ProfileFragment extends SherlockFragment {
         network.getTasks(this);
         network.getDashboardStats(this);
 
-        final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
+        /*final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
         showProgressButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mPager.setCurrentItem(1);
             }
-        });
+        });*/
 
         final TextView personalityTestButton = (TextView) rootView.findViewById(R.id.personalityTestButton);
         personalityTestButton.setOnClickListener(new View.OnClickListener() {
@@ -118,8 +118,10 @@ public class ProfileFragment extends SherlockFragment {
         circularSeekBar3.setBottomLine("PER DAY");
 
         circularSeekBar1.setProgress(30);
-        circularSeekBar2.setProgress(30);
-        circularSeekBar3.setProgress(30);
+        circularSeekBar2.setMax(totalBadges);
+        circularSeekBar2.setProgress(numOfCompBadges);
+        circularSeekBar3.setMax(totalTasks);
+        circularSeekBar3.setProgress(numOfCompTasks);
         circularSeekBar4.setProgress(30);
 
         Thread t1 = new Thread(circularSeekBar1);

@@ -106,7 +106,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, (int) (imageSize), 1.0f);
             layoutParams.gravity = Gravity.CENTER;
             view.setLayoutParams(layoutParams);
-            view.setScaleType(ScaleType.CENTER_CROP);
+            view.setScaleType(ScaleType.FIT_XY);
             //view.setBackgroundColor(Color.GRAY);
             network.getFirstPhoto((int) badgeId, (int) badgeId, view);
 

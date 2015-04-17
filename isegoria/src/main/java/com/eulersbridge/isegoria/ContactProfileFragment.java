@@ -33,6 +33,15 @@ public class ContactProfileFragment extends SherlockFragment {
     private ViewPager mPager;
     private Network network;
 
+    private TextView friendsNumTextView;
+    private TextView groupNumTextView;
+    private TextView rewardsNumTextView;
+
+    private CircularSeekBar circularSeekBar1;
+    private CircularSeekBar circularSeekBar2;
+    private CircularSeekBar circularSeekBar3;
+    private CircularSeekBar circularSeekBar4;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
@@ -45,6 +54,10 @@ public class ContactProfileFragment extends SherlockFragment {
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+        friendsNumTextView = (TextView) rootView.findViewById(R.id.contactFriendsNum);
+        groupNumTextView = (TextView) rootView.findViewById(R.id.contactsGroupNum);
+        rewardsNumTextView = (TextView) rootView.findViewById(R.id.contactRewardsNum);
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
@@ -63,30 +76,45 @@ public class ContactProfileFragment extends SherlockFragment {
         network.getUserDP(profileId, photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
+        network.getDashboardStats(this, profileId);
 
-        final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProgressButton);
-        showProgressButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                mPager.setCurrentItem(1);
-            }
-        });
-
-        CircularSeekBar circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
-        CircularSeekBar circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
-        CircularSeekBar circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
-        CircularSeekBar circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
+        circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
+        circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
+        circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
+        circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
 
         circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
+        return rootView;
+    }
+
+    public void updateStats(int numOfContacts, int numOfCompBadges, int numOfCompTasks,
+                            int totalBadges, int totalTasks) {
+        friendsNumTextView.setText(String.valueOf(numOfContacts));
+        groupNumTextView.setText(String.valueOf("0"));
+        rewardsNumTextView.setText(String.valueOf("0"));
+        circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
+        circularSeekBar2.setBottomLine("/" + String.valueOf(totalBadges));
+        circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
+        circularSeekBar3.setBottomLine("PER DAY");
+
         circularSeekBar1.setProgress(30);
-        circularSeekBar2.setProgress(30);
-        circularSeekBar3.setProgress(30);
+        circularSeekBar2.setMax(totalBadges);
+        circularSeekBar2.setProgress(numOfCompBadges);
+        circularSeekBar3.setMax(totalTasks);
+        circularSeekBar3.setProgress(numOfCompTasks);
         circularSeekBar4.setProgress(30);
 
-        return rootView;
+        Thread t1 = new Thread(circularSeekBar1);
+        t1.start();
+        Thread t2 = new Thread(circularSeekBar2);
+        t2.start();
+        Thread t3 = new Thread(circularSeekBar3);
+        t3.start();
+        Thread t4 = new Thread(circularSeekBar4);
+        t4.start();
     }
 
     public void setViewPager(ViewPager mPager) {

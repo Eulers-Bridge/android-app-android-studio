@@ -87,11 +87,10 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/photoTitle"
+                android:id="@+id/contactFriendsNum"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="100"
                 android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
@@ -126,11 +125,10 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/editText122"
+                android:id="@+id/contactsGroupNum"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="100"
                 android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
@@ -165,11 +163,10 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/editText122"
+                android:id="@+id/contactRewardsNum"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="100"
                 android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/black"
@@ -316,42 +313,6 @@
             android:layout_width="fill_parent"
             android:layout_height="1dip"
             android:background="#838a8a8a" />
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="#64d3d3d3" >
-
-            <TextView
-                android:id="@+id/taskLevelField"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="Tasks"
-                android:textColor="#ff575757"
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp" />
-
-            <TextView
-                android:id="@+id/showProgressButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="Show Progress"
-                android:textColor="#ff0781ff"
-                android:textSize="15dp"
-                android:textStyle="bold"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp" />
-
-
-        </RelativeLayout>
     </LinearLayout>
 
     <ScrollView
@@ -360,13 +321,5 @@
         android:id="@+id/scrollView5"
         android:layout_gravity="center_horizontal" >
 
-        <LinearLayout
-            android:id="@+id/tasksLayout"
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-
-        </LinearLayout>
     </ScrollView>
 </LinearLayout>

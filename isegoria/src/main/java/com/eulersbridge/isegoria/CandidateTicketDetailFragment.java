@@ -124,10 +124,10 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(userId, code, colour, firstName + " " + lastName, "", userId);
+        addTableRow(userId, code, colour, firstName + " " + lastName, "", userId, positionId);
     }
 	
-	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId) {
+	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -210,6 +210,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.LEFT);
+
+        network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
         dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
