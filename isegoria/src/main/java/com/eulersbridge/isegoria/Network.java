@@ -1385,7 +1385,7 @@ public class Network {
         mRequestQueue.add(req);
 	}
 
-    public void getProfileBadges(final ProfileBadgesFragment profileBadgesFragment) {
+    public void getProfileBadges(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges";
 
@@ -1396,12 +1396,36 @@ public class Network {
                             JSONArray jArray = response.getJSONArray("foundObjects");
                             for (int i=0; i<jArray.length(); i++) {
                                 JSONObject currentBadge = jArray.getJSONObject(i);
-
                                 int badgeId = currentBadge.getInt("badgeId");
-                                //String title = currentBadge.getString("level");
-                                String description = currentBadge.getString("description");
                                 String name = currentBadge.getString("name");
-                                profileBadgesFragment.addBadge(badgeId, name, description);
+                                String description = currentBadge.getString("description");
+
+                                int maxLevel = 0;
+                                //Get the max level for each badge
+                                for (int j=0; j<jArray.length(); j++) {
+                                    JSONObject currentBadgeLevel = jArray.getJSONObject(j);
+                                    String nameLevel = currentBadgeLevel.getString("name");
+
+                                    if(name.equals(nameLevel)) {
+                                        if (!currentBadgeLevel.isNull("level")) {
+                                            if (currentBadgeLevel.getInt("level") > maxLevel) {
+                                                maxLevel = currentBadgeLevel.getInt("level");
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(currentBadge.isNull("level") && targetName.equals("")) {
+                                    profileBadgesFragment.addBadge(badgeId, name, description,
+                                            maxLevel);
+                                }
+                                else if(targetName.equals(name) && !currentBadge.isNull("level")) {
+                                    int level = currentBadge.getInt("level");
+                                    if(level == targetLevel) {
+                                        profileBadgesFragment.addBadge(badgeId, name, description,
+                                                maxLevel);
+                                    }
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

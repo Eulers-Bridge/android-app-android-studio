@@ -613,11 +613,11 @@ public class CircularSeekBar extends View implements Runnable {
         canvas.drawText(topLine, x, y, paint);
 
         int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 9.333333333, getResources().getDisplayMetrics());
+                (float) 8.333333333, getResources().getDisplayMetrics());
         x = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 0, getResources().getDisplayMetrics());
         y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float)   17.000000000, getResources().getDisplayMetrics());
+                (float)   16.500000000, getResources().getDisplayMetrics());
 
         paint = new Paint();
         paint.setColor(Color.parseColor("#8A898A"));
