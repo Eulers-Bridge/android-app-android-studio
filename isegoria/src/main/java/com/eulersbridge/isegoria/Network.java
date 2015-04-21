@@ -29,6 +29,7 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.apache.http.HttpEntity;
@@ -675,9 +676,10 @@ public class Network {
                     int numOfCompTasks = currentObject.getInt("numOfCompTasks");
                     int totalBadges = currentObject.getInt("totalBadges");
                     int totalTasks = currentObject.getInt("totalTasks");
+                    int experience = currentObject.getInt("experience");
 
                     profileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
-                            totalBadges, totalTasks);
+                            totalBadges, totalTasks, experience);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1580,15 +1582,15 @@ public class Network {
 	}
 
     public void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
-        this.photoViewFragment = photoViewFragment;
+        this.newsArticleFragment = newsArticleFragment;
         String url = SERVER_URL + "dbInterface/api/newsArticle/"
                 + String.valueOf(newsArticleFragment.getArticleId()) + "/likes";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray response) {
                 try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    JSONArray jArray = response;
                     for(int i=0; i<jArray.length(); i++) {
                         String familyName = jArray.getJSONObject(i).getString("familyName");
                         String email = jArray.getJSONObject(i).getString("email");

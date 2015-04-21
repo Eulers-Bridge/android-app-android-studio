@@ -21,6 +21,9 @@ public class PhotoViewFragment extends SherlockFragment {
 	
 	private float dpWidth;
 	private float dpHeight;
+
+    private ImageView photoStar;
+    private TextView photoLikes;
 	
 	private DisplayMetrics displayMetrics;
 	private int photoPath;
@@ -44,6 +47,9 @@ public class PhotoViewFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPhoto(this, photoPath);
+
+        photoStar = (ImageView) rootView.findViewById(R.id.photoFlag);
+        photoLikes = (TextView) rootView.findViewById(R.id.photoLikes);
 
 		return rootView;
 	}

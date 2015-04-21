@@ -61,12 +61,19 @@ public class NewsArticleFragment extends Fragment {
 
     public void setSetLiked(boolean setLiked) {
         final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
+        final TextView newsArticleLikesView = (TextView) rootView.findViewById(R.id.newsArticleLikes);
         this.setLiked = setLiked;
 
         if(setLiked == false) {
+            int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
+            likes = likes + 1;
+            newsArticleLikesView.setText(String.valueOf(likes));
             starView.setImageResource(R.drawable.star);
         }
         else {
+            int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
+            likes = likes - 1;
+            newsArticleLikesView.setText(String.valueOf(likes));
             starView.setImageResource(R.drawable.stardefault);
         }
     }

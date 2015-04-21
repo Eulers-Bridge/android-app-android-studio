@@ -50,8 +50,21 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true">
 
+                    <TextView
+                        android:id="@+id/photoLikes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:gravity="right"
+                        android:text=""
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/newsPointsSize" />
+
                     <ImageView
-                    android:id="@+id/imageView1"
+                    android:id="@+id/photoStar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/stardefault" />

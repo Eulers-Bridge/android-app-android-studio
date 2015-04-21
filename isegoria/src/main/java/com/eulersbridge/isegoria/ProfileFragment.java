@@ -108,16 +108,20 @@ public class ProfileFragment extends SherlockFragment {
 	}
 
     public void updateStats(int numOfContacts, int numOfCompBadges, int numOfCompTasks,
-                            int totalBadges, int totalTasks) {
+                            int totalBadges, int totalTasks, int experience) {
         friendsNumTextView.setText(String.valueOf(numOfContacts));
         groupNumTextView.setText(String.valueOf("0"));
         rewardsNumTextView.setText(String.valueOf("0"));
+        circularSeekBar1.setTopLine(String.valueOf(experience));
         circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
         circularSeekBar2.setBottomLine("/" + String.valueOf(totalBadges));
         circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
         circularSeekBar3.setBottomLine("PER DAY");
+        circularSeekBar4.setTopLine(String.valueOf("0"));
+        circularSeekBar4.setBottomLine("ATTENDED");
 
-        circularSeekBar1.setProgress(30);
+        circularSeekBar1.setMax(2000);
+        circularSeekBar1.setProgress(experience);
         circularSeekBar2.setMax(totalBadges);
         circularSeekBar2.setProgress(numOfCompBadges);
         circularSeekBar3.setMax(totalTasks);
