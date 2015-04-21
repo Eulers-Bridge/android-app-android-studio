@@ -13,6 +13,10 @@
         android:layout_height="match_parent"
         android:id="@+id/scrollView6" >
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
     <LinearLayout
         android:id="@+id/topBackgroundNews"
         android:layout_width="match_parent"
@@ -190,7 +194,6 @@
 
             </TableLayout>
         </LinearLayout>
+        </LinearLayout>
     </ScrollView>
-
-
 </LinearLayout>
