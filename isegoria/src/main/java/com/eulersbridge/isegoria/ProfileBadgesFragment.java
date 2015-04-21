@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -73,18 +74,23 @@ public class ProfileBadgesFragment extends SherlockFragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getProfileBadges(this, targetName, targetLevel);
+        network.getProfileBadgesComplete(this, targetName, targetLevel);
 
         return rootView;
     }
 
-    public void addBadge(final int badgeId, final String name, final String description,
+    public void addBadgeRemaining(final int badgeId, final String name, final String description,
                          final int maxLevel) {
-        addTableRow(name, description, badgeId, maxLevel);
+        addTableRow(name, description, badgeId, maxLevel, true);
+    }
+
+    public void addBadgeComplete(final int badgeId, final String name, final String description,
+                                  final int maxLevel) {
+        addTableRow(name, description, badgeId, maxLevel, false);
     }
 
     public void addTableRow(final String name, final String description, final int badgeId,
-                            final int maxLevel) {
+                            final int maxLevel, final boolean remaining) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float)  6.666666667, getResources().getDisplayMetrics());
@@ -121,7 +127,9 @@ public class ProfileBadgesFragment extends SherlockFragment {
             //viewLinearLayout.setBackgroundColor(Color.GRAY);
 
             ImageView view = new ImageView(getActivity());
-            //view.setColorFilter(Color.argb(125, 35, 35, 35));
+            if(remaining) {
+                view.setColorFilter(Color.argb(125, 35, 35, 35));
+            }
             layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize, 1.0f);
             layoutParams.gravity = Gravity.CENTER;
             view.setLayoutParams(layoutParams);

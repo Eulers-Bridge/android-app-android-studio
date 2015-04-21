@@ -1385,9 +1385,9 @@ public class Network {
         mRequestQueue.add(req);
 	}
 
-    public void getProfileBadges(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
+    public void getProfileBadgesComplete(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
         this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "dbInterface/api/badges";
+        String url = SERVER_URL + "dbInterface/api/badges/complete/" + String.valueOf(this.userId);
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
@@ -1416,22 +1416,96 @@ public class Network {
                                 }
 
                                 if(currentBadge.isNull("level") && targetName.equals("")) {
-                                    profileBadgesFragment.addBadge(badgeId, name, description,
+                                    profileBadgesFragment.addBadgeComplete(badgeId, name, description,
                                             maxLevel);
                                 }
                                 else if(targetName.equals(name) && !currentBadge.isNull("level")) {
                                     int level = currentBadge.getInt("level");
                                     if(level == targetLevel) {
-                                        profileBadgesFragment.addBadge(badgeId, name, description,
+                                        profileBadgesFragment.addBadgeComplete(badgeId, name, description,
                                                 maxLevel);
                                     }
                                 }
                             }
+
+                            network.getProfileBadgesRemaining(profileBadgesFragment, targetName, targetLevel);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
+        this.profileBadgesFragment = profileBadgesFragment;
+        String url = SERVER_URL + "dbInterface/api/badges/remaining/" + String.valueOf(this.userId);
+
+        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+                    for (int i=0; i<jArray.length(); i++) {
+                        JSONObject currentBadge = jArray.getJSONObject(i);
+                        int badgeId = currentBadge.getInt("badgeId");
+                        String name = currentBadge.getString("name");
+                        String description = currentBadge.getString("description");
+
+                        int maxLevel = 0;
+                        //Get the max level for each badge
+                        for (int j=0; j<jArray.length(); j++) {
+                            JSONObject currentBadgeLevel = jArray.getJSONObject(j);
+                            String nameLevel = currentBadgeLevel.getString("name");
+
+                            if(name.equals(nameLevel)) {
+                                if (!currentBadgeLevel.isNull("level")) {
+                                    if (currentBadgeLevel.getInt("level") > maxLevel) {
+                                        maxLevel = currentBadgeLevel.getInt("level");
+                                    }
+                                }
+                            }
+                        }
+
+                        if(currentBadge.isNull("level") && targetName.equals("")) {
+                            profileBadgesFragment.addBadgeRemaining(badgeId, name, description,
+                                    maxLevel);
+                        }
+                        else if(targetName.equals(name) && !currentBadge.isNull("level")) {
+                            int level = currentBadge.getInt("level");
+                            if(level == targetLevel) {
+                                profileBadgesFragment.addBadgeRemaining(badgeId, name, description,
+                                        maxLevel);
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
