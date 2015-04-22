@@ -1682,8 +1682,10 @@ public class Network {
                                 int creatorID = currentAlbum.getInt("creatorId");
                                 String question = currentAlbum.getString("question");
                                 String answers = currentAlbum.getString("answers");
+                                int numOfComments = currentAlbum.getInt("numOfComments");
 
-                                pollFragment.addQuestion(nodeId, creatorID, question, answers);
+                                pollFragment.addQuestion(nodeId, creatorID, question,
+                                        answers, numOfComments);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
