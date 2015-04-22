@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +15,10 @@ import com.jeremyfeinstein.slidingmenu.lib.app.SlidingFragmentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.text.SpannableString;
+import android.text.Spannable;
+import android.text.style.TypefaceSpan;
+import android.widget.TextView;
 
 public class BaseActivity extends SlidingFragmentActivity {
 	private int mTitleRes;
@@ -47,7 +52,15 @@ public class BaseActivity extends SlidingFragmentActivity {
 		setSlidingActionBarEnabled(true);
 		
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setIcon(R.drawable.app_icon);
+		getSupportActionBar().setIcon(R.drawable.hamburgerbar);
+
+        int titleId = getResources().getIdentifier("action_bar_title", "id",
+                "android");
+        Typeface customFont = Typeface.createFromAsset(getAssets(),
+                "MuseoSansRounded-500.otf");
+        TextView yourTextView = (TextView) findViewById(titleId);
+        yourTextView.setTextColor(getResources().getColor(R.color.white));
+        yourTextView.setTypeface(customFont);
 	}
 
 	@Override

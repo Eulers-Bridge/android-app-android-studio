@@ -21,7 +21,7 @@ public class SlidingMenuItems extends ListFragment {
 		super.onActivityCreated(savedInstanceState);
 		String[] items = getResources().getStringArray(R.array.menu_array);
 		SlidingArrayAdapter itemAdapter = new SlidingArrayAdapter(getActivity(), 
-				R.layout.sliding_menu_item, android.R.id.text1, items);
+				R.layout.sliding_menu_item, R.id.text1, items);
 		setListAdapter(itemAdapter);
 	}
 

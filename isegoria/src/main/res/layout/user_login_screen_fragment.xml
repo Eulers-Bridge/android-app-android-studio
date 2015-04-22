@@ -22,22 +22,23 @@
 	
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/welcome"
-            android:paddingTop="20dp"
-            android:layout_weight="0.76" />
+            android:layout_weight="0.76"
+            android:src="@drawable/isegoria" />
 	        
 	            <TextView
-	                android:id="@+id/photoTitle"
-	                android:layout_width="98dp"
+	                android:id="@+id/isegoriaLabel"
+	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
 	                android:layout_gravity="center_horizontal"
 	                android:ems="10"
+                    android:gravity="center"
 	                android:text="Isegoria"
 	                android:textColor="@color/white"
-	                android:textSize="25sp" >
+	                android:textSize="33dp"
+                    >
 	
 	    	</TextView>
 

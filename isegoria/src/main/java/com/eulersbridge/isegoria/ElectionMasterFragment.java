@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -53,6 +54,19 @@ public class ElectionMasterFragment extends SherlockFragment implements TabListe
 		bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3C7EC9")));
 		bar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 		bar.setSplitBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
+
+        String[] tabNames = {"Election", "Candidates"};
+
+        for(int i = 0; i<bar.getTabCount(); i++){
+            LayoutInflater inflater1 = LayoutInflater.from(getActivity());
+            View customView = inflater1.inflate(R.layout.tab_title, null);
+
+            TextView titleTV = (TextView) customView.findViewById(R.id.action_custom_title);
+            titleTV.setText(tabNames[i]);
+            //Here you can also add any other styling you want.
+
+            bar.getTabAt(i).setCustomView(customView);
+        }
 
 		return rootView;
 	}

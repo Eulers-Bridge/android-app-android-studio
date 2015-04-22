@@ -113,6 +113,7 @@ public class ProfileFragment extends SherlockFragment {
         groupNumTextView.setText(String.valueOf("0"));
         rewardsNumTextView.setText(String.valueOf("0"));
         circularSeekBar1.setTopLine(String.valueOf(experience));
+        circularSeekBar1.setBottomLine("/ ∞");
         circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
         circularSeekBar2.setBottomLine("/" + String.valueOf(totalBadges));
         circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));

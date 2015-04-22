@@ -14,8 +14,10 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
+import android.graphics.Typeface;
 
 public class LoginScreenFragment extends SherlockFragment {
 	private View rootView;
@@ -34,12 +36,19 @@ public class LoginScreenFragment extends SherlockFragment {
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+
+        MainActivity mainActivity = (MainActivity) getActivity();
         
 		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.loginBackground);
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.tumblr_static_aphc);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
 		backgroundLinearLayout.setBackgroundDrawable(d);
+
+        TextView tx = (TextView) rootView.findViewById(R.id.isegoriaLabel);
+        Typeface custom_font = Typeface.createFromAsset(mainActivity.getAssets(),
+                "MuseoSansRounded-300.otf");
+        tx.setTypeface(custom_font);
 		
 		return rootView;		
 	}
