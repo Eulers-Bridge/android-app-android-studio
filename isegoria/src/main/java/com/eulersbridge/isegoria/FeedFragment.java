@@ -54,7 +54,7 @@ public class FeedFragment extends SherlockFragment implements TabListener {
 		bar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 		bar.setSplitBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 
-        String[] tabNames = {"News", "Feed", "Events"};
+        String[] tabNames = {"News", "Photos", "Events"};
 
         for(int i = 0; i<bar.getTabCount(); i++){
             LayoutInflater inflater1 = LayoutInflater.from(getActivity());

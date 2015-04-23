@@ -1549,8 +1549,10 @@ public class Network {
                             date = TimeConverter.convertTimestampTimezone(date);
                             String url = response.getString("url");
                             boolean inappropriateContent = response.getBoolean("inappropriateContent");
+                            int numOfLikes = response.getInt("numOfLikes");
 
-                            photoViewFragment.setData(title, date, inappropriateContent);
+                            photoViewFragment.setData(title, date, inappropriateContent,
+                                    numOfLikes);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1683,9 +1685,10 @@ public class Network {
                                 String question = currentAlbum.getString("question");
                                 String answers = currentAlbum.getString("answers");
                                 int numOfComments = currentAlbum.getInt("numOfComments");
+                                int numOfAnswers = currentAlbum.getInt("numOfAnswers");
 
                                 pollFragment.addQuestion(nodeId, creatorID, question,
-                                        answers, numOfComments);
+                                        answers, numOfComments, numOfAnswers);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

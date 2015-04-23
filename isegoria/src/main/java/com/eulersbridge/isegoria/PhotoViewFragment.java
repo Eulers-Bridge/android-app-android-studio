@@ -58,12 +58,13 @@ public class PhotoViewFragment extends SherlockFragment {
         this.imageBitmap = bitmap;
     }
 
-    public void setData(String title, long date, final boolean inappropriateContent) {
+    public void setData(String title, long date,
+                        final boolean inappropriateContent, int numOfLikes) {
         String dateStr = TimeConverter.convertTimestampToString(date);
 
         TextView photoTileTextView = (TextView) rootView.findViewById(R.id.photoTitle);
         TextView photoDateTextView = (TextView) rootView.findViewById(R.id.photoDate);
-
+        TextView photoLikesTextView = (TextView) rootView.findViewById(R.id.photoLikes);
         ImageView flagged = (ImageView) rootView.findViewById(R.id.photoFlag);
 
         if(!inappropriateContent) {
@@ -72,6 +73,7 @@ public class PhotoViewFragment extends SherlockFragment {
 
         photoTileTextView.setText(title);
         photoDateTextView.setText(dateStr);
+        photoLikesTextView.setText(String.valueOf(numOfLikes));
     }
 	
 	public void addPhoto(final String title, final Bitmap bitmap) {

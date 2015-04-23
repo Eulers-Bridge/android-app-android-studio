@@ -38,6 +38,7 @@ public class PollVoteFragment extends SherlockFragment {
 	private String question;
 	private String answers;
     private int numOfComments;
+    private int numOfAnswers;
     private Network network;
 
     private boolean voted = false;
@@ -53,12 +54,13 @@ public class PollVoteFragment extends SherlockFragment {
         pollVoteFragment = this;
 	}
 	
-	public void setData(int nodeId, int creatorId, String question, String answers, int numOfComments) {
+	public void setData(int nodeId, int creatorId, String question, String answers, int numOfComments, int numOfAnswers) {
         this.nodeId = nodeId;
         this.creatorId = creatorId;
 		this.question = question;
 		this.answers = answers;
         this.numOfComments = numOfComments;
+        this.numOfAnswers = numOfAnswers;
 	}
 	
 	@Override
@@ -163,7 +165,7 @@ public class PollVoteFragment extends SherlockFragment {
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
         TextView noOfAnswersTextView = (TextView) new TextView(getActivity());
-        noOfAnswersTextView.setText("24");
+        noOfAnswersTextView.setText(String.valueOf(numOfAnswers));
         noOfAnswersTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f);
         ImageView noOfAnswersImageView = (ImageView) new ImageView(getActivity());
         noOfAnswersImageView.setScaleType(ScaleType.FIT_XY);

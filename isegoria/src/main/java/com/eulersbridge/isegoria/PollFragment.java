@@ -143,13 +143,13 @@ public class PollFragment extends SherlockFragment {
         this.commentsField = commentsField;
     }
 
-    public void addQuestion(final int nodeId, final int creatorId, final String question, final String answers, final int numOfComments) {
+    public void addQuestion(final int nodeId, final int creatorId, final String question, final String answers, final int numOfComments, final int numOfAnswers) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 			     @Override
 			     public void run() {
 			    	 PollVoteFragment pollVoteFragment = new PollVoteFragment();
-			    	 pollVoteFragment.setData(nodeId, creatorId, question, answers, numOfComments);
+			    	 pollVoteFragment.setData(nodeId, creatorId, question, answers, numOfComments, numOfAnswers);
 
 			         fragments.add((SherlockFragment) pollVoteFragment);
                      network.getPollComments(nodeId, pollVoteFragment);
