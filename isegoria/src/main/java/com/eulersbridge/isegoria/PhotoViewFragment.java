@@ -18,6 +18,7 @@ import java.io.InputStream;
 
 public class PhotoViewFragment extends SherlockFragment {
 	private View rootView;
+    private PhotoViewFragment photoViewFragment;
 	
 	private float dpWidth;
 	private float dpHeight;
@@ -30,9 +31,12 @@ public class PhotoViewFragment extends SherlockFragment {
 
     private Network network;
     private Bitmap imageBitmap;
+    private boolean setLiked = false;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.photoViewFragment = photoViewFragment;
+
 		rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
 		getActivity().setTitle("Isegoria");
 		Bundle bundle = this.getArguments();
@@ -47,12 +51,54 @@ public class PhotoViewFragment extends SherlockFragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPhoto(this, photoPath);
+        network.getPhotoLiked(this);
 
         photoStar = (ImageView) rootView.findViewById(R.id.photoFlag);
         photoLikes = (TextView) rootView.findViewById(R.id.photoLikes);
 
+        final TextView photoLikesTextView = (TextView) rootView.findViewById(R.id.photoLikes);
+        final ImageView starView = (ImageView) rootView.findViewById(R.id.photoStar);
+        starView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(setLiked == false) {
+                    setLiked = true;
+                    starView.setImageResource(R.drawable.star);
+                    network.likePhoto(photoPath, photoViewFragment);
+                    int likes = Integer.parseInt(String.valueOf(photoLikesTextView.getText()));
+                    likes = likes + 1;
+                    photoLikesTextView.setText(String.valueOf(likes));
+                }
+                else {
+                    setLiked = false;
+                    starView.setImageResource(R.drawable.stardefault);
+                    network.unlikePhoto(photoPath, photoViewFragment);
+                    int likes = Integer.parseInt(String.valueOf(photoLikesTextView.getText()));
+                    likes = likes - 1;
+                    photoLikesTextView.setText(String.valueOf(likes));
+                }
+            }
+        });
+
 		return rootView;
 	}
+
+    public void initiallyLiked() {
+        final ImageView starView = (ImageView) rootView.findViewById(R.id.photoStar);
+        starView.setImageResource(R.drawable.star);
+    }
+
+    public boolean isSetLiked() {
+        return setLiked;
+    }
+
+    public int getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(int photoPath) {
+        this.photoPath = photoPath;
+    }
 
     public void setImageBitmap(Bitmap bitmap) {
         this.imageBitmap = bitmap;

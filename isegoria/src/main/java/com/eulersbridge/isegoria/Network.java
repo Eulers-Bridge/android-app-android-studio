@@ -29,7 +29,6 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.apache.http.HttpEntity;
@@ -1586,21 +1585,16 @@ public class Network {
     public void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
         this.newsArticleFragment = newsArticleFragment;
         String url = SERVER_URL + "dbInterface/api/newsArticle/"
-                + String.valueOf(newsArticleFragment.getArticleId()) + "/likes";
+                + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loginEmail) + "/";
 
-        JsonArrayRequest req = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 try {
-                    JSONArray jArray = response;
-                    for(int i=0; i<jArray.length(); i++) {
-                        String familyName = jArray.getJSONObject(i).getString("familyName");
-                        String email = jArray.getJSONObject(i).getString("email");
-                        String givenName = jArray.getJSONObject(i).getString("givenName");
+                    boolean success = response.getBoolean("success");
 
-                        if(email.equals(loginEmail)) {
-                            newsArticleFragment.setSetLiked(true);
-                        }
+                    if(success) {
+                        newsArticleFragment.initiallyLiked();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1631,7 +1625,7 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
-	
+
 	public void getVoteRecords(final VoteFragment voteFragment) {
 		this.voteFragment = voteFragment;
 
@@ -1641,17 +1635,17 @@ public class Network {
 				try {
 					JSONObject jObject = new JSONObject(response);
 					JSONArray jArray = jObject.getJSONArray("photoAlbums");
-					
+
 					for (int i=0; i<jArray.length(); i++) {
 						JSONObject currentVoteRecord = jArray.getJSONObject(i);
-						
+
 						int nodeId = currentVoteRecord.getInt("nodeId");
 						String name = currentVoteRecord.getString("name");
 						String description = currentVoteRecord.getString("description");
 						//String responseBitmap = getRequest("dbInterface/api/photos/" + String.valueOf(nodeId));
 						//JSONObject responseJSON = new JSONObject(responseBitmap);
 						//String pictureURL = responseJSON.getString("url");
-						
+
 						//Bitmap bitmapPicture;
 						//bitmapPicture = getPicture();
 					}
@@ -1660,11 +1654,11 @@ public class Network {
 				}
 			}
 		};
-		
+
 		Thread t = new Thread(r);
 		t.start();
 	}
-	
+
 	public void getPollQuestions(final PollFragment pollFragment) {
 		this.pollFragment = pollFragment;
 
@@ -1830,7 +1824,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            String test = "";
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -2905,6 +2899,144 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
+    public void getPhotoLiked(final PhotoViewFragment photoViewFragment) {
+        this.photoViewFragment = photoViewFragment;
+        String url = SERVER_URL + "dbInterface/api/photo/"
+                + String.valueOf(photoViewFragment.getPhotoPath())
+                + "/likedBy/"
+                + String.valueOf(loginEmail) + "/";
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    boolean success = response.getBoolean("success");
+
+                    if(success) {
+                        photoViewFragment.initiallyLiked();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    public void likePhoto(int photoId, PhotoViewFragment photoViewFragment) {
+        this.newsArticleFragment = newsArticleFragment;
+
+        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId)
+                + "/likedBy/"
+                + String.valueOf(loginEmail) + "/";
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
+    public void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
+        this.newsArticleFragment = newsArticleFragment;
+
+        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            //If we land in here the vote was submitted successfully
+                            String test = "";
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Accept", "application/json");
+                headers.put("Content-type", "application/json; charset=utf-8");
+                return headers;
+            }
+        };
+
+        int socketTimeout = 30000;//30 seconds - change to what you want
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+
+        Log.d("VolleyRequest", req.toString());
+    }
+
     public void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
         this.newsArticleFragment = newsArticleFragment;
 
@@ -2953,7 +3085,7 @@ public class Network {
     public void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
         this.newsArticleFragment = newsArticleFragment;
 
-        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/unlikedBy/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
         HashMap<String, String> params = new HashMap<String, String>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
@@ -3241,7 +3373,7 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
-	
+
 	public void likeNewsArticle(final NewsArticleFragment newsArticleFragment) {
 		this.newsArticleFragment = newsArticleFragment;
 
@@ -3255,9 +3387,9 @@ public class Network {
 				}
 			}
 		};
-		
+
 		Thread t = new Thread(r);
-		t.start();		
+		t.start();
 	}
 
     public String getLoginGivenName() {
@@ -3287,7 +3419,7 @@ public class Network {
     public String getRequest(String params) {
         StringBuffer stringBuffer = new StringBuffer();
         BufferedReader bufferedReader = null;
-        
+
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpParams httpParameters = httpClient.getParams();
@@ -3324,11 +3456,11 @@ public class Network {
         }
         return stringBuffer.toString();
     }
-	
+
 	public String getRequestNoAuth(String params) {
         StringBuffer stringBuffer = new StringBuffer();
         BufferedReader bufferedReader = null;
-        
+
         try {
             HttpClient httpClient = new DefaultHttpClient();
             HttpParams httpParameters = httpClient.getParams();
@@ -3364,7 +3496,7 @@ public class Network {
         }
         return stringBuffer.toString();
     }
-	
+
 	public Bitmap getPicture(String params) {
         StringBuffer stringBuffer = new StringBuffer();
         Bitmap output = null;
@@ -3385,7 +3517,7 @@ public class Network {
         } finally {
 
         }
-        
+
         return output;
     }
 
@@ -3870,19 +4002,19 @@ public class Network {
 	    options.inJustDecodeBounds = false;
 	    return BitmapFactory.decodeStream(is);
 	}
-	
+
 	public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;
 	    int inSampleSize = 1;
-	
+
 	    if (height > reqHeight || width > reqWidth) {
-	
+
 	        final int halfHeight = height / 2;
 	        final int halfWidth = width / 2;
-	
+
 	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
 	        // height and width larger than the requested height and width.
 	        while ((halfHeight / inSampleSize) > reqHeight
@@ -3890,7 +4022,7 @@ public class Network {
 	            inSampleSize *= 2;
 	        }
 	    }
-	
+
 	    return inSampleSize;
 	}
 }

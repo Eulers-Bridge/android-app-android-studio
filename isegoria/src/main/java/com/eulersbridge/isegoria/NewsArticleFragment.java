@@ -55,27 +55,14 @@ public class NewsArticleFragment extends Fragment {
 		return rootView;
 	}
 
-    public boolean isSetLiked() {
-        return setLiked;
+    public void initiallyLiked() {
+        final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
+        starView.setImageResource(R.drawable.star);
+        setLiked = true;
     }
 
-    public void setSetLiked(boolean setLiked) {
-        final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
-        final TextView newsArticleLikesView = (TextView) rootView.findViewById(R.id.newsArticleLikes);
-        this.setLiked = setLiked;
-
-        if(setLiked == false) {
-            int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
-            likes = likes + 1;
-            newsArticleLikesView.setText(String.valueOf(likes));
-            starView.setImageResource(R.drawable.star);
-        }
-        else {
-            int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
-            likes = likes - 1;
-            newsArticleLikesView.setText(String.valueOf(likes));
-            starView.setImageResource(R.drawable.stardefault);
-        }
+    public boolean isSetLiked() {
+        return setLiked;
     }
 
     public int getArticleId() {
@@ -132,20 +119,27 @@ public class NewsArticleFragment extends Fragment {
                     if(inappropriateContent) {
                         flagView.setImageResource(R.drawable.flagdefault);
                     }
-	
+
+                    final TextView newsArticleLikesView = (TextView) rootView.findViewById(R.id.newsArticleLikes);
 					final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
-					flagView.setOnClickListener(new OnClickListener() {
+                    starView.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View view) {
                             if(setLiked == false) {
                                 setLiked = true;
                                 starView.setImageResource(R.drawable.star);
                                 network.likeArticle(articleId, newsArticleFragment);
+                                int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
+                                likes = likes + 1;
+                                newsArticleLikesView.setText(String.valueOf(likes));
                             }
                             else {
                                 setLiked = false;
                                 starView.setImageResource(R.drawable.stardefault);
                                 network.unlikeArticle(articleId, newsArticleFragment);
+                                int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
+                                likes = likes - 1;
+                                newsArticleLikesView.setText(String.valueOf(likes));
                             }
 						}
 					});
