@@ -60,7 +60,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Network {
-	private static String SERVER_URL = "http://54.79.70.241:8080/dbInterface/";
+	private static String SERVER_URL = "http://54.79.70.241:8080/";
 	private static String PICTURE_URL = "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
 	public long userId;
 	private String username;
