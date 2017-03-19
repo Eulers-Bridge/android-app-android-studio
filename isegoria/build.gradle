@@ -3,23 +3,38 @@ apply plugin: 'com.android.application'
 
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'IsegoriaAndroidKey'
+            keyPassword 'EulersBridge88902!@#'
+            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
+            storePassword 'EulersBridge88902'
+        }
+        release {
+            keyAlias 'IsegoriaAndroidKey'
+            keyPassword 'EulersBridge88902!@#'
+            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
+            storePassword 'EulersBridge88902'
+        }
+    }
     compileSdkVersion 21
-    buildToolsVersion '21.1.2'
-
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.eulersbridge.isegoria"
         minSdkVersion 14
         targetSdkVersion 17
     }
-
     lintOptions {
         abortOnError false
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     dexOptions {
