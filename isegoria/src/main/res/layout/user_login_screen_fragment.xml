@@ -54,7 +54,7 @@
 	                android:minHeight="40dp"
 	                android:paddingLeft="5dp"
 	                android:singleLine="true"
-	                android:text="greg.newitt@unimelb.edu.au"
+	                android:text="alangao12345@gmail.com"
 	                android:textColor="@color/grey" >
 	            </EditText>
 	            
