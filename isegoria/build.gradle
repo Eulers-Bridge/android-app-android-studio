@@ -20,7 +20,7 @@ android {
     compileSdkVersion 21
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId "com.eulersbridge.isegoria"
+        applicationId "au.com.isegoria.app"
         minSdkVersion 14
         targetSdkVersion 17
     }
