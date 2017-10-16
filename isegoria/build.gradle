@@ -4,12 +4,12 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        debug {
-            keyAlias 'IsegoriaAndroidKey'
-            keyPassword 'EulersBridge88902!@#'
-            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
-            storePassword 'EulersBridge88902'
-        }
+//        debug {
+//            keyAlias 'IsegoriaAndroidKey'
+//            keyPassword 'EulersBridge88902!@#'
+//            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
+//            storePassword 'EulersBridge88902'
+//        }
         release {
             keyAlias 'IsegoriaAndroidKey'
             keyPassword 'EulersBridge88902!@#'
@@ -17,14 +17,15 @@ android {
             storePassword 'EulersBridge88902'
         }
     }
-    compileSdkVersion 21
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "au.com.isegoria.app"
         minSdkVersion 14
-        targetSdkVersion 17
+        targetSdkVersion 26
         versionName "1.0.1"
     }
+    useLibrary 'org.apache.http.legacy'
     lintOptions {
         abortOnError false
     }
@@ -47,7 +48,7 @@ android {
 dependencies {
     compile project(':library')
     compile project(':viewpagerlibrary')
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'com.mcxiaoke.volley:library:1.0.+'
     compile 'com.sothree.slidinguppanel:library:3.0.0'
     compile files('src/main/java/libs/aws-android-sdk-core-2.1.10.jar')
