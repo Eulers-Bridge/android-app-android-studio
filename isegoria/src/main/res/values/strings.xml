@@ -23,6 +23,18 @@
     <string name="user_signup_confirm_password">Confirm Password</string>
     <string name="user_signup_next_button">Next</string>
 
+    <!-- Personality questions -->
+    <string name="personality_screen_1_description">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science! All you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
+    <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
+    <string name="personality_screen_skip_button">Skip</string>
+    <string name="personality_questions_done_button">Done</string>
+    <string name="personality_screen_2_description">Simply select a number next to each statement to indicate the extent to which you agree or disagree. You should rate the extend to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.</string>
+
+    <!-- Email verification -->
+    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
+    <string name="email_verification_success_button">Verified, Please Log Me In</string>
+    <string name="email_verification_resend_button">Resend Verification Email</string>
+
     <!-- Navigation drawer -->
     <string name="navigation_feed">Feed</string>
     <string name="navigation_election">Election</string>
@@ -40,6 +52,15 @@
     <string name="profile_section_tasks">Tasks</string>
     <string name="profile_section_events">Events</string>
     <string name="profile_show_progress">Show Progress</string>
+    <string name="user_profile_personality_test_button">Complete Personality Test</string>
+
+    <!-- Settings -->
+    <string name="user_settings_profile_picture_content_description">Your profile picture</string>
+    <string name="user_settings_change_photo">Change Photo</string>
+    <string name="user_settings_privacy_settings">Privacy Settings</string>
+    <string name="user_settings_data_collection_opt_out">Opt Out of Data Collection</string>
+    <string name="user_settings_do_not_track">Do not Track</string>
+    <string name="user_settings_about_button">About this App</string>
 
     <!-- About -->
     <string name="about_version_text">Version 1.0 \"Tesla\" Beta</string>
@@ -50,6 +71,5 @@
 
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Sorry, there\'s no web browser available</string>
-
 
 </resources>

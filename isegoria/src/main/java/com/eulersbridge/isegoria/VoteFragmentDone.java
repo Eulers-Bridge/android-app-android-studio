@@ -21,8 +21,8 @@ public class VoteFragmentDone extends Fragment implements OnItemSelectedListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_fragment_done, container, false);
-        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActivity().getActionBar().removeAllTabs();
+
+        //TODO: No tabs
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();

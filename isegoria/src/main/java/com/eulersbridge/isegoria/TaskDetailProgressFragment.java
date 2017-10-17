@@ -78,7 +78,7 @@ public class TaskDetailProgressFragment extends Fragment {
                 (float) 10, getResources().getDisplayMetrics());
 
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.LEFT);
+        taskLayout.setGravity(Gravity.START);
         taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
@@ -106,7 +106,7 @@ public class TaskDetailProgressFragment extends Fragment {
         taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.RIGHT);
+        xpLabel.setGravity(Gravity.END);
         xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 
@@ -143,7 +143,7 @@ public class TaskDetailProgressFragment extends Fragment {
                 (float) 10, getResources().getDisplayMetrics());
 
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.LEFT);
+        taskLayout.setGravity(Gravity.START);
         taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
@@ -171,7 +171,7 @@ public class TaskDetailProgressFragment extends Fragment {
         taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.RIGHT);
+        xpLabel.setGravity(Gravity.END);
         xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 

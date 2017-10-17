@@ -22,8 +22,8 @@ public class PersonalityQuestionsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.personality_questions_fragment, container, false);
-        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        ((MainActivity) getActivity()).getSupportActionBar().show();
+
+        //TODO: No Tabs
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
 

@@ -99,8 +99,8 @@ public class NewsArticleFragment extends Fragment {
 					TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
 					newsTitle.setText(title);
 					
-					TextView newsArticleLikes = rootView.findViewById(R.id.newsArticleLikes);
-					newsArticleLikes.setText(likes);
+					final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
+                    newsArticleLikesView.setText(likes);
 					
 					TextView newsText = rootView.findViewById(R.id.textNews);
 					newsText.setText(content);
@@ -120,7 +120,6 @@ public class NewsArticleFragment extends Fragment {
                         flagView.setImageResource(R.drawable.flagdefault);
                     }
 
-                    final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
 					final ImageView starView = rootView.findViewById(R.id.starView);
                     starView.setOnClickListener(new OnClickListener() {
 						@Override

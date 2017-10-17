@@ -15,7 +15,7 @@ public class UserConsentAgreementFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.user_consent_agreement_fragment, container, false);
 		this.isegoria = (Isegoria) getActivity().getApplication();
-		getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		//TODO: No Tabs
 
 
 		return rootView;

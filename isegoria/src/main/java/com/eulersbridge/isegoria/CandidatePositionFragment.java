@@ -79,7 +79,7 @@ public class CandidatePositionFragment extends Fragment {
         network.getFirstPhoto(0, userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
-		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
 		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);

@@ -660,7 +660,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getDashboardStats(final ProfileFragment profileFragment) {
+    void getDashboardStats(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45");
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {

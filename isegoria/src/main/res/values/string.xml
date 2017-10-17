@@ -15,7 +15,6 @@
   -->
 
 <resources>
-    <string name="app_name">Isegoria</string>
     <string-array name="menu_array">
         <item>Feed</item>
         <item>Election</item>

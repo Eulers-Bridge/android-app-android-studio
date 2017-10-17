@@ -11,7 +11,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:orientation="vertical">
 
@@ -28,13 +28,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Isegoria"
+                android:text="@string/app_name"
                 android:id="@+id/textView7"
                 android:textAlignment="center"
                 android:layout_gravity="center_horizontal"
                 android:textColor="#ffffffff"
                 android:paddingTop="10dp"
-                android:textSize="35dp" />
+                android:textSize="35sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
                 android:layout_gravity="center_horizontal"
                 android:textColor="#ffffffff"
                 android:paddingTop="10dp"
-                android:textSize="16dp" />
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:gravity="center"
@@ -62,17 +62,18 @@
                     android:text="Directed By"
                     android:id="@+id/textView9"
                     android:layout_gravity="center_vertical"
-                    android:textSize="19dp"
+                    android:textSize="19sp"
                     android:textColor="#ff4c74cc"
-                    android:paddingRight="8dp" />
+                    android:paddingRight="8dp"
+                    android:paddingEnd="8dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Miguel Wood"
                     android:id="@+id/textView10"
-                    android:layout_gravity="center|right"
-                    android:textSize="19dp"
+                    android:layout_gravity="center|end"
+                    android:textSize="19sp"
                     android:textColor="#fffff0ef" />
             </LinearLayout>
 
@@ -89,23 +90,24 @@
                     android:text="Android Client"
                     android:id="@+id/textView99"
                     android:layout_gravity="center_vertical"
-                    android:textSize="19dp"
+                    android:textSize="19sp"
                     android:textColor="#ff4c74cc"
-                    android:paddingRight="8dp" />
+                    android:paddingRight="8dp"
+                    android:paddingEnd="8dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Anthony Quattrone"
                     android:id="@+id/textView1000"
-                    android:layout_gravity="center|right"
-                    android:textSize="19dp"
+                    android:layout_gravity="center|end"
+                    android:textSize="19sp"
                     android:textColor="#fffff0ef" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_weight="0"
                 android:gravity="center"
                 android:orientation="horizontal"
@@ -137,9 +139,10 @@
                         android:layout_height="wrap_content"
                         android:text="Behavioral Team"
                         android:id="@+id/textView11"
-                        android:textSize="19dp"
+                        android:textSize="19sp"
                         android:textColor="#ff4c74cc"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingTop="5dp" />
 
                     <TextView
@@ -147,9 +150,10 @@
                         android:layout_height="wrap_content"
                         android:text="James Kotsias"
                         android:id="@+id/textView13"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -157,9 +161,10 @@
                         android:layout_height="wrap_content"
                         android:text="Drew Smith"
                         android:id="@+id/textView14"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -167,10 +172,12 @@
                         android:layout_height="wrap_content"
                         android:text="Greg Newitt"
                         android:id="@+id/textView15"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:layout_marginRight="18dp"
+                        android:layout_marginEnd="18dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -178,9 +185,10 @@
                         android:layout_height="wrap_content"
                         android:text="Miguel Wood"
                         android:id="@+id/textView16"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -188,10 +196,12 @@
                         android:layout_height="wrap_content"
                         android:text="Charlie Eastaugh"
                         android:id="@+id/textView17"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:layout_marginRight="18dp"
+                        android:layout_marginEnd="18dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -199,9 +209,10 @@
                         android:layout_height="wrap_content"
                         android:text="Design Team"
                         android:id="@+id/textView23"
-                        android:textSize="19dp"
+                        android:textSize="19sp"
                         android:textColor="#ff4c74cc"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -209,19 +220,22 @@
                         android:layout_height="wrap_content"
                         android:text="Drew Smith"
                         android:id="@+id/textView24"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
                         android:paddingLeft="20dp"
+                        android:paddingStart="20dp"
                         android:layout_marginRight="18dp"
+                        android:layout_marginEnd="18dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/textView25"
-                        android:textSize="22dp"
+                        android:textSize="22sp"
                         android:textColor="#fffff0ef"
-                        android:paddingLeft="20dp" />
+                        android:paddingLeft="20dp"
+                        android:paddingStart="20dp"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -235,10 +249,11 @@
                         android:layout_height="wrap_content"
                         android:text="Coding Team"
                         android:id="@+id/textView12"
-                        android:textSize="19dp"
+                        android:textSize="19sp"
                         android:textColor="#ff4c74cc"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingTop="5dp" />
 
                     <TextView
@@ -246,10 +261,11 @@
                         android:layout_height="wrap_content"
                         android:text="Alan Gao"
                         android:id="@+id/textView18"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -257,10 +273,11 @@
                         android:layout_height="wrap_content"
                         android:text="David Rivera"
                         android:id="@+id/textView19"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -268,10 +285,11 @@
                         android:layout_height="wrap_content"
                         android:text="Greg Newitt"
                         android:id="@+id/textView20"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -279,10 +297,11 @@
                         android:layout_height="wrap_content"
                         android:text="Anthony Quattrone"
                         android:id="@+id/textView21"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -290,10 +309,11 @@
                         android:layout_height="wrap_content"
                         android:text="Yikai Gong"
                         android:id="@+id/textView22"
-                        android:textSize="18dp"
+                        android:textSize="18sp"
                         android:textColor="#fffff0ef"
-                        android:layout_gravity="right"
+                        android:layout_gravity="end"
                         android:paddingRight="20dp"
+                        android:paddingEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -301,10 +321,11 @@
                         android:layout_height="wrap_content"
                         android:text="Special Thanks To"
                         android:id="@+id/textView26"
-                        android:textSize="19dp"
+                        android:textSize="19sp"
                         android:textColor="#ff4c74cc"
-                        android:layout_gravity="center_vertical|right"
+                        android:layout_gravity="center_vertical|end"
                         android:layout_marginRight="20dp"
+                        android:layout_marginEnd="20dp"
                         android:paddingBottom="5dp" />
 
                     <TextView
@@ -312,9 +333,10 @@
                         android:layout_height="wrap_content"
                         android:text="The Eulers Bridge\nAdvisory Network Members"
                         android:id="@+id/textView27"
-                        android:textSize="15dp"
+                        android:textSize="15sp"
                         android:textColor="#fffff0ef"
-                        android:paddingRight="20dp" />
+                        android:paddingRight="20dp"
+                        android:paddingEnd="20dp"/>
                 </LinearLayout>
 
             </LinearLayout>

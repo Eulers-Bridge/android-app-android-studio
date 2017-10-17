@@ -55,6 +55,7 @@
 	          android:layout_width="match_parent"
 	          android:layout_height="match_parent"
 	          android:paddingLeft="10dp"
+			  android:paddingStart="10dp"
 	          android:text="Welcome to the 2014 University of Melbourne Student Union Elections!
 \n\n
 Here, you&apos;ll find a host of information on your current student council, the new candidates and the different parties they represent. You&apos;ll be able to find 

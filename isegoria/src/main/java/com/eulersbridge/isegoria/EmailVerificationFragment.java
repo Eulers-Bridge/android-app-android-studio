@@ -18,8 +18,9 @@ public class EmailVerificationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.email_verification, container, false);
-        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActivity().getActionBar().removeAllTabs();
+
+        //TODO: No Tabs
+
         emailVerificationFragment = this;
 
         mainActivity = (MainActivity) getActivity();

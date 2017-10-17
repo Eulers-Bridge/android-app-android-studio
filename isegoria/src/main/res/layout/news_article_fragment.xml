@@ -14,7 +14,7 @@
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:gravity="top"
             android:clickable="true"
@@ -32,12 +32,14 @@
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom"
             android:orientation="horizontal"
             android:paddingLeft="12dp"
+			android:paddingStart="12dp"
             android:paddingRight="6dp"
+			android:paddingEnd="6dp"
             android:paddingTop="6dp" >
             
         <TextView
@@ -55,16 +57,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="bottom"
-            android:paddingLeft="12dp" >
+            android:paddingLeft="12dp"
+			android:paddingStart="12dp">
         
             <LinearLayout
 	        	android:layout_width="fill_parent"
-	            android:layout_height="wrap_content"
+	            android:layout_height="0dp"
 	            android:layout_weight="1"
 	            android:orientation="vertical"
 	            android:gravity="bottom"
 	            android:paddingTop="6dp"
 	            android:paddingRight="6dp"
+				android:paddingEnd="6dp"
                 android:id="@+id/newsArticleDivider"
                 android:visibility="invisible">
 	            
@@ -84,19 +88,22 @@
 		        	android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:orientation="horizontal"
-		            android:layout_alignParentLeft="true" 
+		            android:layout_alignParentLeft="true"
+					android:layout_alignParentStart="true"
 		            android:gravity="bottom"
 		             >  
 		             
 		             <ImageView
 		            	    android:id="@+id/newsArticleAuthorImage"
-		            	    android:layout_width="50dp"
+		            	    android:layout_width="0dp"
 		            	    android:layout_height="50dp"
 		            	    android:layout_gravity="center_vertical"
 		            	    android:layout_weight="1"
 		            	    android:paddingRight="5dp"
+						 android:paddingEnd="5dp"
                          android:background="#ff3f3f3f"
                          android:layout_marginRight="5dp"
+						 android:layout_marginEnd="5dp"
                          android:visibility="gone" />
 		             
 			        <LinearLayout
@@ -134,7 +141,8 @@
 		            android:layout_height="wrap_content"
 		            android:orientation="horizontal"
 		            android:layout_gravity="center_vertical"
-		            android:layout_alignParentRight="true" 
+		            android:layout_alignParentRight="true"
+					android:layout_alignParentEnd="true"
 		             >       
 		             
 		            	 <TextView
@@ -144,7 +152,7 @@
 		            	     android:layout_gravity="center_vertical"
 		            	     android:layout_weight="1"
 		            	     android:ems="10"
-		            	     android:gravity="right"
+		            	     android:gravity="end"
 		            	     android:text="205"
 		            	     android:textAppearance="?android:attr/textAppearanceSmall"
 		            	     android:textColor="@color/white"
@@ -184,12 +192,6 @@
         android:paddingTop="10dp"
         android:textSize="@dimen/newsArticleSize" />
         </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-    </LinearLayout>
     </LinearLayout>
     </ScrollView>
 

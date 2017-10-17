@@ -32,8 +32,8 @@ public class VoteFragmentPledge extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_fragment_pledge, container, false);
-        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActivity().getActionBar().removeAllTabs();
+
+        //TODO: No Tabs
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -41,7 +41,7 @@ public class VoteFragmentPledge extends Fragment {
         LinearLayout mContent = rootView.findViewById(R.id.signPad);
         Signature mSignature = new Signature(mainActivity, null);
         mSignature.setBackgroundColor(Color.WHITE);
-        mContent.addView(mSignature, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        mContent.addView(mSignature, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
         Button voteNextButton = rootView.findViewById(R.id.voteNextButton);
         voteNextButton.setOnClickListener(new View.OnClickListener() {
@@ -55,8 +55,8 @@ public class VoteFragmentPledge extends Fragment {
 
                 String location = voteSpinner.getSelectedItem().toString();
                 Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
-                calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                calendar.set(Calendar.MINUTE, timePicker.getMinute());
                 long date = calendar.getTimeInMillis();
 
                 network.addVoteReminder(date, location);

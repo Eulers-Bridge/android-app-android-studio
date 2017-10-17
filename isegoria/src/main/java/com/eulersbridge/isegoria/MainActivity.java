@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Signup Failed");
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				      
 				}

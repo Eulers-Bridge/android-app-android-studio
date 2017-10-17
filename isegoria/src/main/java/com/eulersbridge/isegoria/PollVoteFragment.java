@@ -111,7 +111,7 @@ public class PollVoteFragment extends Fragment {
         LinearLayout viewLinearLayout = new LinearLayout(getActivity());
         viewLinearLayout.setOrientation(LinearLayout.VERTICAL);
         viewLinearLayout.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
-        viewLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.FILL_PARENT));
+        viewLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
         viewLinearLayout.setPadding(0, 0, 0, 0);
 
 		ImageView view = new ImageView(getActivity());
@@ -134,7 +134,7 @@ public class PollVoteFragment extends Fragment {
         textViewArticle.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
         textViewArticle.setText(label);
-        textViewArticle.setGravity(Gravity.LEFT);
+        textViewArticle.setGravity(Gravity.START);
         
         TextView textViewQuestionAskedBy = new TextView(getActivity());
         textViewQuestionAskedBy.setTextColor(Color.parseColor("#000000"));
@@ -142,7 +142,7 @@ public class PollVoteFragment extends Fragment {
         textViewQuestionAskedBy.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewQuestionAskedBy.setText(caption);
         textViewQuestionAskedBy.setPadding(0, 0, 0, 0);
-        textViewQuestionAskedBy.setGravity(Gravity.LEFT);
+        textViewQuestionAskedBy.setGravity(Gravity.START);
 
         network.getUserFullName(pollVoteFragment.getCreatorId(), textViewQuestionAskedBy, "Asked By ");
 
@@ -154,13 +154,13 @@ public class PollVoteFragment extends Fragment {
         LinearLayout indicatorsLinearLayout = new LinearLayout(getActivity());
         indicatorsLinearLayout.setOrientation(LinearLayout.VERTICAL);
         indicatorsLinearLayout.setGravity(Gravity.CENTER_VERTICAL);
-        indicatorsLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        indicatorsLinearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         indicatorsLinearLayout.setPadding(paddingMargin1, 0, 0, 0);
 
         LinearLayout textImageAlignLayout = new LinearLayout(getActivity());
         textImageAlignLayout.setOrientation(LinearLayout.HORIZONTAL);
         textImageAlignLayout.setGravity(Gravity.CENTER_VERTICAL);
-        textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
         TextView noOfAnswersTextView = new TextView(getActivity());
@@ -180,7 +180,7 @@ public class PollVoteFragment extends Fragment {
         textImageAlignLayout = new LinearLayout(getActivity());
         textImageAlignLayout.setOrientation(LinearLayout.HORIZONTAL);
         textImageAlignLayout.setGravity(Gravity.CENTER_VERTICAL);
-        textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
         TextView noOfCommentsTextView = new TextView(getActivity());
@@ -246,7 +246,7 @@ public class PollVoteFragment extends Fragment {
         textViewParty.setTextColor(Color.parseColor("#000000"));
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewParty.setText(party);
-        textViewParty.setGravity(Gravity.RIGHT);
+        textViewParty.setGravity(Gravity.END);
         
         TextView textViewVotes = new TextView(getActivity());
         textViewVotes.setTextColor(Color.parseColor("#000000"));
@@ -257,7 +257,7 @@ public class PollVoteFragment extends Fragment {
             textViewVotes.setText("");
         }
         textViewVotes.setPadding(0, 0, 0, 0);
-        textViewVotes.setGravity(Gravity.LEFT);
+        textViewVotes.setGravity(Gravity.START);
         pollResults.add(textViewVotes);
 		
 		FrameLayout layout2 = new FrameLayout(getActivity());
@@ -329,7 +329,7 @@ public class PollVoteFragment extends Fragment {
         textViewName.setTextColor(Color.parseColor("#000000"));
         textViewName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
         textViewName.setText(name);
-        textViewName.setGravity(Gravity.LEFT);
+        textViewName.setGravity(Gravity.START);
         textViewName.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         
         TextView textViewComment = new TextView(getActivity());
@@ -337,7 +337,7 @@ public class PollVoteFragment extends Fragment {
         textViewComment.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewComment.setText(comment);
         textViewComment.setPadding(0, 0, 0, 0);
-        textViewComment.setGravity(Gravity.LEFT);
+        textViewComment.setGravity(Gravity.START);
         textViewComment.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         linearLayout.addView(textViewName);

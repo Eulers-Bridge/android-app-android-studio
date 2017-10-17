@@ -47,7 +47,9 @@ public class FindAddContactFragment extends Fragment {
         findAddContactFragment = this;
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+
+        //TODO: No tabs
+
         usersAllTableLayout = rootView.findViewById(R.id.usersAllTable);
         friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
         pendingTableLayout = rootView.findViewById(R.id.friendsPendingTableLayout);
@@ -56,7 +58,7 @@ public class FindAddContactFragment extends Fragment {
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
         usersAllTableLayout.addView(dividierView);
 
@@ -134,7 +136,7 @@ public class FindAddContactFragment extends Fragment {
         network.getPictureVolley(url, candidateProfileView);
 
         final ImageView viewProfileImage = new ImageView(getActivity());
-        viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
         viewProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
         viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -155,7 +157,7 @@ public class FindAddContactFragment extends Fragment {
         });
 
         final ImageView candidateProfileImage = new ImageView(getActivity());
-        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -177,7 +179,7 @@ public class FindAddContactFragment extends Fragment {
         });
 
         final ImageView acceptImage = new ImageView(getActivity());
-        acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         acceptImage.setScaleType(ScaleType.CENTER_CROP);
         acceptImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -201,7 +203,7 @@ public class FindAddContactFragment extends Fragment {
         });
 
         final ImageView denyImage = new ImageView(getActivity());
-        denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         denyImage.setScaleType(ScaleType.CENTER_CROP);
         denyImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -228,19 +230,19 @@ public class FindAddContactFragment extends Fragment {
         textViewCandidate.setTextSize(16.0f);
         textViewCandidate.setText(name);
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(12.0f);
         textViewPosition.setText(institution);
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         //network.getPositionText(textViewPosition, positionId);
 
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
@@ -273,7 +275,7 @@ public class FindAddContactFragment extends Fragment {
             linLayout2.addView(denyImage);
             linLayout2.addView(acceptImage);
         }
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight);
 
         layout.addView(candidateProfileView);

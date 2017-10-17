@@ -119,7 +119,7 @@ public class PhotosFragment extends Fragment {
 	        textViewArticle.setTextColor(Color.parseColor("#000000"));
 	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
 	        textViewArticle.setText(label);
-	        textViewArticle.setGravity(Gravity.LEFT);
+	        textViewArticle.setGravity(Gravity.START);
 
 	        textViewArticle.setOnClickListener(new View.OnClickListener() {
 	            @Override
@@ -156,7 +156,7 @@ public class PhotosFragment extends Fragment {
 	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
 	        textViewArticleTime.setText(caption);
 	        textViewArticleTime.setPadding(0, 0, 0, 0);
-	        textViewArticleTime.setGravity(Gravity.LEFT);
+	        textViewArticleTime.setGravity(Gravity.START);
 	        
 	        linearLayout.addView(textViewArticle);
 	        linearLayout.addView(textViewArticleTime);

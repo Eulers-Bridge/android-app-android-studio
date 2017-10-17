@@ -19,7 +19,8 @@ public class VoteViewPagerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
-        ((MainActivity)getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        //TODO: Has Tabs
 
         FragmentManager fm = getChildFragmentManager();
 

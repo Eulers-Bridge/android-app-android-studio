@@ -84,11 +84,11 @@
                     android:id="@+id/personalityTestButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Complete Personality Test"
+                    android:text="@string/user_profile_personality_test_button"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#ff059aff"
                     android:paddingBottom="3dp"
-                    android:textSize="16dp"
+                    android:textSize="16sp"
                     android:paddingTop="3dp" />
             </LinearLayout>
 
@@ -270,7 +270,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/profile_section_badges"
-                        android:textSize="14dp"
+                        android:textSize="14sp"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:textColor="@color/grey" />
                 </LinearLayout>

@@ -19,6 +19,7 @@
         android:paddingTop="14dp" >
 
         <ImageView
+			android:contentDescription="@string/user_settings_profile_picture_content_description"
             android:id="@+id/profilePicSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,7 +40,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
-                        android:text="Change Photo"
+						android:layout_marginStart="5dp"
+                        android:text="@string/user_settings_change_photo"
                         android:textColor="@color/white" />
 
         </LinearLayout>
@@ -63,10 +65,11 @@
             android:background="#64d3d3d3"
             android:ems="10"
             android:paddingLeft="5dp"
-            android:text="Privacy Settings"
+			android:paddingStart="5dp"
+            android:text="@string/user_settings_privacy_settings"
             android:textStyle="bold"
             android:textColor="#ff575757"
-            android:textSize="16dp" >
+            android:textSize="16sp" >
 
         </TextView>
         
@@ -88,7 +91,7 @@
 	        android:paddingLeft="10dp"
 	        android:paddingRight="10dp"
 	        android:paddingTop="10dp"
-	        android:text="Opt Out of Data Collection"
+	        android:text="@string/user_settings_data_collection_opt_out"
 	        android:textSize="14sp" />
 	    
         <View
@@ -104,7 +107,7 @@
 	        android:paddingLeft="10dp"
 	        android:paddingRight="10dp"
 	        android:paddingTop="10dp"
-	        android:text="Do not Track"
+	        android:text="@string/user_settings_do_not_track"
 	        android:textSize="14sp" />
 	    
         <View
@@ -120,10 +123,11 @@
             android:background="#64d3d3d3"
             android:ems="10"
             android:paddingLeft="5dp"
+			android:paddingStart="5dp"
             android:textStyle="bold"
             android:text="Credits"
             android:textColor="#ff575757"
-            android:textSize="16dp" >
+            android:textSize="16sp" >
 
         </TextView>
     
@@ -132,7 +136,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="About this App"
+        android:text="@string/user_settings_about_button"
         android:id="@+id/aboutThisAppButton"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"

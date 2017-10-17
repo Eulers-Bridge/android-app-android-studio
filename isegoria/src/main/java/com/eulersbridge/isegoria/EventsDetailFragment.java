@@ -183,7 +183,7 @@ public class EventsDetailFragment extends Fragment {
         candidateProfileView.setPadding(10, 0, 10, 0);
 
         ImageView candidateProfileImage = new ImageView(getActivity());
-        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
         candidateProfileImage.setPadding(10, 0, 10, 0);
@@ -233,14 +233,14 @@ public class EventsDetailFragment extends Fragment {
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(10, 0, 10, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(10, 0, 10, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         network.getPositionText(textViewPosition, positionId);
 
@@ -260,15 +260,13 @@ public class EventsDetailFragment extends Fragment {
 
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        TableRow.LayoutParams linLayoutParam = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
-        TableRow.LayoutParams linLayoutParam2 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         linLayout2.addView(candidateProfileImage);
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight);
 
         layout.addView(candidateProfileView);
