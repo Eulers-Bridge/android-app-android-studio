@@ -1,14 +1,13 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class ElectionPositionFragment extends SherlockFragment {
+public class ElectionPositionFragment extends Fragment {
 	private View rootView;
 	
 	private float dpWidth;

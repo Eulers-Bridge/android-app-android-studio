@@ -8,8 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -26,10 +28,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class FindAddContactFragment extends SherlockFragment {
+public class FindAddContactFragment extends Fragment {
     private View rootView;
     private TableLayout usersAllTableLayout;
     private TableLayout friendsAllTableLayout;
@@ -48,10 +47,10 @@ public class FindAddContactFragment extends SherlockFragment {
         findAddContactFragment = this;
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        usersAllTableLayout = (TableLayout) rootView.findViewById(R.id.usersAllTable);
-        friendsAllTableLayout = (TableLayout) rootView.findViewById(R.id.friendsAllTableLayout);
-        pendingTableLayout = (TableLayout) rootView.findViewById(R.id.friendsPendingTableLayout);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        usersAllTableLayout = rootView.findViewById(R.id.usersAllTable);
+        friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
+        pendingTableLayout = rootView.findViewById(R.id.friendsPendingTableLayout);
 
         dpWidth = displayMetrics.widthPixels;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -66,7 +65,7 @@ public class FindAddContactFragment extends SherlockFragment {
         network.findFriends(this);
         network.findPendingContacts(this);
 
-        searchFriendsView = (SearchView) rootView.findViewById(R.id.searchFriendsView);
+        searchFriendsView = rootView.findViewById(R.id.searchFriendsView);
         searchFriendsView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -92,7 +91,7 @@ public class FindAddContactFragment extends SherlockFragment {
 
     public void addUser(String firstName, String lastName, final String email, String institution, String url) {
         addTableRow(-1, usersAllTableLayout, firstName + " " + lastName, email, institution, url, 1);
-        LinearLayout searchResultsLinearLayout = (LinearLayout) rootView.findViewById(R.id.searchResultsLinearLayout);
+        LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
         searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
@@ -101,7 +100,7 @@ public class FindAddContactFragment extends SherlockFragment {
     }
 
     public void addPendingFriend(int userId, String firstName, String lastName, final String email, String institution, String url) {
-        LinearLayout pendingRequestsLinearLayout = (LinearLayout) rootView.findViewById(R.id.pendingRequestsLinearLayout);
+        LinearLayout pendingRequestsLinearLayout = rootView.findViewById(R.id.pendingRequestsLinearLayout);
         pendingRequestsLinearLayout.setVisibility(ViewGroup.VISIBLE);
         addTableRow(userId, pendingTableLayout, firstName + " " + lastName, email, institution, url, 3);
     }
@@ -109,7 +108,7 @@ public class FindAddContactFragment extends SherlockFragment {
     // 1 = Search
     // 2 = Current Contact
     // 3 = Pending Contact
-    public void addTableRow(final int userId, TableLayout tableLayout, final String name, final String email, final String institution, final String url, int type) {
+    private void addTableRow(final int userId, TableLayout tableLayout, final String name, final String email, final String institution, final String url, int type) {
         final TableRow tr;
 
         final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -329,7 +328,7 @@ public class FindAddContactFragment extends SherlockFragment {
                 .show();
     }
 
-    public static int calculateInSampleSize(
+    private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
@@ -352,8 +351,8 @@ public class FindAddContactFragment extends SherlockFragment {
         return inSampleSize;
     }
 
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
+    private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();

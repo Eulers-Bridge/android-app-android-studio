@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria;
 /**
  * Created by Anthony on 24/03/2015.
  */
-public class VoteLocation {
+class VoteLocation {
     private String ownerId;
     private String votingLocationId;
     private String name;

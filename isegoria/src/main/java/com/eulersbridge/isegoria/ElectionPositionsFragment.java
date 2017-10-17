@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -21,9 +22,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class ElectionPositionsFragment extends SherlockFragment {
+public class ElectionPositionsFragment extends Fragment {
 	private View rootView;
 	private TableLayout positionsTableLayout;
 	
@@ -35,7 +34,7 @@ public class ElectionPositionsFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
-		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.positionsTableLayout);
+		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
@@ -49,7 +48,7 @@ public class ElectionPositionsFragment extends SherlockFragment {
 		return rootView;
 	}
 
-	public void addTableRow(int drawable1, int drawable2, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	private void addTableRow(int drawable1, int drawable2, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -178,8 +177,8 @@ public class ElectionPositionsFragment extends SherlockFragment {
 		}
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;
@@ -201,8 +200,8 @@ public class ElectionPositionsFragment extends SherlockFragment {
 	    return inSampleSize;
 	}
 	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+														  int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();

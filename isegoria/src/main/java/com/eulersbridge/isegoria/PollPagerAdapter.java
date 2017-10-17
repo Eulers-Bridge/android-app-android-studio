@@ -1,22 +1,21 @@
 package com.eulersbridge.isegoria;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.List;
 
-public class PollPagerAdapter extends FragmentPagerAdapter {
-	private List<SherlockFragment> fragments;
+class PollPagerAdapter extends FragmentPagerAdapter {
+	private final List<Fragment> fragments;
 	
-	public PollPagerAdapter(FragmentManager fm, List<SherlockFragment> fragments) {
+	public PollPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
 		super(fm);
 	    this.fragments = fragments;
 	}
 	
 	 @Override
-	 public SherlockFragment getItem(int position) {
+	 public Fragment getItem(int position) {
 		 return this.fragments.get(position);
 	 }
 	 

@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -19,12 +20,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class PollVoteFragment extends SherlockFragment {
+public class PollVoteFragment extends Fragment {
 	private View rootView;
 	private TableLayout pollTableLayout;
 	
@@ -41,14 +40,14 @@ public class PollVoteFragment extends SherlockFragment {
     private int numOfAnswers;
     private Network network;
 
-    private boolean voted = false;
+    private final boolean voted = false;
 
-    private PollVoteFragment pollVoteFragment;
-    private ArrayList<ImageView> tickBoxes = new ArrayList<ImageView>();
-    private ArrayList<TextView> pollResults = new ArrayList<TextView>();
-    private ArrayList<ProgressBar> progressBars = new ArrayList<ProgressBar>();
+    private final PollVoteFragment pollVoteFragment;
+    private final ArrayList<ImageView> tickBoxes = new ArrayList<>();
+    private final ArrayList<TextView> pollResults = new ArrayList<>();
+    private final ArrayList<ProgressBar> progressBars = new ArrayList<>();
 
-    int pixelWidth = 0;
+    private int pixelWidth = 0;
 
 	public PollVoteFragment() {
         pollVoteFragment = this;
@@ -67,7 +66,7 @@ public class PollVoteFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.poll_fragment, container, false);
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		pollTableLayout = (TableLayout) rootView.findViewById(R.id.pollTableLayout);
+		pollTableLayout = rootView.findViewById(R.id.pollTableLayout);
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -80,14 +79,14 @@ public class PollVoteFragment extends SherlockFragment {
         addTableRow(creatorId, question, "");
         String[] answersSplit = answers.split(",");
 
-        for(int i=0; i<answersSplit.length; i++) {
-            createProgressBars("#0000FF", answersSplit[i], 0000);
+        for (String anAnswersSplit : answersSplit) {
+            createProgressBars("#0000FF", anAnswersSplit, 0000);
         }
 
 		return rootView;
 	}
 	
-	public void addTableRow(int userId, String label, String caption) {
+	private void addTableRow(int userId, String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -117,7 +116,7 @@ public class PollVoteFragment extends SherlockFragment {
 
 		ImageView view = new ImageView(getActivity());
 		//view.setColorFilter(Color.argb(125, 35, 35, 35));
-		view.setLayoutParams(new TableRow.LayoutParams((int)(imageSize), (int)(imageSize)));
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		view.setScaleType(ScaleType.CENTER_CROP);
         viewLinearLayout.addView(view);
         network.getFirstPhoto(0, creatorId, view);
@@ -164,15 +163,15 @@ public class PollVoteFragment extends SherlockFragment {
         textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
-        TextView noOfAnswersTextView = (TextView) new TextView(getActivity());
+        TextView noOfAnswersTextView = new TextView(getActivity());
         noOfAnswersTextView.setText(String.valueOf(numOfAnswers));
         noOfAnswersTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f);
-        ImageView noOfAnswersImageView = (ImageView) new ImageView(getActivity());
+        ImageView noOfAnswersImageView = new ImageView(getActivity());
         noOfAnswersImageView.setScaleType(ScaleType.FIT_XY);
         noOfAnswersImageView.setAdjustViewBounds(true);
         noOfAnswersImageView.setImageResource(R.drawable.votecount);
         noOfAnswersImageView.setLayoutParams(
-                new TableRow.LayoutParams((int)imageSize/2, (int)imageSize/2));
+                new TableRow.LayoutParams(imageSize /2, imageSize /2));
 
         textImageAlignLayout.addView(noOfAnswersTextView);
         textImageAlignLayout.addView(noOfAnswersImageView);
@@ -184,14 +183,14 @@ public class PollVoteFragment extends SherlockFragment {
         textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
-        TextView noOfCommentsTextView = (TextView) new TextView(getActivity());
+        TextView noOfCommentsTextView = new TextView(getActivity());
         noOfCommentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f);
         noOfCommentsTextView.setText(String.valueOf(numOfComments));
-        ImageView noOfCommentsImageView = (ImageView) new ImageView(getActivity());
+        ImageView noOfCommentsImageView = new ImageView(getActivity());
         noOfCommentsImageView.setScaleType(ScaleType.FIT_XY);
         noOfCommentsImageView.setAdjustViewBounds(true);
         noOfCommentsImageView.setImageResource(R.drawable.commentscount);
-        noOfCommentsImageView.setLayoutParams(new TableRow.LayoutParams((int)imageSize/2, (int)imageSize/2));
+        noOfCommentsImageView.setLayoutParams(new TableRow.LayoutParams(imageSize /2, imageSize /2));
 
         textImageAlignLayout.addView(noOfCommentsTextView);
         textImageAlignLayout.addView(noOfCommentsImageView);
@@ -210,7 +209,7 @@ public class PollVoteFragment extends SherlockFragment {
         pollTableLayout.addView(tr);
 	}
 	
-	public void createProgressBars(String color, String party, int votes) {
+	private void createProgressBars(String color, String party, int votes) {
 		TableRow tr = new TableRow(getActivity());
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)  6.666666667, getResources().getDisplayMetrics());
@@ -254,7 +253,7 @@ public class PollVoteFragment extends SherlockFragment {
         textViewVotes.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         DecimalFormat formatter = new DecimalFormat("#,###");
         textViewVotes.setText(formatter.format(votes));
-        if(voted == false) {
+        if(!voted) {
             textViewVotes.setText("");
         }
         textViewVotes.setPadding(0, 0, 0, 0);
@@ -270,7 +269,7 @@ public class PollVoteFragment extends SherlockFragment {
 		layout1.addView(layout2, params1);
 		
 		ImageView view = new ImageView(getActivity());
-		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		view.setScaleType(ScaleType.CENTER_INSIDE);
         view.setImageResource(R.drawable.tickempty);
         tickBoxes.add(view);
@@ -314,7 +313,7 @@ public class PollVoteFragment extends SherlockFragment {
 		tr.setLayoutParams(rowParams);
 		
 		ImageView view = new ImageView(getActivity());
-		view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
+		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		view.setScaleType(ScaleType.CENTER_CROP);
         //view.setImageResource(R.drawable.head1);
         network.findContactPhoto(email, view);
@@ -358,7 +357,7 @@ public class PollVoteFragment extends SherlockFragment {
         return nodeId;
     }
 
-    public int getCreatorId() {
+    private int getCreatorId() {
         return creatorId;
     }
 }

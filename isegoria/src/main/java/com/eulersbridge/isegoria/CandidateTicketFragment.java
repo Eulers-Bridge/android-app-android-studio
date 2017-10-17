@@ -9,6 +9,7 @@ import android.graphics.Paint.Style;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -24,9 +25,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidateTicketFragment extends SherlockFragment {
+public class CandidateTicketFragment extends Fragment {
 	private View rootView;
 	private TableLayout positionsTableLayout;
 	
@@ -50,7 +49,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
-		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.positionsTableLayout);
+		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -78,22 +77,17 @@ public class CandidateTicketFragment extends SherlockFragment {
         lastColour = colour;
         lastLogo = logo;
 
-        if(added) {
-            added = false;
-        }
-        else {
-            added = true;
-        }
+		added = !added;
 
         if(numberOfParties == addedCounter && (numberOfParties % 2) != 0) {
             this.addTableRowOneSquare(ticketId, colour, name, noOfSupporters, logo);
         }
     }
 	
-	public void addTableRow(final int lastTicketId, final int ticketId, final String colour1,
-                            final String colour2, boolean doubleCell, boolean lastCell,
-                            final String title1, final String title2, final String supporters1,
-                            final String supporters2, final String logo1, final String logo2) {
+	private void addTableRow(final int lastTicketId, final int ticketId, final String colour1,
+							 final String colour2, boolean doubleCell, boolean lastCell,
+							 final String title1, final String title2, final String supporters1,
+							 final String supporters2, final String logo1, final String logo2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -113,7 +107,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)imageHeight));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			else
@@ -150,7 +144,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
@@ -178,7 +172,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        tr.addView(relativeLayout);
 	        
 			relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)imageHeight));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
 			if(lastCell)
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, paddingMargin);
 			else
@@ -221,7 +215,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
 			    		Bundle args = new Bundle();
@@ -249,7 +243,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)imageHeight));
+			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
 			if(lastCell)
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
@@ -257,7 +251,7 @@ public class CandidateTicketFragment extends SherlockFragment {
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 			
 			View view = new View(getActivity());
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)imageHeight));
+			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
@@ -281,8 +275,8 @@ public class CandidateTicketFragment extends SherlockFragment {
 		}
 	}
 
-    public void addTableRowOneSquare(final int ticketId, final String colour1, final String title1,
-                                     final String supporters1, final String logo1) {
+    private void addTableRowOneSquare(final int ticketId, final String colour1, final String title1,
+									  final String supporters1, final String logo1) {
         TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -301,7 +295,7 @@ public class CandidateTicketFragment extends SherlockFragment {
             tr.setLayoutParams(rowParams);
 
             RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-            relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), (int)imageHeight));
+            relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
             ((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 
             TextView textViewTitle = new TextView(getActivity());
@@ -335,7 +329,7 @@ public class CandidateTicketFragment extends SherlockFragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
                     Bundle args = new Bundle();
@@ -365,8 +359,8 @@ public class CandidateTicketFragment extends SherlockFragment {
             positionsTableLayout.addView(tr);
     }
 
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;

@@ -1,19 +1,17 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 /**
  * Created by Anthony on 01/04/2015.
 */
-public class PersonalityScreen2Fragment extends SherlockFragment {
+public class PersonalityScreen2Fragment extends Fragment {
     private View rootView;
     private Network network;
 
@@ -24,19 +22,19 @@ public class PersonalityScreen2Fragment extends SherlockFragment {
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
-        final PersonalitySliderBar personalitySliderBar1 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar1);
-        final PersonalitySliderBar personalitySliderBar2 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar2);
-        final PersonalitySliderBar personalitySliderBar3 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar3);
-        final PersonalitySliderBar personalitySliderBar4 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar4);
-        final PersonalitySliderBar personalitySliderBar5 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar5);
-        final PersonalitySliderBar personalitySliderBar6 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar6);
-        final PersonalitySliderBar personalitySliderBar7 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar7);
-        final PersonalitySliderBar personalitySliderBar8 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar8);
-        final PersonalitySliderBar personalitySliderBar9 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar9);
-        final PersonalitySliderBar personalitySliderBar10 = (PersonalitySliderBar) rootView.findViewById(R.id.personalitySliderBar10);
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        final PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);
+        final PersonalitySliderBar personalitySliderBar2 = rootView.findViewById(R.id.personalitySliderBar2);
+        final PersonalitySliderBar personalitySliderBar3 = rootView.findViewById(R.id.personalitySliderBar3);
+        final PersonalitySliderBar personalitySliderBar4 = rootView.findViewById(R.id.personalitySliderBar4);
+        final PersonalitySliderBar personalitySliderBar5 = rootView.findViewById(R.id.personalitySliderBar5);
+        final PersonalitySliderBar personalitySliderBar6 = rootView.findViewById(R.id.personalitySliderBar6);
+        final PersonalitySliderBar personalitySliderBar7 = rootView.findViewById(R.id.personalitySliderBar7);
+        final PersonalitySliderBar personalitySliderBar8 = rootView.findViewById(R.id.personalitySliderBar8);
+        final PersonalitySliderBar personalitySliderBar9 = rootView.findViewById(R.id.personalitySliderBar9);
+        final PersonalitySliderBar personalitySliderBar10 = rootView.findViewById(R.id.personalitySliderBar10);
 
-        Button donePersonalityQuestions = (Button) rootView.findViewById(R.id.donePersonalityQuestions);
+        Button donePersonalityQuestions = rootView.findViewById(R.id.donePersonalityQuestions);
         donePersonalityQuestions.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 float extraversion = (personalitySliderBar1.getScore() + (8-personalitySliderBar6.getScore()))/2;

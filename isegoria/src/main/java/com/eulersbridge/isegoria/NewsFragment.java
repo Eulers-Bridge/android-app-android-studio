@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,9 +24,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class NewsFragment extends SherlockFragment {
+public class NewsFragment extends Fragment {
 	private View rootView;
 	private TableLayout newsTableLayout;
 	
@@ -61,8 +60,8 @@ public class NewsFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		rootView = inflater.inflate(R.layout.news_fragment, container, false);
-		newsTableLayout = (TableLayout) rootView.findViewById(R.id.newsTableLayout);
-        swipeContainerNews = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerNews);
+		newsTableLayout = rootView.findViewById(R.id.newsTableLayout);
+        swipeContainerNews = rootView.findViewById(R.id.swipeContainerNews);
         swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -89,7 +88,7 @@ public class NewsFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void clearTable() {
+    private void clearTable() {
         newsTableLayout.removeAllViews();
     }
 	
@@ -123,7 +122,7 @@ public class NewsFragment extends SherlockFragment {
 				    		 doubleCell = 0;
 				    		 newsFragment.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
 				    	 }
-				     } catch(Exception e) {
+				     } catch(Exception ignored) {
 				    	 
 				     }
 			     }
@@ -133,8 +132,8 @@ public class NewsFragment extends SherlockFragment {
 		}
 	}
 	
-	public void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
-			String articleTitle2, String articleTime2) {
+	private void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
+							 String articleTitle2, String articleTime2) {
 		TableRow tr;
 		String colour = "#F8F8F8";
 
@@ -197,7 +196,7 @@ public class NewsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -257,7 +256,7 @@ public class NewsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -295,14 +294,14 @@ public class NewsFragment extends SherlockFragment {
 			
 			ImageView view = new ImageView(getActivity());
 			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)imageHeight));
+			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			view.setScaleType(ScaleType.CENTER_CROP);
 			network.getPictureVolley(drawable1, view);
 
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -344,8 +343,8 @@ public class NewsFragment extends SherlockFragment {
 		}
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;

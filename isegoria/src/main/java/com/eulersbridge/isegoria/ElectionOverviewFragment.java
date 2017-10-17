@@ -2,15 +2,14 @@ package com.eulersbridge.isegoria;
 
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class ElectionOverviewFragment extends SherlockFragment {
+public class ElectionOverviewFragment extends Fragment {
 	private View rootView;
 	
 	private float dpWidth;
@@ -32,12 +31,12 @@ public class ElectionOverviewFragment extends SherlockFragment {
 		rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
-        electionIntroduction = (TextView) rootView.findViewById(R.id.electionIntroduction);
-        electionTitle = (TextView) rootView.findViewById(R.id.electionTitle);
-        electionDate = (TextView) rootView.findViewById(R.id.electionDate);
-        electionProcess = (TextView) rootView.findViewById(R.id.electionProcess);
-        overviewTextField = (TextView) rootView.findViewById(R.id.overviewTextField);
-        processTextField = (TextView) rootView.findViewById(R.id.processTextField);
+        electionIntroduction = rootView.findViewById(R.id.electionIntroduction);
+        electionTitle = rootView.findViewById(R.id.electionTitle);
+        electionDate = rootView.findViewById(R.id.electionDate);
+        electionProcess = rootView.findViewById(R.id.electionProcess);
+        overviewTextField = rootView.findViewById(R.id.overviewTextField);
+        processTextField = rootView.findViewById(R.id.processTextField);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;

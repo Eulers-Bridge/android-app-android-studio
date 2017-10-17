@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 
-public class TimeConverter {
+class TimeConverter {
 	public static String convertTimestampToString(long timestamp) {
 		Date date = new Date(timestamp);
 

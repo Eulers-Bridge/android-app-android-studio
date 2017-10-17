@@ -164,7 +164,7 @@ public class CircularSeekBar extends View implements Runnable {
 	/**
 	 * {@code RectF} that represents the circle (or ellipse) of the seekbar.
 	 */
-	private RectF mCircleRectF = new RectF();
+	private final RectF mCircleRectF = new RectF();
 
 	/**
 	 * Holds the color value for {@code mPointerPaint} before the {@code Paint} instance is created.
@@ -351,7 +351,7 @@ public class CircularSeekBar extends View implements Runnable {
 	/**
 	 * Pointer position in terms of X and Y coordinates.
 	 */
-	private float[] mPointerPositionXY = new float[2];
+	private final float[] mPointerPositionXY = new float[2];
 
 	/**
 	 * Listener.
@@ -368,12 +368,12 @@ public class CircularSeekBar extends View implements Runnable {
 	 * @param attrArray TypedArray containing the attributes.
 	 */
 	private void initAttributes(TypedArray attrArray) {
-		mCircleXRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_x_radius, DEFAULT_CIRCLE_X_RADIUS) * DPTOPX_SCALE);
-		mCircleYRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_y_radius, DEFAULT_CIRCLE_Y_RADIUS) * DPTOPX_SCALE);
-		mPointerRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_radius, DEFAULT_POINTER_RADIUS) * DPTOPX_SCALE);
-		mPointerHaloWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_width, DEFAULT_POINTER_HALO_WIDTH) * DPTOPX_SCALE);
-		mPointerHaloBorderWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_border_width, DEFAULT_POINTER_HALO_BORDER_WIDTH) * DPTOPX_SCALE);
-		mCircleStrokeWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_stroke_width, DEFAULT_CIRCLE_STROKE_WIDTH) * DPTOPX_SCALE);
+		mCircleXRadius = attrArray.getFloat(R.styleable.CircularSeekBar_circle_x_radius, DEFAULT_CIRCLE_X_RADIUS) * DPTOPX_SCALE;
+		mCircleYRadius = attrArray.getFloat(R.styleable.CircularSeekBar_circle_y_radius, DEFAULT_CIRCLE_Y_RADIUS) * DPTOPX_SCALE;
+		mPointerRadius = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_radius, DEFAULT_POINTER_RADIUS) * DPTOPX_SCALE;
+		mPointerHaloWidth = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_width, DEFAULT_POINTER_HALO_WIDTH) * DPTOPX_SCALE;
+		mPointerHaloBorderWidth = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_border_width, DEFAULT_POINTER_HALO_BORDER_WIDTH) * DPTOPX_SCALE;
+		mCircleStrokeWidth = attrArray.getFloat(R.styleable.CircularSeekBar_circle_stroke_width, DEFAULT_CIRCLE_STROKE_WIDTH) * DPTOPX_SCALE;
 
 		String tempColor = attrArray.getString(R.styleable.CircularSeekBar_pointer_color);
 		if (tempColor != null) {
@@ -952,7 +952,7 @@ public class CircularSeekBar extends View implements Runnable {
 		initPaints();
 	}
 
-    private Activity mainActivity;
+    private final Activity mainActivity;
 
 	public CircularSeekBar(Context context) {
 		super(context);
@@ -1027,11 +1027,11 @@ public class CircularSeekBar extends View implements Runnable {
 	*/
 	public interface OnCircularSeekBarChangeListener {
 
-		public abstract void onProgressChanged(CircularSeekBar circularSeekBar, int progress, boolean fromUser);
+		void onProgressChanged(CircularSeekBar circularSeekBar, int progress, boolean fromUser);
 
-		public abstract void onStopTrackingTouch(CircularSeekBar seekBar);
+		void onStopTrackingTouch(CircularSeekBar seekBar);
 
-		public abstract void onStartTrackingTouch(CircularSeekBar seekBar);
+		void onStartTrackingTouch(CircularSeekBar seekBar);
 	}
 
 	/**

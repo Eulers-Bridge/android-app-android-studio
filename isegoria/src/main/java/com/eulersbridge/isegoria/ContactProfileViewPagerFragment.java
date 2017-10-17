@@ -1,22 +1,20 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import java.util.ArrayList;
 
 /**
  * Created by Anthony on 30/03/2015.
  */
-public class ContactProfileViewPagerFragment extends SherlockFragment {
+public class ContactProfileViewPagerFragment extends Fragment {
     private View rootView;
     private ViewPager mPager;
     private ProfilePagerAdapter mPagerAdapter;
@@ -26,13 +24,13 @@ public class ContactProfileViewPagerFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.contact_profile_viewpager_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
+        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ((MainActivity) getActivity()).getSupportActionBar().show();
 
         Bundle bundle = this.getArguments();
-        profileId = (String) bundle.getString("ProfileId");
+        profileId = bundle.getString("ProfileId");
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
+        FragmentManager fm = getActivity().getSupportFragmentManager();
 
         ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -41,9 +39,9 @@ public class ContactProfileViewPagerFragment extends SherlockFragment {
             }
         };
 
-        ArrayList<SherlockFragment> fragmentList = new ArrayList<SherlockFragment>();
+        ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-        mPager = (ViewPager) rootView.findViewById(R.id.profileViewPagerFragment);
+        mPager = rootView.findViewById(R.id.profileViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
         ContactProfileFragment profileFragment = new ContactProfileFragment();

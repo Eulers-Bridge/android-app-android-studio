@@ -52,11 +52,11 @@ public class EventsDetailFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
-        eventContactTableLayout = (TableLayout) rootView.findViewById(R.id.eventDetailsTableLayout);
+        eventContactTableLayout = rootView.findViewById(R.id.eventDetailsTableLayout);
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
-		addToCalendar = (Button) rootView.findViewById(R.id.addToCalendar);
+		addToCalendar = rootView.findViewById(R.id.addToCalendar);
         addToCalendar.setOnClickListener(new OnClickListener() {
 				@Override
 			    public void onClick(View v) {
@@ -68,8 +68,8 @@ public class EventsDetailFragment extends Fragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        eventDivider1 = (View) rootView.findViewById(R.id.eventDivider1);
-        eventDivider2 = (View) rootView.findViewById(R.id.eventDivider2);
+        eventDivider1 = rootView.findViewById(R.id.eventDivider1);
+        eventDivider2 = rootView.findViewById(R.id.eventDivider2);
         
         isegoria.getNetwork().getEventDetails(this, bundle.getInt("EventId"));
 
@@ -88,7 +88,7 @@ public class EventsDetailFragment extends Fragment {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 200, getResources().getDisplayMetrics());
 
-					LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
+					LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
 					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					//Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
 					//Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
@@ -96,18 +96,18 @@ public class EventsDetailFragment extends Fragment {
 					d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
 					backgroundLinearLayout.setBackgroundDrawable(d);
 
-					TextView eventTitleField = (TextView) rootView.findViewById(R.id.eventTitle);
+					TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
 					eventTitleField.setText(title);
 					
-					TextView eventTime = (TextView) rootView.findViewById(R.id.eventTime);
+					TextView eventTime = rootView.findViewById(R.id.eventTime);
 					eventTime.setText(TimeConverter.convertTimestampToString(timestamp));
 					
-					TextView eventLocationLine1 = (TextView) rootView.findViewById(R.id.eventLocationLine1);
+					TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
 					eventLocationLine1.setText(location);
 
-                    TextView eventLocationLine2 = (TextView) rootView.findViewById(R.id.eventLocationLine2);
+                    TextView eventLocationLine2 = rootView.findViewById(R.id.eventLocationLine2);
 					
-					TextView eventsTextField = (TextView) rootView.findViewById(R.id.eventDetails);
+					TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
 					eventsTextField.setText(content);
 					
 					eventTitle = title;
@@ -119,12 +119,12 @@ public class EventsDetailFragment extends Fragment {
                     eventLocationLine2.setVisibility(ViewGroup.VISIBLE);
 				}
 			});
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
 	}
 	
-	public void addToCalendar(View v) {
+	private void addToCalendar(View v) {
 	    Calendar cal = Calendar.getInstance();     
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
@@ -161,9 +161,9 @@ public class EventsDetailFragment extends Fragment {
         addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
     }
 
-    public void addTableRow(int ticketId, final int userId, String partyAbr,
-                            String colour, String candidateName,
-                            String candidatePosition, int positionId) {
+    private void addTableRow(int ticketId, final int userId, String partyAbr,
+                             String colour, String candidateName,
+                             String candidatePosition, int positionId) {
         TableRow tr;
 
         LinearLayout layout = new LinearLayout(getActivity());
@@ -285,7 +285,7 @@ public class EventsDetailFragment extends Fragment {
         eventContactTableLayout.addView(dividierView);
     }
 
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
@@ -308,8 +308,8 @@ public class EventsDetailFragment extends Fragment {
 	    return inSampleSize;
 	}
 	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();

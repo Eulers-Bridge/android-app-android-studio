@@ -1,25 +1,20 @@
 package com.eulersbridge.isegoria;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.graphics.Typeface;
 
-public class LoginScreenFragment extends SherlockFragment {
+public class LoginScreenFragment extends Fragment {
 	private View rootView;
 	
 	private float dpWidth;
@@ -39,13 +34,13 @@ public class LoginScreenFragment extends SherlockFragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         
-		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.loginBackground);
+		LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.loginBackground);
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.tumblr_static_aphc);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
 		backgroundLinearLayout.setBackgroundDrawable(d);
 
-        TextView tx = (TextView) rootView.findViewById(R.id.isegoriaLabel);
+        TextView tx = rootView.findViewById(R.id.isegoriaLabel);
         Typeface custom_font = Typeface.createFromAsset(mainActivity.getAssets(),
                 "MuseoSansRounded-300.otf");
         tx.setTypeface(custom_font);
@@ -53,7 +48,7 @@ public class LoginScreenFragment extends SherlockFragment {
 		return rootView;		
 	}
 	
-	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
+	private Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {

@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import java.util.Calendar;
 
-public class VoteFragmentDone extends SherlockFragment implements OnItemSelectedListener {
+public class VoteFragmentDone extends Fragment implements OnItemSelectedListener {
     private View rootView;
     private NonSwipeableViewPager mPager;
     private Network network;
@@ -23,13 +21,13 @@ public class VoteFragmentDone extends SherlockFragment implements OnItemSelected
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_fragment_done, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActivity().getActionBar().removeAllTabs();
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        Button addToCalButton = (Button) rootView.findViewById(R.id.addToCalButton);
+        Button addToCalButton = rootView.findViewById(R.id.addToCalButton);
         addToCalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

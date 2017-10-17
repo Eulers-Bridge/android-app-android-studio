@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria;
 /**
  * Created by Anthony on 02/04/2015.
  */
-public class PersonalityPoint {
+class PersonalityPoint {
     private int x;
     private int y;
     private String answer;

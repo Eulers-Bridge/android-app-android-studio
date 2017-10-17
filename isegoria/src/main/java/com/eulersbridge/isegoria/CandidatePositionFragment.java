@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -23,9 +24,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidatePositionFragment extends SherlockFragment {
+public class CandidatePositionFragment extends Fragment {
 	private View rootView;
 	private TableLayout positionsTableLayout;
 	
@@ -37,7 +36,7 @@ public class CandidatePositionFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
-		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.candidatePositionTable);
+		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
         Bundle bundle = this.getArguments();
         int positionId = bundle.getInt("PositionId");
 		
@@ -59,7 +58,7 @@ public class CandidatePositionFragment extends SherlockFragment {
         addTableRow(ticketId, positionId, userId, "", "", firstName + " " + lastName, "", userId);
     }
 	
-	public void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
+	private void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -180,7 +179,7 @@ public class CandidatePositionFragment extends SherlockFragment {
         positionsTableLayout.addView(dividierView);
 	}
 	
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
@@ -203,8 +202,8 @@ public class CandidatePositionFragment extends SherlockFragment {
 	    return inSampleSize;
 	}
 	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();

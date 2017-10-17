@@ -14,14 +14,14 @@ import java.util.ArrayList;
  * Created by Anthony on 01/04/2015.
  */
 public class PersonalitySliderBar extends View {
-    int parentWidth;
-    int parentHeight;
+    private int parentWidth;
+    private int parentHeight;
 
     private int x;
     private int y;
 
     private String answer = "Niether";
-    private ArrayList<PersonalityPoint> points = new ArrayList<PersonalityPoint>();
+    private final ArrayList<PersonalityPoint> points = new ArrayList<>();
 
     private int score;
 
@@ -124,7 +124,7 @@ public class PersonalitySliderBar extends View {
                 (parentWidth/2)-((paint.measureText(answer))/2), (parentHeight/2)+50, paint);
     }
 
-    public void snapToPoint(int x, int y) {
+    private void snapToPoint(int x, int y) {
         int currentDistance = 1000;
         PersonalityPoint currentPoint = null;
         int index = -1;
@@ -149,7 +149,7 @@ public class PersonalitySliderBar extends View {
         return score;
     }
 
-    public void setScore(int score) {
+    private void setScore(int score) {
         this.score = score;
     }
 

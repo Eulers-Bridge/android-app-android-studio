@@ -2,27 +2,37 @@ package com.eulersbridge.isegoria;
 
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.view.MotionEvent;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.MenuItem;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
 import java.util.ArrayList;
-import java.util.List;
 
-public class MainActivity extends BaseActivity {
-	private SherlockFragment mContent;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+	private Fragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
+
+	private DrawerLayout drawerLayout;
+	private ActionBarDrawerToggle drawerToggle;
+	private TabLayout tabLayout;
+	private @IdRes int currentNavigationId;
 	
 	private String firstName;
 	private String lastName; 
@@ -34,51 +44,131 @@ public class MainActivity extends BaseActivity {
 	private String yearOfBirth;
 	private String gender;
 	
-	public MainActivity(){
-		super(R.string.app_name);	
-	}
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.main_activity);
+
+//        int titleId = getResources().getIdentifier("action_bar_title", "id",
+//                "android");
+//        Typeface customFont = Typeface.createFromAsset(getAssets(),
+//                "MuseoSansRounded-500.otf");
+//        TextView yourTextView = (TextView) findViewById(titleId);
+//        yourTextView.setTextColor(getResources().getColor(R.color.white));
+//        yourTextView.setTypeface(customFont);
+
 		application = (Isegoria) getApplicationContext();
 		application.setMainActivity(this);
 		
 		if (savedInstanceState != null)
-			mContent = (SherlockFragment) getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
-		if (mContent == null)
-			mContent = new MainView();
-		
-		setContentView(R.layout.content_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.content_frame, mContent).commit();
-		
-		setBehindContentView(R.layout.menu_frame);
-		getSupportFragmentManager()
-		.beginTransaction()
-		.replace(R.id.menu_frame, new SlidingMenuItems()).commit();
-		
-		getSlidingMenu().setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-		//setSlidingActionBarEnabled(true);
-		getSlidingMenu().setSlidingEnabled(false);
-		
+			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
+
+		if (mContent == null) mContent = new MainView();
+
+		setupToolbarAndNavigation();
+
+		setNavigationDrawerEnabled(false);
+
 		switchContent(new LoginScreenFragment());
         //switchContent(new PersonalityQuestionsFragment());
 	}
 
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        FragmentManager fm = getSupportFragmentManager();
-        List<Fragment> fragments = fm.getFragments();
-        Fragment lastFragment = fragments.get(1);
+	private void setupToolbarAndNavigation() {
+		final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+		setSupportActionBar(toolbar);
 
-        if(lastFragment instanceof PollFragment) {
-            PollFragment pollFragment = (PollFragment) lastFragment;
-            pollFragment.collapseBar(ev);
-        }
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().setTitle(R.string.app_name);
+		}
 
-        return super.dispatchTouchEvent(ev);
-    }
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+		if (navigationView != null) {
+			navigationView.setNavigationItemSelectedListener(this);
+		}
+
+		//Set icon to open/close drawer and provide identifiers for open/close states (not important)
+		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
+		drawerLayout.addDrawerListener(drawerToggle);
+		drawerToggle.syncState();
+
+		tabLayout = (TabLayout)findViewById(R.id.tabLayout);
+	}
+
+	void setNavigationDrawerEnabled(boolean enabled) {
+		drawerLayout.setDrawerLockMode(enabled? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+		drawerToggle.setDrawerIndicatorEnabled(enabled);
+	}
+
+	public TabLayout getTabLayout() {
+		return tabLayout;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		return false;
+	}
+
+	@Override
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+		if (drawerLayout.isDrawerOpen(GravityCompat.START))
+			drawerLayout.closeDrawer(GravityCompat.START);
+
+		if (item.isCheckable()) item.setChecked(true);
+
+		final int newNavigationId = item.getItemId();
+
+		if (currentNavigationId != newNavigationId) {
+			switch(newNavigationId) {
+				case R.id.navigation_feed:
+					final FeedFragment feedFragment = new FeedFragment();
+					feedFragment.setTabLayout(tabLayout);
+
+					switchContent(feedFragment);
+					break;
+
+				case R.id.navigation_election:
+					final ElectionMasterFragment electionFragment = new ElectionMasterFragment();
+					electionFragment.setTabLayout(tabLayout);
+
+					switchContent(electionFragment);
+					break;
+
+				case R.id.navigation_poll:
+					final PollFragment pollFragment = new PollFragment();
+					pollFragment.setTabLayout(tabLayout);
+
+					switchContent(pollFragment);
+					break;
+
+				case R.id.navigation_vote:
+					switchContent(new VoteViewPagerFragment());
+					break;
+
+				case R.id.navigation_profile:
+
+					final ProfileViewPagerFragment profileFragment = new ProfileViewPagerFragment();
+					profileFragment.setTabLayout(tabLayout);
+
+					switchContent(profileFragment);
+					break;
+
+				case R.id.navigation_settings:
+					final UserSettingsFragment userSettingsFragment = new UserSettingsFragment();
+					userSettingsFragment.setTabLayout(tabLayout);
+
+					switchContent(userSettingsFragment);
+					break;
+			}
+
+			currentNavigationId = newNavigationId;
+		}
+
+		return true;
+	}
 	
 	public Isegoria getIsegoriaApplication() {
 		return application;
@@ -101,14 +191,14 @@ public class MainActivity extends BaseActivity {
 	}
 	
 	public void hideDialog() {
-		dialog.dismiss();
+		if (dialog != null) dialog.dismiss();
 	}
 	
 	public void showLoginFailed() {
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Login Failed");
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				      
 				}
@@ -116,11 +206,11 @@ public class MainActivity extends BaseActivity {
 		alertDialog.show();
 	}
 	
-	public void showSignupSucceded() {
+	public void showSignupSucceeded() {
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Signup Succeeded");
-		alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				      
 				}
@@ -213,32 +303,27 @@ public class MainActivity extends BaseActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		try {
-			switch(item.getItemId()){
-				case android.R.id.home:
-					if(application.isLoggedIn()) {
-						toggle();
-					}
-					return true;
-			}
-			
-			switchContent(new UserSettingsFragment());
-			
-			return true;
-		} catch(Exception e) {
-			
+		switch(item.getItemId()){
+			case android.R.id.home:
+				if(application.isLoggedIn()) {
+					//toggle();
+				}
+				return true;
 		}
-		
+
+		switchContent(new UserSettingsFragment());
+
 		return false;
 	}
 	
-	public void switchContent(SherlockFragment fragment) {
+	public void switchContent(Fragment fragment) {
 			mContent = fragment;
+
 			getSupportFragmentManager().popBackStack();
+
 			getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.content_frame, fragment)
+				.replace(R.id.container, fragment)
 				.commit();
-			getSlidingMenu().showContent();
 	}
 }

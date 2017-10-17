@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -22,9 +23,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class EventsFragment extends SherlockFragment {
+public class EventsFragment extends Fragment {
 	private View rootView;
 	private TableLayout newsTableLayout;
     private EventsFragment eventsFragment;
@@ -40,13 +39,13 @@ public class EventsFragment extends SherlockFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		rootView = inflater.inflate(R.layout.events_fragment, container, false);
-		newsTableLayout = (TableLayout) rootView.findViewById(R.id.eventsTableLayout);
+		newsTableLayout = rootView.findViewById(R.id.eventsTableLayout);
         eventsFragment = this;
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels;
 
-        swipeContainerEvents = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerEvents);
+        swipeContainerEvents = rootView.findViewById(R.id.swipeContainerEvents);
         swipeContainerEvents.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -69,7 +68,7 @@ public class EventsFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void clearTable() {
+    private void clearTable() {
         newsTableLayout.removeAllViews();
     }
 	
@@ -78,7 +77,7 @@ public class EventsFragment extends SherlockFragment {
         addTableRow(eventId, bitmapPicture, false, eventName, eventTimeStr);
 	}
 	
-	public void addTableRow(final int eventId, String bitmapPicture, boolean lastCell, String articleTitle1, String articleTime1) {
+	private void addTableRow(final int eventId, String bitmapPicture, boolean lastCell, String articleTitle1, String articleTime1) {
 		TableRow tr;
 		String colour = "#F8F8F8";
 
@@ -102,7 +101,7 @@ public class EventsFragment extends SherlockFragment {
 		tr.setLayoutParams(rowParams);
 			
 		RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-		relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(imageHeight)));
+		relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 		((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
 		if(lastCell)
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin1, paddingMargin1, paddingMargin1, paddingMargin1);
@@ -111,14 +110,14 @@ public class EventsFragment extends SherlockFragment {
 			
 		ImageView view = new ImageView(getActivity());
 		view.setColorFilter(Color.argb(paddingMargin2, paddingMargin3, paddingMargin3, paddingMargin3));
-		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)(imageHeight)));
+		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 		view.setScaleType(ScaleType.CENTER_CROP);
 		network.getPictureVolley(bitmapPicture, view);
 		
 		view.setOnClickListener(new View.OnClickListener() {        
             @Override
             public void onClick(View view) {
-		    		FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+		    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 		    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 		    		fragment2 = new EventsDetailFragment();
 		    		Bundle args = new Bundle();
@@ -159,8 +158,8 @@ public class EventsFragment extends SherlockFragment {
 	    newsTableLayout.addView(tr);
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;

@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -29,9 +30,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidateTicketDetailFragment extends SherlockFragment {
+public class CandidateTicketDetailFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateTicketDetialTableLayout;
     private Button ticketSupportButton;
@@ -41,8 +40,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 
     private String code;
     private String colour;
-    String partyColour = "";
-    String partyLogo = "";
+    private String partyColour = "";
+    private String partyLogo = "";
 
     private TextView partyDetailSupporters;
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
@@ -60,14 +59,14 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         partyColour = bundle.getString("Colour");
         partyLogo = bundle.getString("Logo");
 
-		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
-        partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+		candidateTicketDetialTableLayout = rootView.findViewById(R.id.candidateTicketDetailTable);
+        partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
 		
-		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundDetail);
+		LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundDetail);
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
@@ -77,12 +76,12 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getTicketDetail(ticketId, candidateTicketDetailFragment);
 
-        ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
+        ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
-        ticketSupportButton = (Button) rootView.findViewById(R.id.supportButton);
+        ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        if(network.getUserTickets().contains(new Integer(ticketId))) {
+        if(network.getUserTickets().contains(ticketId)) {
             ticketSupportButton.setText("Unsupport");
         }
 
@@ -91,14 +90,14 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             public void onClick(View view) {
                 if(ticketSupportButton.getText().equals("Support")) {
                     network.supportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                     String value = String.valueOf(partyDetailSupporters.getText());
                     partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
                     ticketSupportButton.setText("Unsupport");
                 }
                 else if(ticketSupportButton.getText().equals("Unsupport")) {
                     network.unsupportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                     String value = String.valueOf(partyDetailSupporters.getText());
                     partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
                     ticketSupportButton.setText("Support");
@@ -106,7 +105,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             }
         });
 
-        TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
+        TextView partyDetailName = rootView.findViewById(R.id.partyNameDetail);
         partyDetailSupporters.setText(String.valueOf(noOfSupporters));
         partyDetailName.setText(ticketName);
 
@@ -127,7 +126,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         addTableRow(userId, code, colour, firstName + " " + lastName, "", userId, positionId);
     }
 	
-	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
+	private void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -161,7 +160,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
@@ -254,7 +253,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         candidateTicketDetialTableLayout.addView(dividierView);
 	}
 
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
@@ -277,8 +276,8 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 	    return inSampleSize;
 	}
 	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -293,7 +292,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 	    return BitmapFactory.decodeResource(res, resId, options);
 	}
 	
-	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
+	private Bitmap fastBlur(Bitmap sentBitmap, int radius) {
         Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
         if (radius < 1) {

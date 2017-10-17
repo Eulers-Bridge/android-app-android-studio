@@ -314,7 +314,6 @@
                         android:id="@+id/textView27"
                         android:textSize="15dp"
                         android:textColor="#fffff0ef"
-                        android:singleLine="false"
                         android:paddingRight="20dp" />
                 </LinearLayout>
 

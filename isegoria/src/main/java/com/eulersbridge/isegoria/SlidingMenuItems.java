@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-
-import com.actionbarsherlock.app.SherlockFragment;
 
 public class SlidingMenuItems extends ListFragment {
 	
@@ -27,7 +26,7 @@ public class SlidingMenuItems extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView lv, View v, int position, long id) {
-		SherlockFragment newContent = null;
+		Fragment newContent = null;
 		switch (position) {
 		case 0:
 			newContent = new FeedFragment();
@@ -55,7 +54,7 @@ public class SlidingMenuItems extends ListFragment {
 			switchFragment(newContent);
 	}
 
-	private void switchFragment(final SherlockFragment fragment) {
+	private void switchFragment(final Fragment fragment) {
 		if (getActivity() == null)
 			return;
 		

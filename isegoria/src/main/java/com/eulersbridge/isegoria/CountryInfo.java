@@ -2,13 +2,13 @@ package com.eulersbridge.isegoria;
 
 import java.util.Vector;
 
-public class CountryInfo {
+class CountryInfo {
 	private String country;
 	private Vector<InstitutionInfo> institutions;
 	
 	public CountryInfo(String country) {
 		this.country = country;
-		this.institutions = new Vector<InstitutionInfo>();
+		this.institutions = new Vector<>();
 	}
 
 	public String getCountry() {

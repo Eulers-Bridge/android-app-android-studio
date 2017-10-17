@@ -49,14 +49,14 @@ public class NewsArticleFragment extends Fragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getNewsArticleLiked(this);
 
-        newsArticleDivider = (View) rootView.findViewById(R.id.newsArticleDivider);
-        newsArticleAuthorImage = (ImageView) rootView.findViewById(R.id.newsArticleAuthorImage);
+        newsArticleDivider = rootView.findViewById(R.id.newsArticleDivider);
+        newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
 
 		return rootView;
 	}
 
     public void initiallyLiked() {
-        final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
+        final ImageView starView = rootView.findViewById(R.id.starView);
         starView.setImageResource(R.drawable.star);
         setLiked = true;
     }
@@ -90,25 +90,25 @@ public class NewsArticleFragment extends Fragment {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 250, getResources().getDisplayMetrics());
 					
-					LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
-					backgroundLinearLayout.getLayoutParams().height = (int) (imageHeight);
+					LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
+					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
 					d.setColorFilter(Color.argb(paddingMargin, paddingMargin2, paddingMargin2, paddingMargin2), Mode.DARKEN);
 					backgroundLinearLayout.setBackgroundDrawable(d);
 					
-					TextView newsTitle = (TextView) rootView.findViewById(R.id.newsArticleTitle);
+					TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
 					newsTitle.setText(title);
 					
-					TextView newsArticleLikes = (TextView) rootView.findViewById(R.id.newsArticleLikes);
+					TextView newsArticleLikes = rootView.findViewById(R.id.newsArticleLikes);
 					newsArticleLikes.setText(likes);
 					
-					TextView newsText = (TextView) rootView.findViewById(R.id.textNews);
+					TextView newsText = rootView.findViewById(R.id.textNews);
 					newsText.setText(content);
 					
-					TextView newsArticleDate = (TextView) rootView.findViewById(R.id.newsArticleDate);
+					TextView newsArticleDate = rootView.findViewById(R.id.newsArticleDate);
 					newsArticleDate.setText(TimeConverter.convertTimestampToString(date));				
 					
-					final ImageView flagView = (ImageView) rootView.findViewById(R.id.flagView);
+					final ImageView flagView = rootView.findViewById(R.id.flagView);
 					flagView.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View view) {
@@ -120,12 +120,12 @@ public class NewsArticleFragment extends Fragment {
                         flagView.setImageResource(R.drawable.flagdefault);
                     }
 
-                    final TextView newsArticleLikesView = (TextView) rootView.findViewById(R.id.newsArticleLikes);
-					final ImageView starView = (ImageView) rootView.findViewById(R.id.starView);
+                    final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
+					final ImageView starView = rootView.findViewById(R.id.starView);
                     starView.setOnClickListener(new OnClickListener() {
 						@Override
 						public void onClick(View view) {
-                            if(setLiked == false) {
+                            if(!setLiked) {
                                 setLiked = true;
                                 starView.setImageResource(R.drawable.star);
                                 network.likeArticle(articleId, newsArticleFragment);
@@ -151,7 +151,7 @@ public class NewsArticleFragment extends Fragment {
                     newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
 				}
 			});
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
 	}
@@ -161,19 +161,19 @@ public class NewsArticleFragment extends Fragment {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					TextView newsArticleName = (TextView) rootView.findViewById(R.id.photoTitle);
+					TextView newsArticleName = rootView.findViewById(R.id.photoTitle);
 					newsArticleName.setText(name);
 				}
 			});
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
 
-        ImageView newsArticleAuthorImage = (ImageView) rootView.findViewById(R.id.newsArticleAuthorImage);
+        ImageView newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
         network.getPictureVolley(photoURL, newsArticleAuthorImage);
 	}
 
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;

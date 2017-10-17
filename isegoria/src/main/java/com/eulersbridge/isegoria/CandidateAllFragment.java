@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -27,17 +28,15 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.ArrayList;
 
-public class CandidateAllFragment extends SherlockFragment {
+public class CandidateAllFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateAllTableLayout;
     private SearchView searchViewCandidatesAll;
-    private ArrayList<String> firstnames = new ArrayList<String>();
-    private ArrayList<String> lastnames = new ArrayList<String>();
-    private ArrayList<TableRow> rows = new ArrayList<TableRow>();
+    private final ArrayList<String> firstnames = new ArrayList<>();
+    private final ArrayList<String> lastnames = new ArrayList<>();
+    private final ArrayList<TableRow> rows = new ArrayList<>();
 	
 	private float dpWidth;
 	private float dpHeight;
@@ -51,7 +50,7 @@ public class CandidateAllFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false);
-		candidateAllTableLayout = (TableLayout) rootView.findViewById(R.id.candidateAllTable);
+		candidateAllTableLayout = rootView.findViewById(R.id.candidateAllTable);
 
 		dpWidth = displayMetrics.widthPixels;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
@@ -65,7 +64,7 @@ public class CandidateAllFragment extends SherlockFragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getCandidates(this);
 
-        searchViewCandidatesAll = (SearchView) rootView.findViewById(R.id.searchViewCandidatesAll);
+        searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
         searchViewCandidatesAll.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String query) {
@@ -80,11 +79,11 @@ public class CandidateAllFragment extends SherlockFragment {
                                 String firstname = firstnames.get(i);
                                 String lastname = lastnames.get(i);
 
-                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
                                     candidateAllTableLayout.removeView(row);
                                 }
                                 cnt = cnt + 1;
-                            } catch(Exception e) {}
+                            } catch(Exception ignored) {}
                         }
                     }
                     candidateAllFragment.rootView.invalidate();
@@ -107,11 +106,11 @@ public class CandidateAllFragment extends SherlockFragment {
                                 String firstname = firstnames.get(i);
                                 String lastname = lastnames.get(i);
 
-                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
                                     candidateAllTableLayout.removeView(row);
                                 }
                                 cnt = cnt + 1;
-                            } catch(Exception e) {}
+                            } catch(Exception ignored) {}
                         }
                     }
                     candidateAllFragment.rootView.invalidate();
@@ -125,7 +124,7 @@ public class CandidateAllFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void addAllRows() {
+    private void addAllRows() {
         try {
             candidateAllTableLayout.removeAllViews();
             for (int i = 0; i < rows.size(); i++) {
@@ -142,10 +141,10 @@ public class CandidateAllFragment extends SherlockFragment {
                 firstName, lastName);
     }
 	
-	public void addTableRow(int ticketId, final int userId, String partyAbr,
-                            String colour, String candidateName,
-                            String candidatePosition, int positionId,
-                            String firstName, String lastName) {
+	private void addTableRow(int ticketId, final int userId, String partyAbr,
+                             String colour, String candidateName,
+                             String candidatePosition, int positionId,
+                             String firstName, String lastName) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -178,7 +177,7 @@ public class CandidateAllFragment extends SherlockFragment {
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
@@ -279,7 +278,7 @@ public class CandidateAllFragment extends SherlockFragment {
         rows.add(tr);
 	}
 	
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
@@ -302,8 +301,8 @@ public class CandidateAllFragment extends SherlockFragment {
 	    return inSampleSize;
 	}
 	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();

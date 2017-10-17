@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -18,10 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class ProfileFragment extends SherlockFragment {
+public class ProfileFragment extends Fragment {
 	private View rootView;
 	
 	private float dpWidth;
@@ -31,10 +29,10 @@ public class ProfileFragment extends SherlockFragment {
     private TextView groupNumTextView;
     private TextView rewardsNumTextView;
 
-    CircularSeekBar circularSeekBar1;
-    CircularSeekBar circularSeekBar2;
-    CircularSeekBar circularSeekBar3;
-    CircularSeekBar circularSeekBar4;
+    private CircularSeekBar circularSeekBar1;
+    private CircularSeekBar circularSeekBar2;
+    private CircularSeekBar circularSeekBar3;
+    private CircularSeekBar circularSeekBar4;
 
     private ViewPager mPager;
     private Network network;
@@ -42,8 +40,6 @@ public class ProfileFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		getActivity().getActionBar().removeAllTabs();
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -52,21 +48,21 @@ public class ProfileFragment extends SherlockFragment {
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
 
-        ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
+        ImageView photoImageView = rootView.findViewById(R.id.profilePic);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        friendsNumTextView = (TextView) rootView.findViewById(R.id.friendsNum);
-        groupNumTextView = (TextView) rootView.findViewById(R.id.groupNum);
-        rewardsNumTextView = (TextView) rootView.findViewById(R.id.rewardsNum);
+        friendsNumTextView = rootView.findViewById(R.id.friendsNum);
+        groupNumTextView = rootView.findViewById(R.id.groupNum);
+        rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        TextView name = (TextView) rootView.findViewById(R.id.profileName);
+        TextView name = rootView.findViewById(R.id.profileName);
         network.getUserFullName((int) network.userId, name, "");
 
-        LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
+        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
@@ -80,11 +76,11 @@ public class ProfileFragment extends SherlockFragment {
             }
         });*/
 
-        final TextView personalityTestButton = (TextView) rootView.findViewById(R.id.personalityTestButton);
+        final TextView personalityTestButton = rootView.findViewById(R.id.personalityTestButton);
         personalityTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 PersonalityQuestionsFragment fragment2 = new PersonalityQuestionsFragment();
                 Bundle args = new Bundle();
@@ -95,10 +91,10 @@ public class ProfileFragment extends SherlockFragment {
             }
         });
 
-        circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
-        circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
-        circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
-        circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
+        circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
+        circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
+        circularSeekBar3 = rootView.findViewById(R.id.circularSeekBar3);
+        circularSeekBar4 = rootView.findViewById(R.id.circularSeekBar4);
 
         circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
@@ -144,7 +140,7 @@ public class ProfileFragment extends SherlockFragment {
     }
 
     public void addTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.tasksLayout);
+        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 43.33333333, getResources().getDisplayMetrics());
@@ -154,7 +150,7 @@ public class ProfileFragment extends SherlockFragment {
                 (float) 10, getResources().getDisplayMetrics());
 
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.LEFT);
+        taskLayout.setGravity(Gravity.START);
         taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin1));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
@@ -182,7 +178,7 @@ public class ProfileFragment extends SherlockFragment {
         taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.RIGHT);
+        xpLabel.setGravity(Gravity.END);
         xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 

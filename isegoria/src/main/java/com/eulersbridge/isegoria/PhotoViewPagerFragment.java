@@ -1,36 +1,32 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import java.util.ArrayList;
 
-public class PhotoViewPagerFragment extends SherlockFragment  {
+public class PhotoViewPagerFragment extends Fragment {
     private View rootView;
     private ViewPager mPager;
     private PhotoPagerAdapter mPagerAdapter;
 
-    private ArrayList<SherlockFragment> fragmentList;
+    private final ArrayList<Fragment> fragmentList;
     private int position;
 
     public PhotoViewPagerFragment() {
-        fragmentList = new ArrayList<SherlockFragment>();
+        fragmentList = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.photo_view_pager_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
+        FragmentManager fm = getActivity().getSupportFragmentManager();
 
         ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -39,7 +35,7 @@ public class PhotoViewPagerFragment extends SherlockFragment  {
             }
         };
 
-        mPager = (ViewPager) rootView.findViewById(R.id.photoViewPagerFragment);
+        mPager = rootView.findViewById(R.id.photoViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
         mPagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
@@ -50,7 +46,7 @@ public class PhotoViewPagerFragment extends SherlockFragment  {
         return rootView;
     }
 
-    public int addFragment(SherlockFragment fragment) {
+    public int addFragment(Fragment fragment) {
         fragmentList.add(fragment);
         return fragmentList.size()-1;
     }

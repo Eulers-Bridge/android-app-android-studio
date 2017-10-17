@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,11 +22,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.io.InputStream;
 
-public class PhotosFragment extends SherlockFragment {
+public class PhotosFragment extends Fragment {
 	private View rootView;
 	private TableLayout photosTableLayout;
 	
@@ -48,12 +47,12 @@ public class PhotosFragment extends SherlockFragment {
         photosFragment = this;
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		photosTableLayout = (TableLayout) rootView.findViewById(R.id.photosTableLayout);
+		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        swipeContainerPhotos = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerPhotos);
+        swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
         swipeContainerPhotos.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -77,7 +76,7 @@ public class PhotosFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void clearTable() {
+    private void clearTable() {
         photosTableLayout.removeAllViews();
     }
 	
@@ -85,7 +84,7 @@ public class PhotosFragment extends SherlockFragment {
 		addTableRow(albumId, label, caption, photoAlbumThumb);
 	}
 
-	public void addTableRow(final int albumId, String label, String caption, String bitmap) {
+	private void addTableRow(final int albumId, String label, String caption, String bitmap) {
 		try {
 			TableRow tr = new TableRow(getActivity());
 
@@ -105,7 +104,7 @@ public class PhotosFragment extends SherlockFragment {
 			tr.setLayoutParams(rowParams);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setLayoutParams(new TableRow.LayoutParams(imageSize, (int)(imageSize)));
+			view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 			view.setScaleType(ScaleType.CENTER_CROP);
             view.setBackgroundColor(Color.GRAY);
 	        LinearLayout linearLayout = new LinearLayout(getActivity());
@@ -125,11 +124,11 @@ public class PhotosFragment extends SherlockFragment {
 	        textViewArticle.setOnClickListener(new View.OnClickListener() {
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
 			    		Bundle args = new Bundle();
-			    		args.putString("Album", (String) String.valueOf(albumId));
+			    		args.putString("Album", String.valueOf(albumId));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
@@ -140,11 +139,11 @@ public class PhotosFragment extends SherlockFragment {
 	       view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
 			    		Bundle args = new Bundle();
-			    		args.putString("Album", (String) String.valueOf(albumId));
+			    		args.putString("Album", String.valueOf(albumId));
 			    		fragment2.setArguments(args);
 			    		fragmentTransaction2.addToBackStack(null);
 			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
@@ -165,13 +164,13 @@ public class PhotosFragment extends SherlockFragment {
 	        tr.addView(view);
 	        tr.addView(linearLayout);	
 	        photosTableLayout.addView(tr);
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;
 	    int inSampleSize = 1;

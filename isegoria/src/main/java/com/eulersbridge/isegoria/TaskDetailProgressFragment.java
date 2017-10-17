@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -17,9 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class TaskDetailProgressFragment extends SherlockFragment {
+public class TaskDetailProgressFragment extends Fragment {
     private View rootView;
 
     private float dpWidth;
@@ -42,7 +41,7 @@ public class TaskDetailProgressFragment extends SherlockFragment {
         network.getRemainingTasks(this);
         network.getCompletedTasks(this);
 
-        ProgressBar pb = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        ProgressBar pb = rootView.findViewById(R.id.progressBar);
         pb.setProgress(50);
         pb.setMax(1000);
         pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
@@ -51,8 +50,8 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     }
 
     public void setLevel(long totalXp) {
-        final TextView taskLevelField = (TextView) rootView.findViewById(R.id.taskLevelField);
-        final TextView taskLevelDesc = (TextView) rootView.findViewById(R.id.taskLevelDesc);
+        final TextView taskLevelField = rootView.findViewById(R.id.taskLevelField);
+        final TextView taskLevelDesc = rootView.findViewById(R.id.taskLevelDesc);
 
         int level = ((int)totalXp / 1000) + 1;
 
@@ -69,7 +68,7 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     }
 
     public void addCompletedTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.completedTasksLayout);
+        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.completedTasksLayout);
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 43.33333333, getResources().getDisplayMetrics());
@@ -134,7 +133,7 @@ public class TaskDetailProgressFragment extends SherlockFragment {
     }
 
     public void addRemainingTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.remainingTasksLayout);
+        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.remainingTasksLayout);
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 43.33333333, getResources().getDisplayMetrics());

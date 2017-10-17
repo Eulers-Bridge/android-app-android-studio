@@ -9,8 +9,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -24,48 +27,31 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import java.io.File;
 
-public class UserSettingsFragment extends SherlockFragment {
+public class UserSettingsFragment extends Fragment {
     private static final int PICK_IMAGE = 1;
-    public final static int REQ_CODE_PICK_IMAGE = 1;
-
-	private View rootView;
-	
-	private float dpWidth;
-	private float dpHeight;
+    private final static int REQ_CODE_PICK_IMAGE = 1;
 
     private ImageView photoImageView;
     private LinearLayout backgroundLinearLayout;
-
-    private Switch doNotTrackSwitch;
-    private Switch optOutDataCollectionSwitch;
 
     private MainActivity mainActivity;
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		getActivity().getActionBar().removeAllTabs();
-
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
 
         mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getUserDPId();
 
-        photoImageView = (ImageView) rootView.findViewById(R.id.profilePicSettings);
+        photoImageView = rootView.findViewById(R.id.profilePicSettings);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
-        doNotTrackSwitch = (Switch) rootView.findViewById(R.id.doNotTrackSwitch);
+        final Switch doNotTrackSwitch = rootView.findViewById(R.id.doNotTrackSwitch);
         doNotTrackSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -73,7 +59,7 @@ public class UserSettingsFragment extends SherlockFragment {
                 network.updateUserDetails();
             }
         });
-        optOutDataCollectionSwitch = (Switch) rootView.findViewById(R.id.optOutDataCollectionSwitch);
+        final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
         optOutDataCollectionSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -82,21 +68,20 @@ public class UserSettingsFragment extends SherlockFragment {
             }
         });
 
-        if(network.isOptOutDataCollection()) {
+        if(network.isOptOutDataCollection())
             doNotTrackSwitch.setChecked(true);
-        }
-        if(network.isTrackingOff()) {
-            optOutDataCollectionSwitch.setChecked(true);
-        }
 
-        backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundSettings);
+        if(network.isTrackingOff())
+            optOutDataCollectionSwitch.setChecked(true);
+
+        backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundSettings);
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
-        final TextView aboutThisAppButton = (TextView) rootView.findViewById(R.id.aboutThisAppButton);
+        final TextView aboutThisAppButton = rootView.findViewById(R.id.aboutThisAppButton);
         aboutThisAppButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 AboutScreenFragment fragment2 = new AboutScreenFragment();
                 Bundle args = new Bundle();
@@ -107,7 +92,7 @@ public class UserSettingsFragment extends SherlockFragment {
             }
         });
 
-        final TextView changePhotoButton = (TextView) rootView.findViewById(R.id.changePhotoButton);
+        final TextView changePhotoButton = rootView.findViewById(R.id.changePhotoButton);
         changePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,6 +108,10 @@ public class UserSettingsFragment extends SherlockFragment {
 		return rootView;
 	}
 
+    public void setTabLayout(TabLayout tabLayout) {
+        tabLayout.setVisibility(View.GONE);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                     Intent imageReturnedIntent) {
@@ -134,7 +123,7 @@ public class UserSettingsFragment extends SherlockFragment {
                     Uri selectedImage = imageReturnedIntent.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                    Cursor cursor = getSherlockActivity().getContentResolver().query(
+                    Cursor cursor = getActivity().getContentResolver().query(
                             selectedImage, filePathColumn, null, null, null);
                     cursor.moveToFirst();
 
@@ -150,7 +139,11 @@ public class UserSettingsFragment extends SherlockFragment {
 
                     Drawable d = new BitmapDrawable(mainActivity.getResources(),
                             ProfileFragment.fastBlur(bitmap, 25));
-                    backgroundLinearLayout.setBackgroundDrawable(d);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        backgroundLinearLayout.setBackground(d);
+                    } else {
+                        backgroundLinearLayout.setBackgroundDrawable(d);
+                    }
 
                     network.s3Upload(file);
 

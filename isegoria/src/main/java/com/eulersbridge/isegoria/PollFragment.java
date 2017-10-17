@@ -1,8 +1,9 @@
 package com.eulersbridge.isegoria;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -16,82 +17,57 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.List;
 import java.util.Vector;
 
-public class PollFragment extends SherlockFragment {
-	private View rootView;
-	private PagerAdapter pollPagerAdapter;
-	public List<SherlockFragment> fragments;
+public class PollFragment extends Fragment {
+    private TabLayout tabLayout;
+    private PagerAdapter pollPagerAdapter;
+	private List<Fragment> fragments;
 
     private com.sothree.slidinguppanel.SlidingUpPanelLayout slidingUpPanelLayout;
-    private PollFragment pollFragment;
     private Network network;
 
     private EditText commentsField;
     private boolean expanded = false;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.poll_vote_fragment, container, false);
-		((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.poll_vote_fragment, container, false);
 
-        pollFragment = this;
-		fragments = new Vector<SherlockFragment>();
+		fragments = new Vector<>();
 		
-		final ViewPager mViewPager = (ViewPager) rootView.findViewById(R.id.pollViewPager);
+		final ViewPager mViewPager = rootView.findViewById(R.id.pollViewPager);
 		pollPagerAdapter = new PollPagerAdapter(getChildFragmentManager(), fragments);
 		mViewPager.setAdapter(pollPagerAdapter);
 
-        TitlePageIndicator tabIndicator = (TitlePageIndicator) rootView.findViewById(R.id.tabPageIndidcatorVote);
+        TitlePageIndicator tabIndicator = rootView.findViewById(R.id.tabPageIndidcatorVote);
 		tabIndicator.setViewPager(mViewPager);
 		
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPollQuestions(this);
 
-        slidingUpPanelLayout = (com.sothree.slidinguppanel.SlidingUpPanelLayout)
-                rootView.findViewById(R.id.sliding_layout);
+        slidingUpPanelLayout = rootView.findViewById(R.id.sliding_layout);
         slidingUpPanelLayout.setTouchEnabled(false);
         slidingUpPanelLayout.setEnabled(false);
-        SlidingUpPanelLayout.PanelSlideListener panelListener = new SlidingUpPanelLayout.PanelSlideListener(){
-            public void onPanelCollapsed(View arg0) {
 
-            }
-            public void onPanelHidden(View arg0) {
-
-            }
-            public void onPanelAnchored(View arg0) {
-
-            }
-            public void onPanelExpanded(View arg0) {
-
-            }
-            public void onPanelSlide(View arg0, float value) {
-
-            }
-        };
-        slidingUpPanelLayout.setPanelSlideListener(panelListener);
-
-        commentsField = (EditText) rootView.findViewById(R.id.commentsField);
-        LinearLayout commentsLayout = (LinearLayout) rootView.findViewById(R.id.commentsLayout);
+        commentsField = rootView.findViewById(R.id.commentsField);
+        LinearLayout commentsLayout = rootView.findViewById(R.id.commentsLayout);
 
         commentsLayout.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    if (expanded == false) {
+                    if (!expanded) {
                         expanded = true;
                         int sliderHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                                 (float) 400, getResources().getDisplayMetrics());
                         slidingUpPanelLayout.setPanelHeight(sliderHeight);
                         commentsField.setFocusableInTouchMode(true);
                         commentsField.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.showSoftInput(commentsField, InputMethodManager.SHOW_IMPLICIT);
                     }
                 }
@@ -99,19 +75,19 @@ public class PollFragment extends SherlockFragment {
             }
         });
 
-        Button postButton = (Button) rootView.findViewById(R.id.postButton);
+        Button postButton = rootView.findViewById(R.id.postButton);
         postButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 PollVoteFragment pollVoteFragment = ((PollVoteFragment) fragments.get(mViewPager.getCurrentItem()));
-                String comment = (pollFragment.getCommentsField().getText().toString());
+                String comment = (PollFragment.this.getCommentsField().getText().toString());
 
                 if(!comment.trim().equals("")) {
-                    network.postPollComment(pollVoteFragment.getNodeId(), comment, pollFragment);
+                    network.postPollComment(pollVoteFragment.getNodeId(), comment, PollFragment.this);
                     collapseBarSlideDown();
 
-                    pollVoteFragment.addTableComment((pollFragment.network.getLoginGivenName()
-                            + " " + pollFragment.network.getLoginFamilyName()), comment, network.getLoginEmail());
-                    pollFragment.getCommentsField().setText("");
+                    pollVoteFragment.addTableComment((PollFragment.this.network.getLoginGivenName()
+                            + " " + PollFragment.this.network.getLoginFamilyName()), comment, network.getLoginEmail());
+                    PollFragment.this.getCommentsField().setText("");
                 }
             }
         });
@@ -119,7 +95,13 @@ public class PollFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public EditText getCommentsField() {
+    public void setTabLayout(TabLayout tabLayout) {
+        this.tabLayout = tabLayout;
+
+        tabLayout.setVisibility(View.GONE);
+    }
+
+    private EditText getCommentsField() {
         return commentsField;
     }
 
@@ -129,12 +111,12 @@ public class PollFragment extends SherlockFragment {
         }
     }
 
-    public void collapseBarSlideDown() {
-        if (expanded == true) {
+    private void collapseBarSlideDown() {
+        if (expanded) {
             expanded = false;
             slidingUpPanelLayout.setPanelHeight(100);
             commentsField.setFocusableInTouchMode(false);
-            InputMethodManager imm = (InputMethodManager) getSherlockActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
@@ -151,7 +133,7 @@ public class PollFragment extends SherlockFragment {
 			    	 PollVoteFragment pollVoteFragment = new PollVoteFragment();
 			    	 pollVoteFragment.setData(nodeId, creatorId, question, answers, numOfComments, numOfAnswers);
 
-			         fragments.add((SherlockFragment) pollVoteFragment);
+			         fragments.add(pollVoteFragment);
                      network.getPollComments(nodeId, pollVoteFragment);
 			    	 pollPagerAdapter.notifyDataSetChanged();
 

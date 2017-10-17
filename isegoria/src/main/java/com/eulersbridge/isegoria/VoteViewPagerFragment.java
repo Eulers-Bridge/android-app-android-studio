@@ -1,19 +1,17 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import java.util.ArrayList;
 
-public class VoteViewPagerFragment extends SherlockFragment  {
+public class VoteViewPagerFragment extends Fragment {
     private View rootView;
     private NonSwipeableViewPager mPager;
     private ProfilePagerAdapter mPagerAdapter;
@@ -21,7 +19,7 @@ public class VoteViewPagerFragment extends SherlockFragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ((MainActivity)getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         FragmentManager fm = getChildFragmentManager();
 
@@ -32,9 +30,9 @@ public class VoteViewPagerFragment extends SherlockFragment  {
             }
         };
 
-        ArrayList<SherlockFragment> fragmentList = new ArrayList<SherlockFragment>();
+        ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-        mPager = (NonSwipeableViewPager) rootView.findViewById(R.id.voteViewPagerFragment);
+        mPager = rootView.findViewById(R.id.voteViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
         VoteFragment voteFragment = new VoteFragment();

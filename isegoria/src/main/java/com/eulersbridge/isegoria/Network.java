@@ -60,7 +60,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Network {
-	private static String SERVER_URL = "http://54.79.70.241:8080/";
+	private static final String SERVER_URL = "http://54.79.70.241:8080/";
 	private static String PICTURE_URL = "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
 	public long userId;
 	private String username;
@@ -69,7 +69,7 @@ public class Network {
     private boolean hasPersonality;
     private boolean loginAccountVerified;
 
-    private Network network;
+    private final Network network;
 	private NewsFragment newsFragment;
 	private NewsArticleFragment newsArticleFragment;
 	private UserSignupFragment userSignupFragment;
@@ -91,7 +91,7 @@ public class Network {
 	private VoteFragment voteFragment;
 	private PollFragment pollFragment;
     private PollVoteFragment pollVoteFragment;
-	private Isegoria application;
+	private final Isegoria application;
     private boolean reminderSet = false;
     private boolean trackingOff;
     private boolean optOutDataCollection;
@@ -110,7 +110,7 @@ public class Network {
     private int userDPId;
 
     private RequestQueue mRequestQueue;
-    private ArrayList<Integer> userTickets = new ArrayList<Integer>();
+    private ArrayList<Integer> userTickets = new ArrayList<>();
 
 	public Network(Isegoria application) {
         this.network = this;
@@ -187,7 +187,7 @@ public class Network {
 	public void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
        Runnable r = new Runnable() {
     	   public void run() {
-    		   StringBuffer stringBuffer = new StringBuffer();
+    		   StringBuilder stringBuffer = new StringBuilder();
     	        BufferedReader bufferedReader = null;
 
     	        try {
@@ -239,7 +239,7 @@ public class Network {
     	            if(stringBuffer.toString().contains(email)) {
     					application.getMainActivity().runOnUiThread(new Runnable() {
     						public void run() {
-    							application.signupSucceded();
+    							application.signupSucceeded();
     						}
     					});
     	            }
@@ -355,7 +355,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -410,7 +410,7 @@ public class Network {
 		t.start();
 	}
 
-	public void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
+	private void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
 		this.newsArticleFragment = newsArticleFragment;
 
 		Runnable r = new Runnable() {
@@ -456,8 +456,8 @@ public class Network {
     }
 
     public void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
-        this.getFirstPhoto(0, (int) profileId, imageView);
-        this.getFirstPhotoBlur(0, (int) profileId, backgroundLinearLayout);
+        this.getFirstPhoto(0, profileId, imageView);
+        this.getFirstPhotoBlur(0, profileId, backgroundLinearLayout);
     }
 
     public void findFriends(final FindAddContactFragment findAddContactFragment) {
@@ -475,7 +475,7 @@ public class Network {
 
                             int userId = resp.getInt("userId");
                             boolean acceptedBoolean = resp.getBoolean("accepted");
-                            if(acceptedBoolean == true) {
+                            if(acceptedBoolean) {
                                 String contactDetails = resp.getString("contactDetails");
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
                             }
@@ -496,7 +496,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -526,7 +526,7 @@ public class Network {
                             boolean acceptedBoolean = resp.getBoolean("accepted");
                             String contactDetails = resp.getString("contactDetails");
 
-                            if(acceptedBoolean == true) {
+                            if(acceptedBoolean) {
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
                             }
                         } catch (Exception e) {
@@ -546,7 +546,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -595,7 +595,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -612,7 +612,7 @@ public class Network {
         mRequestQueue.add(req);
 	}
 
-    public void findContactPending(final int contactId, String query, final FindAddContactFragment findAddContactFragment) {
+    private void findContactPending(final int contactId, String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
 
@@ -643,7 +643,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -693,7 +693,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -743,7 +743,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -760,7 +760,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
+    private void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
 
@@ -792,7 +792,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -813,7 +813,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -834,7 +834,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -858,7 +858,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -879,7 +879,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -903,7 +903,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -924,7 +924,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -978,7 +978,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -996,10 +996,9 @@ public class Network {
     }
 
     public void addVoteReminder(String location, long date) {
-        this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/voteReminder";
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
         params.put("date", String.valueOf(date));
         params.put("electionId", String.valueOf(electionId));
@@ -1026,7 +1025,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1080,7 +1079,7 @@ public class Network {
 
                                     try {
                                         eventsFragment.addEvent(eventId, name, date, picture);
-                                    } catch(Exception e) {
+                                    } catch(Exception ignored) {
 
                                     }
                                 }
@@ -1097,7 +1096,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1133,7 +1132,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1198,7 +1197,7 @@ public class Network {
 		t.start();
 	}
 
-    public void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
+    private void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
         this.eventsDetailFragment = eventsDetailFragment;
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
@@ -1223,7 +1222,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1241,7 +1240,6 @@ public class Network {
     }
 
     public void findContactPhoto(final String email, final ImageView imageView) {
-        this.eventsDetailFragment = eventsDetailFragment;
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
@@ -1267,7 +1265,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1318,7 +1316,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1369,7 +1367,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1443,7 +1441,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1460,7 +1458,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
+    private void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges/remaining/" + String.valueOf(this.userId);
 
@@ -1515,7 +1513,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1565,7 +1563,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1609,7 +1607,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1697,7 +1695,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1714,8 +1712,7 @@ public class Network {
         mRequestQueue.add(req);
 	}
 
-    public void getPollResults(final int nodeId, final PollVoteFragment pollVoteFragment) {
-        this.pollFragment = pollFragment;
+    private void getPollResults(final int nodeId, final PollVoteFragment pollVoteFragment) {
         String url = SERVER_URL + "dbInterface/api/poll/" + String.valueOf(nodeId) + "/results";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
@@ -1744,7 +1741,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1792,7 +1789,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1813,7 +1810,7 @@ public class Network {
         this.pollFragment = pollFragment;
         String url = SERVER_URL + "dbInterface/api/comment";
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("targetId", String.valueOf(pollId));
         params.put("userName", (this.loginGivenName + " " + this.loginFamilyName));
         params.put("userEmail", this.loginEmail);
@@ -1838,7 +1835,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1861,7 +1858,7 @@ public class Network {
                                   float emotionalStability, float openess) {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/personality";
 
-        HashMap<String, Float> params = new HashMap<String, Float>();
+        HashMap<String, Float> params = new HashMap<>();
         params.put("extroversion", extroversion);
         params.put("agreeableness", agreeableness);
         params.put("conscientiousness", conscientiousness);
@@ -1887,7 +1884,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1907,10 +1904,9 @@ public class Network {
     }
 
     public void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
-        this.pollFragment = pollFragment;
         String url = SERVER_URL + "dbInterface/api/poll/" + String.valueOf(pollId) + "/answer";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
             params.put("answerIndex", answerIndex);
             params.put("answererId", (int) userId);
             params.put("pollId", pollId);
@@ -1934,7 +1930,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -1954,7 +1950,6 @@ public class Network {
     }
 
     public void getVoteLocations(final VoteFragment voteFragment) {
-        this.pollFragment = pollFragment;
 
         String url = SERVER_URL + "dbInterface/api/votingLocations/26";
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -1986,7 +1981,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2004,7 +1999,6 @@ public class Network {
     }
 
     public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
-        this.pollFragment = pollFragment;
 
         String url = SERVER_URL + "dbInterface/api/votingLocation/" + pos;
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -2027,7 +2021,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2044,7 +2038,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getLatestElection() {
+    private void getLatestElection() {
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -2071,7 +2065,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2123,7 +2117,7 @@ public class Network {
 
         @Override
         public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap<String, String> headers = new HashMap<String, String>();
+            HashMap<String, String> headers = new HashMap<>();
             String credentials = username + ":" + password;
             String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2142,7 +2136,6 @@ public class Network {
     }
 
     public void getUserSupportedTickets() {
-        this.electionOverviewFragment = electionOverviewFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/support/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -2155,7 +2148,7 @@ public class Network {
                         JSONObject currentObject = jArray.getJSONObject(i);
 
                         int ticketId = currentObject.getInt("ticketId");
-                        userTickets.add(new Integer(ticketId));
+                        userTickets.add(ticketId);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2170,7 +2163,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2221,7 +2214,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2264,7 +2257,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2320,7 +2313,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2376,7 +2369,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2419,7 +2412,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2480,7 +2473,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2535,7 +2528,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2595,7 +2588,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2639,7 +2632,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2688,7 +2681,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2709,7 +2702,7 @@ public class Network {
     public void addVoteReminder(long date, String location) {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(loginEmail) + "/voteReminder";
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
         params.put("date", String.valueOf(date));
         params.put("electionId", String.valueOf(network.electionId));
@@ -2732,7 +2725,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2751,9 +2744,9 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void alreadySetVoteReminder() {
+    private void alreadySetVoteReminder() {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/voteReminders/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
@@ -2789,7 +2782,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2811,8 +2804,8 @@ public class Network {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
 
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-        userTickets.add(new Integer(ticketId));
+        HashMap<String, String> params = new HashMap<>();
+        userTickets.add(ticketId);
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -2834,7 +2827,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2857,8 +2850,8 @@ public class Network {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
 
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-        userTickets.remove(new Integer(ticketId));
+        HashMap<String, String> params = new HashMap<>();
+        userTickets.remove(Integer.valueOf(ticketId));
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -2880,7 +2873,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2928,7 +2921,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2946,12 +2939,11 @@ public class Network {
     }
 
     public void likePhoto(int photoId, PhotoViewFragment photoViewFragment) {
-        this.newsArticleFragment = newsArticleFragment;
 
         String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId)
                 + "/likedBy/"
                 + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -2973,7 +2965,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -2993,10 +2985,9 @@ public class Network {
     }
 
     public void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
-        this.newsArticleFragment = newsArticleFragment;
 
         String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -3018,7 +3009,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3041,7 +3032,7 @@ public class Network {
         this.newsArticleFragment = newsArticleFragment;
 
         String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -3063,7 +3054,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3086,7 +3077,7 @@ public class Network {
         this.newsArticleFragment = newsArticleFragment;
 
         String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -3108,7 +3099,7 @@ public class Network {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3152,7 +3143,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3200,7 +3191,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3250,7 +3241,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3303,7 +3294,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3356,7 +3347,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3416,8 +3407,8 @@ public class Network {
         this.loginEmail = loginEmail;
     }
 
-    public String getRequest(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
+    private String getRequest(String params) {
+        StringBuilder stringBuffer = new StringBuilder();
         BufferedReader bufferedReader = null;
 
         try {
@@ -3457,8 +3448,8 @@ public class Network {
         return stringBuffer.toString();
     }
 
-	public String getRequestNoAuth(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
+	private String getRequestNoAuth(String params) {
+        StringBuilder stringBuffer = new StringBuilder();
         BufferedReader bufferedReader = null;
 
         try {
@@ -3497,8 +3488,8 @@ public class Network {
         return stringBuffer.toString();
     }
 
-	public Bitmap getPicture(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
+	private Bitmap getPicture(String params) {
+        StringBuilder stringBuffer = new StringBuilder();
         Bitmap output = null;
 
         try {
@@ -3514,8 +3505,6 @@ public class Network {
             output = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         } catch (Exception e) {
         	Log.e("Isegoria", "exception", e);
-        } finally {
-
         }
 
         return output;
@@ -3557,7 +3546,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3599,7 +3588,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3639,7 +3628,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3656,7 +3645,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhotoImage(String url, final ImageView view) {
+    private void getFirstPhotoImage(String url, final ImageView view) {
         ImageRequest req = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -3678,7 +3667,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
+    private void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
         String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null,
@@ -3714,7 +3703,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3731,7 +3720,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhotoImageBlur(String url, final LinearLayout view) {
+    private void getFirstPhotoImageBlur(String url, final LinearLayout view) {
         ImageRequest req = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -3814,7 +3803,7 @@ public class Network {
         return voteReminderDate;
     }
 
-    public void setVoteReminderDate(long voteReminderDate) {
+    private void setVoteReminderDate(long voteReminderDate) {
         this.voteReminderDate = voteReminderDate;
     }
 
@@ -3822,7 +3811,7 @@ public class Network {
         return voteReminderLocation;
     }
 
-    public void setVoteReminderLocation(String voteReminderLocation) {
+    private void setVoteReminderLocation(String voteReminderLocation) {
         this.voteReminderLocation = voteReminderLocation;
     }
 
@@ -3894,12 +3883,11 @@ public class Network {
         t.start();
     }
 
-    public void updateDisplayPicturePhoto(String pictureURL) {
-        this.findAddContactFragment = findAddContactFragment;
+    private void updateDisplayPicturePhoto(String pictureURL) {
         String url = SERVER_URL + "dbInterface/api/photo";
         long timestamp = System.currentTimeMillis() / 1000L;
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("url", pictureURL);
         params.put("thumbNailUrl", pictureURL);
         params.put("title", "Profile Picture");
@@ -3927,7 +3915,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -3950,7 +3938,7 @@ public class Network {
     public void updateUserDetails() {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId);
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("trackingOff", String.valueOf(this.isTrackingOff()));
         params.put("optOutDataCollection", String.valueOf(this.optOutDataCollection));
 
@@ -3973,7 +3961,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials =
                         Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -4003,7 +3991,7 @@ public class Network {
 	    return BitmapFactory.decodeStream(is);
 	}
 
-	public static int calculateInSampleSize(
+	private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;

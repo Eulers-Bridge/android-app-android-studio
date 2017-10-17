@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -22,9 +23,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidatePositionsFragment extends SherlockFragment {
+public class CandidatePositionsFragment extends Fragment {
 	private View rootView;
 	private TableLayout positionsTableLayout;
     private Network network;
@@ -37,7 +36,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
     private String lastName;
     private String lastDesc;
 
-    boolean addRow = false;
+    private boolean addRow = false;
     private int addedPositionsCount = 0;
 
 	@Override
@@ -45,7 +44,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
-		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.positionsTableLayout);
+		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
@@ -75,19 +74,14 @@ public class CandidatePositionsFragment extends SherlockFragment {
         this.lastName = name;
         this.lastDesc = desc;
 
-        if(addRow) {
-            addRow = false;
-        }
-        else {
-            addRow = true;
-        }
+		addRow = !addRow;
 
         if(noOfPositions == addedPositionsCount) {
             this.addTableRowOneSquare(electionId, positionId, name, desc);
         }
     }
 	
-	public void addTableRow(int lastElectionId, int electionId, final int lastPositionId, final int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	private void addTableRow(int lastElectionId, int electionId, final int lastPositionId, final int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -136,7 +130,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                     Bundle args = new Bundle();
@@ -181,7 +175,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
             view2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                     Bundle args = new Bundle();
@@ -238,8 +232,8 @@ public class CandidatePositionsFragment extends SherlockFragment {
 		}
 	}
 
-    public void addTableRowOneSquare(int electionId, final int positionId,
-                                     String title1, String desc1) {
+    private void addTableRowOneSquare(int electionId, final int positionId,
+									  String title1, String desc1) {
         TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -284,7 +278,7 @@ public class CandidatePositionsFragment extends SherlockFragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                     Bundle args = new Bundle();
@@ -302,8 +296,8 @@ public class CandidatePositionsFragment extends SherlockFragment {
             positionsTableLayout.addView(tr);
     }
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	private static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = options.outHeight;
 	    final int width = options.outWidth;

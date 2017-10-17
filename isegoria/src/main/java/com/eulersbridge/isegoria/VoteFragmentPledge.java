@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria;
 import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class VoteFragmentPledge extends SherlockFragment  {
+public class VoteFragmentPledge extends Fragment {
     private View rootView;
     private ArrayAdapter<String> voteLocationArrayAdapter;
     private NonSwipeableViewPager mPager;
@@ -34,18 +32,18 @@ public class VoteFragmentPledge extends SherlockFragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.vote_fragment_pledge, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        ((MainActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActivity().getActionBar().removeAllTabs();
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        LinearLayout mContent = (LinearLayout) rootView.findViewById(R.id.signPad);
+        LinearLayout mContent = rootView.findViewById(R.id.signPad);
         Signature mSignature = new Signature(mainActivity, null);
         mSignature.setBackgroundColor(Color.WHITE);
         mContent.addView(mSignature, LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 
-        Button voteNextButton = (Button) rootView.findViewById(R.id.voteNextButton);
+        Button voteNextButton = rootView.findViewById(R.id.voteNextButton);
         voteNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

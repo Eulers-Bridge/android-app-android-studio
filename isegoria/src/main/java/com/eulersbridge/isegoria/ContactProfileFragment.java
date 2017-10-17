@@ -4,7 +4,9 @@ import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,13 +18,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 /**
  * Created by Anthony on 30/03/20paddingMargin3.
  */
-public class ContactProfileFragment extends SherlockFragment {
+public class ContactProfileFragment extends Fragment {
     private View rootView;
 
     private float dpWidth;
@@ -45,43 +44,43 @@ public class ContactProfileFragment extends SherlockFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActivity().getActionBar().removeAllTabs();
 
         Bundle bundle = this.getArguments();
-        profileId = (int) bundle.getInt("ProfileId");
+        profileId = bundle.getInt("ProfileId");
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        friendsNumTextView = (TextView) rootView.findViewById(R.id.contactFriendsNum);
-        groupNumTextView = (TextView) rootView.findViewById(R.id.contactsGroupNum);
-        rewardsNumTextView = (TextView) rootView.findViewById(R.id.contactRewardsNum);
+        friendsNumTextView = rootView.findViewById(R.id.contactFriendsNum);
+        groupNumTextView = rootView.findViewById(R.id.contactsGroupNum);
+        rewardsNumTextView = rootView.findViewById(R.id.contactRewardsNum);
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
 
-        ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
+        ImageView photoImageView = rootView.findViewById(R.id.profilePic);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        TextView name = (TextView) rootView.findViewById(R.id.profileName);
+        TextView name = rootView.findViewById(R.id.profileName);
         network.getUserFullName(profileId, name, "");
 
-        LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
+        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(profileId, photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
         network.getDashboardStats(this, profileId);
 
-        circularSeekBar1 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar1);
-        circularSeekBar2 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar2);
-        circularSeekBar3 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar3);
-        circularSeekBar4 = (CircularSeekBar) rootView.findViewById(R.id.circularSeekBar4);
+        circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
+        circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
+        circularSeekBar3 = rootView.findViewById(R.id.circularSeekBar3);
+        circularSeekBar4 = rootView.findViewById(R.id.circularSeekBar4);
 
         circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
@@ -122,7 +121,7 @@ public class ContactProfileFragment extends SherlockFragment {
     }
 
     public void addTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = (LinearLayout) rootView.findViewById(R.id.tasksLayout);
+        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 43.33333333, getResources().getDisplayMetrics());

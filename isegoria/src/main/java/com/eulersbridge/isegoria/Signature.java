@@ -21,14 +21,14 @@ import java.io.FileOutputStream;
 public class Signature extends View {
     private static final float STROKE_WIDTH = 5f;
     private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
-    private Paint paint = new Paint();
-    private Path path = new Path();
+    private final Paint paint = new Paint();
+    private final Path path = new Path();
 
     private float lastTouchX;
     private float lastTouchY;
     private final RectF dirtyRect = new RectF();
 
-    LinearLayout mContent;
+    private LinearLayout mContent;
     Signature mSignature;
     Button mClear, mGetSign, mCancel;
     public static String tempDir;
@@ -36,7 +36,7 @@ public class Signature extends View {
     public String current = null;
     private Bitmap mBitmap;
     View mView;
-    File mypath;
+    private File mypath;
 
     private String uniqueId;
     private EditText yourName;
@@ -55,7 +55,7 @@ public class Signature extends View {
         Log.v("log_tag", "Height: " + v.getHeight());
         if(mBitmap == null)
         {
-            mBitmap =  Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);;
+            mBitmap =  Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
         }
         Canvas canvas = new Canvas(mBitmap);
         try

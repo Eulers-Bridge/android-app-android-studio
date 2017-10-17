@@ -6,11 +6,10 @@ import java.util.ArrayList;
 
 public class Isegoria extends Application {
 	private MainActivity mainActivity;
-	protected Network network;
+	private Network network;
 	private boolean loggedIn = false;
 	private String username = "";
 	private String password = "";
-	private FeedFragment feedFragment;
 	private ArrayList<CountryInfo> countryObjects;
 	
 	public Isegoria() {
@@ -37,8 +36,14 @@ public class Isegoria extends Application {
 		mainActivity.runOnUiThread(new Runnable() {
 		     @Override
 		     public void run() {
-		    	 mainActivity.hideDialog();
-		    	 mainActivity.switchContent(new FeedFragment());
+                 mainActivity.hideDialog();
+
+                 mainActivity.setNavigationDrawerEnabled(true);
+
+                 final FeedFragment feedFragment = new FeedFragment();
+                 feedFragment.setTabLayout(mainActivity.getTabLayout());
+
+                 mainActivity.switchContent(feedFragment);
 		     }
 		});
 	}
@@ -63,8 +68,8 @@ public class Isegoria extends Application {
         });
     }
 
-	public void signupSucceded() {
-		mainActivity.showSignupSucceded();
+	public void signupSucceeded() {
+		mainActivity.showSignupSucceeded();
 	}
 	
 	public void signupFailed() {

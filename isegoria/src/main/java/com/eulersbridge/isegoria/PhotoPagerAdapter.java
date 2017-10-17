@@ -1,29 +1,28 @@
 package com.eulersbridge.isegoria;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-
-import com.actionbarsherlock.app.SherlockFragment;
 
 import java.util.List;
 
 /**
  * Created by Anthony on 03/04/2015.
  */
-public class PhotoPagerAdapter extends FragmentPagerAdapter {
-    private List<SherlockFragment> fragments;
+class PhotoPagerAdapter extends FragmentPagerAdapter {
+    private final List<Fragment> fragments;
 
-    public PhotoPagerAdapter(FragmentManager fm, List<SherlockFragment> fragments) {
+    public PhotoPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }
 
-    public void addFragment(SherlockFragment fragment) {
+    public void addFragment(Fragment fragment) {
         fragments.add(fragment);
     }
 
     @Override
-    public SherlockFragment getItem(int position) {
+    public Fragment getItem(int position) {
         return this.fragments.get(position);
     }
 
