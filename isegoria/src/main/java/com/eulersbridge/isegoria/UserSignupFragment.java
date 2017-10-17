@@ -14,7 +14,6 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 
 public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
-	private View rootView;
 	private ArrayList<String> countries;
 	private ArrayList<CountryInfo> countryObjects;
 	private ArrayList<String> institutions;
@@ -29,9 +28,11 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
-		getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
+
+		//TODO: Hide tabs
+
 		countries = new ArrayList<>();
 		countryObjects = new ArrayList<>();
 		

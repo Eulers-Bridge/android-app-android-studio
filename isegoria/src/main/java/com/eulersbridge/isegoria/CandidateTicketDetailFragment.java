@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -70,7 +71,11 @@ public class CandidateTicketDetailFragment extends Fragment {
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
-		backgroundLinearLayout.setBackgroundDrawable(d);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            backgroundLinearLayout.setBackground(d);
+        } else {
+            backgroundLinearLayout.setBackgroundDrawable(d);
+        }
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -136,14 +141,14 @@ public class CandidateTicketDetailFragment extends Fragment {
 		layout.setOrientation(LinearLayout.HORIZONTAL);
 		
 		tr = new TableRow(getActivity());
-		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+		LayoutParams rowParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
 		tr.setPadding(0, paddingMargin3, 0, paddingMargin3);
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 53.33333333, getResources().getDisplayMetrics());
         
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(imageHeight, imageHeight));
+		candidateProfileView.setLayoutParams(new LayoutParams(imageHeight, imageHeight));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
@@ -193,8 +198,12 @@ public class CandidateTicketDetailFragment extends Fragment {
         		imageHeight, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-		partyLayout.setBackgroundDrawable(rectShapeDrawable);
-		partyLayout.addView(textViewParty);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            partyLayout.setBackground(rectShapeDrawable);
+        } else {
+            partyLayout.setBackgroundDrawable(rectShapeDrawable);
+        }
+        partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
@@ -213,11 +222,11 @@ public class CandidateTicketDetailFragment extends Fragment {
         network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
-        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT); 
+        LayoutParams relLayoutMasterParam = new LayoutParams((int)dpWidth, LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
         
         RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

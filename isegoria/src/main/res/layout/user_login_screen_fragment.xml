@@ -46,7 +46,8 @@
 			android:maxLines="1"
 			android:text=""
 			android:textColor="@color/grey"
-			android:hint="@string/user_login_email_hint" />
+			android:hint="@string/user_login_email_hint"
+			android:autofillHints="emailAddress"/>
 
 		<!-- Divider -->
 		<View
@@ -72,7 +73,7 @@
 			android:textColor="@color/grey"
 			android:hint="@string/user_login_password_hint"
 			android:maxLines="1"
-			android:autofillHints="username"/>
+			android:autofillHints="password"/>
 
 		<Button
 			android:id="@+id/loginButton"

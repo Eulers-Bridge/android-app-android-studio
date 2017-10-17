@@ -47,7 +47,7 @@ public class ElectionMasterFragment extends Fragment {
 		getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_election_frame1, fragment).commitAllowingStateLoss();
 	}
 
-	final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+	private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
 		@Override
 		public void onTabSelected(TabLayout.Tab tab) {
 			Fragment subFragment = null;

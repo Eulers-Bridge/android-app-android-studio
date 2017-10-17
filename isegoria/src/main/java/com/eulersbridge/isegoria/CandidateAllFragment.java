@@ -39,7 +39,6 @@ public class CandidateAllFragment extends Fragment {
     private final ArrayList<TableRow> rows = new ArrayList<>();
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private CandidateAllFragment candidateAllFragment;
     private Network network;
@@ -53,10 +52,9 @@ public class CandidateAllFragment extends Fragment {
 		candidateAllTableLayout = rootView.findViewById(R.id.candidateAllTable);
 
 		dpWidth = displayMetrics.widthPixels;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-        
+
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
         candidateAllTableLayout.addView(dividierView);
 
@@ -235,7 +233,7 @@ public class CandidateAllFragment extends Fragment {
         network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());

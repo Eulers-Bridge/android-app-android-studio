@@ -47,7 +47,7 @@ public class FeedFragment extends Fragment {
         if (tabLayout != null) tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
     }
 
-    final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+    private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
         @Override
         public void onTabSelected(TabLayout.Tab tab) {
             viewPager.setCurrentItem(tab.getPosition());

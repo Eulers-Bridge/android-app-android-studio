@@ -24,12 +24,10 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 public class CandidatePositionsFragment extends Fragment {
-	private View rootView;
 	private TableLayout positionsTableLayout;
     private Network network;
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private int lastElectionId;
     private int lastPositionId;
@@ -42,12 +40,11 @@ public class CandidatePositionsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		
-		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
+
+		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
         /*addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, "President", "Secretary");
         addTableRow(R.drawable.photo2, R.drawable.photo3, true, false, "Women's Officer", "LGBT Officer");

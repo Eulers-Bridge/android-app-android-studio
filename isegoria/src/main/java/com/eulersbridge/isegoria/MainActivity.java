@@ -75,16 +75,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	private void setupToolbarAndNavigation() {
-		final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+		final Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
 		if (getSupportActionBar() != null) {
 			getSupportActionBar().setTitle(R.string.app_name);
 		}
 
-		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		drawerLayout = findViewById(R.id.drawer_layout);
 
-		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+		final NavigationView navigationView = findViewById(R.id.navigation);
 		if (navigationView != null) {
 			navigationView.setNavigationItemSelectedListener(this);
 		}
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		drawerLayout.addDrawerListener(drawerToggle);
 		drawerToggle.syncState();
 
-		tabLayout = (TabLayout)findViewById(R.id.tabLayout);
+		tabLayout = findViewById(R.id.tabLayout);
 	}
 
 	void setNavigationDrawerEnabled(boolean enabled) {
@@ -179,8 +179,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void login(View v) {
-		TextView userNameField = (TextView) findViewById(R.id.username);
-		TextView passwordField = (TextView) findViewById(R.id.password);
+		TextView userNameField = findViewById(R.id.username);
+		TextView passwordField = findViewById(R.id.password);
 		
 		application.setUsername(userNameField.getText().toString());
 		application.setPassword(passwordField.getText().toString());
@@ -231,15 +231,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void userSignupNext(View view) {
-		TextView firstNameField = (TextView) findViewById(R.id.firstName);
-		TextView lastNameField = (TextView) findViewById(R.id.lastName);
-		TextView universityEmailField = (TextView) findViewById(R.id.universityEmail);
-		TextView newPasswordField = (TextView) findViewById(R.id.newPassword);
-		TextView confirmNewPasswordField = (TextView) findViewById(R.id.confirmNewPassword);
-		Spinner countryField = (Spinner) findViewById(R.id.country);
-		Spinner institutionField = (Spinner) findViewById(R.id.institution);
-		Spinner yearOfBirthField = (Spinner) findViewById(R.id.yearOfBirth);
-		Spinner genderField = (Spinner) findViewById(R.id.gender);
+		TextView firstNameField = findViewById(R.id.firstName);
+		TextView lastNameField = findViewById(R.id.lastName);
+		TextView universityEmailField = findViewById(R.id.universityEmail);
+		TextView newPasswordField = findViewById(R.id.newPassword);
+		TextView confirmNewPasswordField = findViewById(R.id.confirmNewPassword);
+		Spinner countryField = findViewById(R.id.country);
+		Spinner institutionField = findViewById(R.id.institution);
+		Spinner yearOfBirthField = findViewById(R.id.yearOfBirth);
+		Spinner genderField = findViewById(R.id.gender);
 		
 		firstName = firstNameField.getText().toString();
 		lastName = lastNameField.getText().toString(); 

@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,11 +27,9 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 public class CandidateTicketFragment extends Fragment {
-	private View rootView;
 	private TableLayout positionsTableLayout;
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private Network network;
 
@@ -47,12 +46,11 @@ public class CandidateTicketFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		
-		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
+
+		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -140,7 +138,11 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			View view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view.setBackgroundDrawable(rectShapeDrawable);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				view.setBackground(rectShapeDrawable);
+			} else {
+				view.setBackgroundDrawable(rectShapeDrawable);
+			}
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -211,7 +213,11 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view.setBackgroundDrawable(rect2ShapeDrawable);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				view.setBackground(rect2ShapeDrawable);
+			} else {
+				view.setBackgroundDrawable(rect2ShapeDrawable);
+			}
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -325,7 +331,12 @@ public class CandidateTicketFragment extends Fragment {
 
             View view = new View(getActivity());
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            view.setBackgroundDrawable(rectShapeDrawable);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+				view.setBackground(rectShapeDrawable);
+			} else {
+				view.setBackgroundDrawable(rectShapeDrawable);
+			}
+
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -5,9 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,12 +21,6 @@ import android.widget.TextView;
 public class ContactProfileFragment extends Fragment {
     private View rootView;
 
-    private float dpWidth;
-    private float dpHeight;
-
-    private int profileId;
-
-    private ViewPager mPager;
     private Network network;
 
     private TextView friendsNumTextView;
@@ -44,15 +35,11 @@ public class ContactProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActivity().getActionBar().removeAllTabs();
+
+        //TODO: Hide tab layout
 
         Bundle bundle = this.getArguments();
-        profileId = bundle.getInt("ProfileId");
-
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        int profileId = bundle.getInt("ProfileId");
 
         friendsNumTextView = rootView.findViewById(R.id.contactFriendsNum);
         groupNumTextView = rootView.findViewById(R.id.contactsGroupNum);
@@ -116,10 +103,6 @@ public class ContactProfileFragment extends Fragment {
         t4.start();
     }
 
-    public void setViewPager(ViewPager mPager) {
-        this.mPager = mPager;
-    }
-
     public void addTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 
@@ -131,7 +114,7 @@ public class ContactProfileFragment extends Fragment {
                 (float) 10, getResources().getDisplayMetrics());
 
         RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.LEFT);
+        taskLayout.setGravity(Gravity.START);
         taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin1));
 
         LinearLayout leftLayout = new LinearLayout(getActivity());
@@ -159,7 +142,7 @@ public class ContactProfileFragment extends Fragment {
         taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
 
         TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.RIGHT);
+        xpLabel.setGravity(Gravity.END);
         xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
         xpLabel.setText(String.valueOf(xpValue) + " XP");
 

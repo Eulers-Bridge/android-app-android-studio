@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class ElectionOverviewFragment extends Fragment {
-	private View rootView;
-	
-	private float dpWidth;
-	private float dpHeight;
 
     private TextView electionIntroduction;
     private TextView electionTitle;
@@ -28,8 +24,7 @@ public class ElectionOverviewFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        View rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
 
         electionIntroduction = rootView.findViewById(R.id.electionIntroduction);
         electionTitle = rootView.findViewById(R.id.electionTitle);
@@ -37,9 +32,6 @@ public class ElectionOverviewFragment extends Fragment {
         electionProcess = rootView.findViewById(R.id.electionProcess);
         overviewTextField = rootView.findViewById(R.id.overviewTextField);
         processTextField = rootView.findViewById(R.id.processTextField);
-
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();

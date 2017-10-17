@@ -225,10 +225,9 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    xmlns:app="http://schemas.android.com/apk/res/com.eulersbridge.isegoria.CircularSeekBar"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical" >
+                    android:orientation="vertical">
 
                     <com.eulersbridge.isegoria.CircularSeekBar
                         android:id="@+id/circularSeekBar1"

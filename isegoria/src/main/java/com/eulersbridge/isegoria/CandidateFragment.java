@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -32,29 +33,12 @@ public class CandidateFragment extends Fragment {
 		
 		final TabPageIndicator tabPageIndicator = rootView.findViewById(R.id.tabPageIndicatorCandidate);
 		tabPageIndicator.setViewPager(mViewPager);
-		tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
-	    
-		return rootView;
-	}
-	
-	@Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-		
-	}
-	
-	public boolean isLoaded() {
-		return loaded;
-	}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			tabPageIndicator.setBackground(new ColorDrawable(Color.parseColor("#313E4D")));
+		} else {
+			tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
+		}
 
-	public void setLoaded(boolean loaded) {
-		this.loaded = loaded;
-	}
-	
-	public void getElectionTabs() {
-	
-	}
-	
-	public void getCandidatesTabs() {
-	
+		return rootView;
 	}
 }

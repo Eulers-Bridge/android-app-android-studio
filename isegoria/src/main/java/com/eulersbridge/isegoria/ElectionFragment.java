@@ -16,59 +16,26 @@ import java.util.List;
 import java.util.Vector;
 
 public class ElectionFragment extends Fragment implements OnPageChangeListener {
-	private View rootView;
-	private boolean loaded = false;
-	private ElectionPagerAdapter electionPagerAdapter;
-	private ViewPager mViewPager;
-	private TabPageIndicator tabPageIndicator;
-	private List<Fragment> fragments;
-
-    private Network network;
-
-	public ElectionFragment() {
-
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.election_fragment, container, false);
-		
-		fragments = new Vector<>();
+		View rootView = inflater.inflate(R.layout.election_fragment, container, false);
+
+		List<Fragment> fragments = new Vector<>();
         fragments.add(Fragment.instantiate(getActivity(), ElectionOverviewFragment.class.getName()));
         fragments.add(Fragment.instantiate(getActivity(), ElectionProcessFragment.class.getName()));
         fragments.add(Fragment.instantiate(getActivity(), ElectionPositionsFragment.class.getName()));
 
-		mViewPager = rootView.findViewById(R.id.electionViewPager);
-		electionPagerAdapter = new ElectionPagerAdapter(getActivity().getSupportFragmentManager(), fragments);
+		ViewPager mViewPager = rootView.findViewById(R.id.electionViewPager);
+		ElectionPagerAdapter electionPagerAdapter = new ElectionPagerAdapter(getActivity().getSupportFragmentManager(), fragments);
 		mViewPager.setAdapter(electionPagerAdapter);
-		
-		tabPageIndicator = rootView.findViewById(R.id.tabPageIndicator);
+
+		TabPageIndicator tabPageIndicator = rootView.findViewById(R.id.tabPageIndicator);
 		tabPageIndicator.setViewPager(mViewPager);
 		tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
 		tabPageIndicator.setOnPageChangeListener(this);
 
         return rootView;
-	}
-
-	@Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-
-	}
-
-	public boolean isLoaded() {
-		return loaded;
-	}
-
-	public void setLoaded(boolean loaded) {
-		this.loaded = loaded;
-	}
-
-	public void getElectionTabs() {
-
-	}
-
-	public void getCandidatesTabs() {
-
 	}
 
 	@Override
