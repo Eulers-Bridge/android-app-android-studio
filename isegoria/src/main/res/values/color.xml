@@ -3,6 +3,7 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="searchBar">#CAC9CF</color>
+    <color name="profileImageBackground">#AAAAAA</color>
     <color name="grey">#8A898A</color>
     <color name="divider">#27313D</color>
     <color name="offGrey">#F4F4F4</color>

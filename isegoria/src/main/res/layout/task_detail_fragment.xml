@@ -8,47 +8,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#64d3d3d3"
-        >
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp">
 
-        <LinearLayout
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp"
-            android:orientation="vertical"
-            android:paddingTop="5dp">
+            android:id="@+id/progressBar"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" />
+        <TextView
+            android:id="@+id/taskLevelField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text=""
+            android:textColor="#ff575757"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:paddingBottom="2dp" />
 
-            <TextView
-                android:id="@+id/taskLevelField"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text=""
-                android:textColor="#ff575757"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:paddingBottom="2dp" />
-
-            <TextView
-                android:id="@+id/taskLevelDesc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text=""
-                android:textColor="#ff575757"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/taskLevelDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text=""
+            android:textColor="#ff575757"
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <ScrollView
@@ -71,6 +63,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dip"
                     android:background="#838a8a8a" />
+
                 <RelativeLayout
                     android:id="@+id/relativeLayout"
                     android:layout_width="fill_parent"

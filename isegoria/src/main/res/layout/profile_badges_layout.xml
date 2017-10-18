@@ -12,8 +12,6 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:shrinkColumns="*"
-        android:paddingTop="4dp">
-
-    </TableLayout>
+        android:paddingTop="4dp" />
 
 </ScrollView>

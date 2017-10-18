@@ -118,6 +118,16 @@ public class CircularSeekBar extends View implements Runnable {
 	private Paint mPointerHaloBorderPaint;
 
 	/**
+	 * {@code Paint} instance used to draw the top line of text.
+	 */
+	private Paint mTopTextPaint;
+
+	/**
+	 * {@code Paint} instance used to draw the bottom line of text.
+	 */
+	private Paint mBottomTextPaint;
+
+	/**
 	 * The width of the circle (in pixels).
 	 */
 	private float mCircleStrokeWidth;
@@ -505,6 +515,26 @@ public class CircularSeekBar extends View implements Runnable {
 		mPointerHaloBorderPaint.setStrokeWidth(mPointerHaloBorderWidth);
 		mPointerHaloBorderPaint.setStyle(Paint.Style.STROKE);
 
+
+		int topTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				(float) 22.66666667, getResources().getDisplayMetrics());
+
+		mTopTextPaint = new Paint();
+		mTopTextPaint.setColor(Color.BLACK);
+		mTopTextPaint.setTextSize(topTextSize);
+		mTopTextPaint.setFakeBoldText(true);
+		mTopTextPaint.setAntiAlias(true);
+		mTopTextPaint.setDither(true);
+
+		int bottomTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				(float) 7.333333333, getResources().getDisplayMetrics());
+
+		mBottomTextPaint = new Paint();
+		mBottomTextPaint.setColor(Color.parseColor("#8A898A"));
+		mBottomTextPaint.setTextSize(bottomTextSize);
+		mBottomTextPaint.setFakeBoldText(true);
+		mBottomTextPaint.setAntiAlias(true);
+		mBottomTextPaint.setDither(true);
 	}
 
 	/**
@@ -596,39 +626,19 @@ public class CircularSeekBar extends View implements Runnable {
 		canvas.drawPath(mCirclePath, mCircleFillPaint);
 
         int zeroPoint = -(getWidth()/2);
-        int textSize1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 22.66666667, getResources().getDisplayMetrics());
 
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(textSize1);
-        paint.setFakeBoldText(true);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
-        int topLineWidth = ((int) paint.measureText(topLine));
+        int topLineWidth = ((int) mTopTextPaint.measureText(topLine));
         int x = zeroPoint + (getWidth()/2) - (topLineWidth/2);
         int y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)  2.666666667, getResources().getDisplayMetrics());
-        canvas.drawText(topLine, x, y, paint);
+        canvas.drawText(topLine, x, y, mTopTextPaint);
 
-        int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 7.333333333, getResources().getDisplayMetrics());
-        x = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 0, getResources().getDisplayMetrics());
         y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)   16.500000000, getResources().getDisplayMetrics());
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#8A898A"));
-        paint.setTextSize(textSize2);
-        paint.setFakeBoldText(true);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
-        int bottomLineWidth = ((int) paint.measureText(bottomLine));
+        int bottomLineWidth = ((int) mBottomTextPaint.measureText(bottomLine));
         x = zeroPoint + (getWidth()/2) - (bottomLineWidth/2);
-        canvas.drawText(bottomLine, x, y, paint);
+        canvas.drawText(bottomLine, x, y, mBottomTextPaint);
 	}
 
 	/**

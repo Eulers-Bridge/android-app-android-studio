@@ -600,7 +600,6 @@ public class Network {
 
     void getDashboardStats(final ProfileFragment profileFragment) {
         String url = String.format("%s/contacts/%s/", SERVER_URL, loginEmail);
-        Log.d("Isegoria", "DASHBOARD URL: "+url);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
