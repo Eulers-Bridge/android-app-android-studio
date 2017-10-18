@@ -54,15 +54,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class Network {
 	private static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api";
@@ -2731,39 +2736,42 @@ public class Network {
         BufferedReader bufferedReader = null;
 
         try {
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            HttpGet httpGet = new HttpGet();
+            URL url = new URL(SERVER_URL + params);
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setDoInput(true);
 
-            URI uri = new URI(SERVER_URL + params);
-            httpGet.setURI(uri);
-            httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(username, password), HTTP.UTF_8, false));
-            httpGet.addHeader("Accept", "application/json");
-            httpGet.addHeader("Content-type", "application/json");
+            String credentials = username + ":" + password;
+            String base64EncodedCredentials =
+                    Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+            connection.setRequestProperty("Authorization", "Basic " + base64EncodedCredentials);
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Content-type", "application/json");
 
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            InputStream inputStream = httpResponse.getEntity().getContent();
+            InputStream inputStream = connection.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(
                     inputStream));
 
+            stringBuffer = new StringBuilder();
             String readLine = bufferedReader.readLine();
             while (readLine != null) {
                 stringBuffer.append(readLine);
                 stringBuffer.append("\n");
                 readLine = bufferedReader.readLine();
-            }
-        } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
+            };
+
+        } catch (IOException e) {
+            Log.e("Isegoria", "exception", e);
+
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                	Log.e("Isegoria", "exception", e);
+                    Log.e("Isegoria", "exception", e);
                 }
             }
         }
+
         return stringBuffer.toString();
     }
 
