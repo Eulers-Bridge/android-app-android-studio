@@ -2,9 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
@@ -14,8 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
-import com.amazonaws.mobileconnectors.s3.transfermanager.Upload;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -38,23 +34,19 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -66,8 +58,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class Network {
 	private static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api";
@@ -290,7 +280,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequestNoAuth("general-info");
+				String response = getRequest("/general-info", false);
 				try {
 					JSONObject jObject = new JSONObject(response);
 					JSONArray jArray = jObject.getJSONArray("countrys");
@@ -379,7 +369,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("newsArticle/" + String.valueOf(articleId));
+				String response = getRequest("/newsArticle/" + String.valueOf(articleId));
 				try {
 					JSONObject currentArticle = new JSONObject(response);
 
@@ -417,7 +407,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("user/" + userEmail.replace("@", "%40") +"/");
+				String response = getRequest("/user/" + userEmail.replace("@", "%40") +"/");
 				try {
 					JSONObject currentUser = new JSONObject(response);
 
@@ -977,7 +967,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("event/" + String.valueOf(eventId));
+				String response = getRequest("/event/" + String.valueOf(eventId));
 				try {
 					JSONObject currentEvent = new JSONObject(response);
 
@@ -1348,7 +1338,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("voteRecord");
+				String response = getRequest("/voteRecord");
 				try {
 					JSONObject jObject = new JSONObject(response);
 					JSONArray jArray = jObject.getJSONArray("photoAlbums");
@@ -2695,7 +2685,7 @@ public class Network {
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
-					String response = getRequest("newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + email + "/");
+					String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + email + "/");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -2731,7 +2721,15 @@ public class Network {
         this.loginEmail = loginEmail;
     }
 
+    /**
+     * Convenience method for getRequest(params, withAuth) - majority of method usage
+     * is with user auth.
+     */
     private String getRequest(String params) {
+        return getRequest(params, true);
+    }
+
+    private String getRequest(String params, boolean withAuth) {
         StringBuilder stringBuffer = new StringBuilder();
         BufferedReader bufferedReader = null;
 
@@ -2740,10 +2738,13 @@ public class Network {
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setDoInput(true);
 
-            String credentials = username + ":" + password;
-            String base64EncodedCredentials =
-                    Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-            connection.setRequestProperty("Authorization", "Basic " + base64EncodedCredentials);
+            if (withAuth) {
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                connection.setRequestProperty("Authorization", "Basic " + base64EncodedCredentials);
+            }
+
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-type", "application/json");
 
@@ -2772,46 +2773,6 @@ public class Network {
             }
         }
 
-        return stringBuffer.toString();
-    }
-
-	private String getRequestNoAuth(String params) {
-        StringBuilder stringBuffer = new StringBuilder();
-        BufferedReader bufferedReader = null;
-
-        try {
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            HttpGet httpGet = new HttpGet();
-
-            URI uri = new URI(SERVER_URL + params);
-            httpGet.setURI(uri);
-            httpGet.addHeader("Accept", "application/json");
-            httpGet.addHeader("Content-type", "application/json");
-
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            InputStream inputStream = httpResponse.getEntity().getContent();
-            bufferedReader = new BufferedReader(new InputStreamReader(
-                    inputStream));
-
-            String readLine = bufferedReader.readLine();
-            while (readLine != null) {
-                stringBuffer.append(readLine);
-                stringBuffer.append("\n");
-                readLine = bufferedReader.readLine();
-            }
-        } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                	Log.e("Isegoria", "exception", e);
-                }
-            }
-        }
         return stringBuffer.toString();
     }
 
