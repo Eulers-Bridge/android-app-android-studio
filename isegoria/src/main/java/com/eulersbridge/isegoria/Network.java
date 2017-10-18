@@ -16,7 +16,12 @@ import android.widget.TextView;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
 import com.amazonaws.mobileconnectors.s3.transfermanager.Upload;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
@@ -3131,56 +3136,39 @@ public class Network {
         this.trackingOff = trackingOff;
     }
 
-    public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-
-        float xScale = (float) newWidth / sourceWidth;
-        float yScale = (float) newHeight / sourceHeight;
-        float scale = Math.max(xScale, yScale);
-
-        float scaledWidth = scale * sourceWidth;
-        float scaledHeight = scale * sourceHeight;
-
-        float left = (newWidth - scaledWidth) / 2;
-        float top = (newHeight - scaledHeight) / 2;
-
-        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
-        Canvas canvas = new Canvas(dest);
-        canvas.drawBitmap(source, null, targetRect, null);
-
-        return dest;
-    }
-
     void s3Upload(final File file) {
-        Runnable r = new Runnable() {
-            public void run() {
-                CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                        application.getApplicationContext(), // Context,
-                        "715927704730",
-                        "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
-                        "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
-                         "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
-                        Regions.US_EAST_1 // Region
-                );
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                application.getApplicationContext(), // Context,
+                "715927704730",
+                "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
+                "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
+                "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
+                Regions.US_EAST_1 // Region
+        );
 
-                try {
-                    TransferManager transferManager = new TransferManager(credentialsProvider);
-                    long timestamp = System.currentTimeMillis() / 1000L;
-                    String filename = String.valueOf(userId) + "_" + String.valueOf(timestamp) + "_" + file.getName();
-                    Upload upload = transferManager.upload("isegoriauserpics", filename, file);
-                    upload.waitForUploadResult();
+        AmazonS3Client s3Client = new AmazonS3Client(credentialsProvider);
+
+        TransferUtility transferUtility = new TransferUtility(s3Client, application.getApplicationContext());
+
+        long timestamp = System.currentTimeMillis() / 1000L;
+        final String filename = String.valueOf(userId) + "_" + String.valueOf(timestamp) + "_" + file.getName();
+        TransferObserver observer = transferUtility.upload("isegoriauserpics", filename, file);
+        observer.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                if (state == TransferState.COMPLETED) {
                     updateDisplayPicturePhoto("https://s3.amazonaws.com/isegoriauserpics/" + filename);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        };
 
-        Thread t = new Thread(r);
-        t.start();
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) { }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     private void updateDisplayPicturePhoto(String pictureURL) {
