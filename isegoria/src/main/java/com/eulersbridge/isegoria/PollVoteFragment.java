@@ -24,16 +24,12 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PollVoteFragment extends Fragment {
-	private View rootView;
-	private TableLayout pollTableLayout;
-	
-	private float dpWidth;
-	private float dpHeight;
+    private TableLayout pollTableLayout;
 	
 	private boolean insertedFirstRow = false;
 
     private int nodeId;
-    private int creatorId;
+    private String creatorEmail;
 	private String question;
 	private String answers;
     private int numOfComments;
@@ -53,9 +49,9 @@ public class PollVoteFragment extends Fragment {
         pollVoteFragment = this;
 	}
 	
-	public void setData(int nodeId, int creatorId, String question, String answers, int numOfComments, int numOfAnswers) {
+	public void setData(int nodeId, String creatorEmail, String question, String answers, int numOfComments, int numOfAnswers) {
         this.nodeId = nodeId;
-        this.creatorId = creatorId;
+        this.creatorEmail = creatorEmail;
 		this.question = question;
 		this.answers = answers;
         this.numOfComments = numOfComments;
@@ -63,20 +59,18 @@ public class PollVoteFragment extends Fragment {
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.poll_fragment, container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.poll_fragment, container, false);
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		pollTableLayout = rootView.findViewById(R.id.pollTableLayout);
-		
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         pixelWidth = displayMetrics.widthPixels;
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        addTableRow(creatorId, question, "");
+        addTableRow(creatorEmail, question, "");
         String[] answersSplit = answers.split(",");
 
         for (String anAnswersSplit : answersSplit) {
@@ -86,7 +80,7 @@ public class PollVoteFragment extends Fragment {
 		return rootView;
 	}
 	
-	private void addTableRow(int userId, String label, String caption) {
+	private void addTableRow(String userEmail, String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -119,7 +113,7 @@ public class PollVoteFragment extends Fragment {
 		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		view.setScaleType(ScaleType.CENTER_CROP);
         viewLinearLayout.addView(view);
-        network.getFirstPhoto(0, creatorId, view);
+        network.getFirstPhotoFromUser(creatorEmail, view);
 		
 		LinearLayout linearLayout = new LinearLayout(getActivity());
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -144,7 +138,7 @@ public class PollVoteFragment extends Fragment {
         textViewQuestionAskedBy.setPadding(0, 0, 0, 0);
         textViewQuestionAskedBy.setGravity(Gravity.START);
 
-        network.getUserFullName(pollVoteFragment.getCreatorId(), textViewQuestionAskedBy, "Asked By ");
+        network.getUserFullName(pollVoteFragment.getCreatorEmail(), textViewQuestionAskedBy, "Asked By ");
 
         linearLayout.addView(textViewArticle);
         linearLayout.addView(textViewQuestionAskedBy);
@@ -357,7 +351,7 @@ public class PollVoteFragment extends Fragment {
         return nodeId;
     }
 
-    private int getCreatorId() {
-        return creatorId;
+    private String getCreatorEmail() {
+        return creatorEmail;
     }
 }

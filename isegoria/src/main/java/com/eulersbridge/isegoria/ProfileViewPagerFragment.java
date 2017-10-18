@@ -33,9 +33,7 @@ public class ProfileViewPagerFragment extends Fragment {
 
             final ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-            final ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setViewPager(viewPager);
-            fragmentList.add(profileFragment);
+            fragmentList.add(new ProfileFragment());
             fragmentList.add(new TaskDetailProgressFragment());
             fragmentList.add(new ProfileBadgesFragment());
 

@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,12 +24,8 @@ import android.widget.TextView;
 import java.io.InputStream;
 
 public class PhotosFragment extends Fragment {
-	private View rootView;
 	private TableLayout photosTableLayout;
-	
-	private float dpWidth;
-	private float dpHeight;
-	
+
 	private boolean insertedFirstRow = false;
     private PhotosFragment photosFragment;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerPhotos;
@@ -41,16 +36,12 @@ public class PhotosFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.photos_fragment, container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
 		getActivity().setTitle("Isegoria");
         photosFragment = this;
-		
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+
 		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
-		
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
         swipeContainerPhotos.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -169,43 +160,14 @@ public class PhotosFragment extends Fragment {
 		}
 	}
 	
-	private static int calculateInSampleSize(
-			BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	        
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
 	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
 	        int reqWidth, int reqHeight) {
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
 	    options.inJustDecodeBounds = true;
 	    BitmapFactory.decodeResource(res, resId, options);
 
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 	    options.inJustDecodeBounds = false;
 	    return BitmapFactory.decodeResource(res, resId, options);
-	}
-	
-	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
-	        int reqWidth, int reqHeight) {
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeStream(is);
 	}
 }

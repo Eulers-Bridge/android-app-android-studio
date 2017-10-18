@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- * Created by Anthony on 30/03/20paddingMargin3.
+ * Created by Anthony on 30/03/2015.
  */
 public class ContactProfileFragment extends Fragment {
     private View rootView;
@@ -55,8 +55,8 @@ public class ContactProfileFragment extends Fragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        TextView name = rootView.findViewById(R.id.profileName);
-        network.getUserFullName(profileId, name, "");
+        //TextView name = rootView.findViewById(R.id.profileName);
+        //network.getUserFullName(profileId, name, "");
 
         LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(profileId, photoImageView, backgroundLinearLayout);

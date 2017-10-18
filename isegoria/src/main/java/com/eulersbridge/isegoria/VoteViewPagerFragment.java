@@ -11,13 +11,10 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 public class VoteViewPagerFragment extends Fragment {
-    private View rootView;
-    private NonSwipeableViewPager mPager;
-    private ProfilePagerAdapter mPagerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
         //TODO: Has Tabs
 
@@ -32,7 +29,7 @@ public class VoteViewPagerFragment extends Fragment {
 
         ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-        mPager = rootView.findViewById(R.id.voteViewPagerFragment);
+        NonSwipeableViewPager mPager = rootView.findViewById(R.id.voteViewPagerFragment);
         mPager.setOnPageChangeListener(ViewPagerListener);
 
         VoteFragment voteFragment = new VoteFragment();
@@ -43,15 +40,13 @@ public class VoteViewPagerFragment extends Fragment {
         voteFragmentPledge.setViewPager(mPager);
         voteFragmentDone.setViewPager(mPager);
 
-        ProfileFragment profileFragment = new ProfileFragment();
-        profileFragment.setViewPager(mPager);
         fragmentList.add(voteFragment);
         fragmentList.add(voteFragmentPledge);
         fragmentList.add(voteFragmentDone);
 
         voteFragmentPledge.setVoteFragment(voteFragment);
 
-        mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
+        ProfilePagerAdapter mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
         mPager.setAdapter(mPagerAdapter);
 
         return rootView;

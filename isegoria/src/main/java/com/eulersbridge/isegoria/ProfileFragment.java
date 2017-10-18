@@ -21,9 +21,6 @@ import android.widget.TextView;
 
 public class ProfileFragment extends Fragment {
 	private View rootView;
-	
-	private float dpWidth;
-	private float dpHeight;
 
     private TextView friendsNumTextView;
     private TextView groupNumTextView;
@@ -34,16 +31,11 @@ public class ProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
-    private ViewPager mPager;
     private Network network;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
-
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
@@ -60,7 +52,7 @@ public class ProfileFragment extends Fragment {
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
         TextView name = rootView.findViewById(R.id.profileName);
-        network.getUserFullName((int) network.userId, name, "");
+        network.getUserFullName(network.getLoginEmail(), name, "");
 
         LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(photoImageView, backgroundLinearLayout);
@@ -133,10 +125,6 @@ public class ProfileFragment extends Fragment {
         t3.start();
         Thread t4 = new Thread(circularSeekBar4);
         t4.start();
-    }
-
-    public void setViewPager(ViewPager mPager) {
-        this.mPager = mPager;
     }
 
     public void addTask(long taskId, String action, long xpValue) {
