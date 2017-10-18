@@ -21,8 +21,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.io.InputStream;
-
 public class PhotosFragment extends Fragment {
 	private TableLayout photosTableLayout;
 

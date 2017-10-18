@@ -11,9 +11,6 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 public class PhotoViewPagerFragment extends Fragment {
-    private View rootView;
-    private ViewPager mPager;
-    private PhotoPagerAdapter mPagerAdapter;
 
     private final ArrayList<Fragment> fragmentList;
     private int position;
@@ -24,21 +21,13 @@ public class PhotoViewPagerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.photo_view_pager_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.photo_view_pager_fragment, container, false);
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
 
-        ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-            }
-        };
+        ViewPager mPager = rootView.findViewById(R.id.photoViewPagerFragment);
 
-        mPager = rootView.findViewById(R.id.photoViewPagerFragment);
-        mPager.setOnPageChangeListener(ViewPagerListener);
-
-        mPagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
+        PhotoPagerAdapter mPagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
         mPager.setAdapter(mPagerAdapter);
 
         mPager.setCurrentItem(this.position);

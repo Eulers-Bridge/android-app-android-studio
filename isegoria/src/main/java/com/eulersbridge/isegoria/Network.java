@@ -65,7 +65,7 @@ public class Network {
 
     private static final int socketTimeout = 30000; //30 seconds
 
-	public long userId;
+	private long userId;
 	private String username;
 	private String password;
 	private String email;

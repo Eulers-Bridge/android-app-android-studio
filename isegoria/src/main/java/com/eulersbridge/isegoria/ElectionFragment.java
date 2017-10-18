@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -17,6 +18,7 @@ import java.util.Vector;
 
 public class ElectionFragment extends Fragment implements OnPageChangeListener {
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.election_fragment, container, false);
@@ -32,7 +34,11 @@ public class ElectionFragment extends Fragment implements OnPageChangeListener {
 
 		TabPageIndicator tabPageIndicator = rootView.findViewById(R.id.tabPageIndicator);
 		tabPageIndicator.setViewPager(mViewPager);
-		tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			tabPageIndicator.setBackground(new ColorDrawable(Color.parseColor("#313E4D")));
+		} else {
+			tabPageIndicator.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#313E4D")));
+		}
 		tabPageIndicator.setOnPageChangeListener(this);
 
         return rootView;

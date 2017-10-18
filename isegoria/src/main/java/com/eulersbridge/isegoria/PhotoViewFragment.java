@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -12,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
-
-import java.io.InputStream;
 
 public class PhotoViewFragment extends Fragment {
 	private View rootView;

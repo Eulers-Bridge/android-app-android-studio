@@ -16,7 +16,8 @@ import android.widget.LinearLayout;
 import android.graphics.Typeface;
 
 public class LoginScreenFragment extends Fragment {
-	
+
+    @SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_login_screen_fragment, container, false);

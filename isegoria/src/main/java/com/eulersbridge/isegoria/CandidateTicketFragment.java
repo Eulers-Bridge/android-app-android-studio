@@ -26,6 +26,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+@SuppressWarnings("deprecation")
 public class CandidateTicketFragment extends Fragment {
 	private TableLayout positionsTableLayout;
 	

@@ -110,6 +110,7 @@ public class UserSettingsFragment extends Fragment {
         tabLayout.setVisibility(View.GONE);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onActivityResult(int requestCode, int resultCode,
                                     Intent imageReturnedIntent) {

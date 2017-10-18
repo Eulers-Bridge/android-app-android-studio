@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -83,7 +84,8 @@ public class EventsDetailFragment extends Fragment {
 		try {
 			this.timestamp = timestamp;
 			getActivity().runOnUiThread(new Runnable() {
-				@Override
+				@SuppressWarnings("deprecation")
+                @Override
 				public void run() {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 200, getResources().getDisplayMetrics());
@@ -94,9 +96,13 @@ public class EventsDetailFragment extends Fragment {
 					//Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
 					d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
-					backgroundLinearLayout.setBackgroundDrawable(d);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        backgroundLinearLayout.setBackground(d);
+                    } else {
+                        backgroundLinearLayout.setBackgroundDrawable(d);
+                    }
 
-					TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
+                    TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
 					eventTitleField.setText(title);
 					
 					TextView eventTime = rootView.findViewById(R.id.eventTime);

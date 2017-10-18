@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +19,9 @@ public class VoteViewPagerFragment extends Fragment {
 
         FragmentManager fm = getChildFragmentManager();
 
-        ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-            }
-        };
-
         ArrayList<Fragment> fragmentList = new ArrayList<>();
 
         NonSwipeableViewPager mPager = rootView.findViewById(R.id.voteViewPagerFragment);
-        mPager.setOnPageChangeListener(ViewPagerListener);
 
         VoteFragment voteFragment = new VoteFragment();
         VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();

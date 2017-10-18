@@ -1,7 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -20,8 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
-import java.io.InputStream;
 
 public class ProfileBadgesFragment extends Fragment {
     private View rootView;

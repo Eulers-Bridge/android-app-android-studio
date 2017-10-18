@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
@@ -19,8 +20,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.io.InputStream;
 
 public class NewsArticleFragment extends Fragment {
 	private View rootView;
@@ -73,6 +72,7 @@ public class NewsArticleFragment extends Fragment {
 		this.articleId = articleId;
 	}
 
+    @SuppressWarnings("deprecation")
 	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture, final String email, final boolean inappropriateContent) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
@@ -94,9 +94,13 @@ public class NewsArticleFragment extends Fragment {
 					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
 					d.setColorFilter(Color.argb(paddingMargin, paddingMargin2, paddingMargin2, paddingMargin2), Mode.DARKEN);
-					backgroundLinearLayout.setBackgroundDrawable(d);
-					
-					TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        backgroundLinearLayout.setBackground(d);
+                    } else {
+                        backgroundLinearLayout.setBackgroundDrawable(d);
+                    }
+
+                    TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
 					newsTitle.setText(title);
 					
 					final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);

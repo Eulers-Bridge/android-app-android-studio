@@ -18,6 +18,7 @@ import java.util.Vector;
 public class CandidateFragment extends Fragment {
 	private boolean loaded = false;
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.candidate_fragment, container, false);
