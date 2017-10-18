@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -73,7 +74,7 @@ public class NewsArticleFragment extends Fragment {
 	}
 
     @SuppressWarnings("deprecation")
-	public void populateContent(final String title, final String content, final String likes, final long date, final Bitmap picture, final String email, final boolean inappropriateContent) {
+	public void populateContent(final String title, final String content, final String likes, final long date, @Nullable final Bitmap picture, final String email, final boolean inappropriateContent) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -92,12 +93,14 @@ public class NewsArticleFragment extends Fragment {
 					
 					LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
 					backgroundLinearLayout.getLayoutParams().height = imageHeight;
-					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
-					d.setColorFilter(Color.argb(paddingMargin, paddingMargin2, paddingMargin2, paddingMargin2), Mode.DARKEN);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        backgroundLinearLayout.setBackground(d);
-                    } else {
-                        backgroundLinearLayout.setBackgroundDrawable(d);
+                    if (picture != null) {
+                        Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
+                        d.setColorFilter(Color.argb(paddingMargin, paddingMargin2, paddingMargin2, paddingMargin2), Mode.DARKEN);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            backgroundLinearLayout.setBackground(d);
+                        } else {
+                            backgroundLinearLayout.setBackgroundDrawable(d);
+                        }
                     }
 
                     TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);

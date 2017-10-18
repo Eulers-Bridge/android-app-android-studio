@@ -14,6 +14,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -32,6 +33,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+
 import java.util.Calendar;
 
 public class EventsDetailFragment extends Fragment {
@@ -39,16 +44,14 @@ public class EventsDetailFragment extends Fragment {
     private View eventDivider1;
     private View eventDivider2;
 	private float dpWidth;
-	private float dpHeight;
-	private DisplayMetrics displayMetrics;
-	private Isegoria isegoria;
-	private long timestamp;
-	private String eventTitle;
-	private String eventDesc;
+    private Isegoria isegoria;
     private Button addToCalendar;
 
     private TableLayout eventContactTableLayout;
     private Network network;
+
+    private Event event;
+    private Bitmap eventImage;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
@@ -63,29 +66,42 @@ public class EventsDetailFragment extends Fragment {
 			    public void onClick(View v) {
 					addToCalendar(v);
 			    } 
-			}); 
+			});
 
-		displayMetrics = getActivity().getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         eventDivider1 = rootView.findViewById(R.id.eventDivider1);
         eventDivider2 = rootView.findViewById(R.id.eventDivider2);
-        
-        isegoria.getNetwork().getEventDetails(this, bundle.getInt("EventId"));
+
+        event = bundle.getParcelable("event");
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        if (event != null && event.getImageUrl() != null) {
+            network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
+                @Override
+                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                    eventImage = bitmap;
+                    populateContent(event);
+                }
+
+                @Override
+                public void onDownloadFailed(String url, VolleyError error) {
+                    eventImage = null;
+                    populateContent(event);
+                }
+            });
+        }
 		
 		return rootView;
 	}
 	
-	public void populateContent(final String title, final String content, final String location, final String likes, final Bitmap picture, final long timestamp) {
+	public void populateContent(final Event event) {
 		try {
-			this.timestamp = timestamp;
 			getActivity().runOnUiThread(new Runnable() {
-				@SuppressWarnings("deprecation")
-                @Override
+				@Override
 				public void run() {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 200, getResources().getDisplayMetrics());
@@ -94,30 +110,30 @@ public class EventsDetailFragment extends Fragment {
 					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					//Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
 					//Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
-					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
-					d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        backgroundLinearLayout.setBackground(d);
-                    } else {
-                        backgroundLinearLayout.setBackgroundDrawable(d);
+
+                    if (eventImage != null) {
+                        Drawable d = new BitmapDrawable(getActivity().getResources(), eventImage);
+                        d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            backgroundLinearLayout.setBackground(d);
+                        } else {
+                            backgroundLinearLayout.setBackgroundDrawable(d);
+                        }
                     }
 
                     TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
-					eventTitleField.setText(title);
+					eventTitleField.setText(event.getName());
 					
 					TextView eventTime = rootView.findViewById(R.id.eventTime);
-					eventTime.setText(TimeConverter.convertTimestampToString(timestamp));
+					eventTime.setText(TimeConverter.convertTimestampToString(event.getDate()));
 					
 					TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
-					eventLocationLine1.setText(location);
+					eventLocationLine1.setText(event.getLocation());
 
                     TextView eventLocationLine2 = rootView.findViewById(R.id.eventLocationLine2);
 					
 					TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
-					eventsTextField.setText(content);
-					
-					eventTitle = title;
-					eventDesc = content;
+					eventsTextField.setText(event.getDescription());
 
                     addToCalendar.setVisibility(ViewGroup.VISIBLE);
                     eventDivider1.setVisibility(ViewGroup.VISIBLE);
@@ -131,14 +147,13 @@ public class EventsDetailFragment extends Fragment {
 	}
 	
 	private void addToCalendar(View v) {
-	    Calendar cal = Calendar.getInstance();     
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", timestamp);
+        intent.putExtra("beginTime", event.getDate());
         intent.putExtra("allDay", false);
-        intent.putExtra("endTime", timestamp+60*60*1000);
-        intent.putExtra("title", eventTitle);
-        intent.putExtra("description", eventDesc);
+        intent.putExtra("endTime", event.getDate()+60*60*1000);
+        intent.putExtra("title", event.getName());
+        intent.putExtra("description", event.getDescription());
         isegoria.getMainActivity().startActivity(intent);
 	}
 

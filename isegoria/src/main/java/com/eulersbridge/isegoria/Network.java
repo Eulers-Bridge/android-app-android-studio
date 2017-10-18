@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
@@ -32,17 +34,13 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -375,23 +373,37 @@ public class Network {
 
 					int articleId = currentArticle.getInt("articleId");
 					int institutionId = currentArticle.getInt("institutionId");
-					String title = currentArticle.getString("title");
-					String likes = currentArticle.getString("likes");
-					String content = currentArticle.getString("content");
+					final String title = currentArticle.getString("title");
+					final String likes = currentArticle.getString("likes");
+					final String content = currentArticle.getString("content");
                     JSONArray photos = currentArticle.getJSONArray("photos");
                     String picture = photos.getJSONObject(0).getString("url");
 					String email = currentArticle.getString("creatorEmail");
 					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-					Bitmap bitmapPicture = getPicture(picture);
-                    boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
+
+                    final boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
 
 					String likers = currentArticle.getString("likes");
 					long date = currentArticle.getLong("date");
-					date = TimeConverter.convertTimestampTimezone(date);
+					final long convertedDate = TimeConverter.convertTimestampTimezone(date);
 					String link = null;
 
-					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture, email, inappropriateContent);
-					getUser(newsArticleFragment, email);
+                    final String callbackEmail = email;
+
+                    getPicture(picture, new PictureDownloadListener() {
+                        @Override
+                        public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                            newsArticleFragment.populateContent(title, content, likes, convertedDate, bitmap, callbackEmail, inappropriateContent);
+                            getUser(newsArticleFragment, callbackEmail);
+                        }
+
+                        @Override
+                        public void onDownloadFailed(String url, VolleyError error) {
+                            newsArticleFragment.populateContent(title, content, likes, convertedDate, null, callbackEmail, inappropriateContent);
+                            getUser(newsArticleFragment, callbackEmail);
+                        }
+                    });
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -892,35 +904,13 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject jObject) {
                             try {
-                                JSONArray jArray = jObject.getJSONArray("foundObjects");
+                                JSONArray eventsList = jObject.getJSONArray("foundObjects");
 
-                                for (int i=0; i<jArray.length(); i++) {
-                                    JSONObject currentEvent = jArray.getJSONObject(i);
-                                    int eventId = currentEvent.getInt("eventId");
-                                    int institutionId = currentEvent.getInt("institutionId");
-                                    String name = currentEvent.getString("name");
-                                    String description = currentEvent.getString("description");
-                                    JSONArray photos = currentEvent.getJSONArray("photos");
-                                    String picture = photos.getJSONObject(0).getString("url");
-                                    picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-                                    Bitmap bitmapPicture;
+                                for (int i=0; i<eventsList.length(); i++) {
+                                    JSONObject eventItem = eventsList.getJSONObject(i);
 
-                                    String likers = null;
-                                    long date = 10000;
-                                    if(currentEvent.has("created") && !currentEvent.isNull("created")) {
-                                        date = currentEvent.getLong("created");
-                                        date = TimeConverter.convertTimestampTimezone(date);
-                                    }
-
-                                    String creatorEmail = "";
-                                    String studentYear = "";
-                                    String link = null;
-
-                                    try {
-                                        eventsFragment.addEvent(eventId, name, date, picture);
-                                    } catch(Exception ignored) {
-
-                                    }
+                                    Event event = new Event(eventItem);
+                                    eventsFragment.addEvent(event);
                                 }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -961,54 +951,6 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
-
-	void getEventDetails(final EventsDetailFragment eventsDetailFragment, final int eventId) {
-		this.eventDetailFragment = eventsDetailFragment;
-
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("/event/" + String.valueOf(eventId));
-				try {
-					JSONObject currentEvent = new JSONObject(response);
-
-					int eventId = currentEvent.getInt("eventId");
-					int institutionId = currentEvent.getInt("institutionId");
-					String name = currentEvent.getString("name");
-					String location = currentEvent.getString("location");
-					String description = currentEvent.getString("description");
-                    JSONArray photos = currentEvent.getJSONArray("photos");
-                    String picture = photos.getJSONObject(0).getString("url");
-					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-					Bitmap bitmapPicture;
-
-					if(picture == "") {
-						bitmapPicture = null;
-					}
-					else {
-						bitmapPicture = getPicture(picture);
-					}
-
-					String likers = null;
-					long date = 10000;
-					if(currentEvent.has("created") && !currentEvent.isNull("created")) {
-						date = currentEvent.getLong("created");
-						date = TimeConverter.convertTimestampTimezone(date);
-					}
-					String organizerEmail = currentEvent.getString("organizerEmail");
-                    findContact(organizerEmail, eventsDetailFragment);
-					String studentYear = "";
-					String link = null;
-
-					eventsDetailFragment.populateContent(name, description, location, "0", bitmapPicture, date);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-
-		Thread t = new Thread(r);
-		t.start();
-	}
 
     private void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
         this.eventsDetailFragment = eventsDetailFragment;
@@ -2776,25 +2718,29 @@ public class Network {
         return stringBuffer.toString();
     }
 
-	private Bitmap getPicture(String params) {
-        Bitmap output = null;
+    interface PictureDownloadListener {
+        void onDownloadFinished(String url, @Nullable Bitmap bitmap);
+        void onDownloadFailed(String url, VolleyError error);
+    }
 
-        try {
-        	HttpUriRequest request = new HttpGet(params);
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            //request.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(username, password), HTTP.UTF_8, false));
-            HttpResponse response = httpClient.execute(request);
+	void getPicture(final String url, @NonNull final PictureDownloadListener callback) {
+        ImageRequest req = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        callback.onDownloadFinished(url, bitmap);
+                    }
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Volley", error.toString());
+                        callback.onDownloadFailed(url, error);
+                    }
+                });
 
-            HttpEntity entity = response.getEntity();
-            byte[] bytes = EntityUtils.toByteArray(entity);
-            output = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
-        }
-
-        return output;
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
     }
 
     public void getFirstPhoto(int electionId, final int positionId, final ImageView imageView) {
@@ -2940,7 +2886,7 @@ public class Network {
                         view.setImageBitmap(bitmap);
                         view.refreshDrawableState();
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
@@ -3003,7 +2949,7 @@ public class Network {
                                 ProfileFragment.fastBlur(bitmap, 25));
                         view.setBackgroundDrawable(d);
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
@@ -3017,13 +2963,15 @@ public class Network {
     }
 
     void getPictureVolley(String params, final ImageView view) {
+        if (params == null) return;
+
         ImageRequest req = new ImageRequest(params,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
                         view.setImageBitmap(bitmap);
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
@@ -3044,7 +2992,7 @@ public class Network {
                         view.setImageBitmap(srcBmp);
                         fragment.setImageBitmap(srcBmp);
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
