@@ -58,6 +58,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Network {
 	private static final String SERVER_URL = "http://54.79.70.241:8080/";
@@ -130,7 +131,7 @@ public class Network {
         mRequestQueue.start();
 	}
 
-	public void login() {
+	void login() {
 		Runnable r = new Runnable() {
 			public void run() {
 				String response = getRequest("dbInterface/api/login");
@@ -450,21 +451,21 @@ public class Network {
 		t.start();
 	}
 
-    public void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
+    void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
         this.getFirstPhoto(0, (int) userId, imageView);
         this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
     }
 
-    public void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
+    void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
         this.getFirstPhoto(0, profileId, imageView);
         this.getFirstPhotoBlur(0, profileId, backgroundLinearLayout);
     }
 
-    public void findFriends(final FindAddContactFragment findAddContactFragment) {
+    void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -513,7 +514,7 @@ public class Network {
         mRequestQueue.add(req);
 
         url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/contactRequests";
-        req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -568,7 +569,7 @@ public class Network {
         this.findAddContactFragment.clearSearchResults();
         String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -616,7 +617,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -663,7 +664,7 @@ public class Network {
     void getDashboardStats(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45");
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -714,7 +715,7 @@ public class Network {
                                   int profileUserId) {
         String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf(profileUserId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -764,7 +765,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -948,7 +949,7 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1282,7 +1283,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-	public void getPhotoAlbums(final PhotosFragment photosFragment) {
+	void getPhotoAlbums(final PhotosFragment photosFragment) {
 		this.photosFragment = photosFragment;
         String url = SERVER_URL + "dbInterface/api/photoAlbums/7449";
 
@@ -1388,7 +1389,7 @@ public class Network {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges/complete/" + String.valueOf(this.userId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                         try {
@@ -1462,7 +1463,7 @@ public class Network {
         this.profileBadgesFragment = profileBadgesFragment;
         String url = SERVER_URL + "dbInterface/api/badges/remaining/" + String.valueOf(this.userId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1585,7 +1586,7 @@ public class Network {
         String url = SERVER_URL + "dbInterface/api/newsArticle/"
                 + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loginEmail) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1762,7 +1763,7 @@ public class Network {
         this.pollVoteFragment = pollVoteFragment;
         String url = SERVER_URL + "dbInterface/api/comments/" + String.valueOf(pollId) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1952,7 +1953,7 @@ public class Network {
     public void getVoteLocations(final VoteFragment voteFragment) {
 
         String url = SERVER_URL + "dbInterface/api/votingLocations/26";
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
@@ -2001,7 +2002,7 @@ public class Network {
     public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
 
         String url = SERVER_URL + "dbInterface/api/votingLocation/" + pos;
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2041,7 +2042,7 @@ public class Network {
     private void getLatestElection() {
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2087,7 +2088,7 @@ public class Network {
         this.electionOverviewFragment = electionOverviewFragment;
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
@@ -2138,7 +2139,7 @@ public class Network {
     public void getUserSupportedTickets() {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/support/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2185,7 +2186,7 @@ public class Network {
         this.voteFragment = voteFragment;
         String url = SERVER_URL + "dbInterface/api/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2236,7 +2237,7 @@ public class Network {
         this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2279,7 +2280,7 @@ public class Network {
         this.candidateAllFragment = candidateAllFragment;
         String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2335,7 +2336,7 @@ public class Network {
         this.candidatePositionFragment = candidatePositionFragment;
         String url = SERVER_URL + "dbInterface/api/position/" + String.valueOf(selectedPositionId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2390,7 +2391,7 @@ public class Network {
     public void getTicketLabel(final TextView textView, final int tickedId) {
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(tickedId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2434,7 +2435,7 @@ public class Network {
         this.candidateTicketFragment = candidateTicketFragment;
         String url = SERVER_URL + "dbInterface/api/tickets/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2495,7 +2496,7 @@ public class Network {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2550,7 +2551,7 @@ public class Network {
         this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2653,7 +2654,7 @@ public class Network {
         this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "dbInterface/api/positions/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2748,7 +2749,7 @@ public class Network {
         String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/voteReminders/";
         HashMap<String, String> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2899,7 +2900,7 @@ public class Network {
                 + "/likedBy/"
                 + String.valueOf(loginEmail) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3163,7 +3164,7 @@ public class Network {
     public void getTasks(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "dbInterface/api/tasks/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3212,7 +3213,7 @@ public class Network {
     public void getTasks(final ContactProfileFragment contactProfileFragment) {
         String url = SERVER_URL + "dbInterface/api/tasks/complete";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3263,7 +3264,7 @@ public class Network {
         this.taskDetailProgressFragment = taskDetailProgressFragment;
         String url = SERVER_URL + "dbInterface/api/tasks/complete/"+String.valueOf(userId) + "?pageSize=20";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3316,7 +3317,7 @@ public class Network {
         this.taskDetailProgressFragment = taskDetailProgressFragment;
         String url = SERVER_URL + "dbInterface/api/tasks/remaining/"+String.valueOf(userId) + "?pageSize=20";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
