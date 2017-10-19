@@ -646,8 +646,7 @@ public class CircularSeekBar extends View implements Runnable {
 	 * @return The progress of the CircularSeekBar.
 	 */
 	public int getProgress() {
-		int progress = Math.round((float)mMax * mProgressDegrees / mTotalCircleDegrees);
-		return progress;
+		return Math.round((float)mMax * mProgressDegrees / mTotalCircleDegrees);
 	}
 
 	/**

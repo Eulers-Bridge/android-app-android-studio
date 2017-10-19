@@ -1,10 +1,10 @@
 package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -188,79 +188,79 @@ public class Network {
 		t.start();
 	}
 
-	void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
-       Runnable r = new Runnable() {
-    	   public void run() {
-    		   StringBuilder stringBuffer = new StringBuilder();
-    	        BufferedReader bufferedReader = null;
+    void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
+        Runnable r = new Runnable() {
+            public void run() {
+                StringBuilder stringBuffer = new StringBuilder();
+                BufferedReader bufferedReader = null;
 
-    	        try {
-    	            HttpClient httpClient = new DefaultHttpClient();
+                try {
+                    HttpClient httpClient = new DefaultHttpClient();
                     HttpParams httpParameters = httpClient.getParams();
                     HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-    	            HttpPost httpPost = new HttpPost();
+                    HttpPost httpPost = new HttpPost();
 
-    	            URI uri = new URI(SERVER_URL + "/signUp");
-    	            httpPost.setURI(uri);
-    	            httpPost.addHeader("Accept", "application/json");
-    	            httpPost.addHeader("Content-type", "application/json");
+                    URI uri = new URI(SERVER_URL + "/signUp");
+                    httpPost.setURI(uri);
+                    httpPost.addHeader("Accept", "application/json");
+                    httpPost.addHeader("Content-type", "application/json");
 
-    	            JSONObject signup = new JSONObject();
-    	            String json = "";
-    	            try {
-    	            	signup.put("email", email);
-    	            	signup.put("givenName", firstName);
-    	            	signup.put("familyName", lastName);
-    	            	signup.put("gender", gender);
-    	                signup.put("nationality", country);
-    	                signup.put("yearOfBirth",yearOfBirth);
-    	                signup.put("accountVerified", "false");
-    	                signup.put("password", password);
-    	                signup.put("institutionId", String.valueOf(institution));
+                    JSONObject signup = new JSONObject();
+                    String json = "";
+                    try {
+                        signup.put("email", email);
+                        signup.put("givenName", firstName);
+                        signup.put("familyName", lastName);
+                        signup.put("gender", gender);
+                        signup.put("nationality", country);
+                        signup.put("yearOfBirth",yearOfBirth);
+                        signup.put("accountVerified", "false");
+                        signup.put("password", password);
+                        signup.put("institutionId", String.valueOf(institution));
 
-    	                json = signup.toString();
+                        json = signup.toString();
 
-    	            } catch (JSONException e) {
-    	                // TODO Auto-generated catch block
-    	                e.printStackTrace();
-    	            }
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
-    	            StringEntity se = new StringEntity(json);
-    	            httpPost.setEntity(se);
+                    StringEntity se = new StringEntity(json);
+                    httpPost.setEntity(se);
 
-    	            HttpResponse httpResponse = httpClient.execute(httpPost);
-    	            InputStream inputStream = httpResponse.getEntity().getContent();
-    	            bufferedReader = new BufferedReader(new InputStreamReader(
-    	                    inputStream));
+                    HttpResponse httpResponse = httpClient.execute(httpPost);
+                    InputStream inputStream = httpResponse.getEntity().getContent();
+                    bufferedReader = new BufferedReader(new InputStreamReader(
+                            inputStream));
 
-    	            String readLine = bufferedReader.readLine();
-    	            while (readLine != null) {
-    	                stringBuffer.append(readLine);
-    	                stringBuffer.append("\n");
-    	                readLine = bufferedReader.readLine();
-    	            }
+                    String readLine = bufferedReader.readLine();
+                    while (readLine != null) {
+                        stringBuffer.append(readLine);
+                        stringBuffer.append("\n");
+                        readLine = bufferedReader.readLine();
+                    }
 
-    	            if(stringBuffer.toString().contains(email)) {
-    					application.getMainActivity().runOnUiThread(new Runnable() {
-    						public void run() {
-    							application.signupSucceeded();
-    						}
-    					});
-    	            }
-    	            else {
-    					application.getMainActivity().runOnUiThread(new Runnable() {
-    						public void run() {
-    							application.signupFailed();
-    						}
-    					});
-    	            }
+                    if(stringBuffer.toString().contains(email)) {
+                        application.getMainActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                application.signupSucceeded();
+                            }
+                        });
+                    }
+                    else {
+                        application.getMainActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                application.signupFailed();
+                            }
+                        });
+                    }
 
-    	        } catch (Exception e) {
-    	        	Log.e("Isegoria", "exception", e);
-    	        } finally {
-    	            if (bufferedReader != null) {
-    	                try {
-    	                    bufferedReader.close();
+                } catch (Exception e) {
+                    Log.e("Isegoria", "exception", e);
+                } finally {
+                    if (bufferedReader != null) {
+                        try {
+                            bufferedReader.close();
     	                } catch (IOException e) {
     	                	Log.e("Isegoria", "exception", e);
     	                }
@@ -458,7 +458,7 @@ public class Network {
         void onFetchFailure(String userEmail, Exception e);
     }
 
-	void getUser(final String userEmail, final UserInfoListener callback) {
+	private void getUser(final String userEmail, final UserInfoListener callback) {
         Runnable r = new Runnable() {
             public void run() {
                 String response = getRequest(String.format("/user/%s/", userEmail));
@@ -2678,7 +2678,7 @@ public class Network {
                 stringBuffer.append(readLine);
                 stringBuffer.append("\n");
                 readLine = bufferedReader.readLine();
-            };
+            }
 
         } catch (Exception e) {
             Log.e("Isegoria", "exception", e);
@@ -2925,7 +2925,11 @@ public class Network {
                     public void onResponse(Bitmap bitmap) {
                         Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
                                 ProfileFragment.fastBlur(bitmap, 25));
-                        view.setBackgroundDrawable(d);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            view.setBackground(d);
+                        } else {
+                            view.setBackgroundDrawable(d);
+                        }
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {

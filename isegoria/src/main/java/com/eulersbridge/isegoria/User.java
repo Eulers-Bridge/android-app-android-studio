@@ -34,7 +34,7 @@ class User implements Parcelable {
         }
     }
 
-    User(Parcel in) {
+    private User(Parcel in) {
         email = in.readString();
         givenName = in.readString();
         familyName = in.readString();

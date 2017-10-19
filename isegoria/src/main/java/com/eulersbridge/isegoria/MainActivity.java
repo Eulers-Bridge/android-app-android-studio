@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -93,8 +94,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
 		drawerLayout.addDrawerListener(drawerToggle);
 		drawerToggle.syncState();
+		drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				onBackPressed();
+				setShowNavigationBackButton(false);
+			}
+		});
 
 		tabLayout = findViewById(R.id.tabLayout);
+	}
+
+	private void setShowNavigationBackButton(boolean show) {
+		getSupportActionBar().setDisplayHomeAsUpEnabled(show);
+		getSupportActionBar().setDisplayShowHomeEnabled(show);
 	}
 
 	void setNavigationDrawerEnabled(boolean enabled) {
@@ -175,7 +188,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void signupClicked(View view) {
-		switchContent(new UserSignupFragment());
+		setShowNavigationBackButton(true);
+
+		switchContent(new UserSignupFragment(), false);
 	}
 	
 	public void login(View v) {
@@ -207,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void showSignupSucceeded() {
+		setShowNavigationBackButton(false);
+
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Signup Succeeded");
@@ -301,29 +318,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		getSupportFragmentManager().putFragment(outState, "mContent", mContent);
 	}
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		switch(item.getItemId()){
-			case android.R.id.home:
-				if(application.isLoggedIn()) {
-					//toggle();
-				}
-				return true;
+	public void switchContent(Fragment fragment) {
+		switchContent(fragment, true);
+	}
+
+	private void switchContent(Fragment fragment, boolean popBackStack) {
+		mContent = fragment;
+
+		if (popBackStack) {
+			getSupportFragmentManager().popBackStack();
 		}
 
-		switchContent(new UserSettingsFragment());
-
-		return false;
-	}
-	
-	public void switchContent(Fragment fragment) {
-			mContent = fragment;
-
-			getSupportFragmentManager().popBackStack();
-
-			getSupportFragmentManager()
+		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.container, fragment)
-				.commit();
+				.replace(R.id.container, fragment);
+
+		if (!popBackStack) {
+			transaction.addToBackStack(null);
+		}
+
+		transaction.commit();
 	}
 }

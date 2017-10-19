@@ -35,10 +35,6 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 
-import org.json.JSONArray;
-
-import java.util.Calendar;
-
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
     private View eventDivider1;
@@ -98,7 +94,7 @@ public class EventsDetailFragment extends Fragment {
 		return rootView;
 	}
 	
-	public void populateContent(final Event event) {
+	private void populateContent(final Event event) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override

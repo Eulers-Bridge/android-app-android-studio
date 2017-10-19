@@ -46,7 +46,7 @@ class Event implements Parcelable {
         }
     }
 
-    Event(Parcel in) {
+    private Event(Parcel in) {
         name = in.readString();
         location = in.readString();
         description = in.readString();
