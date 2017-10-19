@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Vector;
 
 public class CandidateFragment extends Fragment {
-	private boolean loaded = false;
 
 	@SuppressWarnings("deprecation")
 	@Override

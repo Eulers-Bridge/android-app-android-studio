@@ -23,7 +23,6 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 public class ElectionPositionsFragment extends Fragment {
-	private View rootView;
 	private TableLayout positionsTableLayout;
 	
 	private float dpWidth;
@@ -32,8 +31,8 @@ public class ElectionPositionsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		
-		rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
+
+		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
