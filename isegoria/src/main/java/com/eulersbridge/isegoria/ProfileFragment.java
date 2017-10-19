@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,14 +68,12 @@ public class ProfileFragment extends Fragment {
         personalityTestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                PersonalityQuestionsFragment fragment2 = new PersonalityQuestionsFragment();
-                Bundle args = new Bundle();
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.add(R.id.content_frame, fragment2);
-                fragmentTransaction2.commit();
+
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.content_frame, new PersonalityQuestionsFragment())
+                        .commit();
             }
         });
 

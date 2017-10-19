@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Vector;
 
 public class PollFragment extends Fragment {
-    private TabLayout tabLayout;
     private PagerAdapter pollPagerAdapter;
 	private List<Fragment> fragments;
 
@@ -32,6 +31,8 @@ public class PollFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.poll_vote_fragment, container, false);
+
+        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_poll));
 
 		fragments = new Vector<>();
 		
@@ -54,8 +55,6 @@ public class PollFragment extends Fragment {
 	}
 
     public void setTabLayout(TabLayout tabLayout) {
-        this.tabLayout = tabLayout;
-
         tabLayout.setVisibility(View.GONE);
     }
 

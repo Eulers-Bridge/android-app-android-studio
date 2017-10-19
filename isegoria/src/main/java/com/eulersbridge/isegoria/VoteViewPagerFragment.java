@@ -1,8 +1,8 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,36 +10,93 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 public class VoteViewPagerFragment extends Fragment {
+    private TabLayout tabLayout;
+    private NonSwipeableViewPager viewPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
-        //TODO: Has Tabs
+        ((MainActivity)getActivity()).setToolbarTitle("Vote");
 
-        FragmentManager fm = getChildFragmentManager();
-
-        ArrayList<Fragment> fragmentList = new ArrayList<>();
-
-        NonSwipeableViewPager mPager = rootView.findViewById(R.id.voteViewPagerFragment);
-
-        VoteFragment voteFragment = new VoteFragment();
-        VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();
-        VoteFragmentDone voteFragmentDone = new VoteFragmentDone();
-
-        voteFragment.setViewPager(mPager);
-        voteFragmentPledge.setViewPager(mPager);
-        voteFragmentDone.setViewPager(mPager);
-
-        fragmentList.add(voteFragment);
-        fragmentList.add(voteFragmentPledge);
-        fragmentList.add(voteFragmentDone);
-
-        voteFragmentPledge.setVoteFragment(voteFragment);
-
-        ProfilePagerAdapter mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
-        mPager.setAdapter(mPagerAdapter);
+        setupViewPager(rootView);
+        setupTabLayout();
 
         return rootView;
+    }
+
+    private void setupViewPager(View rootView) {
+        if (rootView == null) rootView = getView();
+
+        if (viewPager == null && rootView != null) {
+            viewPager = rootView.findViewById(R.id.voteViewPagerFragment);
+
+            ArrayList<Fragment> fragments = new ArrayList<>();
+
+            VoteFragment voteFragment = new VoteFragment();
+            VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();
+            VoteFragmentDone voteFragmentDone = new VoteFragmentDone();
+
+            voteFragment.setViewPager(viewPager);
+            voteFragmentPledge.setViewPager(viewPager);
+            voteFragmentDone.setViewPager(viewPager);
+
+            fragments.add(voteFragment);
+            fragments.add(voteFragmentPledge);
+            fragments.add(voteFragmentDone);
+
+            voteFragmentPledge.setVoteFragment(voteFragment);
+
+            SimpleFragmentPagerAdapter viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
+                @Override
+                public CharSequence getPageTitle(int position) {
+                    switch (position) {
+                        case 0:
+                            return "Vote";
+                        case 1:
+                            return "Pledge";
+                        case 2:
+                            return "Done";
+                    }
+                    return null;
+                }
+            };
+            viewPager.setAdapter(viewPagerAdapter);
+
+            viewPager.setCurrentItem(0);
+        }
+    }
+
+    public void setTabLayout(TabLayout tabLayout) {
+        this.tabLayout = tabLayout;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (tabLayout != null) tabLayout.removeOnTabSelectedListener(onTabSelectedListener);
+    }
+
+    private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            viewPager.setCurrentItem(tab.getPosition());
+        }
+
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) { }
+
+        @Override
+        public void onTabReselected(TabLayout.Tab tab) { }
+    };
+
+    private void setupTabLayout() {
+        if (tabLayout == null) return;
+
+        tabLayout.removeAllTabs();
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        tabLayout.setVisibility(View.VISIBLE);
     }
 }

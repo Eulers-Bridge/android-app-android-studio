@@ -1,6 +1,8 @@
 package com.eulersbridge.isegoria;
 
 import android.app.Application;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 
@@ -39,8 +41,13 @@ public class Isegoria extends Application {
                  mainActivity.hideDialog();
 
                  mainActivity.setNavigationDrawerEnabled(true);
+				 mainActivity.setToolbarVisible(true);
 
-                 final FeedFragment feedFragment = new FeedFragment();
+				 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					 mainActivity.getWindow().setStatusBarColor(ContextCompat.getColor(mainActivity, R.color.darkBlue));
+				 }
+
+				 final FeedFragment feedFragment = new FeedFragment();
                  feedFragment.setTabLayout(mainActivity.getTabLayout());
 
                  mainActivity.switchContent(feedFragment);

@@ -4,7 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-	android:gravity="center_vertical">
+	android:gravity="center_vertical"
+	android:paddingStart="@dimen/activity_horizontal_margin"
+	android:paddingEnd="@dimen/activity_horizontal_margin"
+	android:paddingHorizontal="@dimen/activity_horizontal_margin">
 	
 	<ImageView
 		android:id="@+id/imageView1"
@@ -18,20 +21,18 @@
 		android:id="@+id/isegoriaLabel"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+		android:layout_marginTop="4dp"
 		android:layout_gravity="center_horizontal"
 		android:ems="10"
 		android:gravity="center"
 		android:text="Isegoria"
-		android:textColor="@color/white"
-		android:textSize="33sp"  />
+		android:textAppearance="@style/LoginHeadingTextAppearance"  />
 
 	<EditText
 		android:id="@+id/username"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dp"
-		android:layout_marginRight="10dp"
-		android:layout_marginTop="10dp"
+		android:layout_marginTop="16dp"
 		android:background="@color/white"
 		android:ems="10"
 		android:inputType="textEmailAddress"
@@ -48,16 +49,12 @@
 	<View
 		android:layout_width="match_parent"
 		android:layout_height="1dip"
-		android:layout_marginLeft="10dp"
-		android:layout_marginRight="10dp"
 		android:background="#676475" />
 
 	<EditText
 		android:id="@+id/password"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dp"
-		android:layout_marginRight="10dp"
 		android:background="@color/white"
 		android:ems="10"
 		android:inputType="textWebPassword"
@@ -74,39 +71,29 @@
 		android:id="@+id/loginButton"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dp"
-		android:layout_marginRight="10dp"
-		android:layout_marginTop="10dp"
-		android:background="#52BB42"
-		android:minHeight="40dip"
+		android:layout_marginTop="8dp"
+		android:minHeight="48dip"
 		android:onClick="login"
 		android:text="@string/user_login_button"
-		android:textColor="@color/white"
-		android:textStyle="bold" />
+		android:theme="@style/LoginButton" />
 
 	<Button
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dp"
-		android:layout_marginRight="10dp"
-		android:layout_marginTop="10dp"
-		android:background="#4E8DDC"
-		android:minHeight="40dip"
+		android:layout_marginTop="8dp"
+		android:minHeight="48dip"
 		android:onClick="signupClicked"
-		android:text="@string/user_signup_button"
-		android:textColor="@color/white"
-		android:textStyle="bold" />
+		android:text="@string/user_sign_up_button"
+		android:theme="@style/SignUpButton" />
 
 	<TextView
 		android:id="@+id/loginSmallTextView"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		android:layout_marginLeft="15dp"
-		android:layout_marginRight="15dp"
-		android:layout_marginTop="15dp"
+		android:layout_marginTop="16dp"
 		android:gravity="center"
-		android:text="@string/login_smallprint"
-		android:textColor="@color/white" />
+		android:text="@string/login_small_print"
+		style="@style/LoginSignUpSmallPrintText" />
 
 </LinearLayout>

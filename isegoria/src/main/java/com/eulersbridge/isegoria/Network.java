@@ -2649,6 +2649,8 @@ public class Network {
     }
 
     private String getRequest(String params, boolean withAuth) {
+        if (params == null || params.length() == 0) return "";
+
         StringBuilder stringBuffer = new StringBuilder();
         BufferedReader bufferedReader = null;
 

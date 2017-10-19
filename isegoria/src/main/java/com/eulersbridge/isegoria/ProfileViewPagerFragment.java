@@ -19,6 +19,8 @@ public class ProfileViewPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
+        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_profile));
+
         setupViewPager(rootView);
         setupTabLayout();
 
@@ -37,7 +39,7 @@ public class ProfileViewPagerFragment extends Fragment {
             fragmentList.add(new TaskDetailProgressFragment());
             fragmentList.add(new ProfileBadgesFragment());
 
-            final ProfilePagerAdapter pagerAdapter = new ProfilePagerAdapter(getChildFragmentManager(), fragmentList) {
+            final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
                 @Override
                 public CharSequence getPageTitle(int position) {
                     switch (position) {

@@ -14,7 +14,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +41,9 @@ public class UserSettingsFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
 
         mainActivity = (MainActivity) getActivity();
+
+        mainActivity.setToolbarTitle(getString(R.string.section_title_settings));
+
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getUserDPId();
 
@@ -79,14 +81,13 @@ public class UserSettingsFragment extends Fragment {
         aboutThisAppButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                AboutScreenFragment fragment2 = new AboutScreenFragment();
-                Bundle args = new Bundle();
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.add(R.id.content_frame, fragment2);
-                fragmentTransaction2.commit();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+
+                fragmentManager
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.container, new AboutScreenFragment())
+                        .commit();
             }
         });
 

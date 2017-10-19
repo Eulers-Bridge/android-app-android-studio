@@ -15,7 +15,9 @@ public class FeedFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
+
+        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_feed));
 
         setupViewPager(rootView);
         setupTabLayout();
@@ -29,7 +31,7 @@ public class FeedFragment extends Fragment {
         if (viewPager == null && rootView != null) {
             viewPager = rootView.findViewById(R.id.feedViewPagerFragment);
 
-            final FeedViewPagerAdapter viewPagerAdapter = new FeedViewPagerAdapter(getChildFragmentManager());
+            FeedViewPagerAdapter viewPagerAdapter = new FeedViewPagerAdapter(getChildFragmentManager());
             viewPager.setAdapter(viewPagerAdapter);
 
             viewPager.setCurrentItem(0);

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -81,14 +82,17 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	}
 	
 	public void addCountry(final CountryInfo countryInfo) {
-		getActivity().runOnUiThread(new Runnable() {
-		     @Override
-		     public void run() {
-		    	 spinnerArrayAdapter.add(countryInfo.getCountry());
-		    	 countries.add(countryInfo.getCountry());
-		    	 countryObjects.add(countryInfo);
-			 }
-		});
+		Activity activity = getActivity();
+		if (activity != null) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					spinnerArrayAdapter.add(countryInfo.getCountry());
+					countries.add(countryInfo.getCountry());
+					countryObjects.add(countryInfo);
+				}
+			});
+		}
 	}
 	
     public void onItemSelected(AdapterView<?> parent, View view, 

@@ -30,7 +30,7 @@ public class PersonalityQuestionsFragment extends Fragment {
         fragmentList.add(personalityScreen1Fragment);
         fragmentList.add(new PersonalityScreen2Fragment());
 
-        ProfilePagerAdapter mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
+        SimpleFragmentPagerAdapter mPagerAdapter = new SimpleFragmentPagerAdapter(fm, fragmentList);
         mPager.setAdapter(mPagerAdapter);
 
         return rootView;

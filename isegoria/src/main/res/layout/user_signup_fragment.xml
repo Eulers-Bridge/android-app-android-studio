@@ -3,240 +3,196 @@
     android:id="@+id/loginBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tumblr_static_aphc"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+    android:background="@drawable/tumblr_static_aphc">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/scrollView">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal" >
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:orientation="vertical" >
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_gravity="center_horizontal"
+                android:minHeight="100dp"
+                android:minWidth="100dp"
+                android:src="@drawable/app_icon" />
+
+            <TextView
+                android:id="@+id/photoTitle"
+                android:layout_width="98dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:ems="10"
+                android:text="@string/app_name"
+                android:textAppearance="@style/SignUpHeadingTextAppearance" />
+
+            <EditText
+                android:id="@+id/firstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:orientation="vertical" >
+                android:layout_marginTop="16dp"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="@string/user_sign_up_first_name"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:maxLines="1"
+                android:textColor="@color/grey">
+                <requestFocus />
+            </EditText>
 
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
-                    android:layout_gravity="center_horizontal"
-                    android:minHeight="100dp"
-                    android:minWidth="100dp"
-                    android:src="@drawable/app_icon" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <TextView
-                        android:id="@+id/photoTitle"
-                        android:layout_width="98dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:ems="10"
-                        android:text="@string/app_name"
-                        android:textColor="@color/white"
-                        android:textSize="25sp" >
+            <EditText
+                android:id="@+id/lastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="@string/user_sign_up_last_name"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:maxLines="1"
+                android:textColor="@color/grey" />
 
-                </TextView>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <EditText
-                        android:id="@+id/firstName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/white"
-                        android:ems="10"
-                        android:hint="@string/user_signup_first_name"
-                        android:minHeight="40dp"
-                        android:paddingLeft="5dp"
-                        android:paddingStart="5dp"
-                        android:maxLines="1"
-                        android:textColor="@color/grey" >
+            <EditText
+                android:id="@+id/universityEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="@string/user_sign_up_university_email"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:maxLines="1"
+                android:textColor="@color/grey"
+                android:inputType="textEmailAddress">
 
-                        <requestFocus />
-                    </EditText>
+            </EditText>
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <EditText
-                        android:id="@+id/lastName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:ems="10"
-                        android:hint="@string/user_signup_last_name"
-                        android:minHeight="40dp"
-                        android:paddingLeft="5dp"
-                        android:paddingStart="5dp"
-                        android:maxLines="1"
-                        android:textColor="@color/grey" />
+            <EditText
+                android:id="@+id/newPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="@string/user_sign_up_first_password"
+                android:inputType="textWebPassword"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:maxLines="1"
+                android:textColor="@color/grey" >
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            </EditText>
 
-                    <EditText
-                        android:id="@+id/universityEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:ems="10"
-                        android:hint="@string/user_signup_university_email"
-                        android:minHeight="40dp"
-                        android:paddingLeft="5dp"
-                        android:paddingStart="5dp"
-                        android:maxLines="1"
-                        android:textColor="@color/grey"
-                        android:inputType="textEmailAddress">
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    </EditText>
+            <EditText
+                android:id="@+id/confirmNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:ems="10"
+                android:hint="@string/user_sign_up_confirm_password"
+                android:inputType="textWebPassword"
+                android:minHeight="40dp"
+                android:paddingLeft="5dp"
+                android:paddingStart="5dp"
+                android:maxLines="1"
+                android:textColor="@color/grey" >
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            </EditText>
 
-                    <EditText
-                        android:id="@+id/newPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:ems="10"
-                        android:hint="@string/user_signup_first_password"
-                        android:inputType="textWebPassword"
-                        android:minHeight="40dp"
-                        android:paddingLeft="5dp"
-                        android:paddingStart="5dp"
-                        android:maxLines="1"
-                        android:textColor="@color/grey" >
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    </EditText>
+            <Spinner
+                android:id="@+id/gender"
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="40dp"
+                android:minHeight="40dp" />
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <EditText
-                        android:id="@+id/confirmNewPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:ems="10"
-                        android:hint="@string/user_signup_confirm_password"
-                        android:inputType="textWebPassword"
-                        android:minHeight="40dp"
-                        android:paddingLeft="5dp"
-                        android:paddingStart="5dp"
-                        android:maxLines="1"
-                        android:textColor="@color/grey" >
+            <Spinner
+                android:id="@+id/yearOfBirth"
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="40dp"
+                android:minHeight="40dp" />
 
-                    </EditText>
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            <Spinner
+                android:id="@+id/country"
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="40dp"
+                android:minHeight="40dp" />
 
-                    <Spinner
-                        android:id="@+id/gender"
-                        android:layout_width="fill_parent"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:layout_height="40dp"
-                        android:minHeight="40dp" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#676475" />
 
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
+            <Spinner
+                android:id="@+id/institution"
+                android:layout_width="fill_parent"
+                android:background="@color/white"
+                android:layout_height="40dp"
+                android:minHeight="40dp" />
 
-                    <Spinner
-                        android:id="@+id/yearOfBirth"
-                        android:layout_width="fill_parent"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:layout_height="40dp"
-                        android:minHeight="40dp" />
-
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
-
-                    <Spinner
-                        android:id="@+id/country"
-                        android:layout_width="fill_parent"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:layout_height="40dp"
-                        android:minHeight="40dp" />
-
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dip"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="#676475" />
-
-                    <Spinner
-                        android:id="@+id/institution"
-                        android:layout_width="fill_parent"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:background="@color/white"
-                        android:layout_height="40dp"
-                        android:minHeight="40dp" />
-
-                    <Button
-                        android:id="@+id/Button01"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="10dp"
-                        android:background="#4E8DDC"
-                        android:minHeight="40dip"
-                        android:onClick="userSignupNext"
-                        android:text="@string/user_signup_next_button"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/Button01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:minHeight="48dip"
+                android:onClick="userSignupNext"
+                android:text="@string/user_sign_up_next_button"
+                android:theme="@style/SignUpButton"/>
         </LinearLayout>
     </ScrollView>
 

@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private Isegoria application;
 	public ProgressDialog dialog;
 
+	private Toolbar toolbar;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
 	private TabLayout tabLayout;
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	private void setupToolbarAndNavigation() {
-		final Toolbar toolbar = findViewById(R.id.toolbar);
+		toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
 		if (getSupportActionBar() != null) {
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		drawerLayout = findViewById(R.id.drawer_layout);
 
-		final NavigationView navigationView = findViewById(R.id.navigation);
+		NavigationView navigationView = findViewById(R.id.navigation);
 		if (navigationView != null) {
 			navigationView.setNavigationItemSelectedListener(this);
 		}
@@ -105,6 +106,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		tabLayout = findViewById(R.id.tabLayout);
 	}
 
+	void setToolbarTitle(String title) {
+		getSupportActionBar().setTitle(title);
+	}
+
+	void setToolbarVisible(boolean visible) {
+		toolbar.setVisibility(visible? View.VISIBLE : View.GONE);
+	}
+
 	private void setShowNavigationBackButton(boolean show) {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(show);
 		getSupportActionBar().setDisplayShowHomeEnabled(show);
@@ -112,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	void setNavigationDrawerEnabled(boolean enabled) {
 		drawerLayout.setDrawerLockMode(enabled? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
 		drawerToggle.setDrawerIndicatorEnabled(enabled);
 	}
 
@@ -158,7 +166,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 					break;
 
 				case R.id.navigation_vote:
-					switchContent(new VoteViewPagerFragment());
+					VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
+					voteFragment.setTabLayout(tabLayout);
+
+					switchContent(voteFragment);
 					break;
 
 				case R.id.navigation_profile:
@@ -223,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	
 	public void showSignupSucceeded() {
 		setShowNavigationBackButton(false);
+		setToolbarVisible(true);
 
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
@@ -331,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.container, fragment);
+				.replace(R.id.container, fragment, fragment.getClass().toString());
 
 		if (!popBackStack) {
 			transaction.addToBackStack(null);

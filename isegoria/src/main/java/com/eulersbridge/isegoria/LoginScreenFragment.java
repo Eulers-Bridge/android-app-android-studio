@@ -21,15 +21,18 @@ public class LoginScreenFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_login_screen_fragment, container, false);
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setToolbarVisible(false);
+
+        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.loginBackground);
+		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.tumblr_static_aphc);
+
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        
-		LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.loginBackground);
-		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.tumblr_static_aphc);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int) dpWidth, (int) dpHeight /2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -43,7 +46,7 @@ public class LoginScreenFragment extends Fragment {
                 "MuseoSansRounded-300.otf");
         tx.setTypeface(custom_font);
 		
-		return rootView;		
+		return rootView;
 	}
 	
 	private Bitmap fastBlur(Bitmap sentBitmap, int radius) {

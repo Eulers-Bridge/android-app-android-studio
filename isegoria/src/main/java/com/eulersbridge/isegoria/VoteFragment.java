@@ -18,8 +18,7 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 
 public class VoteFragment extends Fragment implements OnItemSelectedListener {
-	private View rootView;
-	private ArrayAdapter<String> voteLocationArrayAdapter;
+    private ArrayAdapter<String> voteLocationArrayAdapter;
     private ArrayList<VoteLocation> voteLocationArray;
 
     private Spinner spinnerLocation;
@@ -34,8 +33,8 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.vote_fragment, container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.vote_fragment, container, false);
 		
         spinnerLocation = rootView.findViewById(R.id.voteLocation);
         spinnerLocation.setOnItemSelectedListener(this);
@@ -47,7 +46,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         datePicker = rootView.findViewById(R.id.datePicker1);
         timePicker = rootView.findViewById(R.id.timePicker1);
         voteDivider1 = rootView.findViewById(R.id.voteDivider1);
-        voteDivider2 = rootView.findViewById(R.id.voteDivider1);
+        voteDivider2 = rootView.findViewById(R.id.voteDivider2);
         voteFragmentTitle1 = rootView.findViewById(R.id.voteFragmentTitle1);
         voteText = rootView.findViewById(R.id.voteText);
 
@@ -64,7 +63,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         network.getVoteLocations(this);
         network.getLatestElection(this);
 
-        if(network.isReminderSet()) {
+        if (network.isReminderSet()) {
             mPager.setCurrentItem(2);
         }
 
