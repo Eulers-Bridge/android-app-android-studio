@@ -43,7 +43,7 @@ public class NewsFragment extends Fragment {
 	private String lastContent; 
 	private Bitmap lastPicture;
     private String lastPictureURL;
-	private String lastLikers;
+	private String lastLikes;
 	private long lastDate;
 	private String lastCreatorEmail; 
 	private String lastStudentYear; 
@@ -92,7 +92,7 @@ public class NewsFragment extends Fragment {
         newsTableLayout.removeAllViews();
     }
 	
-	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likers,
+	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likes,
 			final long date, final String creatorEmail, final String studentYear, final String link) {
 		articlesAdded = articlesAdded + 1;
 
@@ -112,7 +112,7 @@ public class NewsFragment extends Fragment {
 					    	 lastTitle = title;
 					    	 lastContent = content;
 					    	 lastPictureURL = pictureURL;
-					    	 lastLikers = likers;
+					    	 lastLikes = likes;
 					    	 lastDate = date;
 					    	 lastCreatorEmail = creatorEmail;
 					    	 lastStudentYear = studentYear;

@@ -1,8 +1,10 @@
 package com.eulersbridge.isegoria;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -20,6 +22,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -29,12 +33,14 @@ public class PollVoteFragment extends Fragment {
 	private boolean insertedFirstRow = false;
 
     private int nodeId;
-    private String creatorEmail;
+    private User creator;
 	private String question;
 	private String answers;
-    private int numOfComments;
     private int numOfAnswers;
     private Network network;
+
+    private ImageView creatorImageView;
+    private Bitmap creatorPhoto;
 
     private final boolean voted = false;
 
@@ -49,14 +55,37 @@ public class PollVoteFragment extends Fragment {
         pollVoteFragment = this;
 	}
 	
-	public void setData(int nodeId, String creatorEmail, String question, String answers, int numOfComments, int numOfAnswers) {
+	public void setData(int nodeId, @Nullable User creator, String question, String answers, int numOfAnswers) {
         this.nodeId = nodeId;
-        this.creatorEmail = creatorEmail;
+        this.creator = creator;
 		this.question = question;
 		this.answers = answers;
-        this.numOfComments = numOfComments;
         this.numOfAnswers = numOfAnswers;
+
+        if (creator != null) {
+            network.getPicture(creator.getProfilePhotoURL(), new Network.PictureDownloadListener() {
+                @Override
+                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                    creatorPhoto = bitmap;
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateCreatorPhoto();
+                        }
+                    });
+                }
+
+                @Override
+                public void onDownloadFailed(String url, VolleyError error) { }
+            });
+        }
 	}
+
+	private void updateCreatorPhoto() {
+        creatorImageView.setImageBitmap(creatorPhoto);
+        creatorImageView.refreshDrawableState();
+    }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,7 +99,7 @@ public class PollVoteFragment extends Fragment {
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        addTableRow(creatorEmail, question, "");
+        addTableRow(question, "");
         String[] answersSplit = answers.split(",");
 
         for (String anAnswersSplit : answersSplit) {
@@ -80,7 +109,7 @@ public class PollVoteFragment extends Fragment {
 		return rootView;
 	}
 	
-	private void addTableRow(String userEmail, String label, String caption) {
+	private void addTableRow(String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -113,7 +142,7 @@ public class PollVoteFragment extends Fragment {
 		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
 		view.setScaleType(ScaleType.CENTER_CROP);
         viewLinearLayout.addView(view);
-        network.getFirstPhotoFromUser(creatorEmail, view);
+        creatorImageView = view;
 		
 		LinearLayout linearLayout = new LinearLayout(getActivity());
 		linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -138,7 +167,9 @@ public class PollVoteFragment extends Fragment {
         textViewQuestionAskedBy.setPadding(0, 0, 0, 0);
         textViewQuestionAskedBy.setGravity(Gravity.START);
 
-        network.getUserFullName(pollVoteFragment.getCreatorEmail(), textViewQuestionAskedBy, "Asked By ");
+        if (creator != null) {
+            textViewQuestionAskedBy.setText(String.format("Asked by %s", creator.getFullName()));
+        }
 
         linearLayout.addView(textViewArticle);
         linearLayout.addView(textViewQuestionAskedBy);
@@ -177,17 +208,6 @@ public class PollVoteFragment extends Fragment {
         textImageAlignLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         textImageAlignLayout.setPadding(0, 0, 0, 0);
 
-        TextView noOfCommentsTextView = new TextView(getActivity());
-        noOfCommentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f);
-        noOfCommentsTextView.setText(String.valueOf(numOfComments));
-        ImageView noOfCommentsImageView = new ImageView(getActivity());
-        noOfCommentsImageView.setScaleType(ScaleType.FIT_XY);
-        noOfCommentsImageView.setAdjustViewBounds(true);
-        noOfCommentsImageView.setImageResource(R.drawable.commentscount);
-        noOfCommentsImageView.setLayoutParams(new TableRow.LayoutParams(imageSize /2, imageSize /2));
-
-        textImageAlignLayout.addView(noOfCommentsTextView);
-        textImageAlignLayout.addView(noOfCommentsImageView);
         indicatorsLinearLayout.addView(textImageAlignLayout);
 
         LinearLayout questionStatsLinearLayout = new LinearLayout(getActivity());
@@ -287,60 +307,6 @@ public class PollVoteFragment extends Fragment {
 		tr.addView(layout1);
 		pollTableLayout.addView(tr);
 	}
-	
-	public void addTableComment(String name, String comment, String email) {
-		TableRow tr = new TableRow(getActivity());
-
-        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float)  6.666666667, getResources().getDisplayMetrics());
-        int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float)   50.0000, getResources().getDisplayMetrics());
-
-		if(!insertedFirstRow) {
-			insertedFirstRow = true;
-			tr.setPadding(paddingMargin1, paddingMargin1, 0, paddingMargin1);
-		}
-		else {
-			tr.setPadding(paddingMargin1, 0, 0, paddingMargin1);
-		}
-		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-		tr.setLayoutParams(rowParams);
-		
-		ImageView view = new ImageView(getActivity());
-		view.setLayoutParams(new TableRow.LayoutParams(imageSize, imageSize));
-		view.setScaleType(ScaleType.CENTER_CROP);
-        //view.setImageResource(R.drawable.head1);
-        network.findContactPhoto(email, view);
-		
-		LinearLayout linearLayout = new LinearLayout(getActivity());
-		linearLayout.setOrientation(LinearLayout.VERTICAL);
-		linearLayout.setGravity(Gravity.TOP);
-		linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-		linearLayout.setPadding(paddingMargin1, 0, 0, 0);
-        
-        TextView textViewName = new TextView(getActivity());
-        textViewName.setSingleLine(false);
-        textViewName.setTextColor(Color.parseColor("#000000"));
-        textViewName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18.0f);
-        textViewName.setText(name);
-        textViewName.setGravity(Gravity.START);
-        textViewName.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        
-        TextView textViewComment = new TextView(getActivity());
-        textViewComment.setTextColor(Color.parseColor("#000000"));
-        textViewComment.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-        textViewComment.setText(comment);
-        textViewComment.setPadding(0, 0, 0, 0);
-        textViewComment.setGravity(Gravity.START);
-        textViewComment.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-
-        linearLayout.addView(textViewName);
-        linearLayout.addView(textViewComment);
-        
-        tr.addView(view);
-        tr.addView(linearLayout);	
-        pollTableLayout.addView(tr);
-	}
 
     public void setPollResult(int index, int count) {
         pollResults.get(index).setText(String.valueOf(count));
@@ -349,9 +315,5 @@ public class PollVoteFragment extends Fragment {
 
     public int getNodeId() {
         return nodeId;
-    }
-
-    private String getCreatorEmail() {
-        return creatorEmail;
     }
 }

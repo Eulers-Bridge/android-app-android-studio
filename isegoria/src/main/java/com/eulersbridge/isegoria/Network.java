@@ -334,14 +334,14 @@ public class Network {
                                     picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
                                     Bitmap bitmapPicture = null;
 
-                                    String likers = null;
+                                    String likes = currentArticle.optString("likes");
                                     long date = currentArticle.getLong("date");
                                     date = TimeConverter.convertTimestampTimezone(date);
-                                    String creatorEmail = "";
+                                    String creatorEmail = currentArticle.optString("creatorEmail");
                                     String studentYear = "";
                                     String link = null;
 
-                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likers, date, creatorEmail, studentYear, link);
+                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likes, date, creatorEmail, studentYear, link);
                                 } catch (JSONException e1) {
                                     e1.printStackTrace();
                                 }
@@ -372,7 +372,6 @@ public class Network {
 					JSONObject currentArticle = new JSONObject(response);
 
 					int articleId = currentArticle.getInt("articleId");
-					int institutionId = currentArticle.getInt("institutionId");
 					final String title = currentArticle.getString("title");
 					final String likes = currentArticle.getString("likes");
 					final String content = currentArticle.getString("content");
@@ -419,7 +418,7 @@ public class Network {
 
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("/user/" + userEmail.replace("@", "%40") +"/");
+				String response = getRequest(String.format("/user/%s/", userEmail));
 				try {
 					JSONObject currentUser = new JSONObject(response);
 
@@ -454,6 +453,34 @@ public class Network {
 		t.start();
 	}
 
+	interface UserInfoListener {
+        void onFetchSuccess(User user);
+        void onFetchFailure(String userEmail, Exception e);
+    }
+
+	void getUser(final String userEmail, final UserInfoListener callback) {
+        Runnable r = new Runnable() {
+            public void run() {
+                String response = getRequest(String.format("/user/%s/", userEmail));
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    User user = new User(jsonObject);
+
+                    callback.onFetchSuccess(user);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.onFetchFailure(userEmail, e);
+                }
+            }
+        };
+
+        Thread t = new Thread(r);
+        t.start();
+    }
+
     void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
         this.getFirstPhoto(0, (int) userId, imageView);
         this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
@@ -466,7 +493,7 @@ public class Network {
 
     void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "/contactRequests/" + String.valueOf(this.userId) + "/";
+        String url = String.format("%s/contactRequests/%d/", SERVER_URL, userId);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -1322,18 +1349,38 @@ public class Network {
                             JSONArray jArray = response.getJSONArray("polls");
 
                             for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentAlbum = jArray.getJSONObject(i);
+                                JSONObject jsonObject = jArray.getJSONObject(i);
 
-                                int nodeId = currentAlbum.getInt("nodeId");
-                                //int creatorID = currentAlbum.getInt("creatorId");
-                                String creatorEmail = currentAlbum.getString("creatorEmail");
-                                String question = currentAlbum.getString("question");
-                                String answers = currentAlbum.getString("answers");
-                                int numOfComments = currentAlbum.getInt("numOfComments");
-                                int numOfAnswers = currentAlbum.getInt("numOfAnswers");
+                                final int nodeId = jsonObject.getInt("nodeId");
+                                String creatorEmail = jsonObject.getString("creatorEmail");
+                                final String question = jsonObject.getString("question");
+                                final String answers = jsonObject.optString("answers");
 
-                                pollFragment.addQuestion(nodeId, creatorEmail, question,
-                                        answers, numOfComments, numOfAnswers);
+                                int numOfAnswers = 0;
+                                if (answers != null) {
+                                    numOfAnswers = answers.split(",").length;
+                                }
+
+                                final int callbackNumOfAnswers = numOfAnswers;
+
+                                if (creatorEmail != null) {
+                                    getUser(creatorEmail, new UserInfoListener() {
+                                        @Override
+                                        public void onFetchSuccess(User user) {
+                                            pollFragment.addQuestion(nodeId, user, question,
+                                                    answers, callbackNumOfAnswers);
+                                        }
+
+                                        @Override
+                                        public void onFetchFailure(String userEmail, Exception e) {
+                                            pollFragment.addQuestion(nodeId, null, question,
+                                                    answers, callbackNumOfAnswers);
+                                        }
+                                    });
+                                } else {
+                                    pollFragment.addQuestion(nodeId, null, question,
+                                            answers, callbackNumOfAnswers);
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1383,76 +1430,6 @@ public class Network {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
-    }
-
-    void getPollComments(final int pollId, final PollVoteFragment pollVoteFragment) {
-        this.pollVoteFragment = pollVoteFragment;
-        String url = SERVER_URL + "/comments/" + String.valueOf(pollId) + "/";
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        int targetId = jArray.getJSONObject(i).getInt("targetId");
-                        int commentId = jArray.getJSONObject(i).getInt("commentId");
-                        String userName = jArray.getJSONObject(i).getString("userName");
-                        String userEmail = jArray.getJSONObject(i).getString("userEmail");
-                        String content = jArray.getJSONObject(i).getString("content");
-
-                        pollVoteFragment.addTableComment(userName, content, userEmail);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
-
-    void postPollComment(final int pollId, String comment, final PollFragment pollFragment) {
-        this.pollFragment = pollFragment;
-        String url = SERVER_URL + "/comment";
-
-        HashMap<String, String> params = new HashMap<>();
-        params.put("targetId", String.valueOf(pollId));
-        params.put("userName", (this.loginGivenName + " " + this.loginFamilyName));
-        params.put("userEmail", this.loginEmail);
-        params.put("content", comment);
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        Log.d("VolleyRequest", req.toString());
     }
 
     void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
@@ -2679,6 +2656,7 @@ public class Network {
             URL url = new URL(SERVER_URL + params);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setDoInput(true);
+            connection.setDoOutput(false);
 
             if (withAuth) {
                 String credentials = username + ":" + password;
@@ -2702,7 +2680,7 @@ public class Network {
                 readLine = bufferedReader.readLine();
             };
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e("Isegoria", "exception", e);
 
         } finally {

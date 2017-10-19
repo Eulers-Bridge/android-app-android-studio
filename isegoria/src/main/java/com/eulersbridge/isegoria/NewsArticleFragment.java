@@ -26,9 +26,7 @@ public class NewsArticleFragment extends Fragment {
 	private View rootView;
     private View newsArticleDivider;
     private ImageView newsArticleAuthorImage;
-	private float dpWidth;
-	private float dpHeight;
-	private Isegoria isegoria;
+    private Isegoria isegoria;
 	private int articleId;
     private NewsArticleFragment newsArticleFragment;
 
@@ -80,8 +78,6 @@ public class NewsArticleFragment extends Fragment {
 				@Override
 				public void run() {
 					DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-					dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-			        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
                     int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 83.33333333, getResources().getDisplayMetrics());

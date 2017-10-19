@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -30,7 +31,6 @@ public class PollFragment extends Fragment {
     private com.sothree.slidinguppanel.SlidingUpPanelLayout slidingUpPanelLayout;
     private Network network;
 
-    private EditText commentsField;
     private boolean expanded = false;
 
 	@Override
@@ -53,44 +53,6 @@ public class PollFragment extends Fragment {
         slidingUpPanelLayout = rootView.findViewById(R.id.sliding_layout);
         slidingUpPanelLayout.setTouchEnabled(false);
         slidingUpPanelLayout.setEnabled(false);
-
-        commentsField = rootView.findViewById(R.id.commentsField);
-        LinearLayout commentsLayout = rootView.findViewById(R.id.commentsLayout);
-
-        commentsLayout.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                    if (!expanded) {
-                        expanded = true;
-                        int sliderHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                (float) 400, getResources().getDisplayMetrics());
-                        slidingUpPanelLayout.setPanelHeight(sliderHeight);
-                        commentsField.setFocusableInTouchMode(true);
-                        commentsField.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(commentsField, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                }
-                return true;
-            }
-        });
-
-        Button postButton = rootView.findViewById(R.id.postButton);
-        postButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                PollVoteFragment pollVoteFragment = ((PollVoteFragment) fragments.get(mViewPager.getCurrentItem()));
-                String comment = (PollFragment.this.getCommentsField().getText().toString());
-
-                if(!comment.trim().equals("")) {
-                    network.postPollComment(pollVoteFragment.getNodeId(), comment, PollFragment.this);
-                    collapseBarSlideDown();
-
-                    pollVoteFragment.addTableComment((PollFragment.this.network.getLoginGivenName()
-                            + " " + PollFragment.this.network.getLoginFamilyName()), comment, network.getLoginEmail());
-                    PollFragment.this.getCommentsField().setText("");
-                }
-            }
-        });
 		
 		return rootView;
 	}
@@ -99,10 +61,6 @@ public class PollFragment extends Fragment {
         this.tabLayout = tabLayout;
 
         tabLayout.setVisibility(View.GONE);
-    }
-
-    private EditText getCommentsField() {
-        return commentsField;
     }
 
     public void collapseBar(MotionEvent ev) {
@@ -115,26 +73,20 @@ public class PollFragment extends Fragment {
         if (expanded) {
             expanded = false;
             slidingUpPanelLayout.setPanelHeight(100);
-            commentsField.setFocusableInTouchMode(false);
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
 
-    public void setCommentsField(EditText commentsField) {
-        this.commentsField = commentsField;
-    }
-
-    public void addQuestion(final int nodeId, final String creatorEmail, final String question, final String answers, final int numOfComments, final int numOfAnswers) {
+    public void addQuestion(final int nodeId, @Nullable final User creator, final String question, final String answers, final int numOfAnswers) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 			     @Override
 			     public void run() {
 			    	 PollVoteFragment pollVoteFragment = new PollVoteFragment();
-			    	 pollVoteFragment.setData(nodeId, creatorEmail, question, answers, numOfComments, numOfAnswers);
+			    	 pollVoteFragment.setData(nodeId, creator, question, answers, numOfAnswers);
 
 			         fragments.add(pollVoteFragment);
-                     network.getPollComments(nodeId, pollVoteFragment);
 			    	 pollPagerAdapter.notifyDataSetChanged();
 
 			     }

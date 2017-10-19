@@ -48,28 +48,6 @@
                 android:background="@color/barBackground"
                 android:paddingBottom="3dp" >
 
-                <LinearLayout
-                    android:id="@+id/commentsLayout"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true">
-
-                    <EditText
-                        android:id="@+id/commentsField"
-                        android:focusableInTouchMode="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="10dp"
-                        android:paddingStart="10dp"
-                        android:hint="Enter a Comment"
-                        android:textColor="@color/white"
-                        android:background="#00000000"
-                        />
-
-                    </LinearLayout>
-
                 <Button
                     android:id="@+id/postButton"
                     style="?android:attr/buttonStyleSmall"
