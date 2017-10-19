@@ -2028,10 +2028,11 @@ public class Network {
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jArray = response.getJSONArray("foundObjects");
+
                     for(int i=0; i<jArray.length(); i++) {
                         JSONObject positionObject = jArray.getJSONObject(i);
 
-                        int electionId = positionObject.getInt("electionId");
+                        int electionId = positionObject.optInt("electionId", 0);
                         int positionId = positionObject.getInt("positionId");
                         String name = positionObject.getString("name");
                         String desc = positionObject.getString("description");
@@ -2050,7 +2051,6 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
