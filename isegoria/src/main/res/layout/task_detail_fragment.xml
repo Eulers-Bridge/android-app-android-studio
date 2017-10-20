@@ -60,14 +60,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
                 <View
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="1dip"
                     android:background="#838a8a8a" />
 
                 <RelativeLayout
                     android:id="@+id/relativeLayout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:background="#64d3d3d3" >
 
                     <TextView
@@ -100,13 +100,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
                 <View
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="1dip"
                     android:background="#838a8a8a" />
                 <RelativeLayout
                     android:id="@+id/relativeLayout2"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:background="#64d3d3d3" >
 
                     <TextView

@@ -7,7 +7,7 @@
     android:background="#ffffffff">
     <TableLayout
         android:id="@+id/candidatePositionTable"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="0,1"
          >

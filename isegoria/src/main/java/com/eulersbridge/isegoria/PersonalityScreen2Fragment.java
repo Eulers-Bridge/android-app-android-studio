@@ -38,10 +38,10 @@ public class PersonalityScreen2Fragment extends Fragment {
                 float agreeableness = (personalitySliderBar7.getScore() + (8-personalitySliderBar2.getScore()))/2;
                 float conscientiousness = (personalitySliderBar3.getScore() + (8-personalitySliderBar8.getScore()))/2;
                 float emotionalStability = (personalitySliderBar9.getScore() + (8-personalitySliderBar4.getScore()))/2;
-                float opennesstoExperiences = (personalitySliderBar5.getScore() + (10-personalitySliderBar6.getScore()))/2;
+                float opennessToExperiences = (personalitySliderBar5.getScore() + (10-personalitySliderBar6.getScore()))/2;
 
                 network.answerPersonality(extraversion, agreeableness, conscientiousness,
-                        emotionalStability, opennesstoExperiences);
+                        emotionalStability, opennessToExperiences);
             }
         });
 

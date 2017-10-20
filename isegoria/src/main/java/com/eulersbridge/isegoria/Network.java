@@ -745,7 +745,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showAddedDialog();
+                            findAddContactFragment.showAddedMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -776,7 +776,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showAcceptDialog();
+                            findAddContactFragment.showAcceptMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -807,7 +807,7 @@ public class Network {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showDenyDialog();
+                            findAddContactFragment.showDenyMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -1396,6 +1396,10 @@ public class Network {
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
+    }
+
+    void answerEfficacy() {
+
     }
 
     void answerPersonality(float extroversion, float agreeableness, float conscientiousness,

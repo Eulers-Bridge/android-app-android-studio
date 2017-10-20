@@ -21,16 +21,24 @@
     <string name="user_sign_up_confirm_password">Confirm Password</string>
     <string name="user_sign_up_next_button">Next</string>
 
-    <!-- Personality questions -->
+    <!-- Personality Questions -->
     <string name="section_title_personality_questions">Personality Questions</string>
 
-    <string name="personality_screen_1_description">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science! All you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
+    <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science! All you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
     <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
     <string name="personality_screen_skip_button">Skip</string>
     <string name="personality_questions_done_button">Done</string>
     <string name="personality_screen_2_description">Simply select a number next to each statement to indicate the extent to which you agree or disagree. You should rate the extend to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.</string>
 
     <string name="user_consent_next_button">Next</string>
+
+    <string name="personality_slider_disagree_strongly">Disagree Strongly</string>
+    <string name="personality_slider_disagree_moderately">Disagree Moderately</string>
+    <string name="personality_slider_disagree_a_little">Disagree a Little</string>
+    <string name="personality_slider_neither">Neither</string>
+    <string name="personality_slider_agree_a_little">Agree a Little</string>
+    <string name="personality_slider_agree_moderately">Agree Moderately</string>
+    <string name="personality_slider_agree_strongly">Agree Strongly</string>
 
     <!-- Voting -->
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
@@ -40,16 +48,32 @@
 
     <string name="event_add_to_calendar">Add to Calendar</string>
 
+    <!-- Self Efficacy Questions -->
+    <string name="section_title_self_efficacy_questions">Self-Efficacy Questions</string>
+    <string name="self_efficacy_done_button">Done</string>
+    <string name="self_efficacy_questions_message">The PPSE-S composed of 4 items aimed to assess individuals’ beliefs in their capabilities to engage actively in politics. The 4 items are measured on a 5 point Likert scale, from 1 (not at all) to 5 (completely).</string>
+
+    <string name="self_efficacy_slider_not_at_all">Not at all</string>
+    <string name="self_efficacy_slider_unlikely">Somewhat unlikely</string>
+    <string name="self_efficacy_slider_neutral">Neutral</string>
+    <string name="self_efficacy_slider_likely">Somewhat likely</string>
+    <string name="self_efficacy_slider_completely">Completely</string>
+
     <!-- Email verification -->
     <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
     <string name="email_verification_success_button">Verified, Please Log Me In</string>
     <string name="email_verification_resend_button">Resend Verification Email</string>
+
+    <!-- News -->
+    <string name="news_article_star_content_description">Star news article</string>
+    <string name="news_article_flag_content_description">Flag news article</string>
 
     <!-- Navigation drawer labels -->
     <string name="navigation_feed">Feed</string>
     <string name="navigation_election">Election</string>
     <string name="navigation_poll">Poll</string>
     <string name="navigation_vote">Vote</string>
+    <string name="navigation_friends">Friends</string>
     <string name="navigation_profile">Profile</string>
     <string name="navigation_settings">Settings</string>
 
@@ -58,8 +82,9 @@
     <string name="section_title_election">Election</string>
     <string name="section_title_poll">Poll</string>
     <string name="section_title_vote">Vote</string>
+    <string name="section_title_friends">Friends</string>
     <string name="section_title_profile">Profile</string>
-    <string name="section_title_settings">Profile</string>
+    <string name="section_title_settings">Settings</string>
 
     <!-- User profile page -->
     <string name="profile_section_friends">FRIENDS</string>
@@ -87,5 +112,8 @@
     <!-- Misc -->
     <string name="drawer_open" tools:keep="@string/drawer_open">Drawer Open</string>
     <string name="drawer_close" tools:keep="@string/drawer_close">Drawer Close</string>
+
+    <string name="contact_profile_picture_content_description">Contact profile picture</string>
+    <string name="friends_search_title">Search</string>
 
 </resources>

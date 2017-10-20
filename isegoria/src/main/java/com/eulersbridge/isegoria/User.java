@@ -40,7 +40,7 @@ class User implements Parcelable {
             givenName = jsonObject.getString("givenName");
             familyName = jsonObject.getString("familyName");
 
-            accountVerified = jsonObject.getBoolean("accountVerified");
+            accountVerified = jsonObject.optBoolean("accountVerified");
             hasPersonality = jsonObject.getBoolean("hasPersonality");
 
             trackingOff = jsonObject.getBoolean("trackingOff");

@@ -74,6 +74,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
+                //SelfEfficacyQuestionsFragment personalityQuestionsFragment = new SelfEfficacyQuestionsFragment();
                 PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
                 personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
 

@@ -56,7 +56,7 @@
             </EditText>
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
@@ -74,7 +74,7 @@
                 android:textColor="@color/grey" />
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
@@ -95,7 +95,7 @@
             </EditText>
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
@@ -116,7 +116,7 @@
             </EditText>
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
@@ -137,49 +137,49 @@
             </EditText>
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
             <Spinner
                 android:id="@+id/gender"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
                 android:minHeight="40dp" />
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
             <Spinner
                 android:id="@+id/yearOfBirth"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
                 android:minHeight="40dp" />
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
             <Spinner
                 android:id="@+id/country"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
                 android:minHeight="40dp" />
 
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dip"
                 android:background="#676475" />
 
             <Spinner
                 android:id="@+id/institution"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
                 android:minHeight="40dp" />

@@ -10,7 +10,7 @@
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="match_parent" >
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
     >
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom"
@@ -53,7 +53,7 @@
 		</LinearLayout>
                 
         <LinearLayout
-        	android:layout_width="fill_parent"
+        	android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="bottom"
@@ -61,7 +61,7 @@
 			android:paddingStart="12dp">
         
             <LinearLayout
-	        	android:layout_width="fill_parent"
+	        	android:layout_width="match_parent"
 	            android:layout_height="0dp"
 	            android:layout_weight="1"
 	            android:orientation="vertical"
@@ -73,15 +73,15 @@
                 android:visibility="invisible">
 	            
 	            <View
-	            	android:layout_width="fill_parent"
+	            	android:layout_width="match_parent"
 	                android:layout_height="1dip"
 	                android:background="#676475" />
 	        </LinearLayout>   
 	         
             <RelativeLayout
 			    android:id="@+id/RelativeLayout01" 
-			    android:layout_width="fill_parent" 
-			    android:layout_height="fill_parent"
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent"
 			    android:paddingTop="10dp"
 			    >
 	            <LinearLayout
@@ -163,14 +163,16 @@
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:layout_weight="1"
-			                android:src="@drawable/stardefault" />
+			                android:src="@drawable/stardefault"
+							android:contentDescription="@string/news_article_star_content_description" />
 			            
 			            <ImageView
 			                android:id="@+id/flagView"
 			                android:layout_width="wrap_content"
 			                android:layout_height="wrap_content"
 			                android:layout_weight="1"
-			                android:src="@drawable/flagdefault" />
+			                android:src="@drawable/flagdefault"
+							android:contentDescription="@string/news_article_flag_content_description" />
 		      	
 		        </LinearLayout> 
 	        </RelativeLayout>
@@ -179,12 +181,12 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical" >
                 <TextView
         android:id="@+id/textNews"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:ems="10"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"

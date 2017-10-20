@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -30,7 +32,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	private Isegoria application;
 	public ProgressDialog dialog;
 
-	private Toolbar toolbar;
+	private CoordinatorLayout coordinatorLayout;
+	private TextView toolbarTitleTextView;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
 	private TabLayout tabLayout;
@@ -52,14 +55,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		setContentView(R.layout.main_activity);
 
-//        int titleId = getResources().getIdentifier("action_bar_title", "id",
-//                "android");
-//        Typeface customFont = Typeface.createFromAsset(getAssets(),
-//                "MuseoSansRounded-500.otf");
-//        TextView yourTextView = (TextView) findViewById(titleId);
-//        yourTextView.setTextColor(getResources().getColor(R.color.white));
-//        yourTextView.setTypeface(customFont);
-
 		application = (Isegoria) getApplicationContext();
 		application.setMainActivity(this);
 		
@@ -69,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (mContent == null) mContent = new MainView();
 
 		setupToolbarAndNavigation();
+		coordinatorLayout = findViewById(R.id.coordinatorLayout);
 
 		setNavigationDrawerEnabled(false);
 
@@ -77,12 +73,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	private void setupToolbarAndNavigation() {
-		toolbar = findViewById(R.id.toolbar);
+		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		if (getSupportActionBar() != null) {
-			getSupportActionBar().setTitle(R.string.app_name);
-		}
+		getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+		Typeface titleFont = Typeface.createFromAsset(getAssets(),
+				"MuseoSansRounded-500.otf");
+		toolbarTitleTextView = toolbar.findViewById(R.id.toolbar_title);
+		toolbarTitleTextView.setTypeface(titleFont);
 
 		drawerLayout = findViewById(R.id.drawer_layout);
 
@@ -106,12 +105,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		tabLayout = findViewById(R.id.tabLayout);
 	}
 
+	void setToolbarShowsTitle(boolean visible) {
+		toolbarTitleTextView.setVisibility(visible? View.VISIBLE : View.GONE);
+	}
+
 	void setToolbarTitle(String title) {
-		getSupportActionBar().setTitle(title);
+		toolbarTitleTextView.setText(title);
 	}
 
 	void setToolbarVisible(boolean visible) {
-		toolbar.setVisibility(visible? View.VISIBLE : View.GONE);
+		if (visible) {
+			getSupportActionBar().show();
+		} else {
+			getSupportActionBar().hide();
+		}
 	}
 
 	private void setShowNavigationBackButton(boolean show) {
@@ -170,6 +177,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 					voteFragment.setTabLayout(tabLayout);
 
 					switchContent(voteFragment);
+					break;
+
+				case R.id.navigation_friends:
+					FindAddContactFragment friendsFragment = new FindAddContactFragment();
+					friendsFragment.setTabLayout(tabLayout);
+
+					switchContent(friendsFragment);
 					break;
 
 				case R.id.navigation_profile:

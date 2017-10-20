@@ -8,10 +8,12 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
     
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@null"
+        android:id="@+id/coordinatorLayout">
 
         <include layout="@layout/main_partial_appbar"/>
 
@@ -22,7 +24,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-    </LinearLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <!-- Navigation drawer -->
     <android.support.design.widget.NavigationView

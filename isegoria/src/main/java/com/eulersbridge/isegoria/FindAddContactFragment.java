@@ -1,43 +1,49 @@
 package com.eulersbridge.isegoria;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class FindAddContactFragment extends Fragment {
     private View rootView;
+
     private TableLayout usersAllTableLayout;
     private TableLayout friendsAllTableLayout;
     private TableLayout pendingTableLayout;
 
     private float dpWidth;
-    private float dpHeight;
 
     private FindAddContactFragment findAddContactFragment;
-    private SearchView searchFriendsView;
     private Network network;
+
+    private MainActivity mainActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,43 +52,79 @@ public class FindAddContactFragment extends Fragment {
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
 
-        //TODO: No tabs
+        setHasOptionsMenu(true);
 
         usersAllTableLayout = rootView.findViewById(R.id.usersAllTable);
         friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
         pendingTableLayout = rootView.findViewById(R.id.friendsPendingTableLayout);
 
         dpWidth = displayMetrics.widthPixels;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
-        usersAllTableLayout.addView(dividierView);
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
+        usersAllTableLayout.addView(dividerView);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity = (MainActivity) getActivity();
+        mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
+
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.findFriends(this);
         network.findPendingContacts(this);
 
-        searchFriendsView = rootView.findViewById(R.id.searchFriendsView);
-        searchFriendsView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
+        return rootView;
+    }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.friends, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        // Set max width, remove left padding to assist in getting search view text aligned
+        // with where Toolbar title previously was
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setPadding(0,searchView.getPaddingTop(),searchView.getPaddingRight(),searchView.getPaddingBottom());
+
+        // Get the search view's inner LinearLayout and remove the left margin
+        LinearLayout searchEditFrame = searchView.findViewById(R.id.search_edit_frame);
+        ((LinearLayout.LayoutParams) searchEditFrame.getLayoutParams()).leftMargin = 0;
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                mainActivity.setToolbarShowsTitle(!hasFocus);
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(query.length() != 0) {
+                if (query.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(query).matches()) {
                     network.findContacts(query, findAddContactFragment);
                     return true;
                 }
                 return false;
             }
-        });
 
-        return rootView;
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(newText).matches()) {
+                    network.findContacts(newText, findAddContactFragment);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    public void setTabLayout(TabLayout tabLayout) {
+        tabLayout.setVisibility(View.GONE);
     }
 
     public void clearSearchResults() {
@@ -255,14 +297,12 @@ public class FindAddContactFragment extends Fragment {
 
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         //linLayout2.setBackgroundColor((Color.parseColor("#000000")));
         linLayout2.setOrientation(LinearLayout.HORIZONTAL);
-        LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         if(type == 1) {
             linLayout2.addView(candidateProfileImage);
         }
@@ -289,43 +329,16 @@ public class FindAddContactFragment extends Fragment {
         tableLayout.addView(dividierView);
     }
 
-    public void showAddedDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Sent")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showAddedMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
-    public void showAcceptDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Accepted")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showAcceptMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
-    public void showDenyDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Denied")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showDenyMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
     private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,

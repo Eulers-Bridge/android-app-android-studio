@@ -31,6 +31,11 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="PositiveButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="colorButtonNormal">#52BB42</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <!-- Login / Sign Up -->
     <style name="LoginSignUpHeadingTextAppearance">
         <item name="android:textColor">@color/white</item>
@@ -46,7 +51,6 @@
 
     <style name="LoginSignUpButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/white</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="LoginButton" parent="LoginSignUpButton">
@@ -60,6 +64,12 @@
     <style name="LoginSignUpSmallPrintText">
         <item name="android:textColor">@color/white</item>
         <item name="android:alpha">0.7</item>
+    </style>
+
+    <!-- Self Efficacy Questions -->
+    <style name="QuestionSubheadingTextAppearance">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
     </style>
 
 </resources>

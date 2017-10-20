@@ -29,7 +29,7 @@
     >
 
         <LinearLayout
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="bottom"
@@ -51,7 +51,7 @@
 		</LinearLayout>
                 
         <LinearLayout
-        	android:layout_width="fill_parent"
+        	android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="bottom"
@@ -59,7 +59,7 @@
 			android:paddingStart="12dp">
         
             <LinearLayout
-	        	android:layout_width="fill_parent"
+	        	android:layout_width="match_parent"
 	            android:layout_height="0dp"
 	            android:layout_weight="1"
 	            android:orientation="vertical"
@@ -70,7 +70,7 @@
                 android:visibility="invisible">
 	            
 	            <View
-	            	android:layout_width="fill_parent"
+	            	android:layout_width="match_parent"
 	                android:layout_height="1dip"
 	                android:background="#676475"
                     android:id="@+id/eventDivider1" />
@@ -78,8 +78,8 @@
 	         
             <RelativeLayout
 			    android:id="@+id/RelativeLayout01" 
-			    android:layout_width="fill_parent" 
-			    android:layout_height="fill_parent"
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent"
 			    android:paddingTop="10dp"
 			    >
 	            <LinearLayout
@@ -172,7 +172,7 @@
             android:visibility="invisible" />
         
        	 <View
-	     	android:layout_width="fill_parent"
+	     	android:layout_width="match_parent"
 	        android:layout_height="1dip"
 	        android:paddingTop="3dp"
 	        android:background="#676475"

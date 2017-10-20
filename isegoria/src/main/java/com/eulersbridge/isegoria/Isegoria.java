@@ -1,6 +1,9 @@
 package com.eulersbridge.isegoria;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 
@@ -44,7 +47,15 @@ public class Isegoria extends Application {
 				 mainActivity.setToolbarVisible(true);
 
 				 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					 mainActivity.getWindow().setStatusBarColor(ContextCompat.getColor(mainActivity, R.color.darkBlue));
+					 int color = ContextCompat.getColor(mainActivity, R.color.darkBlue);
+					 mainActivity.getWindow().setStatusBarColor(color);
+
+					 //Set color of multitasking bar (have to pass in app name and icon again however)
+
+					 Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
+					 mainActivity.setTaskDescription(
+					 		new ActivityManager.TaskDescription(getString(R.string.app_name), icon, color));
+					 icon.recycle();
 				 }
 
 				 final FeedFragment feedFragment = new FeedFragment();

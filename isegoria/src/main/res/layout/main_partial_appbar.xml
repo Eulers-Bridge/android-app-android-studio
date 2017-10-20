@@ -12,8 +12,21 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:animateLayoutChanges="true"
             android:theme="@style/ToolbarStyle"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed" />
+            app:layout_scrollFlags="scroll|exitUntilCollapsed" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:layout_gravity="start|center_horizontal"
+                android:animateLayoutChanges="true"
+                android:paddingTop="2dp"
+                android:id="@+id/toolbar_title"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+        </android.support.v7.widget.Toolbar>
         
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"

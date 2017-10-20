@@ -97,7 +97,8 @@ public class EventsDetailFragment extends Fragment {
 	private void populateContent(final Event event) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
-				@Override
+				@SuppressWarnings("deprecation")
+                @Override
 				public void run() {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 200, getResources().getDisplayMetrics());
