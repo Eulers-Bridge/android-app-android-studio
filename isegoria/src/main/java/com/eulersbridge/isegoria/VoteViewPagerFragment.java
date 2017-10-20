@@ -17,7 +17,7 @@ public class VoteViewPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
-        ((MainActivity)getActivity()).setToolbarTitle("Vote");
+        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_vote));
 
         setupViewPager(rootView);
         setupTabLayout();
@@ -39,7 +39,6 @@ public class VoteViewPagerFragment extends Fragment {
 
             voteFragment.setViewPager(viewPager);
             voteFragmentPledge.setViewPager(viewPager);
-            voteFragmentDone.setViewPager(viewPager);
 
             fragments.add(voteFragment);
             fragments.add(voteFragmentPledge);

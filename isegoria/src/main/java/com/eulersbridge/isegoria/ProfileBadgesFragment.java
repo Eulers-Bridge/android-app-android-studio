@@ -24,8 +24,6 @@ public class ProfileBadgesFragment extends Fragment {
     private TableLayout badgesTableLayout;
     private TableRow tr;
 
-    private float dpWidth;
-    private float dpHeight;
     private int photosPerRow = -1;
     private int fitPerRow = 0;
     private int squareSize;
@@ -56,9 +54,6 @@ public class ProfileBadgesFragment extends Fragment {
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         badgesTableLayout = rootView.findViewById(R.id.profileBadgesTableLayout);
-
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         squareSize = displayMetrics.widthPixels / 3 - (10/3);
         fitPerRow = 3;

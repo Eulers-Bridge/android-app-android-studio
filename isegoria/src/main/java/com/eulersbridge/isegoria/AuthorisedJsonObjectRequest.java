@@ -22,8 +22,8 @@ class AuthorisedJsonObjectRequest extends JsonObjectRequest {
         super(method, url, jsonRequest, listener, errorListener);
     }
 
-    AuthorisedJsonObjectRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        super(url, jsonRequest, listener, errorListener);
+    AuthorisedJsonObjectRequest(String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        super(url, null, listener, errorListener);
     }
 
     @Override

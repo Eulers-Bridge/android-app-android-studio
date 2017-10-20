@@ -63,46 +63,14 @@ public class Network {
 
     private static final int socketTimeout = 30000; //30 seconds
 
-	private long userId;
-	private String username;
-	private String password;
-	private String email;
-    private boolean hasPersonality;
-    private boolean loginAccountVerified;
+	private User loggedInUser;
+    private String username;
+    private String password;
 
     private final Network network;
-	private NewsFragment newsFragment;
-	private NewsArticleFragment newsArticleFragment;
-	private UserSignupFragment userSignupFragment;
-	private EventsDetailFragment eventDetailFragment;
-    private ElectionOverviewFragment electionOverviewFragment;
-    private EventsDetailFragment eventsDetailFragment;
-    private CandidatePositionsFragment candidatePositionsFragment;
-	private PhotosFragment photosFragment;
-	private PhotoAlbumFragment photoAlbumFragment;
-	private PhotoViewFragment photoViewFragment;
-    private CandidateAllFragment candidateAllFragment;
-    private CandidateTicketFragment candidateTicketFragment;
-    private CandidatePositionFragment candidatePositionFragment;
-    private TaskDetailProgressFragment taskDetailProgressFragment;
-    private ProfileBadgesFragment profileBadgesFragment;
-    private EmailVerificationFragment emailVerificationFragment;
-    private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private FindAddContactFragment findAddContactFragment;
-	private VoteFragment voteFragment;
-	private PollFragment pollFragment;
-    private PollVoteFragment pollVoteFragment;
 	private final Isegoria application;
     private boolean reminderSet = false;
-    private boolean trackingOff;
-    private boolean optOutDataCollection;
-
-    private String loginGivenName = "";
-    private String loginFamilyName = "";
-    private String loginEmail = "";
-    private String loginGender = "";
-    private String loginNationality = "";
-    private String loginYearOfBirth = "";
 
     private String voteReminderLocation;
     private long voteReminderDate;
@@ -134,6 +102,18 @@ public class Network {
         mRequestQueue.start();
 	}
 
+	User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    void setTrackingOff(boolean trackingOff) {
+        loggedInUser.setTrackingOff(trackingOff);
+    }
+
+    void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
+        loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
+    }
+
 	void login() {
 		Runnable r = new Runnable() {
 			public void run() {
@@ -144,24 +124,14 @@ public class Network {
                     }
                     else {
                         JSONObject jObject = new JSONObject(response);
-                        userId = jObject.getLong("userId");
 
-                        JSONObject jUser = jObject.getJSONObject("user");
-                        loginGivenName = jUser.getString("givenName");
-                        loginFamilyName = jUser.getString("familyName");
-                        loginEmail = jUser.getString("email");
-                        loginAccountVerified = jUser.getBoolean("accountVerified");
-                        hasPersonality = jUser.getBoolean("hasPersonality");
-                        trackingOff = jUser.getBoolean("trackingOff");
-                        optOutDataCollection = jUser.getBoolean("optOutDataCollection");
+                        JSONObject userObject = jObject.getJSONObject("user");
+                        loggedInUser = new User(userObject);
+                        loggedInUser.setId(jObject.getString("userId"));
 
-                        loginGender = jUser.getString("gender");
-                        loginNationality = jUser.getString("nationality");
-                        loginYearOfBirth = jUser.getString("yearOfBirth");
-
-                        if (loginAccountVerified) {
+                        if (loggedInUser.isAccountVerified()) {
                             application.setLoggedIn(true);
-                            if(hasPersonality) {
+                            if(loggedInUser.hasPersonality()) {
                                 application.setFeedFragment();
                             }
                             else {
@@ -274,8 +244,6 @@ public class Network {
 	}
 
 	void getGeneralInfo(final UserSignupFragment userSignupFragment) {
-		this.userSignupFragment = userSignupFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
 				String response = getRequest("/general-info", false);
@@ -312,10 +280,9 @@ public class Network {
 
 
 	void getNewsArticles(final NewsFragment newsFragment) {
-		this.newsFragment = newsFragment;
         String url = SERVER_URL + "/newsArticles/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -363,8 +330,6 @@ public class Network {
 	}
 
 	void getNewsArticle(final NewsArticleFragment newsArticleFragment, final int articleId) {
-		this.newsArticleFragment = newsArticleFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
 				String response = getRequest("/newsArticle/" + String.valueOf(articleId));
@@ -414,43 +379,43 @@ public class Network {
 	}
 
 	private void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
-		this.newsArticleFragment = newsArticleFragment;
+		if (userEmail.equals(loggedInUser.getEmail())) {
+            newsArticleFragment.populateUserContent(loggedInUser.getFullName(), loggedInUser.getProfilePhotoURL());
 
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest(String.format("/user/%s/", userEmail));
-				try {
-					JSONObject currentUser = new JSONObject(response);
+        } else {
+            Runnable r = new Runnable() {
+                public void run() {
+                    String response = getRequest(String.format("/user/%s/", userEmail));
+                    try {
+                        JSONObject userObject = new JSONObject(response);
 
-					String givenName = currentUser.getString("givenName");
-					String familyName = currentUser.getString("familyName");
-					String gender = currentUser.getString("gender");
-					String name = givenName + " " + familyName;
+                        User user = new User(userObject);
 
-                    JSONArray photos = currentUser.getJSONArray("photos");
+                        JSONArray photos = userObject.getJSONArray("photos");
 
-                    int index=0;
-                    for(int i=0; i<photos.length(); i++) {
-                        JSONObject currentObject = photos.getJSONObject(i);
-                        String currentSeq = currentObject.getString("sequence");
+                        int index=0;
+                        for(int i=0; i<photos.length(); i++) {
+                            JSONObject currentObject = photos.getJSONObject(i);
+                            String currentSeq = currentObject.getString("sequence");
 
-                        if(currentSeq.equals("0")) {
-                            index = i;
-                            break;
+                            if(currentSeq.equals("0")) {
+                                index = i;
+                                break;
+                            }
                         }
+
+                        String photoURL = (userObject.getJSONArray("photos").getJSONObject(index).getString("url"));
+
+                        newsArticleFragment.populateUserContent(user.getFullName(), photoURL);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+                }
+            };
 
-                    String photoURL = (currentUser.getJSONArray("photos").getJSONObject(index).getString("url"));
-
-					newsArticleFragment.populateUserContent(name, photoURL);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-
-		Thread t = new Thread(r);
-		t.start();
+            Thread t = new Thread(r);
+            t.start();
+        }
 	}
 
 	interface UserInfoListener {
@@ -459,31 +424,36 @@ public class Network {
     }
 
 	private void getUser(final String userEmail, final UserInfoListener callback) {
-        Runnable r = new Runnable() {
-            public void run() {
-                String response = getRequest(String.format("/user/%s/", userEmail));
-                try {
+        if (userEmail.equals(loggedInUser.getEmail())) {
+            callback.onFetchSuccess(loggedInUser);
 
-                    JSONObject jsonObject = new JSONObject(response);
+        } else {
+            Runnable r = new Runnable() {
+                public void run() {
+                    String response = getRequest(String.format("/user/%s/", userEmail));
+                    try {
 
-                    User user = new User(jsonObject);
+                        JSONObject jsonObject = new JSONObject(response);
 
-                    callback.onFetchSuccess(user);
+                        User user = new User(jsonObject);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    callback.onFetchFailure(userEmail, e);
+                        callback.onFetchSuccess(user);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.onFetchFailure(userEmail, e);
+                    }
                 }
-            }
-        };
+            };
 
-        Thread t = new Thread(r);
-        t.start();
+            Thread t = new Thread(r);
+            t.start();
+        }
     }
 
     void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
-        this.getFirstPhoto(0, (int) userId, imageView);
-        this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
+        this.getFirstPhoto(0, Integer.valueOf(loggedInUser.getId()), imageView);
+        this.getFirstPhotoBlur(0, Integer.valueOf(loggedInUser.getId()), backgroundLinearLayout);
     }
 
     void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
@@ -493,9 +463,9 @@ public class Network {
 
     void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = String.format("%s/contactRequests/%d/", SERVER_URL, userId);
+        String url = String.format("%s/contactRequests/%s/", SERVER_URL, loggedInUser.getId());
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -529,8 +499,8 @@ public class Network {
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 
-        url = SERVER_URL + "/user/" + String.valueOf(this.userId) + "/contactRequests";
-        req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contactRequests";
+        req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -571,20 +541,13 @@ public class Network {
         this.findAddContactFragment.clearSearchResults();
         String url = SERVER_URL + "/contact/" + String.valueOf(query) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    User user = new User(response);
+                    findAddContactFragment.addUser(user);
 
-                    JSONObject profilePhoto = response.getJSONObject("profilePhoto");
-                    String profilePhotoURL = profilePhoto.getString("url");
-
-                    findAddContactFragment.addUser(givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -606,20 +569,15 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    User user = new User(response);
+                    user.setId(String.valueOf(contactId));
 
-                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
-                    String profilePhotoURL = profilePhoto.getString("url");
+                    findAddContactFragment.addPendingFriend(contactId, user);
 
-                    findAddContactFragment.addPendingFriend(contactId, givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -638,34 +596,25 @@ public class Network {
     }
 
     void getDashboardStats(final ProfileFragment profileFragment) {
-        String url = String.format("%s/contacts/%s/", SERVER_URL, loginEmail);
+        String url = String.format("%s/contacts/%s/", SERVER_URL, loggedInUser.getEmail());
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray foundObjects = response.getJSONArray("foundObjects");
 
                     int numOfContacts = 0;
-                    int numOfCompBadges = 0;
-                    int numOfCompTasks = 0;
-                    int totalBadges = 0;
                     int totalTasks = 0;
-                    int experience = 0;
 
                     if (foundObjects.length() > 0) {
                         JSONObject currentObject = foundObjects.getJSONObject(0);
 
                         numOfContacts = currentObject.getInt("numOfContacts");
-                        numOfCompBadges = currentObject.getInt("numOfCompBadges");
-                        numOfCompTasks = currentObject.getInt("numOfCompTasks");
-                        totalBadges = currentObject.getInt("totalBadges");
                         totalTasks = currentObject.getInt("totalTasks");
-                        experience = currentObject.getInt("experience");
                     }
 
-                    profileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
-                            totalBadges, totalTasks, experience);
+                    profileFragment.updateStats(numOfContacts, totalTasks);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -684,11 +633,44 @@ public class Network {
         mRequestQueue.add(req);
     }
 
+    interface RemainingBadgeCountListener {
+        void onFetchSuccess(long remainingBadgeCount);
+        void onFetchFailure(Exception e);
+    }
+
+    void getRemainingBadgeCount(final RemainingBadgeCountListener callback) {
+        String url = String.format("%s/badges/remaining/%s", SERVER_URL, loggedInUser.getId());
+
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jArray = response.getJSONArray("foundObjects");
+
+                    callback.onFetchSuccess(jArray.length());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    callback.onFetchFailure(e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        });
+
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
     void getDashboardStats(final ContactProfileFragment contactProfileFragment,
                                   int profileUserId) {
         String url = SERVER_URL + "/contacts/" + String.valueOf(profileUserId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -724,21 +706,17 @@ public class Network {
         this.findAddContactFragment = findAddContactFragment;
         String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    User user = new User(response);
+
                     int userId = Integer.parseInt(query);
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    user.setId(String.valueOf(userId));
 
-                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
-                    String profilePhotoURL = profilePhoto.getString("url");
+                    findAddContactFragment.addFriend(userId, user);
 
-                    findAddContactFragment.addFriend(userId, givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -758,7 +736,7 @@ public class Network {
 
     void addFriend(String email, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "/user/" + String.valueOf(userId) + "/contact/" + String.valueOf(email) + "/";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contact/" + String.valueOf(email) + "/";
 
         HashMap<String, Integer> params = new HashMap<>();
 
@@ -851,9 +829,9 @@ public class Network {
 
     void findPendingContacts(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "/contactRequests/" + String.valueOf(this.userId) + "/";
+        String url = SERVER_URL + "/contactRequests/" + String.valueOf(loggedInUser.getId()) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -888,7 +866,7 @@ public class Network {
     }
 
     public void addVoteReminder(String location, long date) {
-        String url = SERVER_URL + "/user/" + String.valueOf(userId) + "/voteReminder";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminder";
 
         HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
@@ -926,7 +904,7 @@ public class Network {
 	void getEvents(final EventsFragment eventsFragment) {
         String url = SERVER_URL + "/events/26/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -957,10 +935,9 @@ public class Network {
 	}
 
     void verifyEmail(final EmailVerificationFragment emailVerificationFragment) {
-        this.emailVerificationFragment = emailVerificationFragment;
         String url = SERVER_URL + "/emailVerification/" + String.valueOf(username) + "/resend";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -980,10 +957,9 @@ public class Network {
     }
 
     private void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
-        this.eventsDetailFragment = eventsDetailFragment;
         String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1011,7 +987,7 @@ public class Network {
     void findContactPhoto(final String email, final ImageView imageView) {
         String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1039,10 +1015,9 @@ public class Network {
     }
 
 	void getPhotoAlbums(final PhotosFragment photosFragment) {
-		this.photosFragment = photosFragment;
         String url = SERVER_URL + "/photoAlbums/7449";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1077,10 +1052,9 @@ public class Network {
 	}
 
 	void getPhotoAlbum(final PhotoAlbumFragment photoAlbumFragment, final String albumId) {
-		this.photoAlbumFragment = photoAlbumFragment;
-        String url = SERVER_URL + "/photos/" + String.valueOf(albumId) + "?pageSize=100";
+		String url = SERVER_URL + "/photos/" + String.valueOf(albumId) + "?pageSize=100";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1115,10 +1089,9 @@ public class Network {
 	}
 
     void getProfileBadgesComplete(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
-        this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "/badges/complete/" + String.valueOf(this.userId);
+        String url = SERVER_URL + "/badges/complete/" + String.valueOf(loggedInUser.getId());
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                         try {
@@ -1176,10 +1149,9 @@ public class Network {
     }
 
     private void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
-        this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "/badges/remaining/" + String.valueOf(this.userId);
+        String url = SERVER_URL + "/badges/remaining/" + String.valueOf(loggedInUser.getId());
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1235,10 +1207,9 @@ public class Network {
     }
 
 	void getPhoto(final PhotoViewFragment photoViewFragment, final int photoId) {
-		this.photoViewFragment = photoViewFragment;
-        String url = SERVER_URL + "/photo/" + String.valueOf(photoId);
+		String url = SERVER_URL + "/photo/" + String.valueOf(photoId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1272,9 +1243,8 @@ public class Network {
 	}
 
     void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
         String url = SERVER_URL + "/newsArticle/"
-                + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+                + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -1303,8 +1273,6 @@ public class Network {
     }
 
 	public void getVoteRecords(final VoteFragment voteFragment) {
-		this.voteFragment = voteFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
 				String response = getRequest("/voteRecord");
@@ -1336,11 +1304,9 @@ public class Network {
 	}
 
 	void getPollQuestions(final PollFragment pollFragment) {
-		this.pollFragment = pollFragment;
+		String url = SERVER_URL + "/polls/26";
 
-        String url = SERVER_URL + "/polls/26";
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1402,7 +1368,7 @@ public class Network {
     private void getPollResults(final int nodeId, final PollVoteFragment pollVoteFragment) {
         String url = SERVER_URL + "/poll/" + String.valueOf(nodeId) + "/results";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1434,7 +1400,7 @@ public class Network {
 
     void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
                                   float emotionalStability, float openess) {
-        String url = SERVER_URL + "/user/" + String.valueOf(userId) + "/personality";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/personality";
 
         HashMap<String, Float> params = new HashMap<>();
         params.put("extroversion", extroversion);
@@ -1473,7 +1439,7 @@ public class Network {
 
         HashMap<String, Integer> params = new HashMap<>();
             params.put("answerIndex", answerIndex);
-            params.put("answererId", (int) userId);
+            params.put("answererId", Integer.valueOf(loggedInUser.getId()));
             params.put("pollId", pollId);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
@@ -1504,7 +1470,7 @@ public class Network {
     void getVoteLocations(final VoteFragment voteFragment) {
 
         String url = SERVER_URL + "/votingLocations/26";
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
@@ -1540,7 +1506,7 @@ public class Network {
     public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
 
         String url = SERVER_URL + "/votingLocation/" + pos;
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1567,7 +1533,7 @@ public class Network {
     private void getLatestElection() {
         String url = SERVER_URL + "/elections/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1595,7 +1561,6 @@ public class Network {
     }
 
     void getLatestElection(final ElectionOverviewFragment electionOverviewFragment) {
-        this.electionOverviewFragment = electionOverviewFragment;
         String url = SERVER_URL + "/elections/26";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
@@ -1645,9 +1610,9 @@ public class Network {
     }
 
     void getUserSupportedTickets() {
-        String url = SERVER_URL + "/user/" + String.valueOf(this.userId) + "/support/";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/support/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1677,10 +1642,9 @@ public class Network {
     }
 
     void getLatestElection(final VoteFragment voteFragment) {
-        this.voteFragment = voteFragment;
         String url = SERVER_URL + "/elections/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1713,10 +1677,9 @@ public class Network {
     }
 
     public void getCandidates(final CandidatePositionsFragment candidatePositionsFragment) {
-        this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "/candidates/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1742,10 +1705,9 @@ public class Network {
     }
 
     void getCandidates(final CandidateAllFragment candidateAllFragment) {
-        this.candidateAllFragment = candidateAllFragment;
         String url = SERVER_URL + "/candidates/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1784,10 +1746,9 @@ public class Network {
     }
 
     void getCandidatesPosition(final CandidatePositionFragment candidatePositionFragment, final int selectedPositionId) {
-        this.candidatePositionFragment = candidatePositionFragment;
         String url = SERVER_URL + "/position/" + String.valueOf(selectedPositionId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1828,7 +1789,7 @@ public class Network {
     void getTicketLabel(final TextView textView, final int tickedId) {
         String url = SERVER_URL + "/ticket/" + String.valueOf(tickedId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1855,10 +1816,9 @@ public class Network {
     }
 
     void getTickets(final CandidateTicketFragment candidateTicketFragment) {
-        this.candidateTicketFragment = candidateTicketFragment;
         String url = SERVER_URL + "/tickets/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1902,10 +1862,9 @@ public class Network {
     }
 
     void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1944,10 +1903,9 @@ public class Network {
     }
 
     void getTicketCandidates(final CandidateTicketDetailFragment candidateTicketDetailFragment, final int selectedTickedId) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
         String url = SERVER_URL + "/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1992,7 +1950,7 @@ public class Network {
     void getPositionText(final TextView positionTextView, int positionId) {
         String url = SERVER_URL + "/position/" + String.valueOf(positionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2020,10 +1978,9 @@ public class Network {
     }
 
     void getPositions(final CandidatePositionsFragment candidatePositionsFragment) {
-        this.candidatePositionsFragment = candidatePositionsFragment;
         String url = SERVER_URL + "/positions/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2057,7 +2014,7 @@ public class Network {
     }
 
     void addVoteReminder(long date, String location) {
-        String url = SERVER_URL + "/user/" + String.valueOf(loginEmail) + "/voteReminder";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getEmail()) + "/voteReminder";
 
         HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
@@ -2090,10 +2047,10 @@ public class Network {
     }
 
     private void alreadySetVoteReminder() {
-        String url = SERVER_URL + "/user/" + String.valueOf(this.userId) + "/voteReminders/";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminders/";
         HashMap<String, String> params = new HashMap<>();
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2132,9 +2089,7 @@ public class Network {
     }
 
     void supportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-
-        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
         userTickets.add(ticketId);
 
@@ -2157,7 +2112,6 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2166,9 +2120,7 @@ public class Network {
     }
 
     void unsupportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-
-        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
         userTickets.remove(Integer.valueOf(ticketId));
 
@@ -2191,7 +2143,6 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2200,11 +2151,10 @@ public class Network {
     }
 
     void getPhotoLiked(final PhotoViewFragment photoViewFragment) {
-        this.photoViewFragment = photoViewFragment;
         String url = SERVER_URL + "/photo/"
                 + String.valueOf(photoViewFragment.getPhotoPath())
                 + "/likedBy/"
-                + String.valueOf(loginEmail) + "/";
+                + String.valueOf(loggedInUser.getEmail()) + "/";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -2226,7 +2176,6 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2236,7 +2185,7 @@ public class Network {
 
         String url = SERVER_URL + "/photo/" + String.valueOf(photoId)
                 + "/likedBy/"
-                + String.valueOf(loginEmail) + "/";
+                + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
@@ -2268,7 +2217,7 @@ public class Network {
 
     void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
 
-        String url = SERVER_URL + "/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
@@ -2299,9 +2248,7 @@ public class Network {
     }
 
     void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
-
-        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
@@ -2323,7 +2270,6 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2332,9 +2278,7 @@ public class Network {
     }
 
     void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
-
-        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
@@ -2356,41 +2300,11 @@ public class Network {
             }
         });
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 
         Log.d("VolleyRequest", req.toString());
-    }
-
-    void getUserFullName(String userEmail, final TextView textView, final String params) {
-        String url = String.format("%s/user/%s/", SERVER_URL, userEmail);
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String fullName = response.getString("givenName") + " " +
-                                    response.getString("familyName");
-
-                            textView.setText(params + fullName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
     }
 
     void getTasks(final ProfileFragment profileFragment) {
@@ -2493,8 +2407,7 @@ public class Network {
     }
 
     void getCompletedTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
-        this.taskDetailProgressFragment = taskDetailProgressFragment;
-        String url = SERVER_URL + "/tasks/complete/"+String.valueOf(userId) + "?pageSize=20";
+        String url = SERVER_URL + "/tasks/complete/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -2539,15 +2452,13 @@ public class Network {
             }
         };
 
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
     void getRemainingTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
-        this.taskDetailProgressFragment = taskDetailProgressFragment;
-        String url = SERVER_URL + "/tasks/remaining/"+String.valueOf(userId) + "?pageSize=20";
+        String url = SERVER_URL + "/tasks/remaining/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
         JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -2591,7 +2502,6 @@ public class Network {
                 return headers;
             }
         };
-
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2599,12 +2509,10 @@ public class Network {
     }
 
 	public void likeNewsArticle(final NewsArticleFragment newsArticleFragment) {
-		this.newsArticleFragment = newsArticleFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
-					String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + email + "/");
+					String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + loggedInUser.getEmail() + "/");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -2615,30 +2523,6 @@ public class Network {
 		Thread t = new Thread(r);
 		t.start();
 	}
-
-    String getLoginGivenName() {
-        return loginGivenName;
-    }
-
-    public void setLoginGivenName(String loginGivenName) {
-        this.loginGivenName = loginGivenName;
-    }
-
-    String getLoginFamilyName() {
-        return loginFamilyName;
-    }
-
-    public void setLoginFamilyName(String loginFamilyName) {
-        this.loginFamilyName = loginFamilyName;
-    }
-
-    String getLoginEmail() {
-        return loginEmail;
-    }
-
-    public void setLoginEmail(String loginEmail) {
-        this.loginEmail = loginEmail;
-    }
 
     /**
      * Convenience method for getRequest(params, withAuth) - majority of method usage
@@ -2669,6 +2553,8 @@ public class Network {
 
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestProperty("Content-type", "application/json");
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return "";
 
             InputStream inputStream = connection.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(
@@ -2726,47 +2612,7 @@ public class Network {
     public void getFirstPhoto(int electionId, final int positionId, final ImageView imageView) {
         String url = String.format("%s/photos/%d/", SERVER_URL, positionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray photos = response.getJSONArray("photos");
-
-                            int index=0;
-                            for(int i=0; i<photos.length(); i++) {
-                                JSONObject currentObject = photos.getJSONObject(i);
-                                String currentSeq = currentObject.getString("sequence");
-
-                                if(currentSeq.equals("0")) {
-                                    index = i;
-                                    break;
-                                }
-                            }
-
-                            String url = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
-                            getFirstPhotoImage(url, imageView);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
-
-    void getFirstPhotoFromUser(final String userEmail, final ImageView imageView) {
-        String url = String.format("%s/photos/%s/", SERVER_URL, userEmail);
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2804,9 +2650,9 @@ public class Network {
     }
 
     void getUserDPId() {
-        String url = String.format("%s/photos/%s/", SERVER_URL, loginEmail);
+        String url = String.format("%s/photos/%s/", SERVER_URL, loggedInUser.getEmail());
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2814,33 +2660,6 @@ public class Network {
                             userDPId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
                             String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
-
-    public void getFirstPhoto(String email, final ImageView imageView) {
-        String url = SERVER_URL + "/photos/" + String.valueOf(email) + "/";
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
-                            getFirstPhotoImage(url, imageView);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -2883,7 +2702,7 @@ public class Network {
     private void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
         String url = SERVER_URL + "/photos/" + String.valueOf(positionId) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2923,10 +2742,11 @@ public class Network {
     private void getFirstPhotoImageBlur(String url, final LinearLayout view) {
         ImageRequest req = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
+                    @SuppressWarnings("deprecation")
                     @Override
                     public void onResponse(Bitmap bitmap) {
                         Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
-                                ProfileFragment.fastBlur(bitmap, 25));
+                                Utils.fastBlur(bitmap, 25));
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                             view.setBackground(d);
                         } else {
@@ -3021,22 +2841,6 @@ public class Network {
         this.voteReminderLocation = voteReminderLocation;
     }
 
-    boolean isOptOutDataCollection() {
-        return optOutDataCollection;
-    }
-
-    void setOptOutDataCollection(boolean optOutDataCollection) {
-        this.optOutDataCollection = optOutDataCollection;
-    }
-
-    boolean isTrackingOff() {
-        return trackingOff;
-    }
-
-    void setTrackingOff(boolean trackingOff) {
-        this.trackingOff = trackingOff;
-    }
-
     void s3Upload(final File file) {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 application.getApplicationContext(), // Context,
@@ -3052,7 +2856,7 @@ public class Network {
         TransferUtility transferUtility = new TransferUtility(s3Client, application.getApplicationContext());
 
         long timestamp = System.currentTimeMillis() / 1000L;
-        final String filename = String.valueOf(userId) + "_" + String.valueOf(timestamp) + "_" + file.getName();
+        final String filename = String.valueOf(loggedInUser.getId()) + "_" + String.valueOf(timestamp) + "_" + file.getName();
         TransferObserver observer = transferUtility.upload("isegoriauserpics", filename, file);
         observer.setTransferListener(new TransferListener() {
             @Override
@@ -3082,7 +2886,7 @@ public class Network {
         params.put("title", "Profile Picture");
         params.put("description", "Profile Picture");
         params.put("date", String.valueOf(timestamp));
-        params.put("ownerId", String.valueOf(userId));
+        params.put("ownerId", String.valueOf(loggedInUser.getId()));
         params.put("sequence", String.valueOf("0"));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
@@ -3111,11 +2915,11 @@ public class Network {
     }
 
     void updateUserDetails() {
-        String url = SERVER_URL + "/user/" + String.valueOf(userId);
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId());
 
         HashMap<String, String> params = new HashMap<>();
-        params.put("trackingOff", String.valueOf(this.isTrackingOff()));
-        params.put("optOutDataCollection", String.valueOf(this.optOutDataCollection));
+        params.put("trackingOff", String.valueOf(loggedInUser.isTrackingOff()));
+        params.put("optOutDataCollection", String.valueOf(loggedInUser.isOptedOutOfDataCollection()));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {

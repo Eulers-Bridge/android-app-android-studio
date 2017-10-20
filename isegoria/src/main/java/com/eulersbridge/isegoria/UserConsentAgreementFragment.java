@@ -7,16 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class UserConsentAgreementFragment extends Fragment {
-	private View rootView;
-	private Isegoria isegoria;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.user_consent_agreement_fragment, container, false);
-		this.isegoria = (Isegoria) getActivity().getApplication();
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		//TODO: No Tabs
-
-
-		return rootView;
+		return inflater.inflate(R.layout.user_consent_agreement_fragment, container, false);
 	}
 }

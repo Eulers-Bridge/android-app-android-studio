@@ -70,7 +70,10 @@ public class Isegoria extends Application {
             @Override
             public void run() {
                 mainActivity.hideDialog();
-                mainActivity.switchContent(new PersonalityQuestionsFragment());
+
+				PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
+				personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                mainActivity.switchContent(personalityQuestionsFragment);
             }
         });
     }

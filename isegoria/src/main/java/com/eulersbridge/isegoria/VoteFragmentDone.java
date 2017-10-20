@@ -13,13 +13,11 @@ import android.widget.Button;
 import java.util.Calendar;
 
 public class VoteFragmentDone extends Fragment implements OnItemSelectedListener {
-    private View rootView;
-    private NonSwipeableViewPager mPager;
     private Network network;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.vote_fragment_done, container, false);
+        View rootView = inflater.inflate(R.layout.vote_fragment_done, container, false);
 
         //TODO: No tabs
 
@@ -43,10 +41,6 @@ public class VoteFragmentDone extends Fragment implements OnItemSelectedListener
         });
 
         return rootView;
-    }
-
-    public void setViewPager(NonSwipeableViewPager mPager) {
-        this.mPager = mPager;
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,

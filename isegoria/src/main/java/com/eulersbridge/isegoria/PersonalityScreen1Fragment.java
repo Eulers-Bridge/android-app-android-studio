@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,18 +12,14 @@ import android.widget.Button;
  * Created by Anthony on 01/04/2015.
  */
 public class PersonalityScreen1Fragment extends Fragment {
-    private View rootView;
 
-    private Network network;
     private ViewPager mPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.personality_screen1_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.personality_screen1_fragment, container, false);
 
         final MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        FragmentManager fm = getActivity().getSupportFragmentManager();
 
         final Button takePersonalityButton = rootView.findViewById(R.id.takePersonalityButton);
         takePersonalityButton.setOnClickListener(new View.OnClickListener() {

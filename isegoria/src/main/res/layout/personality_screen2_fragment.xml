@@ -1,217 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/scrollView7"
     android:background="#ffffffff">
 
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/scrollView7">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="10dp"
+        android:weightSum="1"
+        android:paddingTop="5dp">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:text="@string/personality_screen_2_description"
+            android:id="@+id/textView5"
+            android:layout_gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:gravity="start" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Extraverted, enthusiastic"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar1"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Critical, quarrelsome"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar2"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dependable, self-disciplined"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar3"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Anxious, easily upset"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar4"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Open to new experiences"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar5"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reserved, quiet"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar6"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sympathetic, warm"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar7"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disorganized, careless"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar8"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calm, emotionally stable"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar9"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Conventional, uncreative"
+            android:textStyle="bold"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:id="@+id/textView6"
+            android:textSize="16sp" />
+
+        <com.eulersbridge.isegoria.PersonalitySliderBar
+            android:id="@+id/personalitySliderBar10"
+            android:layout_width="fill_parent"
+            android:layout_height="75dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp" />
+
+        <Button
+            android:id="@+id/donePersonalityQuestions"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:paddingBottom="10dp"
-            android:weightSum="1"
-            android:paddingTop="5dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/personality_screen_2_description"
-                android:id="@+id/textView5"
-                android:layout_gravity="center"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:gravity="start" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Extraverted, enthusiastic"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar1"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Critical, quarrelsome"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar2"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dependable, self-disciplined"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar3"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Anxious, easily upset"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar4"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Open to new experiences"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar5"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reserved, quiet"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar6"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sympathetic, warm"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar7"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Disorganized, careless"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar8"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Calm, emotionally stable"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar9"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Conventional, uncreative"
-                android:textStyle="bold"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:id="@+id/textView6"
-                android:textSize="16sp" />
-
-            <com.eulersbridge.isegoria.PersonalitySliderBar
-                android:id="@+id/personalitySliderBar10"
-                android:layout_width="fill_parent"
-                android:layout_height="75dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp" />
-
-            <Button
-                android:id="@+id/donePersonalityQuestions"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:paddingBottom="10dp"
-                android:background="#52BB42"
-                android:minHeight="40dip"
-                android:text="@string/personality_questions_done_button"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal" />
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+            android:background="#52BB42"
+            android:minHeight="40dip"
+            android:text="@string/personality_questions_done_button"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+</ScrollView>

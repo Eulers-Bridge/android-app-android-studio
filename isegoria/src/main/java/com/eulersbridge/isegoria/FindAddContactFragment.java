@@ -89,20 +89,20 @@ public class FindAddContactFragment extends Fragment {
         usersAllTableLayout.removeAllViews();
     }
 
-    public void addUser(String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(-1, usersAllTableLayout, firstName + " " + lastName, email, institution, url, 1);
+    public void addUser(User user) {
+        addTableRow(-1, usersAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 1);
         LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
         searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
-    public void addFriend(int userId, String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(userId, friendsAllTableLayout, firstName + " " + lastName, email, institution, url, 2);
+    public void addFriend(int userId, User user) {
+        addTableRow(userId, friendsAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 2);
     }
 
-    public void addPendingFriend(int userId, String firstName, String lastName, final String email, String institution, String url) {
+    public void addPendingFriend(int userId, User user) {
         LinearLayout pendingRequestsLinearLayout = rootView.findViewById(R.id.pendingRequestsLinearLayout);
         pendingRequestsLinearLayout.setVisibility(ViewGroup.VISIBLE);
-        addTableRow(userId, pendingTableLayout, firstName + " " + lastName, email, institution, url, 3);
+        addTableRow(userId, pendingTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 3);
     }
 
     // 1 = Search

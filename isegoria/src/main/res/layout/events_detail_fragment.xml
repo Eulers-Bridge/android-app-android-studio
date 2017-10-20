@@ -127,7 +127,7 @@
 		            	     android:onClick="addToCalendar"
 		            	     android:paddingRight="10dp"
 							 android:paddingEnd="10dp"
-		            	     android:text="Add to Calendar"
+		            	     android:text="@string/event_add_to_calendar"
 		            	     android:textColor="@color/white"
                              android:visibility="invisible" />
 

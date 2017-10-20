@@ -1,9 +1,7 @@
 package com.eulersbridge.isegoria;
 
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,13 +23,10 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 public class NewsFragment extends Fragment {
-	private View rootView;
 	private TableLayout newsTableLayout;
 	
 	private float dpWidth;
-	private float dpHeight;
-	
-	private Isegoria isegoria;
+
 	private NewsFragment newsFragment;
 	
 	private int[] drawables = new int[14];
@@ -58,8 +53,7 @@ public class NewsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		this.isegoria = (Isegoria) getActivity().getApplication();
-		rootView = inflater.inflate(R.layout.news_fragment, container, false);
+		View rootView = inflater.inflate(R.layout.news_fragment, container, false);
 		newsTableLayout = rootView.findViewById(R.id.newsTableLayout);
         swipeContainerNews = rootView.findViewById(R.id.swipeContainerNews);
         swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -78,7 +72,6 @@ public class NewsFragment extends Fragment {
         });
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         this.newsFragment = this;
         
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -341,21 +334,5 @@ public class NewsFragment extends Fragment {
 	        tr.addView(relativeLayout);	
 	        newsTableLayout.addView(tr);
 		}
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
-
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
-
-	    // Calculate inSampleSize
-	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
 	}
 }

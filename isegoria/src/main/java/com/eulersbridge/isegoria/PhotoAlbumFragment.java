@@ -21,9 +21,7 @@ public class PhotoAlbumFragment extends Fragment {
 	private View rootView;
 	private TableLayout photosAlbumTableLayout;
 	private TableRow tr;
-	
-	private float dpWidth;
-	private float dpHeight;
+
 	private int photosPerRow = -1;
 	private int fitPerRow = 0;
 	private int squareSize;
@@ -49,9 +47,6 @@ public class PhotoAlbumFragment extends Fragment {
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		photosAlbumTableLayout = rootView.findViewById(R.id.photosAlbumTableLayout);
-
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 6.666666667, getResources().getDisplayMetrics());

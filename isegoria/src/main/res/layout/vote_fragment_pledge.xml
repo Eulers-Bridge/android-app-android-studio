@@ -43,7 +43,7 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:text="Make it official and sign on the line above to finish your democratic pledge."
+        android:text="@string/vote_sign_pledge_message"
         android:textColor="#757581"
         android:textSize="20sp" />
 
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/green_button"
             android:gravity="center"
-            android:text="Next"
+            android:text="@string/vote_sign_pledge_next_button"
             android:textColor="#52BB42"
             android:layout_gravity="top" />
 

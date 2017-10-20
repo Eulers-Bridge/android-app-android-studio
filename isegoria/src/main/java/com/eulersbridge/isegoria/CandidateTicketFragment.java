@@ -1,8 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
@@ -32,9 +29,7 @@ public class CandidateTicketFragment extends Fragment {
 	
 	private float dpWidth;
 
-    private Network network;
-
-    private int lastTicketId;
+	private int lastTicketId;
     private String lastName;
     private String lastNoOfSupporters;
     private String lastColour;
@@ -54,7 +49,7 @@ public class CandidateTicketFragment extends Fragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
         MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+		Network network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getTickets(this);
         network.getUserSupportedTickets();
         
@@ -370,20 +365,4 @@ public class CandidateTicketFragment extends Fragment {
 
             positionsTableLayout.addView(tr);
     }
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
-
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
-
-	    // Calculate inSampleSize
-	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
-	}
 }

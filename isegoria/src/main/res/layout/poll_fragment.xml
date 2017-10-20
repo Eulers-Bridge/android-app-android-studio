@@ -1,26 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
   xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:orientation="vertical"
-  >
-  
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:paddingTop="10dp" >
+    android:id="@+id/scrollView1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingTop="10dp" >
 
-            <TableLayout
-                android:id="@+id/pollTableLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:shrinkColumns="1"
-                android:stretchColumns="0" >
+        <TableLayout
+            android:id="@+id/pollTableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:shrinkColumns="1"
+            android:stretchColumns="0" >
 
-            </TableLayout>
-    </ScrollView>
-
-
-</LinearLayout>
+        </TableLayout>
+</ScrollView>

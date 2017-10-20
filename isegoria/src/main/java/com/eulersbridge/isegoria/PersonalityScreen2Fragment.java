@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +11,15 @@ import android.widget.Button;
  * Created by Anthony on 01/04/2015.
 */
 public class PersonalityScreen2Fragment extends Fragment {
-    private View rootView;
     private Network network;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.personality_screen2_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.personality_screen2_fragment, container, false);
 
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
         final PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);
         final PersonalitySliderBar personalitySliderBar2 = rootView.findViewById(R.id.personalitySliderBar2);
         final PersonalitySliderBar personalitySliderBar3 = rootView.findViewById(R.id.personalitySliderBar3);
