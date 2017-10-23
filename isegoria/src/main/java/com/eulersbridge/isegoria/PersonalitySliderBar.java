@@ -1,29 +1,23 @@
 package com.eulersbridge.isegoria;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
 
 import java.util.ArrayList;
 
 /**
  * Created by Anthony on 01/04/2015.
  */
-public class PersonalitySliderBar extends View {
-    int parentWidth;
-    int parentHeight;
+public class PersonalitySliderBar extends BaseSliderBar {
+    private Paint disagreePaint;
+    private Paint centrePaint;
+    private Paint agreePaint;
 
-    private int x;
-    private int y;
-
-    private String answer = "Niether";
-    private ArrayList<PersonalityPoint> points = new ArrayList<PersonalityPoint>();
-
-    private int score;
+    private Paint notchPaint;
 
     public PersonalitySliderBar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -31,134 +25,72 @@ public class PersonalitySliderBar extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-        this.setMeasuredDimension(parentWidth, parentHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        x = (parentWidth/2);
-        y = (parentHeight/2);
+        setupPoints();
+    }
+
+    private void setupPoints() {
+        int parentWidth = getParentWidth();
+        int pointY = getParentHeight() / 2;
+        Resources resources = getResources();
+
+        addPoint(new SliderBarPoint(horizontalPadding, pointY, resources.getString(R.string.personality_slider_disagree_strongly)));
+        addPoint(new SliderBarPoint(parentWidth/6, pointY, resources.getString(R.string.personality_slider_disagree_moderately)));
+        addPoint(new SliderBarPoint((parentWidth/6)*2, pointY, resources.getString(R.string.personality_slider_disagree_a_little)));
+        addPoint(new SliderBarPoint((parentWidth/6)*3, pointY, resources.getString(R.string.personality_slider_neither)));
+        addPoint(new SliderBarPoint((parentWidth/6)*4, pointY, resources.getString(R.string.personality_slider_agree_a_little)));
+        addPoint(new SliderBarPoint((parentWidth/6)*5, pointY, resources.getString(R.string.personality_slider_agree_moderately)));
+        addPoint(new SliderBarPoint(parentWidth - horizontalPadding, pointY, resources.getString(R.string.personality_slider_agree_strongly)));
+    }
+
+    @Override
+    protected void setupPaints() {
+        super.setupPaints();
+
+        disagreePaint = new Paint();
+        disagreePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightRed));
+        disagreePaint.setStrokeWidth(4);
+
+        centrePaint = new Paint();
+        centrePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightGrey));
+        centrePaint.setStrokeWidth(4);
+
+        agreePaint = new Paint();
+        agreePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightGreen));
+        agreePaint.setStrokeWidth(4);
+
+        notchPaint = new Paint();
+        notchPaint.setColor(ContextCompat.getColor(getContext(), R.color.barBackground));
+        notchPaint.setStrokeWidth(4);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+        int lineY = getParentHeight() / 2;
+        int parentWidth = getParentWidth();
 
-        Paint paint = new Paint();
-        paint.setColor(Color.parseColor("#FF6D65"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine(0, (parentHeight/2), (parentWidth/3), (parentHeight/2), paint);
+        final ArrayList<SliderBarPoint> points = getPoints();
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#8694A3"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine((parentWidth/3), (parentHeight/2), (parentWidth/3)*2, (parentHeight/2), paint);
+        // Disagree segment
+        canvas.drawLine(horizontalPadding, lineY, (parentWidth/3), lineY, disagreePaint);
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#60C353"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine((parentWidth/3)*2, (parentHeight/2), (parentWidth/3)*3,
-                (parentHeight/2), paint);
+        // Neutral/weak segment
+        canvas.drawLine((parentWidth/3), lineY,
+                (parentWidth/3)*2, lineY, centrePaint);
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine(2, (parentHeight/2)-10, 2, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint(2, (parentHeight/2), "Disagree Strongly"));
+        // Agree segment
+        canvas.drawLine((parentWidth/3)*2, lineY,
+                parentWidth - horizontalPadding, lineY, agreePaint);
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine((parentWidth/3), (parentHeight/2)-10, (parentWidth/3), (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint((parentWidth/3), (parentHeight/2), "Disagree Moderately"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine((parentWidth/3)/2, (parentHeight/2)-10, (parentWidth/3)/2, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint((parentWidth/3)/2, (parentHeight/2), "Disagree a Little"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine(((parentWidth/3)/2)*3, (parentHeight/2)-10, ((parentWidth/3)/2)*3, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint(((parentWidth/3)/2)*3, (parentHeight/2), "Neither"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine(((parentWidth/3)/2)*4, (parentHeight/2)-10, ((parentWidth/3)/2)*4, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint(((parentWidth/3)/2)*4, (parentHeight/2), "Agree a Little"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine(((parentWidth/3)/2)*5, (parentHeight/2)-10, ((parentWidth/3)/2)*5, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint(((parentWidth/3)/2)*5, (parentHeight/2), "Agree Moderately"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#313E4D"));
-        paint.setStrokeWidth(4);
-        canvas.drawLine((((parentWidth/3)/2)*6)-2, (parentHeight/2)-10, (((parentWidth/3)/2)*6)-2, (parentHeight/2)+10, paint);
-        points.add(new PersonalityPoint((((parentWidth/3)/2)*6)-2, (parentHeight/2), "Agree Strongly"));
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#FFFFFF"));
-        paint.setStyle(Paint.Style.FILL);
-        paint.setStrokeWidth(4);
-        paint.setAntiAlias(true);
-        canvas.drawCircle(x, y, 20, paint);
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#4A90E2"));
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(4);
-        paint.setAntiAlias(true);
-        canvas.drawCircle(x, y, 20, paint);
-
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#738192"));
-        paint.setTextSize(16);
-        paint.setAntiAlias(true);
-        canvas.drawText(answer,
-                (parentWidth/2)-((paint.measureText(answer))/2), (parentHeight/2)+50, paint);
-    }
-
-    public void snapToPoint(int x, int y) {
-        int currentDistance = 1000;
-        PersonalityPoint currentPoint = null;
-        int index = -1;
-
-        for(int i=0; i<points.size(); i++) {
-            PersonalityPoint point = points.get(i);
-
-            if(Math.abs(point.getX() - x) < currentDistance) {
-                currentPoint = point;
-                index = i;
-                currentDistance = Math.abs(point.getX() - x);
-            }
+        // Notches
+        for (int i = 0; i < points.size() - 1; i++) {
+            SliderBarPoint point = points.get(i);
+            canvas.drawLine(point.getX(), point.getY() - 10, point.getX(), point.getY() + 10,
+                    notchPaint);
         }
 
-        setScore(index+1);
-        this.x = currentPoint.getX();
-        this.answer = currentPoint.getAnswer();
-        invalidate();
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        x = (int) event.getX();
-        snapToPoint((int) event.getX(), (int) event.getY());
-
-        invalidate();
-        return true;
+        // Have superclass draw circle on top
+        super.onDraw(canvas);
     }
 }

@@ -1,9 +1,8 @@
 package com.eulersbridge.isegoria;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -18,17 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-import java.io.InputStream;
-
-public class PhotoAlbumFragment extends SherlockFragment {
+public class PhotoAlbumFragment extends Fragment {
 	private View rootView;
 	private TableLayout photosAlbumTableLayout;
 	private TableRow tr;
-	
-	private float dpWidth;
-	private float dpHeight;
+
 	private int photosPerRow = -1;
 	private int fitPerRow = 0;
 	private int squareSize;
@@ -50,19 +43,16 @@ public class PhotoAlbumFragment extends SherlockFragment {
 		rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
 		getActivity().setTitle("Isegoria");
 		Bundle bundle = this.getArguments();
-		photoAlbumName = (String) bundle.getString("Album");
+		photoAlbumName = bundle.getString("Album");
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		photosAlbumTableLayout = (TableLayout) rootView.findViewById(R.id.photosAlbumTableLayout);
-
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+		photosAlbumTableLayout = rootView.findViewById(R.id.photosAlbumTableLayout);
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 6.666666667, getResources().getDisplayMetrics());
 
-        squareSize = (int) (displayMetrics.widthPixels / 4) - (10/4);
-        fitPerRow = (int) 4;
+        squareSize = displayMetrics.widthPixels / 4 - (10/4);
+        fitPerRow = 4;
         dividerPadding = (10/4);
 
         tr = new TableRow(getActivity());
@@ -80,7 +70,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
 		addTableRow(bitmap, photoId);
 	}
 
-	public void addTableRow(String bitmap, final int photoPath) {
+	private void addTableRow(String bitmap, final int photoPath) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float) 6.666666667, getResources().getDisplayMetrics());
@@ -104,7 +94,7 @@ public class PhotoAlbumFragment extends SherlockFragment {
 
             ImageView view = new ImageView(getActivity());
             //view.setColorFilter(Color.argb(125, 35, 35, 35));
-            view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, (int) (squareSize), 1.0f));
+            view.setLayoutParams(new LinearLayout.LayoutParams(squareSize, squareSize, 1.0f));
             view.setScaleType(ScaleType.CENTER_CROP);
             view.setBackgroundColor(Color.GRAY);
 
@@ -127,11 +117,11 @@ public class PhotoAlbumFragment extends SherlockFragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     PhotoViewFragment fragment2 = new PhotoViewFragment();
                     Bundle args = new Bundle();
-                    args.putString("PhotoName", (String) String.valueOf(photoPath));
+                    args.putString("PhotoName", String.valueOf(photoPath));
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
                     fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);
@@ -144,36 +134,8 @@ public class PhotoAlbumFragment extends SherlockFragment {
 
             tr.addView(viewLinearLayout);
             tr.addView(linearLayout);
-        } catch(Exception e) {
+        } catch(Exception ignored) {
 
         }
-	}
-	
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
-	        int reqWidth, int reqHeight) {
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeStream(is);
 	}
 }

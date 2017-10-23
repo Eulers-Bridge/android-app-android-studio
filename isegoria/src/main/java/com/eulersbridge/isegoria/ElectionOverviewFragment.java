@@ -2,19 +2,13 @@ package com.eulersbridge.isegoria;
 
 
 import android.os.Bundle;
-import android.util.DisplayMetrics;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class ElectionOverviewFragment extends SherlockFragment {
-	private View rootView;
-	
-	private float dpWidth;
-	private float dpHeight;
+public class ElectionOverviewFragment extends Fragment {
 
     private TextView electionIntroduction;
     private TextView electionTitle;
@@ -29,18 +23,14 @@ public class ElectionOverviewFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        View rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
 
-        electionIntroduction = (TextView) rootView.findViewById(R.id.electionIntroduction);
-        electionTitle = (TextView) rootView.findViewById(R.id.electionTitle);
-        electionDate = (TextView) rootView.findViewById(R.id.electionDate);
-        electionProcess = (TextView) rootView.findViewById(R.id.electionProcess);
-        overviewTextField = (TextView) rootView.findViewById(R.id.overviewTextField);
-        processTextField = (TextView) rootView.findViewById(R.id.processTextField);
-
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        electionIntroduction = rootView.findViewById(R.id.electionIntroduction);
+        electionTitle = rootView.findViewById(R.id.electionTitle);
+        electionDate = rootView.findViewById(R.id.electionDate);
+        electionProcess = rootView.findViewById(R.id.electionProcess);
+        overviewTextField = rootView.findViewById(R.id.overviewTextField);
+        processTextField = rootView.findViewById(R.id.processTextField);
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();

@@ -1,164 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:id="@+id/scrollView2">
 
-    <SearchView
-        android:id="@+id/searchFriendsView"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/searchBar" >
-
-    </SearchView>
-
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollView2"
-        android:layout_column="1">
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/searchResultsLinearLayout"
+            android:visibility="gone">
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/searchResultsLinearLayout"
-                android:visibility="gone">
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
-                    android:background="#838a8a8a" />
-                <RelativeLayout
-                    android:id="@+id/relativeLayoutSearchResults"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="#64d3d3d3" >
-
-                    <TextView
-                        android:id="@+id/taskLevelFieldSearchResults"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Search Results"
-                        android:textColor="#ff575757"
-                        android:textSize="16dp"
-                        android:textStyle="bold"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp" />
-
-
-                </RelativeLayout>
-            </LinearLayout>
-
-            <TableLayout
-                android:id="@+id/usersAllTable"
+                android:layout_height="1dip"
+                android:background="#838a8a8a" />
+            <RelativeLayout
+                android:id="@+id/relativeLayoutSearchResults"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                >
-                <TableRow
-                    android:id="@+id/tableRow1"
+                android:layout_height="match_parent"
+                android:background="#64d3d3d3" >
+
+                <TextView
+                    android:id="@+id/taskLevelFieldSearchResults"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
-                </TableRow>
-            </TableLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/pendingRequestsLinearLayout"
-                android:visibility="gone">
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
-                    android:background="#838a8a8a" />
-                <RelativeLayout
-                    android:id="@+id/relativeLayoutPending"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="#64d3d3d3" >
-
-                    <TextView
-                        android:id="@+id/taskLevelFieldPending"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Pending Friend Requests"
-                        android:textColor="#ff575757"
-                        android:textSize="16dp"
-                        android:textStyle="bold"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Search Results"
+                    android:textColor="#ff575757"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp" />
 
 
-                </RelativeLayout>
-            </LinearLayout>
-
-            <TableLayout
-                android:id="@+id/friendsPendingTableLayout"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                >
-                <TableRow
-                    android:id="@+id/tableRow2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
-                </TableRow>
-            </TableLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dip"
-                    android:background="#838a8a8a" />
-                <RelativeLayout
-                    android:id="@+id/relativeLayout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:background="#64d3d3d3" >
-
-                    <TextView
-                        android:id="@+id/taskLevelField"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Current Friends"
-                        android:textColor="#ff575757"
-                        android:textSize="16dp"
-                        android:textStyle="bold"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp" />
-
-
-                </RelativeLayout>
-            </LinearLayout>
-
-            <TableLayout
-                android:id="@+id/friendsAllTableLayout"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                >
-                <TableRow
-                    android:id="@+id/tableRow2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
-                </TableRow>
-            </TableLayout>
-
+            </RelativeLayout>
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+        <TableLayout
+            android:id="@+id/usersAllTable"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <TableRow
+                android:id="@+id/tableRow1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+            </TableRow>
+        </TableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/pendingRequestsLinearLayout"
+            android:visibility="gone">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:background="#838a8a8a" />
+            <RelativeLayout
+                android:id="@+id/relativeLayoutPending"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#64d3d3d3" >
+
+                <TextView
+                    android:id="@+id/taskLevelFieldPending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Pending Friend Requests"
+                    android:textColor="#ff575757"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp" />
+
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <TableLayout
+            android:id="@+id/friendsPendingTableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <TableRow
+                android:id="@+id/tableRow2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+            </TableRow>
+        </TableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:background="#838a8a8a" />
+            <RelativeLayout
+                android:id="@+id/relativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#64d3d3d3" >
+
+                <TextView
+                    android:id="@+id/taskLevelField"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Current Friends"
+                    android:textColor="#ff575757"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp" />
+
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <TableLayout
+            android:id="@+id/friendsAllTableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <TableRow
+                android:id="@+id/tableRow2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -2,8 +2,8 @@ package com.eulersbridge.isegoria;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,20 +12,13 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-import java.io.InputStream;
-
-public class PhotoViewFragment extends SherlockFragment {
+public class PhotoViewFragment extends Fragment {
 	private View rootView;
     private PhotoViewFragment photoViewFragment;
-	
-	private float dpWidth;
-	private float dpHeight;
 
     private ImageView photoStar;
     private TextView photoLikes;
-	
+
 	private DisplayMetrics displayMetrics;
 	private int photoPath;
 
@@ -35,16 +28,13 @@ public class PhotoViewFragment extends SherlockFragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.photoViewFragment = photoViewFragment;
 
-		rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
+        rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
 		getActivity().setTitle("Isegoria");
 		Bundle bundle = this.getArguments();
-		photoPath = (int) bundle.getInt("PhotoId");
-		
+		photoPath = bundle.getInt("PhotoId");
+
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
         addPhoto("", imageBitmap);
 
@@ -53,29 +43,28 @@ public class PhotoViewFragment extends SherlockFragment {
         network.getPhoto(this, photoPath);
         network.getPhotoLiked(this);
 
-        photoStar = (ImageView) rootView.findViewById(R.id.photoFlag);
-        photoLikes = (TextView) rootView.findViewById(R.id.photoLikes);
+        photoStar = rootView.findViewById(R.id.photoFlag);
+        photoLikes = rootView.findViewById(R.id.photoLikes);
 
-        final TextView photoLikesTextView = (TextView) rootView.findViewById(R.id.photoLikes);
-        final ImageView starView = (ImageView) rootView.findViewById(R.id.photoStar);
+        final ImageView starView = rootView.findViewById(R.id.photoStar);
         starView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(setLiked == false) {
+                if(!setLiked) {
                     setLiked = true;
                     starView.setImageResource(R.drawable.star);
                     network.likePhoto(photoPath, photoViewFragment);
-                    int likes = Integer.parseInt(String.valueOf(photoLikesTextView.getText()));
+                    int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
                     likes = likes + 1;
-                    photoLikesTextView.setText(String.valueOf(likes));
+                    photoLikes.setText(String.valueOf(likes));
                 }
                 else {
                     setLiked = false;
                     starView.setImageResource(R.drawable.stardefault);
                     network.unlikePhoto(photoPath, photoViewFragment);
-                    int likes = Integer.parseInt(String.valueOf(photoLikesTextView.getText()));
+                    int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
                     likes = likes - 1;
-                    photoLikesTextView.setText(String.valueOf(likes));
+                    photoLikes.setText(String.valueOf(likes));
                 }
             }
         });
@@ -84,7 +73,7 @@ public class PhotoViewFragment extends SherlockFragment {
 	}
 
     public void initiallyLiked() {
-        final ImageView starView = (ImageView) rootView.findViewById(R.id.photoStar);
+        final ImageView starView = rootView.findViewById(R.id.photoStar);
         starView.setImageResource(R.drawable.star);
     }
 
@@ -108,10 +97,10 @@ public class PhotoViewFragment extends SherlockFragment {
                         final boolean inappropriateContent, int numOfLikes) {
         String dateStr = TimeConverter.convertTimestampToString(date);
 
-        TextView photoTileTextView = (TextView) rootView.findViewById(R.id.photoTitle);
-        TextView photoDateTextView = (TextView) rootView.findViewById(R.id.photoDate);
-        TextView photoLikesTextView = (TextView) rootView.findViewById(R.id.photoLikes);
-        ImageView flagged = (ImageView) rootView.findViewById(R.id.photoFlag);
+        TextView photoTileTextView = rootView.findViewById(R.id.photoTitle);
+        TextView photoDateTextView = rootView.findViewById(R.id.photoDate);
+        TextView photoLikesTextView = rootView.findViewById(R.id.photoLikes);
+        ImageView flagged = rootView.findViewById(R.id.photoFlag);
 
         if(!inappropriateContent) {
             flagged.setImageResource(R.drawable.flag);
@@ -122,19 +111,19 @@ public class PhotoViewFragment extends SherlockFragment {
         photoLikesTextView.setText(String.valueOf(numOfLikes));
     }
 	
-	public void addPhoto(final String title, final Bitmap bitmap) {
+	private void addPhoto(final String title, final Bitmap bitmap) {
 		try {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					AssetManager assetManager = getActivity().getAssets();
-					TextView photoTitle = (TextView) rootView.findViewById(R.id.photoTitle);
+					TextView photoTitle = rootView.findViewById(R.id.photoTitle);
 					photoTitle.setText(title);
-					ImageView photoImageView = (ImageView) rootView.findViewById(R.id.profilePic);
+					ImageView photoImageView = rootView.findViewById(R.id.profilePic);
 					try {
 						photoImageView.setScaleType(ScaleType.CENTER_CROP);
 						photoImageView.setImageBitmap(bitmap);
-						photoImageView.getLayoutParams().width = (int) displayMetrics.widthPixels;
+						photoImageView.getLayoutParams().width = displayMetrics.widthPixels;
 						photoImageView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
 						photoImageView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
 					} catch (Exception e) {
@@ -142,36 +131,8 @@ public class PhotoViewFragment extends SherlockFragment {
 					}   
 				}
 			});
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
-	}
-
-	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
-	        int reqWidth, int reqHeight) {
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeStream(is);
 	}
 }

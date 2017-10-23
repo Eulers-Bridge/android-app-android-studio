@@ -118,6 +118,16 @@ public class CircularSeekBar extends View implements Runnable {
 	private Paint mPointerHaloBorderPaint;
 
 	/**
+	 * {@code Paint} instance used to draw the top line of text.
+	 */
+	private Paint mTopTextPaint;
+
+	/**
+	 * {@code Paint} instance used to draw the bottom line of text.
+	 */
+	private Paint mBottomTextPaint;
+
+	/**
 	 * The width of the circle (in pixels).
 	 */
 	private float mCircleStrokeWidth;
@@ -164,7 +174,7 @@ public class CircularSeekBar extends View implements Runnable {
 	/**
 	 * {@code RectF} that represents the circle (or ellipse) of the seekbar.
 	 */
-	private RectF mCircleRectF = new RectF();
+	private final RectF mCircleRectF = new RectF();
 
 	/**
 	 * Holds the color value for {@code mPointerPaint} before the {@code Paint} instance is created.
@@ -351,7 +361,7 @@ public class CircularSeekBar extends View implements Runnable {
 	/**
 	 * Pointer position in terms of X and Y coordinates.
 	 */
-	private float[] mPointerPositionXY = new float[2];
+	private final float[] mPointerPositionXY = new float[2];
 
 	/**
 	 * Listener.
@@ -368,12 +378,12 @@ public class CircularSeekBar extends View implements Runnable {
 	 * @param attrArray TypedArray containing the attributes.
 	 */
 	private void initAttributes(TypedArray attrArray) {
-		mCircleXRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_x_radius, DEFAULT_CIRCLE_X_RADIUS) * DPTOPX_SCALE);
-		mCircleYRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_y_radius, DEFAULT_CIRCLE_Y_RADIUS) * DPTOPX_SCALE);
-		mPointerRadius = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_radius, DEFAULT_POINTER_RADIUS) * DPTOPX_SCALE);
-		mPointerHaloWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_width, DEFAULT_POINTER_HALO_WIDTH) * DPTOPX_SCALE);
-		mPointerHaloBorderWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_border_width, DEFAULT_POINTER_HALO_BORDER_WIDTH) * DPTOPX_SCALE);
-		mCircleStrokeWidth = (float) (attrArray.getFloat(R.styleable.CircularSeekBar_circle_stroke_width, DEFAULT_CIRCLE_STROKE_WIDTH) * DPTOPX_SCALE);
+		mCircleXRadius = attrArray.getFloat(R.styleable.CircularSeekBar_circle_x_radius, DEFAULT_CIRCLE_X_RADIUS) * DPTOPX_SCALE;
+		mCircleYRadius = attrArray.getFloat(R.styleable.CircularSeekBar_circle_y_radius, DEFAULT_CIRCLE_Y_RADIUS) * DPTOPX_SCALE;
+		mPointerRadius = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_radius, DEFAULT_POINTER_RADIUS) * DPTOPX_SCALE;
+		mPointerHaloWidth = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_width, DEFAULT_POINTER_HALO_WIDTH) * DPTOPX_SCALE;
+		mPointerHaloBorderWidth = attrArray.getFloat(R.styleable.CircularSeekBar_pointer_halo_border_width, DEFAULT_POINTER_HALO_BORDER_WIDTH) * DPTOPX_SCALE;
+		mCircleStrokeWidth = attrArray.getFloat(R.styleable.CircularSeekBar_circle_stroke_width, DEFAULT_CIRCLE_STROKE_WIDTH) * DPTOPX_SCALE;
 
 		String tempColor = attrArray.getString(R.styleable.CircularSeekBar_pointer_color);
 		if (tempColor != null) {
@@ -505,6 +515,26 @@ public class CircularSeekBar extends View implements Runnable {
 		mPointerHaloBorderPaint.setStrokeWidth(mPointerHaloBorderWidth);
 		mPointerHaloBorderPaint.setStyle(Paint.Style.STROKE);
 
+
+		int topTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				(float) 22.66666667, getResources().getDisplayMetrics());
+
+		mTopTextPaint = new Paint();
+		mTopTextPaint.setColor(Color.BLACK);
+		mTopTextPaint.setTextSize(topTextSize);
+		mTopTextPaint.setFakeBoldText(true);
+		mTopTextPaint.setAntiAlias(true);
+		mTopTextPaint.setDither(true);
+
+		int bottomTextSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+				(float) 7.333333333, getResources().getDisplayMetrics());
+
+		mBottomTextPaint = new Paint();
+		mBottomTextPaint.setColor(Color.parseColor("#8A898A"));
+		mBottomTextPaint.setTextSize(bottomTextSize);
+		mBottomTextPaint.setFakeBoldText(true);
+		mBottomTextPaint.setAntiAlias(true);
+		mBottomTextPaint.setDither(true);
 	}
 
 	/**
@@ -596,39 +626,19 @@ public class CircularSeekBar extends View implements Runnable {
 		canvas.drawPath(mCirclePath, mCircleFillPaint);
 
         int zeroPoint = -(getWidth()/2);
-        int textSize1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 22.66666667, getResources().getDisplayMetrics());
 
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(textSize1);
-        paint.setFakeBoldText(true);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
-        int topLineWidth = ((int) paint.measureText(topLine));
+        int topLineWidth = ((int) mTopTextPaint.measureText(topLine));
         int x = zeroPoint + (getWidth()/2) - (topLineWidth/2);
         int y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)  2.666666667, getResources().getDisplayMetrics());
-        canvas.drawText(topLine, x, y, paint);
+        canvas.drawText(topLine, x, y, mTopTextPaint);
 
-        int textSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 7.333333333, getResources().getDisplayMetrics());
-        x = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 0, getResources().getDisplayMetrics());
         y = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)   16.500000000, getResources().getDisplayMetrics());
 
-        paint = new Paint();
-        paint.setColor(Color.parseColor("#8A898A"));
-        paint.setTextSize(textSize2);
-        paint.setFakeBoldText(true);
-        paint.setAntiAlias(true);
-        paint.setDither(true);
-
-        int bottomLineWidth = ((int) paint.measureText(bottomLine));
+        int bottomLineWidth = ((int) mBottomTextPaint.measureText(bottomLine));
         x = zeroPoint + (getWidth()/2) - (bottomLineWidth/2);
-        canvas.drawText(bottomLine, x, y, paint);
+        canvas.drawText(bottomLine, x, y, mBottomTextPaint);
 	}
 
 	/**
@@ -636,8 +646,7 @@ public class CircularSeekBar extends View implements Runnable {
 	 * @return The progress of the CircularSeekBar.
 	 */
 	public int getProgress() {
-		int progress = Math.round((float)mMax * mProgressDegrees / mTotalCircleDegrees);
-		return progress;
+		return Math.round((float)mMax * mProgressDegrees / mTotalCircleDegrees);
 	}
 
 	/**
@@ -952,7 +961,7 @@ public class CircularSeekBar extends View implements Runnable {
 		initPaints();
 	}
 
-    private Activity mainActivity;
+    private final Activity mainActivity;
 
 	public CircularSeekBar(Context context) {
 		super(context);
@@ -1027,11 +1036,11 @@ public class CircularSeekBar extends View implements Runnable {
 	*/
 	public interface OnCircularSeekBarChangeListener {
 
-		public abstract void onProgressChanged(CircularSeekBar circularSeekBar, int progress, boolean fromUser);
+		void onProgressChanged(CircularSeekBar circularSeekBar, int progress, boolean fromUser);
 
-		public abstract void onStopTrackingTouch(CircularSeekBar seekBar);
+		void onStopTrackingTouch(CircularSeekBar seekBar);
 
-		public abstract void onStartTrackingTouch(CircularSeekBar seekBar);
+		void onStartTrackingTouch(CircularSeekBar seekBar);
 	}
 
 	/**

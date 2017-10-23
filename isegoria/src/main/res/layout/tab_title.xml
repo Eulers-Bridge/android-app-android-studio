@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/action_custom_title"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:textColor="#fff"
-    android:textSize="15dp"
+    android:textSize="15sp"
     android:textStyle="bold"
     android:paddingTop="13dp"
     android:gravity="center" />

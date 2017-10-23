@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -27,20 +28,17 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.ArrayList;
 
-public class CandidateAllFragment extends SherlockFragment {
+public class CandidateAllFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateAllTableLayout;
     private SearchView searchViewCandidatesAll;
-    private ArrayList<String> firstnames = new ArrayList<String>();
-    private ArrayList<String> lastnames = new ArrayList<String>();
-    private ArrayList<TableRow> rows = new ArrayList<TableRow>();
+    private final ArrayList<String> firstnames = new ArrayList<>();
+    private final ArrayList<String> lastnames = new ArrayList<>();
+    private final ArrayList<TableRow> rows = new ArrayList<>();
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private CandidateAllFragment candidateAllFragment;
     private Network network;
@@ -51,13 +49,12 @@ public class CandidateAllFragment extends SherlockFragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		
 		rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false);
-		candidateAllTableLayout = (TableLayout) rootView.findViewById(R.id.candidateAllTable);
+		candidateAllTableLayout = rootView.findViewById(R.id.candidateAllTable);
 
 		dpWidth = displayMetrics.widthPixels;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-        
+
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
         candidateAllTableLayout.addView(dividierView);
 
@@ -65,7 +62,7 @@ public class CandidateAllFragment extends SherlockFragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getCandidates(this);
 
-        searchViewCandidatesAll = (SearchView) rootView.findViewById(R.id.searchViewCandidatesAll);
+        searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
         searchViewCandidatesAll.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String query) {
@@ -80,11 +77,11 @@ public class CandidateAllFragment extends SherlockFragment {
                                 String firstname = firstnames.get(i);
                                 String lastname = lastnames.get(i);
 
-                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
                                     candidateAllTableLayout.removeView(row);
                                 }
                                 cnt = cnt + 1;
-                            } catch(Exception e) {}
+                            } catch(Exception ignored) {}
                         }
                     }
                     candidateAllFragment.rootView.invalidate();
@@ -107,11 +104,11 @@ public class CandidateAllFragment extends SherlockFragment {
                                 String firstname = firstnames.get(i);
                                 String lastname = lastnames.get(i);
 
-                                if(firstname.toLowerCase().indexOf(query.toLowerCase()) == -1 && lastname.toLowerCase().indexOf(query.toLowerCase()) == -1) {
+                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
                                     candidateAllTableLayout.removeView(row);
                                 }
                                 cnt = cnt + 1;
-                            } catch(Exception e) {}
+                            } catch(Exception ignored) {}
                         }
                     }
                     candidateAllFragment.rootView.invalidate();
@@ -125,7 +122,7 @@ public class CandidateAllFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void addAllRows() {
+    private void addAllRows() {
         try {
             candidateAllTableLayout.removeAllViews();
             for (int i = 0; i < rows.size(); i++) {
@@ -142,10 +139,10 @@ public class CandidateAllFragment extends SherlockFragment {
                 firstName, lastName);
     }
 	
-	public void addTableRow(int ticketId, final int userId, String partyAbr,
-                            String colour, String candidateName,
-                            String candidatePosition, int positionId,
-                            String firstName, String lastName) {
+	private void addTableRow(int ticketId, final int userId, String partyAbr,
+                             String colour, String candidateName,
+                             String candidatePosition, int positionId,
+                             String firstName, String lastName) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -171,14 +168,14 @@ public class CandidateAllFragment extends SherlockFragment {
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
-		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
 		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
@@ -224,19 +221,19 @@ public class CandidateAllFragment extends SherlockFragment {
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
@@ -251,15 +248,13 @@ public class CandidateAllFragment extends SherlockFragment {
         
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
         
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
         linLayout2.addView(candidateProfileImage);
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight); 
         
 		layout.addView(candidateProfileView);
@@ -279,31 +274,8 @@ public class CandidateAllFragment extends SherlockFragment {
         rows.add(tr);
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -311,7 +283,7 @@ public class CandidateAllFragment extends SherlockFragment {
 	    BitmapFactory.decodeResource(res, resId, options);
 
 	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 
 	    // Decode bitmap with inSampleSize set
 	    options.inJustDecodeBounds = false;

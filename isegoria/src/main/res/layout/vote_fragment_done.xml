@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/white"
     android:gravity="center_vertical">
@@ -21,7 +21,7 @@
         android:textSize="20sp" />
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="horizontal"
@@ -32,7 +32,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="horizontal"
@@ -52,12 +52,12 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:text="You're ready to go! Make sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!"
+        android:text="@string/vote_done_message"
         android:textColor="#757581"
         android:textSize="15sp" />
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:background="@android:color/white"
@@ -68,14 +68,14 @@
 
     <Button
         android:id="@+id/addToCalButton"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:background="#52BB42"
         android:minHeight="40dip"
-        android:text="Add to Local Calendar"
+        android:text="@string/vote_done_add_to_calendar"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal" />

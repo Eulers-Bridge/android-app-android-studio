@@ -1,46 +1,49 @@
 package com.eulersbridge.isegoria;
 
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SearchView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public class FindAddContactFragment extends SherlockFragment {
+public class FindAddContactFragment extends Fragment {
     private View rootView;
+
     private TableLayout usersAllTableLayout;
     private TableLayout friendsAllTableLayout;
     private TableLayout pendingTableLayout;
 
     private float dpWidth;
-    private float dpHeight;
 
     private FindAddContactFragment findAddContactFragment;
-    private SearchView searchFriendsView;
     private Network network;
+
+    private MainActivity mainActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,68 +51,106 @@ public class FindAddContactFragment extends SherlockFragment {
         findAddContactFragment = this;
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        usersAllTableLayout = (TableLayout) rootView.findViewById(R.id.usersAllTable);
-        friendsAllTableLayout = (TableLayout) rootView.findViewById(R.id.friendsAllTableLayout);
-        pendingTableLayout = (TableLayout) rootView.findViewById(R.id.friendsPendingTableLayout);
+
+        setHasOptionsMenu(true);
+
+        usersAllTableLayout = rootView.findViewById(R.id.usersAllTable);
+        friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
+        pendingTableLayout = rootView.findViewById(R.id.friendsPendingTableLayout);
 
         dpWidth = displayMetrics.widthPixels;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
-        usersAllTableLayout.addView(dividierView);
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
+        usersAllTableLayout.addView(dividerView);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity = (MainActivity) getActivity();
+        mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
+
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.findFriends(this);
         network.findPendingContacts(this);
 
-        searchFriendsView = (SearchView) rootView.findViewById(R.id.searchFriendsView);
-        searchFriendsView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
+        return rootView;
+    }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.friends, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        // Set max width, remove left padding to assist in getting search view text aligned
+        // with where Toolbar title previously was
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setPadding(0,searchView.getPaddingTop(),searchView.getPaddingRight(),searchView.getPaddingBottom());
+
+        // Get the search view's inner LinearLayout and remove the left margin
+        LinearLayout searchEditFrame = searchView.findViewById(R.id.search_edit_frame);
+        ((LinearLayout.LayoutParams) searchEditFrame.getLayoutParams()).leftMargin = 0;
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                mainActivity.setToolbarShowsTitle(!hasFocus);
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if(query.length() != 0) {
+                if (query.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(query).matches()) {
                     network.findContacts(query, findAddContactFragment);
                     return true;
                 }
                 return false;
             }
-        });
 
-        return rootView;
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(newText).matches()) {
+                    network.findContacts(newText, findAddContactFragment);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    public void setTabLayout(TabLayout tabLayout) {
+        tabLayout.setVisibility(View.GONE);
     }
 
     public void clearSearchResults() {
         usersAllTableLayout.removeAllViews();
     }
 
-    public void addUser(String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(-1, usersAllTableLayout, firstName + " " + lastName, email, institution, url, 1);
-        LinearLayout searchResultsLinearLayout = (LinearLayout) rootView.findViewById(R.id.searchResultsLinearLayout);
+    public void addUser(User user) {
+        addTableRow(-1, usersAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 1);
+        LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
         searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
-    public void addFriend(int userId, String firstName, String lastName, final String email, String institution, String url) {
-        addTableRow(userId, friendsAllTableLayout, firstName + " " + lastName, email, institution, url, 2);
+    public void addFriend(int userId, User user) {
+        addTableRow(userId, friendsAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 2);
     }
 
-    public void addPendingFriend(int userId, String firstName, String lastName, final String email, String institution, String url) {
-        LinearLayout pendingRequestsLinearLayout = (LinearLayout) rootView.findViewById(R.id.pendingRequestsLinearLayout);
+    public void addPendingFriend(int userId, User user) {
+        LinearLayout pendingRequestsLinearLayout = rootView.findViewById(R.id.pendingRequestsLinearLayout);
         pendingRequestsLinearLayout.setVisibility(ViewGroup.VISIBLE);
-        addTableRow(userId, pendingTableLayout, firstName + " " + lastName, email, institution, url, 3);
+        addTableRow(userId, pendingTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 3);
     }
 
     // 1 = Search
     // 2 = Current Contact
     // 3 = Pending Contact
-    public void addTableRow(final int userId, TableLayout tableLayout, final String name, final String email, final String institution, final String url, int type) {
+    private void addTableRow(final int userId, TableLayout tableLayout, final String name, final String email, final String institution, final String url, int type) {
         final TableRow tr;
 
         final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -135,7 +176,7 @@ public class FindAddContactFragment extends SherlockFragment {
         network.getPictureVolley(url, candidateProfileView);
 
         final ImageView viewProfileImage = new ImageView(getActivity());
-        viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
         viewProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
         viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -156,7 +197,7 @@ public class FindAddContactFragment extends SherlockFragment {
         });
 
         final ImageView candidateProfileImage = new ImageView(getActivity());
-        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -178,7 +219,7 @@ public class FindAddContactFragment extends SherlockFragment {
         });
 
         final ImageView acceptImage = new ImageView(getActivity());
-        acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         acceptImage.setScaleType(ScaleType.CENTER_CROP);
         acceptImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -202,7 +243,7 @@ public class FindAddContactFragment extends SherlockFragment {
         });
 
         final ImageView denyImage = new ImageView(getActivity());
-        denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         denyImage.setScaleType(ScaleType.CENTER_CROP);
         denyImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -229,19 +270,19 @@ public class FindAddContactFragment extends SherlockFragment {
         textViewCandidate.setTextSize(16.0f);
         textViewCandidate.setText(name);
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(12.0f);
         textViewPosition.setText(institution);
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         //network.getPositionText(textViewPosition, positionId);
 
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
@@ -256,14 +297,12 @@ public class FindAddContactFragment extends SherlockFragment {
 
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         //linLayout2.setBackgroundColor((Color.parseColor("#000000")));
         linLayout2.setOrientation(LinearLayout.HORIZONTAL);
-        LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         if(type == 1) {
             linLayout2.addView(candidateProfileImage);
         }
@@ -274,7 +313,7 @@ public class FindAddContactFragment extends SherlockFragment {
             linLayout2.addView(denyImage);
             linLayout2.addView(acceptImage);
         }
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight);
 
         layout.addView(candidateProfileView);
@@ -290,70 +329,20 @@ public class FindAddContactFragment extends SherlockFragment {
         tableLayout.addView(dividierView);
     }
 
-    public void showAddedDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Sent")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showAddedMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
-    public void showAcceptDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Accepted")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showAcceptMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
-    public void showDenyDialog() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Isegoria")
-                .setMessage("Friend Request has Been Denied")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+    public void showDenyMessage() {
+        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
     }
 
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
+    private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -361,7 +350,7 @@ public class FindAddContactFragment extends SherlockFragment {
         BitmapFactory.decodeResource(res, resId, options);
 
         // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+        options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;

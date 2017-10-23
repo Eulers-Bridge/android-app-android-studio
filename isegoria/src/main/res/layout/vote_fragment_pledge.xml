@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:id="@+id/signPad"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_weight="1"
         android:background="@android:color/white"
@@ -19,7 +19,7 @@
 
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:background="@color/white"
         android:layout_height="10dp"
         android:paddingLeft="40dp"
@@ -28,7 +28,7 @@
         >
 
         <View
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="1dip"
             android:background="#676475" />
     </LinearLayout>
@@ -43,12 +43,12 @@
         android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:text="Make it official and sign on the line above to finish your democratic pledge."
+        android:text="@string/vote_sign_pledge_message"
         android:textColor="#757581"
         android:textSize="20sp" />
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:layout_weight="1"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/green_button"
             android:gravity="center"
-            android:text="Next"
+            android:text="@string/vote_sign_pledge_next_button"
             android:textColor="#52BB42"
             android:layout_gravity="top" />
 

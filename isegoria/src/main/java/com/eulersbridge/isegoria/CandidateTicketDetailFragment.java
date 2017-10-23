@@ -10,7 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -29,20 +31,18 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidateTicketDetailFragment extends SherlockFragment {
+@SuppressWarnings("deprecation")
+public class CandidateTicketDetailFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateTicketDetialTableLayout;
     private Button ticketSupportButton;
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private String code;
     private String colour;
-    String partyColour = "";
-    String partyLogo = "";
+    private String partyColour = "";
+    private String partyLogo = "";
 
     private TextView partyDetailSupporters;
     private CandidateTicketDetailFragment candidateTicketDetailFragment;
@@ -60,29 +60,33 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         partyColour = bundle.getString("Colour");
         partyLogo = bundle.getString("Logo");
 
-		candidateTicketDetialTableLayout = (TableLayout) rootView.findViewById(R.id.candidateTicketDetailTable);
-        partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+		candidateTicketDetialTableLayout = rootView.findViewById(R.id.candidateTicketDetailTable);
+        partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 		
-		LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundDetail);
+		LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundDetail);
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
-		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
-		Drawable d = new BitmapDrawable(getActivity().getResources(), fastBlur(b, 25));
-		backgroundLinearLayout.setBackgroundDrawable(d);
+		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int) dpHeight /2, false);
+		Drawable d = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(b, 25));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            backgroundLinearLayout.setBackground(d);
+        } else {
+            backgroundLinearLayout.setBackgroundDrawable(d);
+        }
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getTicketDetail(ticketId, candidateTicketDetailFragment);
 
-        ImageView partyDetailLogo = (ImageView) rootView.findViewById(R.id.partyDetailLogo);
+        ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(0, ticketId, partyDetailLogo);
 
-        ticketSupportButton = (Button) rootView.findViewById(R.id.supportButton);
+        ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        if(network.getUserTickets().contains(new Integer(ticketId))) {
+        if(network.getUserTickets().contains(ticketId)) {
             ticketSupportButton.setText("Unsupport");
         }
 
@@ -91,14 +95,14 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             public void onClick(View view) {
                 if(ticketSupportButton.getText().equals("Support")) {
                     network.supportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                     String value = String.valueOf(partyDetailSupporters.getText());
                     partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
                     ticketSupportButton.setText("Unsupport");
                 }
                 else if(ticketSupportButton.getText().equals("Unsupport")) {
                     network.unsupportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = (TextView) rootView.findViewById(R.id.partyDetailSupporters);
+                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                     String value = String.valueOf(partyDetailSupporters.getText());
                     partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
                     ticketSupportButton.setText("Support");
@@ -106,7 +110,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
             }
         });
 
-        TextView partyDetailName = (TextView) rootView.findViewById(R.id.partyNameDetail);
+        TextView partyDetailName = rootView.findViewById(R.id.partyNameDetail);
         partyDetailSupporters.setText(String.valueOf(noOfSupporters));
         partyDetailName.setText(ticketName);
 
@@ -127,7 +131,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         addTableRow(userId, code, colour, firstName + " " + lastName, "", userId, positionId);
     }
 	
-	public void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
+	private void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -137,14 +141,14 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		layout.setOrientation(LinearLayout.HORIZONTAL);
 		
 		tr = new TableRow(getActivity());
-		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+		LayoutParams rowParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 		tr.setLayoutParams(rowParams);
 		tr.setPadding(0, paddingMargin3, 0, paddingMargin3);
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 53.33333333, getResources().getDisplayMetrics());
         
 		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(imageHeight, imageHeight));
+		candidateProfileView.setLayoutParams(new LayoutParams(imageHeight, imageHeight));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
@@ -153,7 +157,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 
-				Gravity.RIGHT));
+				Gravity.END));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageHeight, imageHeight));
 		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
@@ -161,7 +165,7 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
@@ -194,31 +198,35 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         		imageHeight, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-		partyLayout.setBackgroundDrawable(rectShapeDrawable);
-		partyLayout.addView(textViewParty);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            partyLayout.setBackground(rectShapeDrawable);
+        } else {
+            partyLayout.setBackgroundDrawable(rectShapeDrawable);
+        }
+        partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
-        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT); 
+        LayoutParams relLayoutMasterParam = new LayoutParams((int)dpWidth, LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
         
         RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -229,15 +237,13 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
         
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
         linLayout2.addView(candidateProfileImage);
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight); 
         
 		layout.addView(candidateProfileView);
@@ -253,32 +259,9 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
         candidateTicketDetialTableLayout.addView(tr);
         candidateTicketDetialTableLayout.addView(dividierView);
 	}
-
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
 	
-	    if (height > reqHeight || width > reqWidth) {
-	
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -286,211 +269,10 @@ public class CandidateTicketDetailFragment extends SherlockFragment {
 	    BitmapFactory.decodeResource(res, resId, options);
 
 	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 
 	    // Decode bitmap with inSampleSize set
 	    options.inJustDecodeBounds = false;
 	    return BitmapFactory.decodeResource(res, resId, options);
 	}
-	
-	public Bitmap fastBlur(Bitmap sentBitmap, int radius) {
-        Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
-
-        if (radius < 1) {
-            return (null);
-        }
-
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-
-        int[] pix = new int[w * h];
-        bitmap.getPixels(pix, 0, w, 0, 0, w, h);
-
-        int wm = w - 1;
-        int hm = h - 1;
-        int wh = w * h;
-        int div = radius + radius + 1;
-
-        int r[] = new int[wh];
-        int g[] = new int[wh];
-        int b[] = new int[wh];
-        int rsum, gsum, bsum, x, y, i, p, yp, yi, yw;
-        int vmin[] = new int[Math.max(w, h)];
-
-        int divsum = (div + 1) >> 1;
-        divsum *= divsum;
-        int dv[] = new int[256 * divsum];
-        for (i = 0; i < 256 * divsum; i++) {
-            dv[i] = (i / divsum);
-        }
-
-        yw = yi = 0;
-
-        int[][] stack = new int[div][3];
-        int stackpointer;
-        int stackstart;
-        int[] sir;
-        int rbs;
-        int r1 = radius + 1;
-        int routsum, goutsum, boutsum;
-        int rinsum, ginsum, binsum;
-
-        for (y = 0; y < h; y++) {
-            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            for (i = -radius; i <= radius; i++) {
-                p = pix[yi + Math.min(wm, Math.max(i, 0))];
-                sir = stack[i + radius];
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
-                sir[2] = (p & 0x0000ff);
-                rbs = r1 - Math.abs(i);
-                rsum += sir[0] * rbs;
-                gsum += sir[1] * rbs;
-                bsum += sir[2] * rbs;
-                if (i > 0) {
-                    rinsum += sir[0];
-                    ginsum += sir[1];
-                    binsum += sir[2];
-                } else {
-                    routsum += sir[0];
-                    goutsum += sir[1];
-                    boutsum += sir[2];
-                }
-            }
-            stackpointer = radius;
-
-            for (x = 0; x < w; x++) {
-
-                r[yi] = dv[rsum];
-                g[yi] = dv[gsum];
-                b[yi] = dv[bsum];
-
-                rsum -= routsum;
-                gsum -= goutsum;
-                bsum -= boutsum;
-
-                stackstart = stackpointer - radius + div;
-                sir = stack[stackstart % div];
-
-                routsum -= sir[0];
-                goutsum -= sir[1];
-                boutsum -= sir[2];
-
-                if (y == 0) {
-                    vmin[x] = Math.min(x + radius + 1, wm);
-                }
-                p = pix[yw + vmin[x]];
-
-                sir[0] = (p & 0xff0000) >> 16;
-                sir[1] = (p & 0x00ff00) >> 8;
-                sir[2] = (p & 0x0000ff);
-
-                rinsum += sir[0];
-                ginsum += sir[1];
-                binsum += sir[2];
-
-                rsum += rinsum;
-                gsum += ginsum;
-                bsum += binsum;
-
-                stackpointer = (stackpointer + 1) % div;
-                sir = stack[(stackpointer) % div];
-
-                routsum += sir[0];
-                goutsum += sir[1];
-                boutsum += sir[2];
-
-                rinsum -= sir[0];
-                ginsum -= sir[1];
-                binsum -= sir[2];
-
-                yi++;
-            }
-            yw += w;
-        }
-        for (x = 0; x < w; x++) {
-            rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            yp = -radius * w;
-            for (i = -radius; i <= radius; i++) {
-                yi = Math.max(0, yp) + x;
-
-                sir = stack[i + radius];
-
-                sir[0] = r[yi];
-                sir[1] = g[yi];
-                sir[2] = b[yi];
-
-                rbs = r1 - Math.abs(i);
-
-                rsum += r[yi] * rbs;
-                gsum += g[yi] * rbs;
-                bsum += b[yi] * rbs;
-
-                if (i > 0) {
-                    rinsum += sir[0];
-                    ginsum += sir[1];
-                    binsum += sir[2];
-                } else {
-                    routsum += sir[0];
-                    goutsum += sir[1];
-                    boutsum += sir[2];
-                }
-
-                if (i < hm) {
-                    yp += w;
-                }
-            }
-            yi = x;
-            stackpointer = radius;
-            for (y = 0; y < h; y++) {
-                // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                pix[yi] = ( 0xff000000 & pix[yi] ) | ( dv[rsum] << 16 ) | ( dv[gsum] << 8 ) | dv[bsum];
-
-                rsum -= routsum;
-                gsum -= goutsum;
-                bsum -= boutsum;
-
-                stackstart = stackpointer - radius + div;
-                sir = stack[stackstart % div];
-
-                routsum -= sir[0];
-                goutsum -= sir[1];
-                boutsum -= sir[2];
-
-                if (x == 0) {
-                    vmin[y] = Math.min(y + r1, hm) * w;
-                }
-                p = x + vmin[y];
-
-                sir[0] = r[p];
-                sir[1] = g[p];
-                sir[2] = b[p];
-
-                rinsum += sir[0];
-                ginsum += sir[1];
-                binsum += sir[2];
-
-                rsum += rinsum;
-                gsum += ginsum;
-                bsum += binsum;
-
-                stackpointer = (stackpointer + 1) % div;
-                sir = stack[stackpointer];
-
-                routsum += sir[0];
-                goutsum += sir[1];
-                boutsum += sir[2];
-
-                rinsum -= sir[0];
-                ginsum -= sir[1];
-                binsum -= sir[2];
-
-                yi += w;
-            }
-        }
-
-        bitmap.setPixels(pix, 0, w, 0, 0, w, h);
-
-        return (bitmap);
-    }
 }

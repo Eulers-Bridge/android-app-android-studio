@@ -1,0 +1,167 @@
+package com.eulersbridge.isegoria;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
+import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.View;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Seb on 20/10/2017.
+ */
+
+public class BaseSliderBar extends View {
+
+    private int parentWidth;
+    private int parentHeight;
+
+    private int y;
+
+    private final int circleRadius = 20;
+    private final int circleStrokeWidth = 4;
+    final int horizontalPadding = (circleRadius + (6 * circleStrokeWidth))/2;
+
+    private final ArrayList<SliderBarPoint> points = new ArrayList<>();
+
+    private int dragX = -1;
+    private SliderBarPoint currentPoint;
+
+    private Paint circleFillPaint;
+    private Paint circleStrokePaint;
+
+    private Paint textPaint;
+
+    public BaseSliderBar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        setupPaints();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        parentWidth = MeasureSpec.getSize(widthMeasureSpec) - horizontalPadding;
+        parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+        this.setMeasuredDimension(parentWidth, parentHeight);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        y = (parentHeight/2);
+    }
+
+    void addPoint(SliderBarPoint point) {
+        points.add(point);
+    }
+
+    ArrayList<SliderBarPoint> getPoints() {
+        return points;
+    }
+
+    int getParentWidth() {
+        return parentWidth;
+    }
+
+    int getParentHeight() {
+        return parentHeight;
+    }
+
+    void setupPaints() {
+        Context context = getContext();
+
+        circleFillPaint = new Paint();
+        circleFillPaint.setColor(ContextCompat.getColor(context, R.color.white));
+        circleFillPaint.setStyle(Paint.Style.FILL);
+        circleFillPaint.setStrokeWidth(circleStrokeWidth);
+        circleFillPaint.setAntiAlias(true);
+
+        circleStrokePaint = new Paint();
+        circleStrokePaint.setColor(ContextCompat.getColor(context, R.color.lightBlue));
+        circleStrokePaint.setStyle(Paint.Style.STROKE);
+        circleStrokePaint.setStrokeWidth(circleStrokeWidth);
+        circleStrokePaint.setAntiAlias(true);
+
+        textPaint = new Paint();
+        textPaint.setColor(ContextCompat.getColor(context, R.color.slider_text));
+
+        // Convert text size from SP (screen density dependent) to pixels
+        int pixelSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 11,
+                getResources().getDisplayMetrics());
+
+        textPaint.setTextSize(pixelSize);
+        textPaint.setAntiAlias(true);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if (currentPoint == null) currentPoint = points.get((points.size() - 1) / 2); // Centre point
+
+        int lineY = parentHeight / 2;
+
+        // Circle
+        int circleX;
+        if (dragX >= 0) {
+            circleX = dragX;
+        } else {
+            circleX = currentPoint.getX();
+        }
+
+        canvas.drawCircle(circleX, y, circleRadius + 8, circleFillPaint);
+        canvas.drawCircle(circleX, y, circleRadius, circleStrokePaint);
+
+        String answer = currentPoint.getAnswer();
+        canvas.drawText(answer, (parentWidth - textPaint.measureText(answer))/2, lineY + 50,
+                textPaint);
+    }
+
+    /**
+     * Snap to the closest notch/point once the user has released the slider / finished draggin
+     */
+    private void snapToPoint(int x) {
+        int currentDistance = parentWidth;
+        SliderBarPoint newPoint = null;
+
+        for (int i = 0; i < points.size(); i++) {
+            SliderBarPoint point = points.get(i);
+
+            if (Math.abs(point.getX() - x) < currentDistance) {
+                currentDistance = Math.abs(point.getX() - x);
+                newPoint = point;
+            }
+        }
+
+        if (newPoint != null) {
+            currentPoint = newPoint;
+
+            invalidate();
+        }
+    }
+
+    public int getScore() {
+        return points.indexOf(currentPoint) + 1;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        int x = (int) event.getX();
+
+        // Let the user drag the slider, and snap to a point once they let go
+        if (event.getAction() == MotionEvent.ACTION_UP
+                || event.getAction() == MotionEvent.ACTION_CANCEL) {
+            dragX = -1;
+            snapToPoint(x);
+
+        } else if (x >= horizontalPadding && x <= parentWidth - horizontalPadding) {
+            dragX = x;
+            invalidate();
+
+            return true; // Interested in any more events in this gesture (to wait for touch up/cancel)
+        }
+
+        return false; // Not interested in any further events in this gesture
+    }
+}

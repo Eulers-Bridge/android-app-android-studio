@@ -1,7 +1,8 @@
 package com.eulersbridge.isegoria;
 
-import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,9 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.ArrayList;
 
-public class UserSignupFragment extends SherlockFragment implements OnItemSelectedListener {
-	private View rootView;
+public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
 	private ArrayList<String> countries;
 	private ArrayList<CountryInfo> countryObjects;
 	private ArrayList<String> institutions;
@@ -30,11 +28,13 @@ public class UserSignupFragment extends SherlockFragment implements OnItemSelect
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
-		getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		countries = new ArrayList<String>();
-		countryObjects = new ArrayList<CountryInfo>();
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
+
+		//TODO: Hide tabs
+
+		countries = new ArrayList<>();
+		countryObjects = new ArrayList<>();
 		
 		isegoria = (Isegoria) getActivity().getApplication();
 		isegoria.setCountryObjects(countryObjects);
@@ -42,26 +42,26 @@ public class UserSignupFragment extends SherlockFragment implements OnItemSelect
         isegoria.setNetwork(network);
         network.getGeneralInfo(this);
         
-        Spinner spinner = (Spinner) rootView.findViewById(R.id.country);
+        Spinner spinner = rootView.findViewById(R.id.country);
         spinner.setOnItemSelectedListener(this);
-        spinnerArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+        spinnerArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerArrayAdapter);
  
-        Spinner spinnerInstitution = (Spinner) rootView.findViewById(R.id.institution);
-        spinnerInstitutionArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+        Spinner spinnerInstitution = rootView.findViewById(R.id.institution);
+        spinnerInstitutionArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         spinnerInstitutionArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerInstitution.setAdapter(spinnerInstitutionArrayAdapter);
         
-        Spinner spinnerGender = (Spinner) rootView.findViewById(R.id.gender);
-        spinnerGenderArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+        Spinner spinnerGender = rootView.findViewById(R.id.gender);
+        spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         spinnerGenderArrayAdapter.add("Male");
         spinnerGenderArrayAdapter.add("Female");
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(spinnerGenderArrayAdapter);
         
-        Spinner spinnerYearOfBirth = (Spinner) rootView.findViewById(R.id.yearOfBirth);
-        spinnerYearOfBirthArrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item);
+        Spinner spinnerYearOfBirth = rootView.findViewById(R.id.yearOfBirth);
+        spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         int cnt = 0;
         for(int i=1900; i<=2014; i++) {
         	spinnerYearOfBirthArrayAdapter.add(String.valueOf(i));
@@ -82,14 +82,17 @@ public class UserSignupFragment extends SherlockFragment implements OnItemSelect
 	}
 	
 	public void addCountry(final CountryInfo countryInfo) {
-		getActivity().runOnUiThread(new Runnable() {
-		     @Override
-		     public void run() {
-		    	 spinnerArrayAdapter.add(countryInfo.getCountry());
-		    	 countries.add(countryInfo.getCountry());
-		    	 countryObjects.add(countryInfo);
-			 }
-		});
+		Activity activity = getActivity();
+		if (activity != null) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					spinnerArrayAdapter.add(countryInfo.getCountry());
+					countries.add(countryInfo.getCountry());
+					countryObjects.add(countryInfo);
+				}
+			});
+		}
 	}
 	
     public void onItemSelected(AdapterView<?> parent, View view, 
@@ -98,7 +101,7 @@ public class UserSignupFragment extends SherlockFragment implements OnItemSelect
     	spinnerInstitutionArrayAdapter.clear();
     	
     	for(int i=0; i<countryObjects.size(); i++) {
-    		CountryInfo countryInfo = (CountryInfo) countryObjects.get(i);
+    		CountryInfo countryInfo = countryObjects.get(i);
     		if(selectedCountry.equals(countryInfo.getCountry())) {
     			for(int j=0; j<countryInfo.getInstitutions().size(); j++) {
     				InstitutionInfo currentInstitution = countryInfo.getInstitutions().get(j);

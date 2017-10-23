@@ -1,53 +1,63 @@
 package com.eulersbridge.isegoria;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import java.util.ArrayList;
 
 /**
  * Created by Anthony on 01/04/2015.
  */
-public class PersonalityQuestionsFragment extends SherlockFragment {
-    private View rootView;
-    private NonSwipeableViewPager mPager;
-    private ProfilePagerAdapter mPagerAdapter;
+public class PersonalityQuestionsFragment extends Fragment {
+    private TabLayout tabLayout;
+    private NonSwipeableViewPager viewPager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.personality_questions_fragment, container, false);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        ((SherlockFragmentActivity) getActivity()).getSupportActionBar().show();
+        View rootView = inflater.inflate(R.layout.personality_questions_fragment, container, false);
 
-        FragmentManager fm = ((SherlockFragmentActivity) getActivity()).getSupportFragmentManager();
+        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_personality_questions));
 
-        ViewPager.SimpleOnPageChangeListener ViewPagerListener = new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-            }
-        };
-
-        mPager = (NonSwipeableViewPager) rootView.findViewById(R.id.personalityViewPagerFragment);
-        mPager.setOnPageChangeListener(ViewPagerListener);
-
-        PersonalityScreen1Fragment personalityScreen1Fragment = new PersonalityScreen1Fragment();
-        personalityScreen1Fragment.setViewPager(mPager);
-        ArrayList<SherlockFragment> fragmentList = new ArrayList<SherlockFragment>();
-        fragmentList.add(personalityScreen1Fragment);
-        fragmentList.add(new PersonalityScreen2Fragment());
-
-        mPagerAdapter = new ProfilePagerAdapter(fm, fragmentList);
-        mPager.setAdapter(mPagerAdapter);
+        setupViewPager(rootView);
+        setupTabLayout();
 
         return rootView;
+    }
+
+    private void setupViewPager(View rootView) {
+        if (rootView == null) rootView = getView();
+
+        if (viewPager == null && rootView != null) {
+            viewPager = rootView.findViewById(R.id.personalityViewPagerFragment);
+
+            PersonalityScreen1Fragment personalityScreen1Fragment = new PersonalityScreen1Fragment();
+            personalityScreen1Fragment.setViewPager(viewPager);
+
+            ArrayList<Fragment> fragments = new ArrayList<>();
+
+            fragments.add(personalityScreen1Fragment);
+            fragments.add(new PersonalityScreen2Fragment());
+
+            SimpleFragmentPagerAdapter viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments);
+            viewPager.setAdapter(viewPagerAdapter);
+
+            viewPager.setCurrentItem(0);
+        }
+    }
+
+    public void setTabLayout(TabLayout tabLayout) {
+        this.tabLayout = tabLayout;
+    }
+
+    private void setupTabLayout() {
+        if (tabLayout == null) return;
+
+        tabLayout.setVisibility(View.GONE);
+        tabLayout.removeAllTabs();
+        tabLayout.setupWithViewPager(viewPager);
     }
 }

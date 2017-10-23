@@ -1,16 +1,20 @@
 package com.eulersbridge.isegoria;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 
 public class Isegoria extends Application {
 	private MainActivity mainActivity;
-	protected Network network;
+	private Network network;
 	private boolean loggedIn = false;
 	private String username = "";
 	private String password = "";
-	private FeedFragment feedFragment;
 	private ArrayList<CountryInfo> countryObjects;
 	
 	public Isegoria() {
@@ -37,8 +41,27 @@ public class Isegoria extends Application {
 		mainActivity.runOnUiThread(new Runnable() {
 		     @Override
 		     public void run() {
-		    	 mainActivity.hideDialog();
-		    	 mainActivity.switchContent(new FeedFragment());
+                 mainActivity.hideDialog();
+
+                 mainActivity.setNavigationDrawerEnabled(true);
+				 mainActivity.setToolbarVisible(true);
+
+				 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					 int color = ContextCompat.getColor(mainActivity, R.color.darkBlue);
+					 mainActivity.getWindow().setStatusBarColor(color);
+
+					 //Set color of multitasking bar (have to pass in app name and icon again however)
+
+					 Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
+					 mainActivity.setTaskDescription(
+					 		new ActivityManager.TaskDescription(getString(R.string.app_name), icon, color));
+					 icon.recycle();
+				 }
+
+				 final FeedFragment feedFragment = new FeedFragment();
+                 feedFragment.setTabLayout(mainActivity.getTabLayout());
+
+                 mainActivity.switchContent(feedFragment);
 		     }
 		});
 	}
@@ -58,13 +81,16 @@ public class Isegoria extends Application {
             @Override
             public void run() {
                 mainActivity.hideDialog();
-                mainActivity.switchContent(new PersonalityQuestionsFragment());
+
+				PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
+				personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                mainActivity.switchContent(personalityQuestionsFragment);
             }
         });
     }
 
-	public void signupSucceded() {
-		mainActivity.showSignupSucceded();
+	public void signupSucceeded() {
+		mainActivity.showSignupSucceeded();
 	}
 	
 	public void signupFailed() {

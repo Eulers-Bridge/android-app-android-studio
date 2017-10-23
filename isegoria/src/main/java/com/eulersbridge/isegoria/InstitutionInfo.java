@@ -1,6 +1,6 @@
 package com.eulersbridge.isegoria;
 
-public class InstitutionInfo {
+class InstitutionInfo {
 	private String id;
 	private String institution;
 	

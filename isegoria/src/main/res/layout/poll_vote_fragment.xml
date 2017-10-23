@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/pollLinearLayout"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     >
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -16,8 +16,8 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true">
 
@@ -25,16 +25,12 @@
                 android:id="@+id/tabPageIndidcatorVote"
                 android:layout_height="wrap_content"
                 android:background="#313E4D"
-                android:layout_alignParentTop="true"
-                android:layout_width="fill_parent" />
+                android:layout_width="match_parent" />
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/pollViewPager"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_below="@id/tabPageIndidcatorVote"
-                />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -48,33 +44,9 @@
                 android:id="@+id/footer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
                 android:layout_gravity="center_vertical"
                 android:background="@color/barBackground"
                 android:paddingBottom="3dp" >
-
-                <LinearLayout
-                    android:id="@+id/commentsLayout"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="fill_parent"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true">
-
-                    <EditText
-                        android:id="@+id/commentsField"
-                        android:focusableInTouchMode="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentTop="true"
-                        android:paddingLeft="10dp"
-                        android:hint="Enter a Comment"
-                        android:textColor="@color/white"
-                        android:background="#00000000"
-                        />
-
-                    </LinearLayout>
 
                 <Button
                     android:id="@+id/postButton"
@@ -82,6 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
                     android:background="@color/greenButtonBackground"
                     android:text="Post"

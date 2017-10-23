@@ -1,11 +1,10 @@
 package com.eulersbridge.isegoria;
 
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,16 +22,11 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class NewsFragment extends SherlockFragment {
-	private View rootView;
+public class NewsFragment extends Fragment {
 	private TableLayout newsTableLayout;
 	
 	private float dpWidth;
-	private float dpHeight;
-	
-	private Isegoria isegoria;
+
 	private NewsFragment newsFragment;
 	
 	private int[] drawables = new int[14];
@@ -44,7 +38,7 @@ public class NewsFragment extends SherlockFragment {
 	private String lastContent; 
 	private Bitmap lastPicture;
     private String lastPictureURL;
-	private String lastLikers;
+	private String lastLikes;
 	private long lastDate;
 	private String lastCreatorEmail; 
 	private String lastStudentYear; 
@@ -59,10 +53,9 @@ public class NewsFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		this.isegoria = (Isegoria) getActivity().getApplication();
-		rootView = inflater.inflate(R.layout.news_fragment, container, false);
-		newsTableLayout = (TableLayout) rootView.findViewById(R.id.newsTableLayout);
-        swipeContainerNews = (android.support.v4.widget.SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainerNews);
+		View rootView = inflater.inflate(R.layout.news_fragment, container, false);
+		newsTableLayout = rootView.findViewById(R.id.newsTableLayout);
+        swipeContainerNews = rootView.findViewById(R.id.swipeContainerNews);
         swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -79,7 +72,6 @@ public class NewsFragment extends SherlockFragment {
         });
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         this.newsFragment = this;
         
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -89,11 +81,11 @@ public class NewsFragment extends SherlockFragment {
 		return rootView;
 	}
 
-    public void clearTable() {
+    private void clearTable() {
         newsTableLayout.removeAllViews();
     }
 	
-	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likers,
+	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likes,
 			final long date, final String creatorEmail, final String studentYear, final String link) {
 		articlesAdded = articlesAdded + 1;
 
@@ -113,7 +105,7 @@ public class NewsFragment extends SherlockFragment {
 					    	 lastTitle = title;
 					    	 lastContent = content;
 					    	 lastPictureURL = pictureURL;
-					    	 lastLikers = likers;
+					    	 lastLikes = likes;
 					    	 lastDate = date;
 					    	 lastCreatorEmail = creatorEmail;
 					    	 lastStudentYear = studentYear;
@@ -123,7 +115,7 @@ public class NewsFragment extends SherlockFragment {
 				    		 doubleCell = 0;
 				    		 newsFragment.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
 				    	 }
-				     } catch(Exception e) {
+				     } catch(Exception ignored) {
 				    	 
 				     }
 			     }
@@ -133,8 +125,8 @@ public class NewsFragment extends SherlockFragment {
 		}
 	}
 	
-	public void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
-			String articleTitle2, String articleTime2) {
+	private void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
+							 String articleTitle2, String articleTime2) {
 		TableRow tr;
 		String colour = "#F8F8F8";
 
@@ -197,7 +189,7 @@ public class NewsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -257,7 +249,7 @@ public class NewsFragment extends SherlockFragment {
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -295,14 +287,14 @@ public class NewsFragment extends SherlockFragment {
 			
 			ImageView view = new ImageView(getActivity());
 			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
-			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, (int)imageHeight));
+			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			view.setScaleType(ScaleType.CENTER_CROP);
 			network.getPictureVolley(drawable1, view);
 
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
 			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
 			    		NewsArticleFragment fragment2 = new NewsArticleFragment();
 			    		Bundle args = new Bundle();
@@ -342,44 +334,5 @@ public class NewsFragment extends SherlockFragment {
 	        tr.addView(relativeLayout);	
 	        newsTableLayout.addView(tr);
 		}
-	}
-	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
-
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
-
-	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
 	}
 }

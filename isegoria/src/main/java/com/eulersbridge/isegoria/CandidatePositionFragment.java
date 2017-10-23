@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -23,27 +24,22 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-public class CandidatePositionFragment extends SherlockFragment {
-	private View rootView;
-	private TableLayout positionsTableLayout;
+public class CandidatePositionFragment extends Fragment {
+    private TableLayout positionsTableLayout;
 	
 	private float dpWidth;
-	private float dpHeight;
 
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
-		rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
-		positionsTableLayout = (TableLayout) rootView.findViewById(R.id.candidatePositionTable);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
+		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
         Bundle bundle = this.getArguments();
         int positionId = bundle.getInt("PositionId");
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;  
         
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
@@ -59,7 +55,7 @@ public class CandidatePositionFragment extends SherlockFragment {
         addTableRow(ticketId, positionId, userId, "", "", firstName + " " + lastName, "", userId);
     }
 	
-	public void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
+	private void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -83,7 +79,7 @@ public class CandidatePositionFragment extends SherlockFragment {
         network.getFirstPhoto(0, userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
-		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
 		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
@@ -128,19 +124,19 @@ public class CandidatePositionFragment extends SherlockFragment {
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         network.getPositionText(textViewPosition, positionId);
         
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
@@ -155,15 +151,15 @@ public class CandidatePositionFragment extends SherlockFragment {
         
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
         
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
-        LayoutParams linLayoutParam2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+
         linLayout2.addView(candidateProfileImage);
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight); 
         
 		layout.addView(candidateProfileView);
@@ -180,31 +176,8 @@ public class CandidatePositionFragment extends SherlockFragment {
         positionsTableLayout.addView(dividierView);
 	}
 	
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-	
-	    if (height > reqHeight || width > reqWidth) {
-	
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -212,7 +185,7 @@ public class CandidatePositionFragment extends SherlockFragment {
 	    BitmapFactory.decodeResource(res, resId, options);
 
 	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 
 	    // Decode bitmap with inSampleSize set
 	    options.inJustDecodeBounds = false;

@@ -1,7 +1,119 @@
-<resources>
-    <string name="title_activity_browse_picture">BrowsePictureActivity</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Isegoria</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="isegoria_logo_content_description">Isegoria Logo</string>
+
+    <!-- Login / Sign Up -->
+    <string name="user_login_email_hint">Email</string>
+    <string name="user_login_password_hint">Password</string>
+
+    <string name="user_login_button">Login</string>
+    <string name="user_sign_up_button">Sign Up</string>
+
+    <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
+
+    <string name="user_sign_up_first_name">First Name</string>
+    <string name="user_sign_up_last_name">Last Name</string>
+    <string name="user_sign_up_university_email">University Email</string>
+    <string name="user_sign_up_first_password">New Password</string>
+    <string name="user_sign_up_confirm_password">Confirm Password</string>
+    <string name="user_sign_up_next_button">Next</string>
+
+    <!-- Personality Questions -->
+    <string name="section_title_personality_questions">Personality Questions</string>
+
+    <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science! All you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
+    <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
+    <string name="personality_screen_skip_button">Skip</string>
+    <string name="personality_questions_done_button">Done</string>
+    <string name="personality_screen_2_description">Simply select a number next to each statement to indicate the extent to which you agree or disagree. You should rate the extend to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.</string>
+
+    <string name="user_consent_next_button">Next</string>
+
+    <string name="personality_slider_disagree_strongly">Disagree Strongly</string>
+    <string name="personality_slider_disagree_moderately">Disagree Moderately</string>
+    <string name="personality_slider_disagree_a_little">Disagree a Little</string>
+    <string name="personality_slider_neither">Neither</string>
+    <string name="personality_slider_agree_a_little">Agree a Little</string>
+    <string name="personality_slider_agree_moderately">Agree Moderately</string>
+    <string name="personality_slider_agree_strongly">Agree Strongly</string>
+
+    <!-- Voting -->
+    <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
+    <string name="vote_sign_pledge_next_button">Next</string>
+    <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
+    <string name="vote_done_message">You\'re ready to go! Make sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!</string>
+
+    <string name="event_add_to_calendar">Add to Calendar</string>
+
+    <!-- Self Efficacy Questions -->
+    <string name="section_title_self_efficacy_questions">Self-Efficacy Questions</string>
+    <string name="self_efficacy_done_button">Done</string>
+    <string name="self_efficacy_questions_message">The PPSE-S composed of 4 items aimed to assess individuals’ beliefs in their capabilities to engage actively in politics. The 4 items are measured on a 5 point Likert scale, from 1 (not at all) to 5 (completely).</string>
+
+    <string name="self_efficacy_slider_not_at_all">Not at all</string>
+    <string name="self_efficacy_slider_unlikely">Somewhat unlikely</string>
+    <string name="self_efficacy_slider_neutral">Neutral</string>
+    <string name="self_efficacy_slider_likely">Somewhat likely</string>
+    <string name="self_efficacy_slider_completely">Completely</string>
+
+    <!-- Email verification -->
+    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
+    <string name="email_verification_success_button">Verified, Please Log Me In</string>
+    <string name="email_verification_resend_button">Resend Verification Email</string>
+
+    <!-- News -->
+    <string name="news_article_star_content_description">Star news article</string>
+    <string name="news_article_flag_content_description">Flag news article</string>
+
+    <!-- Navigation drawer labels -->
+    <string name="navigation_feed">Feed</string>
+    <string name="navigation_election">Election</string>
+    <string name="navigation_poll">Poll</string>
+    <string name="navigation_vote">Vote</string>
+    <string name="navigation_friends">Friends</string>
+    <string name="navigation_profile">Profile</string>
+    <string name="navigation_settings">Settings</string>
+
+    <!-- Toolbar titles for each navigation item -->
+    <string name="section_title_feed">Feed</string>
+    <string name="section_title_election">Election</string>
+    <string name="section_title_poll">Poll</string>
+    <string name="section_title_vote">Vote</string>
+    <string name="section_title_friends">Friends</string>
+    <string name="section_title_profile">Profile</string>
+    <string name="section_title_settings">Settings</string>
+
+    <!-- User profile page -->
+    <string name="profile_section_friends">FRIENDS</string>
+    <string name="profile_section_groups">GROUPS</string>
+    <string name="profile_section_rewards">REWARDS</string>
+    <string name="profile_section_experience_level">Exp Level</string>
+    <string name="profile_section_badges">Badges</string>
+    <string name="profile_section_tasks">Tasks</string>
+    <string name="profile_section_events">Events</string>
+    <string name="profile_show_progress">Show Progress</string>
+    <string name="user_profile_personality_test_button">Complete Personality Test</string>
+
+    <!-- Settings -->
+    <string name="settings_profile_picture_content_description">Your profile picture</string>
+    <string name="settings_change_photo">Change Photo</string>
+    <string name="settings_privacy_settings">Privacy Settings</string>
+    <string name="settings_data_collection_opt_out">Opt Out of Data Collection</string>
+    <string name="settings_do_not_track">Do not Track</string>
+    <string name="settings_about_button">About this App</string>
+    <string name="settings_credits">Credits</string>
+
+    <!-- About -->
+    <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
+
+    <!-- Misc -->
+    <string name="drawer_open" tools:keep="@string/drawer_open">Drawer Open</string>
+    <string name="drawer_close" tools:keep="@string/drawer_close">Drawer Close</string>
+
+    <string name="contact_profile_picture_content_description">Contact profile picture</string>
+    <string name="friends_search_title">Search</string>
 
 </resources>

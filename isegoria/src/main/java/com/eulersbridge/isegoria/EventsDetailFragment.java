@@ -12,7 +12,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -31,87 +33,104 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.util.Calendar;
+import com.android.volley.VolleyError;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
     private View eventDivider1;
     private View eventDivider2;
 	private float dpWidth;
-	private float dpHeight;
-	private DisplayMetrics displayMetrics;
-	private Isegoria isegoria;
-	private long timestamp;
-	private String eventTitle;
-	private String eventDesc;
+    private Isegoria isegoria;
     private Button addToCalendar;
 
     private TableLayout eventContactTableLayout;
     private Network network;
+
+    private Event event;
+    private Bitmap eventImage;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
-        eventContactTableLayout = (TableLayout) rootView.findViewById(R.id.eventDetailsTableLayout);
+        eventContactTableLayout = rootView.findViewById(R.id.eventDetailsTableLayout);
 		this.isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
-		addToCalendar = (Button) rootView.findViewById(R.id.addToCalendar);
+		addToCalendar = rootView.findViewById(R.id.addToCalendar);
         addToCalendar.setOnClickListener(new OnClickListener() {
 				@Override
 			    public void onClick(View v) {
 					addToCalendar(v);
 			    } 
-			}); 
+			});
 
-		displayMetrics = getActivity().getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 
-        eventDivider1 = (View) rootView.findViewById(R.id.eventDivider1);
-        eventDivider2 = (View) rootView.findViewById(R.id.eventDivider2);
-        
-        isegoria.getNetwork().getEventDetails(this, bundle.getInt("EventId"));
+        eventDivider1 = rootView.findViewById(R.id.eventDivider1);
+        eventDivider2 = rootView.findViewById(R.id.eventDivider2);
+
+        event = bundle.getParcelable("event");
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        if (event != null && event.getImageUrl() != null) {
+            network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
+                @Override
+                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                    eventImage = bitmap;
+                    populateContent(event);
+                }
+
+                @Override
+                public void onDownloadFailed(String url, VolleyError error) {
+                    eventImage = null;
+                    populateContent(event);
+                }
+            });
+        }
 		
 		return rootView;
 	}
 	
-	public void populateContent(final String title, final String content, final String location, final String likes, final Bitmap picture, final long timestamp) {
+	private void populateContent(final Event event) {
 		try {
-			this.timestamp = timestamp;
 			getActivity().runOnUiThread(new Runnable() {
-				@Override
+				@SuppressWarnings("deprecation")
+                @Override
 				public void run() {
                     int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                             (float) 200, getResources().getDisplayMetrics());
 
-					LinearLayout backgroundLinearLayout = (LinearLayout) rootView.findViewById(R.id.topBackgroundNews);
+					LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
 					backgroundLinearLayout.getLayoutParams().height = imageHeight;
 					//Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
 					//Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
-					Drawable d = new BitmapDrawable(getActivity().getResources(), picture);
-					d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
-					backgroundLinearLayout.setBackgroundDrawable(d);
 
-					TextView eventTitleField = (TextView) rootView.findViewById(R.id.eventTitle);
-					eventTitleField.setText(title);
-					
-					TextView eventTime = (TextView) rootView.findViewById(R.id.eventTime);
-					eventTime.setText(TimeConverter.convertTimestampToString(timestamp));
-					
-					TextView eventLocationLine1 = (TextView) rootView.findViewById(R.id.eventLocationLine1);
-					eventLocationLine1.setText(location);
+                    if (eventImage != null) {
+                        Drawable d = new BitmapDrawable(getActivity().getResources(), eventImage);
+                        d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            backgroundLinearLayout.setBackground(d);
+                        } else {
+                            backgroundLinearLayout.setBackgroundDrawable(d);
+                        }
+                    }
 
-                    TextView eventLocationLine2 = (TextView) rootView.findViewById(R.id.eventLocationLine2);
+                    TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
+					eventTitleField.setText(event.getName());
 					
-					TextView eventsTextField = (TextView) rootView.findViewById(R.id.eventDetails);
-					eventsTextField.setText(content);
+					TextView eventTime = rootView.findViewById(R.id.eventTime);
+					eventTime.setText(TimeConverter.convertTimestampToString(event.getDate()));
 					
-					eventTitle = title;
-					eventDesc = content;
+					TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
+					eventLocationLine1.setText(event.getLocation());
+
+                    TextView eventLocationLine2 = rootView.findViewById(R.id.eventLocationLine2);
+					
+					TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
+					eventsTextField.setText(event.getDescription());
 
                     addToCalendar.setVisibility(ViewGroup.VISIBLE);
                     eventDivider1.setVisibility(ViewGroup.VISIBLE);
@@ -119,20 +138,19 @@ public class EventsDetailFragment extends Fragment {
                     eventLocationLine2.setVisibility(ViewGroup.VISIBLE);
 				}
 			});
-		} catch(Exception e) {
+		} catch(Exception ignored) {
 			
 		}
 	}
 	
-	public void addToCalendar(View v) {
-	    Calendar cal = Calendar.getInstance();     
+	private void addToCalendar(View v) {
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", timestamp);
+        intent.putExtra("beginTime", event.getDate());
         intent.putExtra("allDay", false);
-        intent.putExtra("endTime", timestamp+60*60*1000);
-        intent.putExtra("title", eventTitle);
-        intent.putExtra("description", eventDesc);
+        intent.putExtra("endTime", event.getDate()+60*60*1000);
+        intent.putExtra("title", event.getName());
+        intent.putExtra("description", event.getDescription());
         isegoria.getMainActivity().startActivity(intent);
 	}
 
@@ -161,9 +179,9 @@ public class EventsDetailFragment extends Fragment {
         addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
     }
 
-    public void addTableRow(int ticketId, final int userId, String partyAbr,
-                            String colour, String candidateName,
-                            String candidatePosition, int positionId) {
+    private void addTableRow(int ticketId, final int userId, String partyAbr,
+                             String colour, String candidateName,
+                             String candidatePosition, int positionId) {
         TableRow tr;
 
         LinearLayout layout = new LinearLayout(getActivity());
@@ -183,7 +201,7 @@ public class EventsDetailFragment extends Fragment {
         candidateProfileView.setPadding(10, 0, 10, 0);
 
         ImageView candidateProfileImage = new ImageView(getActivity());
-        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT));
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
         candidateProfileImage.setPadding(10, 0, 10, 0);
@@ -233,19 +251,19 @@ public class EventsDetailFragment extends Fragment {
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(10, 0, 10, 0);
-        textViewCandidate.setGravity(Gravity.LEFT);
+        textViewCandidate.setGravity(Gravity.START);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(10, 0, 10, 0);
-        textViewPosition.setGravity(Gravity.LEFT);
+        textViewPosition.setGravity(Gravity.START);
 
         network.getPositionText(textViewPosition, positionId);
 
         View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, 1));
+        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
@@ -260,15 +278,13 @@ public class EventsDetailFragment extends Fragment {
 
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
-        TableRow.LayoutParams linLayoutParam = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
-        TableRow.LayoutParams linLayoutParam2 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         linLayout2.addView(candidateProfileImage);
-        linLayout2.setGravity(Gravity.RIGHT);
+        linLayout2.setGravity(Gravity.END);
         linLayout2.setLayoutParams(relativeParamsRight);
 
         layout.addView(candidateProfileView);
@@ -284,32 +300,9 @@ public class EventsDetailFragment extends Fragment {
         eventContactTableLayout.addView(tr);
         eventContactTableLayout.addView(dividierView);
     }
-
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
 	
-	    if (height > reqHeight || width > reqWidth) {
-	
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-	
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-	
-	    return inSampleSize;
-	}
-	
-	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                          int reqWidth, int reqHeight) {
 
 	    // First decode with inJustDecodeBounds=true to check dimensions
 	    final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -317,7 +310,7 @@ public class EventsDetailFragment extends Fragment {
 	    BitmapFactory.decodeResource(res, resId, options);
 
 	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
 
 	    // Decode bitmap with inSampleSize set
 	    options.inJustDecodeBounds = false;

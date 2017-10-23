@@ -4,14 +4,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
 import java.util.List;
 
-public class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
-	private List<SherlockFragment> fragments;
+class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
+	private final List<Fragment> fragments;
 	
-	public CandidatePagerAdapter(FragmentManager fm, List<SherlockFragment> fragments) {
+	CandidatePagerAdapter(FragmentManager fm, List<Fragment> fragments) {
 		super(fm);
 	    this.fragments = fragments;
 	}

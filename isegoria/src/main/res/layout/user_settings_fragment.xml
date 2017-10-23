@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
     android:id="@+id/settingsFrame"
     android:gravity="top"
     android:orientation="vertical" >
@@ -14,11 +13,12 @@
         android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingLeft="14dp"
-        android:paddingRight="14dp"
-        android:paddingTop="14dp" >
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp" >
 
         <ImageView
+			android:contentDescription="@string/settings_profile_picture_content_description"
             android:id="@+id/profilePicSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,112 +31,89 @@
 	        android:layout_height="wrap_content"
 	        android:gravity="center"
 	        android:orientation="horizontal"
-	        android:paddingTop="10dp" >
+	        android:paddingTop="8dp" >
                     	               
-                    <Button
-                        android:id="@+id/changePhotoButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="5dp"
-                        android:text="Change Photo"
-                        android:textColor="@color/white" />
-
+			<Button
+				android:id="@+id/changePhotoButton"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:text="@string/settings_change_photo"
+				android:textColor="@color/white" />
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-	    
-        <View
-			android:layout_width="wrap_content"
-		    android:layout_height="1dip"
-		    android:background="#838a8a8a" />
-	    
-        <TextView
-            android:id="@+id/photoTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#64d3d3d3"
-            android:ems="10"
-            android:paddingLeft="5dp"
-            android:text="Privacy Settings"
-            android:textStyle="bold"
-            android:textColor="#ff575757"
-            android:textSize="16dp" >
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:paddingLeft="16dp"
+		android:paddingStart="16dp"
+		android:layout_marginTop="16dp"
+		android:layout_marginBottom="16dp"
+		android:text="@string/settings_privacy_settings"
+		android:textStyle="bold"
+		android:textColor="#ff575757"
+		android:textSize="16sp" >
 
-        </TextView>
-        
-        <View
-			android:layout_width="wrap_content"
-		    android:layout_height="1dip"
-		    android:background="@color/offGrey" />
+	</TextView>
 
-        <View
-			android:layout_width="wrap_content"
-		    android:layout_height="1dip"
-		    android:background="@color/offGrey" />
+	<Switch
+		android:id="@+id/optOutDataCollectionSwitch"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="16dp"
+		android:paddingRight="16dp"
+		android:text="@string/settings_data_collection_opt_out"
+		android:textSize="14sp" />
 
-	    <Switch
-	        android:id="@+id/optOutDataCollectionSwitch"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:paddingLeft="10dp"
-	        android:paddingRight="10dp"
-	        android:paddingTop="10dp"
-	        android:text="Opt Out of Data Collection"
-	        android:textSize="14sp" />
-	    
-        <View
-			android:layout_width="wrap_content"
-		    android:layout_height="1dip"
-		    android:background="@color/offGrey" />
-	
-	    <Switch
-	        android:id="@+id/doNotTrackSwitch"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingBottom="10dp"
-	        android:paddingLeft="10dp"
-	        android:paddingRight="10dp"
-	        android:paddingTop="10dp"
-	        android:text="Do not Track"
-	        android:textSize="14sp" />
-	    
-        <View
-			android:layout_width="wrap_content"
-		    android:layout_height="1dip"
-		    android:background="@color/offGrey" />
-        
-        <TextView
-            android:id="@+id/photoTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#64d3d3d3"
-            android:ems="10"
-            android:paddingLeft="5dp"
-            android:textStyle="bold"
-            android:text="Credits"
-            android:textColor="#ff575757"
-            android:textSize="16dp" >
+	<View
+		android:layout_width="wrap_content"
+		android:layout_height="1dip"
+		android:layout_marginTop="8dp"
+		android:layout_marginBottom="8dp"
+		android:layout_marginVertical="8dp"
+		android:background="@color/offGrey" />
 
-        </TextView>
-    
-	</LinearLayout>
+	<Switch
+		android:id="@+id/doNotTrackSwitch"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="16dp"
+		android:paddingRight="16dp"
+		android:text="@string/settings_do_not_track"
+		android:textSize="14sp" />
+
+	<View
+		android:layout_width="wrap_content"
+		android:layout_height="1dip"
+		android:layout_marginTop="8dp"
+		android:layout_marginBottom="8dp"
+		android:layout_marginVertical="8dp"
+		android:background="@color/offGrey" />
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="8dp"
+		android:ems="10"
+		android:paddingLeft="16dp"
+		android:paddingStart="16dp"
+		android:textStyle="bold"
+		android:text="@string/settings_credits"
+		android:textColor="#ff575757"
+		android:textSize="16sp" >
+
+	</TextView>
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="About this App"
+        android:text="@string/settings_about_button"
         android:id="@+id/aboutThisAppButton"
-        android:paddingLeft="10dp"
+        android:paddingLeft="16dp"
         android:paddingTop="10dp"
-        android:paddingRight="10dp"
+        android:paddingRight="16dp"
         android:paddingBottom="10dp" />
 
 </LinearLayout>

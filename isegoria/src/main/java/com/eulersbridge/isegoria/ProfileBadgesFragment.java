@@ -1,10 +1,9 @@
 package com.eulersbridge.isegoria;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
@@ -20,17 +19,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-
-import java.io.InputStream;
-
-public class ProfileBadgesFragment extends SherlockFragment {
+public class ProfileBadgesFragment extends Fragment {
     private View rootView;
     private TableLayout badgesTableLayout;
     private TableRow tr;
 
-    private float dpWidth;
-    private float dpHeight;
     private int photosPerRow = -1;
     private int fitPerRow = 0;
     private int squareSize;
@@ -42,7 +35,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
     private Network network;
 
     private String targetName = "";
-    int targetLevel = 0;
+    private int targetLevel = 0;
 
     public ProfileBadgesFragment() {
         insertedFirstRow = false;
@@ -57,16 +50,13 @@ public class ProfileBadgesFragment extends SherlockFragment {
         try {
             targetName = bundle.getString("name");
             targetLevel = bundle.getInt("level");
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        badgesTableLayout = (TableLayout) rootView.findViewById(R.id.profileBadgesTableLayout);
+        badgesTableLayout = rootView.findViewById(R.id.profileBadgesTableLayout);
 
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-
-        squareSize = (int) (displayMetrics.widthPixels / 3) - (10/3);
-        fitPerRow = (int) 3;
+        squareSize = displayMetrics.widthPixels / 3 - (10/3);
+        fitPerRow = 3;
         dividerPadding = (10/3);
 
         tr = new TableRow(getActivity());
@@ -89,8 +79,8 @@ public class ProfileBadgesFragment extends SherlockFragment {
         addTableRow(name, description, badgeId, maxLevel, false);
     }
 
-    public void addTableRow(final String name, final String description, final int badgeId,
-                            final int maxLevel, final boolean remaining) {
+    private void addTableRow(final String name, final String description, final int badgeId,
+                             final int maxLevel, final boolean remaining) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float)  6.666666667, getResources().getDisplayMetrics());
@@ -135,7 +125,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
             view.setLayoutParams(layoutParams);
             view.setScaleType(ScaleType.FIT_XY);
             //view.setBackgroundColor(Color.GRAY);
-            network.getFirstPhoto((int) badgeId, (int) badgeId, view);
+            network.getFirstPhoto(badgeId, badgeId, view);
 
             viewLinearLayout.setPadding(0, 0, 0, paddingMargin);
             viewLinearLayout.addView(view);
@@ -177,7 +167,7 @@ public class ProfileBadgesFragment extends SherlockFragment {
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getSherlockActivity().getSupportFragmentManager();
+                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                         FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                         ProfileBadgesFragment fragment2 = new ProfileBadgesFragment();
                         Bundle args = new Bundle();
@@ -195,33 +185,5 @@ public class ProfileBadgesFragment extends SherlockFragment {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
-    }
-
-    public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
-                                                       int reqWidth, int reqHeight) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(is);
     }
 }

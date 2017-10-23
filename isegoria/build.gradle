@@ -1,15 +1,13 @@
 apply plugin: 'com.android.application'
 
-
-
 android {
     signingConfigs {
-        debug {
-            keyAlias 'IsegoriaAndroidKey'
-            keyPassword 'EulersBridge88902!@#'
-            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
-            storePassword 'EulersBridge88902'
-        }
+//        debug {
+//            keyAlias 'IsegoriaAndroidKey'
+//            keyPassword 'EulersBridge88902!@#'
+//            storeFile file('/Users/jay/proj/eulers-bridge/keystores/isegoria-android.jks')
+//            storePassword 'EulersBridge88902'
+//        }
         release {
             keyAlias 'IsegoriaAndroidKey'
             keyPassword 'EulersBridge88902!@#'
@@ -17,41 +15,52 @@ android {
             storePassword 'EulersBridge88902'
         }
     }
-    compileSdkVersion 21
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "au.com.isegoria.app"
         minSdkVersion 14
+<<<<<<< HEAD
         targetSdkVersion 17
         versionCode 2
         versionName "1.0.1"
+=======
+        targetSdkVersion 26
+        versionName "1.0.2"
+>>>>>>> dependency-toolchain-updates
     }
     lintOptions {
         abortOnError false
     }
+    useLibrary 'org.apache.http.legacy'
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.release
-        }
         debug {
             signingConfig signingConfigs.debug
         }
+        release {
+            minifyEnabled false
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
+        }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
 dependencies {
-    compile project(':library')
-    compile project(':viewpagerlibrary')
-    compile 'com.android.support:support-v4:22.0.0'
-    compile 'com.mcxiaoke.volley:library:1.0.+'
-    compile 'com.sothree.slidinguppanel:library:3.0.0'
-    compile files('src/main/java/libs/aws-android-sdk-core-2.1.10.jar')
-    compile files('src/main/java/libs/aws-android-sdk-s3-2.1.10.jar')
-    compile files('src/main/java/libs/aws-android-sdk-cognito-2.1.10.jar')
+    compile 'com.android.support:support-fragment:26.1.0'
+    // v4 fragment library depends on all other v4 libraries for now.
+    // core-ui in order to access `ViewPager` (does not affect APK size)
+    compile 'com.android.support:support-core-ui:26.1.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.volley:volley:1.0.0'
+    compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
+    compile 'com.sothree.slidinguppanel:library:3.3.1'
+    compile 'com.amazonaws:aws-android-sdk-core:2.4.0'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.4.0'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.4.0'
 }

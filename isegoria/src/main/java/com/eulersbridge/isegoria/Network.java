@@ -1,12 +1,12 @@
 package com.eulersbridge.isegoria;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.ImageView;
@@ -14,9 +14,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transfermanager.TransferManager;
-import com.amazonaws.mobileconnectors.s3.transfermanager.Upload;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
@@ -31,20 +34,13 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,54 +50,27 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Network {
-	private static String SERVER_URL = "http://54.79.70.241:8080/";
+	private static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api";
 	private static String PICTURE_URL = "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
-	public long userId;
-	private String username;
-	private String password;
-	private String email;
-    private boolean hasPersonality;
-    private boolean loginAccountVerified;
 
-    private Network network;
-	private NewsFragment newsFragment;
-	private NewsArticleFragment newsArticleFragment;
-	private UserSignupFragment userSignupFragment;
-	private EventsDetailFragment eventDetailFragment;
-    private ElectionOverviewFragment electionOverviewFragment;
-    private EventsDetailFragment eventsDetailFragment;
-    private CandidatePositionsFragment candidatePositionsFragment;
-	private PhotosFragment photosFragment;
-	private PhotoAlbumFragment photoAlbumFragment;
-	private PhotoViewFragment photoViewFragment;
-    private CandidateAllFragment candidateAllFragment;
-    private CandidateTicketFragment candidateTicketFragment;
-    private CandidatePositionFragment candidatePositionFragment;
-    private TaskDetailProgressFragment taskDetailProgressFragment;
-    private ProfileBadgesFragment profileBadgesFragment;
-    private EmailVerificationFragment emailVerificationFragment;
-    private CandidateTicketDetailFragment candidateTicketDetailFragment;
+    private static final int socketTimeout = 30000; //30 seconds
+
+	private User loggedInUser;
+    private String username;
+    private String password;
+
+    private final Network network;
     private FindAddContactFragment findAddContactFragment;
-	private VoteFragment voteFragment;
-	private PollFragment pollFragment;
-    private PollVoteFragment pollVoteFragment;
-	private Isegoria application;
+	private final Isegoria application;
     private boolean reminderSet = false;
-    private boolean trackingOff;
-    private boolean optOutDataCollection;
-
-    private String loginGivenName = "";
-    private String loginFamilyName = "";
-    private String loginEmail = "";
-    private String loginGender = "";
-    private String loginNationality = "";
-    private String loginYearOfBirth = "";
 
     private String voteReminderLocation;
     private long voteReminderDate;
@@ -110,7 +79,7 @@ public class Network {
     private int userDPId;
 
     private RequestQueue mRequestQueue;
-    private ArrayList<Integer> userTickets = new ArrayList<Integer>();
+    private ArrayList<Integer> userTickets = new ArrayList<>();
 
 	public Network(Isegoria application) {
         this.network = this;
@@ -123,6 +92,9 @@ public class Network {
 		this.username = username;
 		this.password = password;
 
+        AuthorisedJsonObjectRequest.username = username;
+        AuthorisedJsonObjectRequest.password = password;
+
         Cache cache = new DiskBasedCache(application.getCacheDir(), 1024 * 1024); // 1MB cap
         BasicNetwork network = new BasicNetwork(new HurlStack());
 
@@ -130,34 +102,36 @@ public class Network {
         mRequestQueue.start();
 	}
 
-	public void login() {
+	User getLoggedInUser() {
+        return loggedInUser;
+    }
+
+    void setTrackingOff(boolean trackingOff) {
+        loggedInUser.setTrackingOff(trackingOff);
+    }
+
+    void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
+        loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
+    }
+
+	void login() {
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("dbInterface/api/login");
+				String response = getRequest("/login");
 				try {
                     if(response.startsWith("HTTP Status 401 - User is disabled")) {
                         application.setVerification();
                     }
                     else {
                         JSONObject jObject = new JSONObject(response);
-                        userId = jObject.getLong("userId");
 
-                        JSONObject jUser = jObject.getJSONObject("user");
-                        loginGivenName = jUser.getString("givenName");
-                        loginFamilyName = jUser.getString("familyName");
-                        loginEmail = jUser.getString("email");
-                        loginAccountVerified = jUser.getBoolean("accountVerified");
-                        hasPersonality = jUser.getBoolean("hasPersonality");
-                        trackingOff = jUser.getBoolean("trackingOff");
-                        optOutDataCollection = jUser.getBoolean("optOutDataCollection");
+                        JSONObject userObject = jObject.getJSONObject("user");
+                        loggedInUser = new User(userObject);
+                        loggedInUser.setId(jObject.getString("userId"));
 
-                        loginGender = jUser.getString("gender");
-                        loginNationality = jUser.getString("nationality");
-                        loginYearOfBirth = jUser.getString("yearOfBirth");
-
-                        if (loginAccountVerified) {
+                        if (loggedInUser.isAccountVerified()) {
                             application.setLoggedIn(true);
-                            if(hasPersonality) {
+                            if(loggedInUser.hasPersonality()) {
                                 application.setFeedFragment();
                             }
                             else {
@@ -184,79 +158,79 @@ public class Network {
 		t.start();
 	}
 
-	public void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
-       Runnable r = new Runnable() {
-    	   public void run() {
-    		   StringBuffer stringBuffer = new StringBuffer();
-    	        BufferedReader bufferedReader = null;
+    void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
+        Runnable r = new Runnable() {
+            public void run() {
+                StringBuilder stringBuffer = new StringBuilder();
+                BufferedReader bufferedReader = null;
 
-    	        try {
-    	            HttpClient httpClient = new DefaultHttpClient();
+                try {
+                    HttpClient httpClient = new DefaultHttpClient();
                     HttpParams httpParameters = httpClient.getParams();
                     HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-    	            HttpPost httpPost = new HttpPost();
+                    HttpPost httpPost = new HttpPost();
 
-    	            URI uri = new URI(SERVER_URL + "dbInterface/api/signUp");
-    	            httpPost.setURI(uri);
-    	            httpPost.addHeader("Accept", "application/json");
-    	            httpPost.addHeader("Content-type", "application/json");
+                    URI uri = new URI(SERVER_URL + "/signUp");
+                    httpPost.setURI(uri);
+                    httpPost.addHeader("Accept", "application/json");
+                    httpPost.addHeader("Content-type", "application/json");
 
-    	            JSONObject signup = new JSONObject();
-    	            String json = "";
-    	            try {
-    	            	signup.put("email", email);
-    	            	signup.put("givenName", firstName);
-    	            	signup.put("familyName", lastName);
-    	            	signup.put("gender", gender);
-    	                signup.put("nationality", country);
-    	                signup.put("yearOfBirth",yearOfBirth);
-    	                signup.put("accountVerified", "false");
-    	                signup.put("password", password);
-    	                signup.put("institutionId", String.valueOf(institution));
+                    JSONObject signup = new JSONObject();
+                    String json = "";
+                    try {
+                        signup.put("email", email);
+                        signup.put("givenName", firstName);
+                        signup.put("familyName", lastName);
+                        signup.put("gender", gender);
+                        signup.put("nationality", country);
+                        signup.put("yearOfBirth",yearOfBirth);
+                        signup.put("accountVerified", "false");
+                        signup.put("password", password);
+                        signup.put("institutionId", String.valueOf(institution));
 
-    	                json = signup.toString();
+                        json = signup.toString();
 
-    	            } catch (JSONException e) {
-    	                // TODO Auto-generated catch block
-    	                e.printStackTrace();
-    	            }
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
-    	            StringEntity se = new StringEntity(json);
-    	            httpPost.setEntity(se);
+                    StringEntity se = new StringEntity(json);
+                    httpPost.setEntity(se);
 
-    	            HttpResponse httpResponse = httpClient.execute(httpPost);
-    	            InputStream inputStream = httpResponse.getEntity().getContent();
-    	            bufferedReader = new BufferedReader(new InputStreamReader(
-    	                    inputStream));
+                    HttpResponse httpResponse = httpClient.execute(httpPost);
+                    InputStream inputStream = httpResponse.getEntity().getContent();
+                    bufferedReader = new BufferedReader(new InputStreamReader(
+                            inputStream));
 
-    	            String readLine = bufferedReader.readLine();
-    	            while (readLine != null) {
-    	                stringBuffer.append(readLine);
-    	                stringBuffer.append("\n");
-    	                readLine = bufferedReader.readLine();
-    	            }
+                    String readLine = bufferedReader.readLine();
+                    while (readLine != null) {
+                        stringBuffer.append(readLine);
+                        stringBuffer.append("\n");
+                        readLine = bufferedReader.readLine();
+                    }
 
-    	            if(stringBuffer.toString().contains(email)) {
-    					application.getMainActivity().runOnUiThread(new Runnable() {
-    						public void run() {
-    							application.signupSucceded();
-    						}
-    					});
-    	            }
-    	            else {
-    					application.getMainActivity().runOnUiThread(new Runnable() {
-    						public void run() {
-    							application.signupFailed();
-    						}
-    					});
-    	            }
+                    if(stringBuffer.toString().contains(email)) {
+                        application.getMainActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                application.signupSucceeded();
+                            }
+                        });
+                    }
+                    else {
+                        application.getMainActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                application.signupFailed();
+                            }
+                        });
+                    }
 
-    	        } catch (Exception e) {
-    	        	Log.e("Isegoria", "exception", e);
-    	        } finally {
-    	            if (bufferedReader != null) {
-    	                try {
-    	                    bufferedReader.close();
+                } catch (Exception e) {
+                    Log.e("Isegoria", "exception", e);
+                } finally {
+                    if (bufferedReader != null) {
+                        try {
+                            bufferedReader.close();
     	                } catch (IOException e) {
     	                	Log.e("Isegoria", "exception", e);
     	                }
@@ -269,12 +243,10 @@ public class Network {
        t.start();
 	}
 
-	public void getGeneralInfo(final UserSignupFragment userSignupFragment) {
-		this.userSignupFragment = userSignupFragment;
-
+	void getGeneralInfo(final UserSignupFragment userSignupFragment) {
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequestNoAuth("dbInterface/api/general-info");
+				String response = getRequest("/general-info", false);
 				try {
 					JSONObject jObject = new JSONObject(response);
 					JSONArray jArray = jObject.getJSONArray("countrys");
@@ -307,11 +279,10 @@ public class Network {
 	}
 
 
-	public void getNewsArticles(final NewsFragment newsFragment) {
-		this.newsFragment = newsFragment;
-        String url = SERVER_URL + "dbInterface/api/newsArticles/26";
+	void getNewsArticles(final NewsFragment newsFragment) {
+        String url = SERVER_URL + "/newsArticles/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -330,14 +301,14 @@ public class Network {
                                     picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
                                     Bitmap bitmapPicture = null;
 
-                                    String likers = null;
+                                    String likes = currentArticle.optString("likes");
                                     long date = currentArticle.getLong("date");
                                     date = TimeConverter.convertTimestampTimezone(date);
-                                    String creatorEmail = "";
+                                    String creatorEmail = currentArticle.optString("creatorEmail");
                                     String studentYear = "";
                                     String link = null;
 
-                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likers, date, creatorEmail, studentYear, link);
+                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likes, date, creatorEmail, studentYear, link);
                                 } catch (JSONException e1) {
                                     e1.printStackTrace();
                                 }
@@ -351,95 +322,52 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        });
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-	public void getNewsArticle(final NewsArticleFragment newsArticleFragment, final int articleId) {
-		this.newsArticleFragment = newsArticleFragment;
-
+	void getNewsArticle(final NewsArticleFragment newsArticleFragment, final int articleId) {
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("dbInterface/api/newsArticle/" + String.valueOf(articleId));
+				String response = getRequest("/newsArticle/" + String.valueOf(articleId));
 				try {
 					JSONObject currentArticle = new JSONObject(response);
 
 					int articleId = currentArticle.getInt("articleId");
-					int institutionId = currentArticle.getInt("institutionId");
-					String title = currentArticle.getString("title");
-					String likes = currentArticle.getString("likes");
-					String content = currentArticle.getString("content");
+					final String title = currentArticle.getString("title");
+					final String likes = currentArticle.getString("likes");
+					final String content = currentArticle.getString("content");
                     JSONArray photos = currentArticle.getJSONArray("photos");
                     String picture = photos.getJSONObject(0).getString("url");
 					String email = currentArticle.getString("creatorEmail");
 					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-					Bitmap bitmapPicture = getPicture(picture);
-                    boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
+
+                    final boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
 
 					String likers = currentArticle.getString("likes");
 					long date = currentArticle.getLong("date");
-					date = TimeConverter.convertTimestampTimezone(date);
+					final long convertedDate = TimeConverter.convertTimestampTimezone(date);
 					String link = null;
 
-					newsArticleFragment.populateContent(title, content, likes, date, bitmapPicture, email, inappropriateContent);
-					getUser(newsArticleFragment, email);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
+                    final String callbackEmail = email;
 
-		Thread t = new Thread(r);
-		t.start();
-	}
-
-	public void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
-		this.newsArticleFragment = newsArticleFragment;
-
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("dbInterface/api/user/" + userEmail.replace("@", "%40") +"/");
-				try {
-					JSONObject currentUser = new JSONObject(response);
-
-					String givenName = currentUser.getString("givenName");
-					String familyName = currentUser.getString("familyName");
-					String gender = currentUser.getString("gender");
-					String name = givenName + " " + familyName;
-
-                    JSONArray photos = currentUser.getJSONArray("photos");
-
-                    int index=0;
-                    for(int i=0; i<photos.length(); i++) {
-                        JSONObject currentObject = photos.getJSONObject(i);
-                        String currentSeq = currentObject.getString("sequence");
-
-                        if(currentSeq.equals("0")) {
-                            index = i;
-                            break;
+                    getPicture(picture, new PictureDownloadListener() {
+                        @Override
+                        public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                            newsArticleFragment.populateContent(title, content, likes, convertedDate, bitmap, callbackEmail, inappropriateContent);
+                            getUser(newsArticleFragment, callbackEmail);
                         }
-                    }
 
-                    String photoURL = (currentUser.getJSONArray("photos").getJSONObject(index).getString("url"));
+                        @Override
+                        public void onDownloadFailed(String url, VolleyError error) {
+                            newsArticleFragment.populateContent(title, content, likes, convertedDate, null, callbackEmail, inappropriateContent);
+                            getUser(newsArticleFragment, callbackEmail);
+                        }
+                    });
 
-					newsArticleFragment.populateUserContent(name, photoURL);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -450,21 +378,94 @@ public class Network {
 		t.start();
 	}
 
-    public void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
-        this.getFirstPhoto(0, (int) userId, imageView);
-        this.getFirstPhotoBlur(0, (int) userId, backgroundLinearLayout);
+	private void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
+		if (userEmail.equals(loggedInUser.getEmail())) {
+            newsArticleFragment.populateUserContent(loggedInUser.getFullName(), loggedInUser.getProfilePhotoURL());
+
+        } else {
+            Runnable r = new Runnable() {
+                public void run() {
+                    String response = getRequest(String.format("/user/%s/", userEmail));
+                    try {
+                        JSONObject userObject = new JSONObject(response);
+
+                        User user = new User(userObject);
+
+                        JSONArray photos = userObject.getJSONArray("photos");
+
+                        int index=0;
+                        for(int i=0; i<photos.length(); i++) {
+                            JSONObject currentObject = photos.getJSONObject(i);
+                            String currentSeq = currentObject.getString("sequence");
+
+                            if(currentSeq.equals("0")) {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        String photoURL = (userObject.getJSONArray("photos").getJSONObject(index).getString("url"));
+
+                        newsArticleFragment.populateUserContent(user.getFullName(), photoURL);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+        }
+	}
+
+	interface UserInfoListener {
+        void onFetchSuccess(User user);
+        void onFetchFailure(String userEmail, Exception e);
     }
 
-    public void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
-        this.getFirstPhoto(0, (int) profileId, imageView);
-        this.getFirstPhotoBlur(0, (int) profileId, backgroundLinearLayout);
+	private void getUser(final String userEmail, final UserInfoListener callback) {
+        if (userEmail.equals(loggedInUser.getEmail())) {
+            callback.onFetchSuccess(loggedInUser);
+
+        } else {
+            Runnable r = new Runnable() {
+                public void run() {
+                    String response = getRequest(String.format("/user/%s/", userEmail));
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response);
+
+                        User user = new User(jsonObject);
+
+                        callback.onFetchSuccess(user);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.onFetchFailure(userEmail, e);
+                    }
+                }
+            };
+
+            Thread t = new Thread(r);
+            t.start();
+        }
     }
 
-    public void findFriends(final FindAddContactFragment findAddContactFragment) {
+    void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
+        this.getFirstPhoto(0, Integer.valueOf(loggedInUser.getId()), imageView);
+        this.getFirstPhotoBlur(0, Integer.valueOf(loggedInUser.getId()), backgroundLinearLayout);
+    }
+
+    void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
+        this.getFirstPhoto(0, profileId, imageView);
+        this.getFirstPhotoBlur(0, profileId, backgroundLinearLayout);
+    }
+
+    void findFriends(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
+        String url = String.format("%s/contactRequests/%s/", SERVER_URL, loggedInUser.getId());
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -475,7 +476,7 @@ public class Network {
 
                             int userId = resp.getInt("userId");
                             boolean acceptedBoolean = resp.getBoolean("accepted");
-                            if(acceptedBoolean == true) {
+                            if(acceptedBoolean) {
                                 String contactDetails = resp.getString("contactDetails");
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
                             }
@@ -492,28 +493,14 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 
-        url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/contactRequests";
-        req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contactRequests";
+        req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -526,7 +513,7 @@ public class Network {
                             boolean acceptedBoolean = resp.getBoolean("accepted");
                             String contactDetails = resp.getString("contactDetails");
 
-                            if(acceptedBoolean == true) {
+                            if(acceptedBoolean) {
                                 network.findContactFriend(String.valueOf(userId), findAddContactFragment);
                             }
                         } catch (Exception e) {
@@ -542,46 +529,25 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        socketTimeout = 30000;//30 seconds - change to what you want
         policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-	public void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
+	void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
         this.findAddContactFragment.clearSearchResults();
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(query) + "/";
+        String url = SERVER_URL + "/contact/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    User user = new User(response);
+                    findAddContactFragment.addUser(user);
 
-                    JSONObject profilePhoto = response.getJSONObject("profilePhoto");
-                    String profilePhotoURL = profilePhoto.getString("url");
-
-                    findAddContactFragment.addUser(givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -591,45 +557,27 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-    public void findContactPending(final int contactId, String query, final FindAddContactFragment findAddContactFragment) {
+    private void findContactPending(final int contactId, String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
+        String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    User user = new User(response);
+                    user.setId(String.valueOf(contactId));
 
-                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
-                    String profilePhotoURL = profilePhoto.getString("url");
+                    findAddContactFragment.addPendingFriend(contactId, user);
 
-                    findAddContactFragment.addPendingFriend(contactId, givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -639,49 +587,71 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getDashboardStats(final ProfileFragment profileFragment) {
-        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf("45");
+    void getDashboardStats(final ProfileFragment profileFragment) {
+        String url = String.format("%s/contacts/%s/", SERVER_URL, loggedInUser.getEmail());
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray foundObjects = response.getJSONArray("foundObjects");
+
+                    int numOfContacts = 0;
+                    int totalTasks = 0;
+
+                    if (foundObjects.length() > 0) {
+                        JSONObject currentObject = foundObjects.getJSONObject(0);
+
+                        numOfContacts = currentObject.getInt("numOfContacts");
+                        totalTasks = currentObject.getInt("totalTasks");
+                    }
+
+                    profileFragment.updateStats(numOfContacts, totalTasks);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Volley", error.toString());
+            }
+        });
+
+        
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
+    }
+
+    interface RemainingBadgeCountListener {
+        void onFetchSuccess(long remainingBadgeCount);
+        void onFetchFailure(Exception e);
+    }
+
+    void getRemainingBadgeCount(final RemainingBadgeCountListener callback) {
+        String url = String.format("%s/badges/remaining/%s", SERVER_URL, loggedInUser.getId());
+
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jArray = response.getJSONArray("foundObjects");
-                    JSONObject currentObject = jArray.getJSONObject(0);
 
-                    int numOfContacts = currentObject.getInt("numOfContacts");
-                    int numOfCompBadges = currentObject.getInt("numOfCompBadges");
-                    int numOfCompTasks = currentObject.getInt("numOfCompTasks");
-                    int totalBadges = currentObject.getInt("totalBadges");
-                    int totalTasks = currentObject.getInt("totalTasks");
-                    int experience = currentObject.getInt("experience");
-
-                    profileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
-                            totalBadges, totalTasks, experience);
+                    callback.onFetchSuccess(jArray.length());
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    callback.onFetchFailure(e);
                 }
             }
         }, new Response.ErrorListener() {
@@ -689,32 +659,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getDashboardStats(final ContactProfileFragment contactProfileFragment,
+    void getDashboardStats(final ContactProfileFragment contactProfileFragment,
                                   int profileUserId) {
-        String url = SERVER_URL + "dbInterface/api/contacts/" + String.valueOf(profileUserId);
+        String url = SERVER_URL + "/contacts/" + String.valueOf(profileUserId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -739,46 +695,28 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        });
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
+    private void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(query) + "/";
+        String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    User user = new User(response);
+
                     int userId = Integer.parseInt(query);
-                    String givenName = response.getString("givenName");
-                    String familyName = response.getString("familyName");
-                    String gender = response.getString("gender");
-                    String email = response.getString("email");
-                    String nationality = response.getString("nationality");
+                    user.setId(String.valueOf(userId));
 
-                    JSONObject profilePhoto = response.getJSONArray("photos").getJSONObject(0);
-                    String profilePhotoURL = profilePhoto.getString("url");
+                    findAddContactFragment.addFriend(userId, user);
 
-                    findAddContactFragment.addFriend(userId, givenName, familyName, email, "The University of Melbourne", profilePhotoURL);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -788,39 +726,26 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void addFriend(String email, final FindAddContactFragment findAddContactFragment) {
+    void addFriend(String email, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/contact/" + String.valueOf(email) + "/";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showAddedDialog();
+                            findAddContactFragment.showAddedMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -830,23 +755,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -854,18 +765,18 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void acceptContact(String email, final FindAddContactFragment findAddContactFragment) {
+    void acceptContact(String email, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
+        String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showAcceptDialog();
+                            findAddContactFragment.showAcceptMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -875,23 +786,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -899,18 +796,18 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void denyContact(String email, final FindAddContactFragment findAddContactFragment) {
+    void denyContact(String email, final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
+        String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            findAddContactFragment.showDenyDialog();
+                            findAddContactFragment.showDenyMessage();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -920,23 +817,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -944,11 +827,11 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void findPendingContacts(final FindAddContactFragment findAddContactFragment) {
+    void findPendingContacts(final FindAddContactFragment findAddContactFragment) {
         this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/contactRequests/" + String.valueOf(this.userId) + "/";
+        String url = SERVER_URL + "/contactRequests/" + String.valueOf(loggedInUser.getId()) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -974,32 +857,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
     public void addVoteReminder(String location, long date) {
-        this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/voteReminder";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminder";
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
         params.put("date", String.valueOf(date));
         params.put("electionId", String.valueOf(electionId));
@@ -1007,7 +876,7 @@ public class Network {
         setVoteReminderDate(date);
         setVoteReminderLocation(location);
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1022,23 +891,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1046,43 +901,21 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-	public void getEvents(final EventsFragment eventsFragment) {
-        String url = SERVER_URL + "dbInterface/api/events/26/";
+	void getEvents(final EventsFragment eventsFragment) {
+        String url = SERVER_URL + "/events/26/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
                             try {
-                                JSONArray jArray = jObject.getJSONArray("foundObjects");
+                                JSONArray eventsList = jObject.getJSONArray("foundObjects");
 
-                                for (int i=0; i<jArray.length(); i++) {
-                                    JSONObject currentEvent = jArray.getJSONObject(i);
-                                    int eventId = currentEvent.getInt("eventId");
-                                    int institutionId = currentEvent.getInt("institutionId");
-                                    String name = currentEvent.getString("name");
-                                    String description = currentEvent.getString("description");
-                                    JSONArray photos = currentEvent.getJSONArray("photos");
-                                    String picture = photos.getJSONObject(0).getString("url");
-                                    picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-                                    Bitmap bitmapPicture;
+                                for (int i=0; i<eventsList.length(); i++) {
+                                    JSONObject eventItem = eventsList.getJSONObject(i);
 
-                                    String likers = null;
-                                    long date = 10000;
-                                    if(currentEvent.has("created") && !currentEvent.isNull("created")) {
-                                        date = currentEvent.getLong("created");
-                                        date = TimeConverter.convertTimestampTimezone(date);
-                                    }
-
-                                    String creatorEmail = "";
-                                    String studentYear = "";
-                                    String link = null;
-
-                                    try {
-                                        eventsFragment.addEvent(eventId, name, date, picture);
-                                    } catch(Exception e) {
-
-                                    }
+                                    Event event = new Event(eventItem);
+                                    eventsFragment.addEvent(event);
                                 }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1093,32 +926,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-    public void verifyEmail(final EmailVerificationFragment emailVerificationFragment) {
-        this.emailVerificationFragment = emailVerificationFragment;
-        String url = SERVER_URL + "dbInterface/api/emailVerification/" + String.valueOf(username) + "/resend";
+    void verifyEmail(final EmailVerificationFragment emailVerificationFragment) {
+        String url = SERVER_URL + "/emailVerification/" + String.valueOf(username) + "/resend";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1129,80 +948,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-	public void getEventDetails(final EventsDetailFragment eventsDetailFragment, final int eventId) {
-		this.eventDetailFragment = eventsDetailFragment;
+    private void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
+        String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("dbInterface/api/event/" + String.valueOf(eventId));
-				try {
-					JSONObject currentEvent = new JSONObject(response);
-
-					int eventId = currentEvent.getInt("eventId");
-					int institutionId = currentEvent.getInt("institutionId");
-					String name = currentEvent.getString("name");
-					String location = currentEvent.getString("location");
-					String description = currentEvent.getString("description");
-                    JSONArray photos = currentEvent.getJSONArray("photos");
-                    String picture = photos.getJSONObject(0).getString("url");
-					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-					Bitmap bitmapPicture;
-
-					if(picture == "") {
-						bitmapPicture = null;
-					}
-					else {
-						bitmapPicture = getPicture(picture);
-					}
-
-					String likers = null;
-					long date = 10000;
-					if(currentEvent.has("created") && !currentEvent.isNull("created")) {
-						date = currentEvent.getLong("created");
-						date = TimeConverter.convertTimestampTimezone(date);
-					}
-					String organizerEmail = currentEvent.getString("organizerEmail");
-                    findContact(organizerEmail, eventsDetailFragment);
-					String studentYear = "";
-					String link = null;
-
-					eventsDetailFragment.populateContent(name, description, location, "0", bitmapPicture, date);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-
-		Thread t = new Thread(r);
-		t.start();
-	}
-
-    public void findContact(final String email, final EventsDetailFragment eventsDetailFragment) {
-        this.eventsDetailFragment = eventsDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
-
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1219,32 +976,18 @@ public class Network {
                 Log.d("Volley", error.toString());
                 eventsDetailFragment.addCandidate(email);
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void findContactPhoto(final String email, final ImageView imageView) {
-        this.eventsDetailFragment = eventsDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/contact/" + String.valueOf(email) + "/";
+    void findContactPhoto(final String email, final ImageView imageView) {
+        String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1263,32 +1006,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-	public void getPhotoAlbums(final PhotosFragment photosFragment) {
-		this.photosFragment = photosFragment;
-        String url = SERVER_URL + "dbInterface/api/photoAlbums/7449";
+	void getPhotoAlbums(final PhotosFragment photosFragment) {
+        String url = SERVER_URL + "/photoAlbums/7449";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1314,32 +1043,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-	public void getPhotoAlbum(final PhotoAlbumFragment photoAlbumFragment, final String albumId) {
-		this.photoAlbumFragment = photoAlbumFragment;
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(albumId) + "?pageSize=250";
+	void getPhotoAlbum(final PhotoAlbumFragment photoAlbumFragment, final String albumId) {
+		String url = SERVER_URL + "/photos/" + String.valueOf(albumId) + "?pageSize=100";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jObject) {
@@ -1365,32 +1080,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-    public void getProfileBadgesComplete(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
-        this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "dbInterface/api/badges/complete/" + String.valueOf(this.userId);
+    void getProfileBadgesComplete(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
+        String url = SERVER_URL + "/badges/complete/" + String.valueOf(loggedInUser.getId());
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                         try {
@@ -1439,32 +1140,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
-        this.profileBadgesFragment = profileBadgesFragment;
-        String url = SERVER_URL + "dbInterface/api/badges/remaining/" + String.valueOf(this.userId);
+    private void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
+        String url = SERVER_URL + "/badges/remaining/" + String.valueOf(loggedInUser.getId());
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1511,32 +1198,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-	public void getPhoto(final PhotoViewFragment photoViewFragment, final int photoId) {
-		this.photoViewFragment = photoViewFragment;
-        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId);
+	void getPhoto(final PhotoViewFragment photoViewFragment, final int photoId) {
+		String url = SERVER_URL + "/photo/" + String.valueOf(photoId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1561,33 +1234,19 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-    public void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
-        String url = SERVER_URL + "dbInterface/api/newsArticle/"
-                + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loginEmail) + "/";
+    void getNewsArticleLiked(final NewsArticleFragment newsArticleFragment) {
+        String url = SERVER_URL + "/newsArticle/"
+                + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -1605,33 +1264,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
 	public void getVoteRecords(final VoteFragment voteFragment) {
-		this.voteFragment = voteFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
-				String response = getRequest("dbInterface/api/voteRecord");
+				String response = getRequest("/voteRecord");
 				try {
 					JSONObject jObject = new JSONObject(response);
 					JSONArray jArray = jObject.getJSONArray("photoAlbums");
@@ -1642,7 +1286,7 @@ public class Network {
 						int nodeId = currentVoteRecord.getInt("nodeId");
 						String name = currentVoteRecord.getString("name");
 						String description = currentVoteRecord.getString("description");
-						//String responseBitmap = getRequest("dbInterface/api/photos/" + String.valueOf(nodeId));
+						//String responseBitmap = getRequest("photos/" + String.valueOf(nodeId));
 						//JSONObject responseJSON = new JSONObject(responseBitmap);
 						//String pictureURL = responseJSON.getString("url");
 
@@ -1659,30 +1303,50 @@ public class Network {
 		t.start();
 	}
 
-	public void getPollQuestions(final PollFragment pollFragment) {
-		this.pollFragment = pollFragment;
+	void getPollQuestions(final PollFragment pollFragment) {
+		String url = SERVER_URL + "/polls/26";
 
-        String url = SERVER_URL + "dbInterface/api/polls/26";
-
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+
                         try {
                             JSONArray jArray = response.getJSONArray("polls");
 
                             for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentAlbum = jArray.getJSONObject(i);
+                                JSONObject jsonObject = jArray.getJSONObject(i);
 
-                                int nodeId = currentAlbum.getInt("nodeId");
-                                int creatorID = currentAlbum.getInt("creatorId");
-                                String question = currentAlbum.getString("question");
-                                String answers = currentAlbum.getString("answers");
-                                int numOfComments = currentAlbum.getInt("numOfComments");
-                                int numOfAnswers = currentAlbum.getInt("numOfAnswers");
+                                final int nodeId = jsonObject.getInt("nodeId");
+                                String creatorEmail = jsonObject.getString("creatorEmail");
+                                final String question = jsonObject.getString("question");
+                                final String answers = jsonObject.optString("answers");
 
-                                pollFragment.addQuestion(nodeId, creatorID, question,
-                                        answers, numOfComments, numOfAnswers);
+                                int numOfAnswers = 0;
+                                if (answers != null) {
+                                    numOfAnswers = answers.split(",").length;
+                                }
+
+                                final int callbackNumOfAnswers = numOfAnswers;
+
+                                if (creatorEmail != null) {
+                                    getUser(creatorEmail, new UserInfoListener() {
+                                        @Override
+                                        public void onFetchSuccess(User user) {
+                                            pollFragment.addQuestion(nodeId, user, question,
+                                                    answers, callbackNumOfAnswers);
+                                        }
+
+                                        @Override
+                                        public void onFetchFailure(String userEmail, Exception e) {
+                                            pollFragment.addQuestion(nodeId, null, question,
+                                                    answers, callbackNumOfAnswers);
+                                        }
+                                    });
+                                } else {
+                                    pollFragment.addQuestion(nodeId, null, question,
+                                            answers, callbackNumOfAnswers);
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1693,32 +1357,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
 
-    public void getPollResults(final int nodeId, final PollVoteFragment pollVoteFragment) {
-        this.pollFragment = pollFragment;
-        String url = SERVER_URL + "dbInterface/api/poll/" + String.valueOf(nodeId) + "/results";
+    private void getPollResults(final int nodeId, final PollVoteFragment pollVoteFragment) {
+        String url = SERVER_URL + "/poll/" + String.valueOf(nodeId) + "/results";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1740,135 +1390,30 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getPollComments(final int pollId, final PollVoteFragment pollVoteFragment) {
-        this.pollVoteFragment = pollVoteFragment;
-        String url = SERVER_URL + "dbInterface/api/comments/" + String.valueOf(pollId) + "/";
+    void answerEfficacy() {
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        int targetId = jArray.getJSONObject(i).getInt("targetId");
-                        int commentId = jArray.getJSONObject(i).getInt("commentId");
-                        String userName = jArray.getJSONObject(i).getString("userName");
-                        String userEmail = jArray.getJSONObject(i).getString("userEmail");
-                        String content = jArray.getJSONObject(i).getString("content");
-
-                        pollVoteFragment.addTableComment(userName, content, userEmail);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
     }
 
-    public void postPollComment(final int pollId, String comment, final PollFragment pollFragment) {
-        this.pollFragment = pollFragment;
-        String url = SERVER_URL + "dbInterface/api/comment";
-
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("targetId", String.valueOf(pollId));
-        params.put("userName", (this.loginGivenName + " " + this.loginFamilyName));
-        params.put("userEmail", this.loginEmail);
-        params.put("content", comment);
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        Log.d("VolleyRequest", req.toString());
-    }
-
-    public void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
+    void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
                                   float emotionalStability, float openess) {
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/personality";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/personality";
 
-        HashMap<String, Float> params = new HashMap<String, Float>();
+        HashMap<String, Float> params = new HashMap<>();
         params.put("extroversion", extroversion);
         params.put("agreeableness", agreeableness);
         params.put("conscientiousness", conscientiousness);
         params.put("emotionalStability", emotionalStability);
         params.put("openess", openess);
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1883,22 +1428,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1906,16 +1438,15 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
-        this.pollFragment = pollFragment;
-        String url = SERVER_URL + "dbInterface/api/poll/" + String.valueOf(pollId) + "/answer";
+    void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
+        String url = SERVER_URL + "/poll/" + String.valueOf(pollId) + "/answer";
 
-        HashMap<String, Integer> params = new HashMap<String, Integer>();
+        HashMap<String, Integer> params = new HashMap<>();
             params.put("answerIndex", answerIndex);
-            params.put("answererId", (int) userId);
+            params.put("answererId", Integer.valueOf(loggedInUser.getId()));
             params.put("pollId", pollId);
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -1930,22 +1461,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1953,11 +1471,10 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void getVoteLocations(final VoteFragment voteFragment) {
-        this.pollFragment = pollFragment;
+    void getVoteLocations(final VoteFragment voteFragment) {
 
-        String url = SERVER_URL + "dbInterface/api/votingLocations/26";
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        String url = SERVER_URL + "/votingLocations/26";
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
@@ -1982,32 +1499,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
     public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
-        this.pollFragment = pollFragment;
 
-        String url = SERVER_URL + "dbInterface/api/votingLocation/" + pos;
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        String url = SERVER_URL + "/votingLocation/" + pos;
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2023,39 +1526,25 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getLatestElection() {
-        String url = SERVER_URL + "dbInterface/api/elections/26";
+    private void getLatestElection() {
+        String url = SERVER_URL + "/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray foundObject = response.getJSONArray("foundObjects");
                     JSONObject electionObject = foundObject.getJSONObject(0);
 
-                    int electionId = electionObject.getInt("electionId");
-                    network.electionId = electionId;
+                    network.electionId = electionObject.getInt("electionId");
 
                     alreadySetVoteReminder();
                 } catch (Exception e) {
@@ -2067,33 +1556,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getLatestElection(final ElectionOverviewFragment electionOverviewFragment) {
-        this.electionOverviewFragment = electionOverviewFragment;
-        String url = SERVER_URL + "dbInterface/api/elections/26";
+    void getLatestElection(final ElectionOverviewFragment electionOverviewFragment) {
+        String url = SERVER_URL + "/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
@@ -2123,7 +1597,7 @@ public class Network {
 
         @Override
         public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap<String, String> headers = new HashMap<String, String>();
+            HashMap<String, String> headers = new HashMap<>();
             String credentials = username + ":" + password;
             String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -2134,18 +1608,15 @@ public class Network {
             return headers;
         }
     };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getUserSupportedTickets() {
-        this.electionOverviewFragment = electionOverviewFragment;
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/support/";
+    void getUserSupportedTickets() {
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/support/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2155,7 +1626,7 @@ public class Network {
                         JSONObject currentObject = jArray.getJSONObject(i);
 
                         int ticketId = currentObject.getInt("ticketId");
-                        userTickets.add(new Integer(ticketId));
+                        userTickets.add(ticketId);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2166,41 +1637,25 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getLatestElection(final VoteFragment voteFragment) {
-        this.voteFragment = voteFragment;
-        String url = SERVER_URL + "dbInterface/api/elections/26";
+    void getLatestElection(final VoteFragment voteFragment) {
+        String url = SERVER_URL + "/elections/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jArray = response.getJSONArray("foundObjects");
                     JSONObject electionObject = jArray.getJSONObject(0);
 
-                    int electionId = electionObject.getInt("electionId");
-                    network.electionId = electionId;
+                    network.electionId = electionObject.getInt("electionId");
 
                     long startVoting = electionObject.getLong("startVoting");
                     long endVoting = electionObject.getLong("endVoting");
@@ -2217,33 +1672,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
     public void getCandidates(final CandidatePositionsFragment candidatePositionsFragment) {
-        this.candidatePositionsFragment = candidatePositionsFragment;
-        String url = SERVER_URL + "dbInterface/api/candidates/26";
+        String url = SERVER_URL + "/candidates/26";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2260,33 +1700,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getCandidates(final CandidateAllFragment candidateAllFragment) {
-        this.candidateAllFragment = candidateAllFragment;
-        String url = SERVER_URL + "dbInterface/api/candidates/" + String.valueOf(electionId);
+    void getCandidates(final CandidateAllFragment candidateAllFragment) {
+        String url = SERVER_URL + "/candidates/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2316,33 +1741,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getCandidatesPosition(final CandidatePositionFragment candidatePositionFragment, final int selectedPositionId) {
-        this.candidatePositionFragment = candidatePositionFragment;
-        String url = SERVER_URL + "dbInterface/api/position/" + String.valueOf(selectedPositionId) + "/candidates";
+    void getCandidatesPosition(final CandidatePositionFragment candidatePositionFragment, final int selectedPositionId) {
+        String url = SERVER_URL + "/position/" + String.valueOf(selectedPositionId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2372,32 +1782,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getTicketLabel(final TextView textView, final int tickedId) {
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(tickedId);
+    void getTicketLabel(final TextView textView, final int tickedId) {
+        String url = SERVER_URL + "/ticket/" + String.valueOf(tickedId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2415,33 +1811,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getTickets(final CandidateTicketFragment candidateTicketFragment) {
-        this.candidateTicketFragment = candidateTicketFragment;
-        String url = SERVER_URL + "dbInterface/api/tickets/" + String.valueOf(electionId);
+    void getTickets(final CandidateTicketFragment candidateTicketFragment) {
+        String url = SERVER_URL + "/tickets/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2476,33 +1857,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/candidates";
+    void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
+        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2532,32 +1898,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
+        });
 
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getTicketCandidates(final CandidateTicketDetailFragment candidateTicketDetailFragment, final int selectedTickedId) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
+    void getTicketCandidates(final CandidateTicketDetailFragment candidateTicketDetailFragment, final int selectedTickedId) {
+        String url = SERVER_URL + "/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2591,32 +1943,18 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getPositionText(final TextView positionTextView, int positionId) {
-        String url = SERVER_URL + "dbInterface/api/position/" + String.valueOf(positionId);
+    void getPositionText(final TextView positionTextView, int positionId) {
+        String url = SERVER_URL + "/position/" + String.valueOf(positionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2635,40 +1973,27 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getPositions(final CandidatePositionsFragment candidatePositionsFragment) {
-        this.candidatePositionsFragment = candidatePositionsFragment;
-        String url = SERVER_URL + "dbInterface/api/positions/" + String.valueOf(electionId);
+    void getPositions(final CandidatePositionsFragment candidatePositionsFragment) {
+        String url = SERVER_URL + "/positions/" + String.valueOf(electionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jArray = response.getJSONArray("foundObjects");
+
                     for(int i=0; i<jArray.length(); i++) {
                         JSONObject positionObject = jArray.getJSONObject(i);
 
-                        int electionId = positionObject.getInt("electionId");
+                        int electionId = positionObject.optInt("electionId", 0);
                         int positionId = positionObject.getInt("positionId");
                         String name = positionObject.getString("name");
                         String desc = positionObject.getString("description");
@@ -2685,36 +2010,22 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
+        });
 
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void addVoteReminder(long date, String location) {
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(loginEmail) + "/voteReminder";
+    void addVoteReminder(long date, String location) {
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getEmail()) + "/voteReminder";
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("location", location);
         params.put("date", String.valueOf(date));
         params.put("electionId", String.valueOf(network.electionId));
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2729,21 +2040,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2751,11 +2050,11 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void alreadySetVoteReminder() {
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(this.userId) + "/voteReminders/";
-        HashMap<String, String> params = new HashMap<String, String>();
+    private void alreadySetVoteReminder() {
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminders/";
+        HashMap<String, String> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2785,36 +2084,20 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
-                        Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void supportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
+    void supportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
+        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
+        userTickets.add(ticketId);
 
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-        userTickets.add(new Integer(ticketId));
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2831,21 +2114,8 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2853,14 +2123,12 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void unsupportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
-        this.candidateTicketDetailFragment = candidateTicketDetailFragment;
+    void unsupportTicket(int ticketId, CandidateTicketDetailFragment candidateTicketDetailFragment) {
+        String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
+        userTickets.remove(Integer.valueOf(ticketId));
 
-        String url = SERVER_URL + "dbInterface/api/ticket/" + String.valueOf(ticketId) + "/support/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-        userTickets.remove(new Integer(ticketId));
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2877,21 +2145,8 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2899,14 +2154,13 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void getPhotoLiked(final PhotoViewFragment photoViewFragment) {
-        this.photoViewFragment = photoViewFragment;
-        String url = SERVER_URL + "dbInterface/api/photo/"
+    void getPhotoLiked(final PhotoViewFragment photoViewFragment) {
+        String url = SERVER_URL + "/photo/"
                 + String.valueOf(photoViewFragment.getPhotoPath())
                 + "/likedBy/"
-                + String.valueOf(loginEmail) + "/";
+                + String.valueOf(loggedInUser.getEmail()) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -2924,36 +2178,21 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void likePhoto(int photoId, PhotoViewFragment photoViewFragment) {
-        this.newsArticleFragment = newsArticleFragment;
+    void likePhoto(int photoId, PhotoViewFragment photoViewFragment) {
 
-        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId)
+        String url = SERVER_URL + "/photo/" + String.valueOf(photoId)
                 + "/likedBy/"
-                + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+                + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2970,21 +2209,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2992,13 +2219,12 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
-        this.newsArticleFragment = newsArticleFragment;
+    void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
 
-        String url = SERVER_URL + "dbInterface/api/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
+        String url = SERVER_URL + "/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3015,21 +2241,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -3037,13 +2251,11 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
+    void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
+        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
 
-        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3060,21 +2272,8 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -3082,13 +2281,11 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        this.newsArticleFragment = newsArticleFragment;
+    void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
+        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
+        HashMap<String, String> params = new HashMap<>();
 
-        String url = SERVER_URL + "dbInterface/api/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loginEmail) + "/";
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3105,21 +2302,8 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
+        });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -3127,52 +2311,10 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void getUserFullName(int userId, final TextView textView, final String params) {
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId) + "/";
+    void getTasks(final ProfileFragment profileFragment) {
+        String url = SERVER_URL + "/tasks/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String fullName = response.getString("givenName") + " " +
-                                    response.getString("familyName");
-
-                            textView.setText(params + fullName);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
-
-    public void getTasks(final ProfileFragment profileFragment) {
-        String url = SERVER_URL + "dbInterface/api/tasks/";
-
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3200,7 +2342,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3212,16 +2354,16 @@ public class Network {
             }
         };
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getTasks(final ContactProfileFragment contactProfileFragment) {
-        String url = SERVER_URL + "dbInterface/api/tasks/complete";
+    void getTasks(final ContactProfileFragment contactProfileFragment) {
+        String url = SERVER_URL + "/tasks/complete";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3250,7 +2392,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3262,17 +2404,16 @@ public class Network {
             }
         };
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getCompletedTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
-        this.taskDetailProgressFragment = taskDetailProgressFragment;
-        String url = SERVER_URL + "dbInterface/api/tasks/complete/"+String.valueOf(userId) + "?pageSize=20";
+    void getCompletedTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
+        String url = SERVER_URL + "/tasks/complete/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3303,7 +2444,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3315,17 +2456,15 @@ public class Network {
             }
         };
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getRemainingTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
-        this.taskDetailProgressFragment = taskDetailProgressFragment;
-        String url = SERVER_URL + "dbInterface/api/tasks/remaining/"+String.valueOf(userId) + "?pageSize=20";
+    void getRemainingTasks(final TaskDetailProgressFragment taskDetailProgressFragment) {
+        String url = SERVER_URL + "/tasks/remaining/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        JsonObjectRequest req = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -3356,7 +2495,7 @@ public class Network {
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
+                HashMap<String, String> headers = new HashMap<>();
                 String credentials = username + ":" + password;
                 String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(),
                         Base64.NO_WRAP);
@@ -3367,20 +2506,17 @@ public class Network {
                 return headers;
             }
         };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
 	public void likeNewsArticle(final NewsArticleFragment newsArticleFragment) {
-		this.newsArticleFragment = newsArticleFragment;
-
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
-					String response = getRequest("dbInterface/api/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + email + "/");
+					String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + loggedInUser.getEmail() + "/");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -3392,139 +2528,95 @@ public class Network {
 		t.start();
 	}
 
-    public String getLoginGivenName() {
-        return loginGivenName;
+    /**
+     * Convenience method for getRequest(params, withAuth) - majority of method usage
+     * is with user auth.
+     */
+    private String getRequest(String params) {
+        return getRequest(params, true);
     }
 
-    public void setLoginGivenName(String loginGivenName) {
-        this.loginGivenName = loginGivenName;
-    }
+    private String getRequest(String params, boolean withAuth) {
+        if (params == null || params.length() == 0) return "";
 
-    public String getLoginFamilyName() {
-        return loginFamilyName;
-    }
-
-    public void setLoginFamilyName(String loginFamilyName) {
-        this.loginFamilyName = loginFamilyName;
-    }
-
-    public String getLoginEmail() {
-        return loginEmail;
-    }
-
-    public void setLoginEmail(String loginEmail) {
-        this.loginEmail = loginEmail;
-    }
-
-    public String getRequest(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuffer = new StringBuilder();
         BufferedReader bufferedReader = null;
 
         try {
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            HttpGet httpGet = new HttpGet();
+            URL url = new URL(SERVER_URL + params);
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setDoInput(true);
+            connection.setDoOutput(false);
 
-            URI uri = new URI(SERVER_URL + params);
-            httpGet.setURI(uri);
-            httpGet.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(username, password), HTTP.UTF_8, false));
-            httpGet.addHeader("Accept", "application/json");
-            httpGet.addHeader("Content-type", "application/json");
+            if (withAuth) {
+                String credentials = username + ":" + password;
+                String base64EncodedCredentials =
+                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                connection.setRequestProperty("Authorization", "Basic " + base64EncodedCredentials);
+            }
 
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            InputStream inputStream = httpResponse.getEntity().getContent();
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty("Content-type", "application/json");
+
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return "";
+
+            InputStream inputStream = connection.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(
                     inputStream));
 
+            stringBuffer = new StringBuilder();
             String readLine = bufferedReader.readLine();
             while (readLine != null) {
                 stringBuffer.append(readLine);
                 stringBuffer.append("\n");
                 readLine = bufferedReader.readLine();
             }
+
         } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
+            Log.e("Isegoria", "exception", e);
+
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                	Log.e("Isegoria", "exception", e);
+                    Log.e("Isegoria", "exception", e);
                 }
             }
         }
+
         return stringBuffer.toString();
     }
 
-	public String getRequestNoAuth(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
-        BufferedReader bufferedReader = null;
-
-        try {
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            HttpGet httpGet = new HttpGet();
-
-            URI uri = new URI(SERVER_URL + params);
-            httpGet.setURI(uri);
-            httpGet.addHeader("Accept", "application/json");
-            httpGet.addHeader("Content-type", "application/json");
-
-            HttpResponse httpResponse = httpClient.execute(httpGet);
-            InputStream inputStream = httpResponse.getEntity().getContent();
-            bufferedReader = new BufferedReader(new InputStreamReader(
-                    inputStream));
-
-            String readLine = bufferedReader.readLine();
-            while (readLine != null) {
-                stringBuffer.append(readLine);
-                stringBuffer.append("\n");
-                readLine = bufferedReader.readLine();
-            }
-        } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                	Log.e("Isegoria", "exception", e);
-                }
-            }
-        }
-        return stringBuffer.toString();
+    interface PictureDownloadListener {
+        void onDownloadFinished(String url, @Nullable Bitmap bitmap);
+        void onDownloadFailed(String url, VolleyError error);
     }
 
-	public Bitmap getPicture(String params) {
-        StringBuffer stringBuffer = new StringBuffer();
-        Bitmap output = null;
+	void getPicture(final String url, @NonNull final PictureDownloadListener callback) {
+        ImageRequest req = new ImageRequest(url,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap bitmap) {
+                        callback.onDownloadFinished(url, bitmap);
+                    }
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
+                new Response.ErrorListener() {
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Volley", error.toString());
+                        callback.onDownloadFailed(url, error);
+                    }
+                });
 
-        try {
-        	HttpUriRequest request = new HttpGet(params);
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpParams httpParameters = httpClient.getParams();
-            HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-            //request.addHeader(BasicScheme.authenticate(new UsernamePasswordCredentials(username, password), HTTP.UTF_8, false));
-            HttpResponse response = httpClient.execute(request);
-
-            HttpEntity entity = response.getEntity();
-            byte[] bytes = EntityUtils.toByteArray(entity);
-            output = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-        } catch (Exception e) {
-        	Log.e("Isegoria", "exception", e);
-        } finally {
-
-        }
-
-        return output;
+        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        req.setRetryPolicy(policy);
+        mRequestQueue.add(req);
     }
 
     public void getFirstPhoto(int electionId, final int positionId, final ImageView imageView) {
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
+        String url = String.format("%s/photos/%d/", SERVER_URL, positionId);
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3553,37 +2645,23 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getUserDPId() {
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(this.userId) + "/";
+    void getUserDPId() {
+        String url = String.format("%s/photos/%s/", SERVER_URL, loggedInUser.getEmail());
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            int nodeId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
-                            userDPId = nodeId;
+                            userDPId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
                             String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
 
                         } catch (Exception e) {
@@ -3595,68 +2673,15 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhoto(String email, final ImageView imageView) {
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(email) + "/";
-
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
-                            getFirstPhotoImage(url, imageView);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
-
-    public void getFirstPhotoImage(String url, final ImageView view) {
+    private void getFirstPhotoImage(String url, final ImageView view) {
         ImageRequest req = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -3664,7 +2689,7 @@ public class Network {
                         view.setImageBitmap(bitmap);
                         view.refreshDrawableState();
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
@@ -3672,16 +2697,16 @@ public class Network {
                 }) {
         };
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
-        String url = SERVER_URL + "dbInterface/api/photos/" + String.valueOf(positionId) + "/";
+    private void getFirstPhotoBlur(int electionId, int positionId, final LinearLayout imageView) {
+        String url = SERVER_URL + "/photos/" + String.valueOf(positionId) + "/";
 
-        JsonObjectRequest req = new JsonObjectRequest(url, null,
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3710,70 +2735,64 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json");
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhotoImageBlur(String url, final LinearLayout view) {
+    private void getFirstPhotoImageBlur(String url, final LinearLayout view) {
         ImageRequest req = new ImageRequest(url,
                 new Response.Listener<Bitmap>() {
+                    @SuppressWarnings("deprecation")
                     @Override
                     public void onResponse(Bitmap bitmap) {
                         Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
-                                ProfileFragment.fastBlur(bitmap, 25));
-                        view.setBackgroundDrawable(d);
+                                Utils.fastBlur(bitmap, 25));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                            view.setBackground(d);
+                        } else {
+                            view.setBackgroundDrawable(d);
+                        }
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
                     }
                 });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getPictureVolley(String params, final ImageView view) {
+    void getPictureVolley(String params, final ImageView view) {
+        if (params == null) return;
+
         ImageRequest req = new ImageRequest(params,
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap bitmap) {
                         view.setImageBitmap(bitmap);
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
                     }
                 });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public void getPictureVolley2(String params, final ImageView view, final int squareSize, final PhotoViewFragment fragment) {
+    void getPictureVolley2(String params, final ImageView view, final int squareSize, final PhotoViewFragment fragment) {
         ImageRequest req = new ImageRequest(params,
                 new Response.Listener<Bitmap>() {
                     @Override
@@ -3781,20 +2800,20 @@ public class Network {
                         view.setImageBitmap(srcBmp);
                         fragment.setImageBitmap(srcBmp);
                     }
-                }, 0, 0, null,
+                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
                 new Response.ErrorListener() {
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Volley", error.toString());
                     }
                 });
 
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
-    public ArrayList<Integer> getUserTickets() {
+    ArrayList<Integer> getUserTickets() {
         return userTickets;
     }
 
@@ -3802,7 +2821,7 @@ public class Network {
         this.userTickets = userTickets;
     }
 
-    public boolean isReminderSet() {
+    boolean isReminderSet() {
         return reminderSet;
     }
 
@@ -3810,105 +2829,71 @@ public class Network {
         this.reminderSet = reminderSet;
     }
 
-    public long getVoteReminderDate() {
+    long getVoteReminderDate() {
         return voteReminderDate;
     }
 
-    public void setVoteReminderDate(long voteReminderDate) {
+    private void setVoteReminderDate(long voteReminderDate) {
         this.voteReminderDate = voteReminderDate;
     }
 
-    public String getVoteReminderLocation() {
+    String getVoteReminderLocation() {
         return voteReminderLocation;
     }
 
-    public void setVoteReminderLocation(String voteReminderLocation) {
+    private void setVoteReminderLocation(String voteReminderLocation) {
         this.voteReminderLocation = voteReminderLocation;
     }
 
-    public boolean isOptOutDataCollection() {
-        return optOutDataCollection;
-    }
+    void s3Upload(final File file) {
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                application.getApplicationContext(), // Context,
+                "715927704730",
+                "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
+                "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
+                "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
+                Regions.US_EAST_1 // Region
+        );
 
-    public void setOptOutDataCollection(boolean optOutDataCollection) {
-        this.optOutDataCollection = optOutDataCollection;
-    }
+        AmazonS3Client s3Client = new AmazonS3Client(credentialsProvider);
 
-    public boolean isTrackingOff() {
-        return trackingOff;
-    }
+        TransferUtility transferUtility = new TransferUtility(s3Client, application.getApplicationContext());
 
-    public void setTrackingOff(boolean trackingOff) {
-        this.trackingOff = trackingOff;
-    }
-
-    public Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-
-        float xScale = (float) newWidth / sourceWidth;
-        float yScale = (float) newHeight / sourceHeight;
-        float scale = Math.max(xScale, yScale);
-
-        float scaledWidth = scale * sourceWidth;
-        float scaledHeight = scale * sourceHeight;
-
-        float left = (newWidth - scaledWidth) / 2;
-        float top = (newHeight - scaledHeight) / 2;
-
-        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
-        Canvas canvas = new Canvas(dest);
-        canvas.drawBitmap(source, null, targetRect, null);
-
-        return dest;
-    }
-
-    public void s3Upload(final File file) {
-        Runnable r = new Runnable() {
-            public void run() {
-                CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                        application.getApplicationContext(), // Context,
-                        "715927704730",
-                        "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
-                        "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
-                         "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
-                        Regions.US_EAST_1 // Region
-                );
-
-                try {
-                    TransferManager transferManager = new TransferManager(credentialsProvider);
-                    long timestamp = System.currentTimeMillis() / 1000L;
-                    String filename = String.valueOf(userId) + "_" + String.valueOf(timestamp) + "_" + file.getName();
-                    Upload upload = transferManager.upload("isegoriauserpics", filename, file);
-                    upload.waitForUploadResult();
+        long timestamp = System.currentTimeMillis() / 1000L;
+        final String filename = String.valueOf(loggedInUser.getId()) + "_" + String.valueOf(timestamp) + "_" + file.getName();
+        TransferObserver observer = transferUtility.upload("isegoriauserpics", filename, file);
+        observer.setTransferListener(new TransferListener() {
+            @Override
+            public void onStateChanged(int id, TransferState state) {
+                if (state == TransferState.COMPLETED) {
                     updateDisplayPicturePhoto("https://s3.amazonaws.com/isegoriauserpics/" + filename);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        };
 
-        Thread t = new Thread(r);
-        t.start();
+            @Override
+            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) { }
+
+            @Override
+            public void onError(int id, Exception ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
-    public void updateDisplayPicturePhoto(String pictureURL) {
-        this.findAddContactFragment = findAddContactFragment;
-        String url = SERVER_URL + "dbInterface/api/photo";
+    private void updateDisplayPicturePhoto(String pictureURL) {
+        String url = SERVER_URL + "/photo";
         long timestamp = System.currentTimeMillis() / 1000L;
 
-        HashMap<String, String> params = new HashMap<String, String>();
+        HashMap<String, String> params = new HashMap<>();
         params.put("url", pictureURL);
         params.put("thumbNailUrl", pictureURL);
         params.put("title", "Profile Picture");
         params.put("description", "Profile Picture");
         params.put("date", String.valueOf(timestamp));
-        params.put("ownerId", String.valueOf(userId));
+        params.put("ownerId", String.valueOf(loggedInUser.getId()));
         params.put("sequence", String.valueOf("0"));
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3923,23 +2908,9 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -3947,14 +2918,14 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void updateUserDetails() {
-        String url = SERVER_URL + "dbInterface/api/user/" + String.valueOf(userId);
+    void updateUserDetails() {
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId());
 
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("trackingOff", String.valueOf(this.isTrackingOff()));
-        params.put("optOutDataCollection", String.valueOf(this.optOutDataCollection));
+        HashMap<String, String> params = new HashMap<>();
+        params.put("trackingOff", String.valueOf(loggedInUser.isTrackingOff()));
+        params.put("optOutDataCollection", String.valueOf(loggedInUser.isOptedOutOfDataCollection()));
 
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -3969,60 +2940,13 @@ public class Network {
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
             }
-        }) {
+        });
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                String credentials = username + ":" + password;
-                String base64EncodedCredentials =
-                        Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Accept", "application/json");
-                headers.put("Content-type", "application/json; charset=utf-8");
-
-                return headers;
-            }
-        };
-
-        int socketTimeout = 30000;//30 seconds - change to what you want
+        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 
         Log.d("VolleyRequest", req.toString());
     }
-
-	public static Bitmap decodeSampledBitmapFromBitmap(InputStream is,
-	        int reqWidth, int reqHeight) {
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeStream(is);
-	}
-
-	public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-	    // Raw height and width of image
-	    final int height = options.outHeight;
-	    final int width = options.outWidth;
-	    int inSampleSize = 1;
-
-	    if (height > reqHeight || width > reqWidth) {
-
-	        final int halfHeight = height / 2;
-	        final int halfWidth = width / 2;
-
-	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-	        // height and width larger than the requested height and width.
-	        while ((halfHeight / inSampleSize) > reqHeight
-	                && (halfWidth / inSampleSize) > reqWidth) {
-	            inSampleSize *= 2;
-	        }
-	    }
-
-	    return inSampleSize;
-	}
 }

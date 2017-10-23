@@ -3,6 +3,7 @@
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
     <color name="searchBar">#CAC9CF</color>
+    <color name="profileImageBackground">#AAAAAA</color>
     <color name="grey">#8A898A</color>
     <color name="divider">#27313D</color>
     <color name="offGrey">#F4F4F4</color>
@@ -16,4 +17,11 @@
     <color name="barBackground">#313E4D</color>
     <color name="barText">#A1B2C5</color>
     <color name="greenButtonBackground">#60C353</color>
+
+    <color name="navigation_selected_background">#F5F5F5</color> <!-- Grey 100 -->
+
+    <color name="slider_text">#738192</color>
+
+    <color name="self_efficacy_slider_2">#647EC7</color>
+    <color name="self_efficacy_slider_3">#B4629A</color>
 </resources>
