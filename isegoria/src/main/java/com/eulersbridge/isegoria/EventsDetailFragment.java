@@ -34,6 +34,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.eulersbridge.isegoria.models.Event;
+import com.eulersbridge.isegoria.utilities.TimeConverter;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;

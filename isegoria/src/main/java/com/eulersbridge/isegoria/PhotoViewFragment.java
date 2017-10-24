@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 public class PhotoViewFragment extends Fragment {
 	private View rootView;
     private PhotoViewFragment photoViewFragment;

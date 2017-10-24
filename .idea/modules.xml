@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android-app-android-studio.iml" filepath="$PROJECT_DIR$/android-app-android-studio.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dateSlider/dateSlider.iml" filepath="$PROJECT_DIR$/dateSlider/dateSlider.iml" />
       <module fileurl="file://$PROJECT_DIR$/isegoria/isegoria.iml" filepath="$PROJECT_DIR$/isegoria/isegoria.iml" />
     </modules>
   </component>

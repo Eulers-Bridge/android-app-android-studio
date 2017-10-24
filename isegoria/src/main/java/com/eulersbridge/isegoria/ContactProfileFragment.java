@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.views.CircularSeekBar;
+
 /**
  * Created by Anthony on 30/03/2015.
  */

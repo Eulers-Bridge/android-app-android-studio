@@ -24,7 +24,7 @@
             android:layout_marginTop="24dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.SelfEfficacySliderBar
+        <com.eulersbridge.isegoria.election.SelfEfficacySliderBar
             android:id="@+id/selfEfficacySliderBar1"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -36,7 +36,7 @@
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.SelfEfficacySliderBar
+        <com.eulersbridge.isegoria.election.SelfEfficacySliderBar
             android:id="@+id/selfEfficacySliderBar2"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -48,7 +48,7 @@
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.SelfEfficacySliderBar
+        <com.eulersbridge.isegoria.election.SelfEfficacySliderBar
             android:id="@+id/selfEfficacySliderBar3"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -60,7 +60,7 @@
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.SelfEfficacySliderBar
+        <com.eulersbridge.isegoria.election.SelfEfficacySliderBar
             android:id="@+id/selfEfficacySliderBar4"
             android:layout_width="match_parent"
             android:layout_height="48dp" />

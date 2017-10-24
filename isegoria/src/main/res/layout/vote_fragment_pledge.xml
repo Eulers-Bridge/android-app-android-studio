@@ -15,8 +15,10 @@
         android:paddingLeft="40dp"
         android:paddingRight="40dp">
 
+        <com.eulersbridge.isegoria.views.Signature
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"

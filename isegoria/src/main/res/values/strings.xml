@@ -115,5 +115,6 @@
 
     <string name="contact_profile_picture_content_description">Contact profile picture</string>
     <string name="friends_search_title">Search</string>
+    <string name="poll_asked_by">Asked by %s</string>
 
 </resources>

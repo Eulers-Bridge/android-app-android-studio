@@ -28,6 +28,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.utilities.Utils;
+
 import java.util.ArrayList;
 
 public class CandidateAllFragment extends Fragment {
