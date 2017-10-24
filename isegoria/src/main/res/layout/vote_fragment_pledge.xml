@@ -26,8 +26,7 @@
         android:layout_height="10dp"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <View
             android:layout_width="match_parent"
@@ -55,19 +54,28 @@
         android:paddingTop="10dp"
         android:layout_weight="1"
         android:background="@android:color/white"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:gravity="center">
 
         <Button
             android:id="@+id/voteNextButton"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:background="@drawable/green_button"
-            android:gravity="center"
             android:text="@string/vote_sign_pledge_next_button"
             android:textColor="#52BB42"
-            android:layout_gravity="top" />
+            android:layout_gravity="center" />
 
+        <Button
+            android:id="@+id/selfEfficacyStartButton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/green_button"
+            android:text="@string/vote_sign_pledge_self_efficacy_button"
+            android:textColor="#52BB42"
+            android:layout_gravity="center" />
     </LinearLayout>
 
 </LinearLayout>

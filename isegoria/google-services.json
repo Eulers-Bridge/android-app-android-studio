@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "880300655790",
+    "project_id": "firebase-isegoria"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:880300655790:android:578c21f63a1e5b22",
+        "android_client_info": {
+          "package_name": "au.com.isegoria.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "880300655790-0a055e5sh27kt1uefsoggkqoekl5akpe.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "880300655790-8aucaadbvvf2lmq857chjm69gucn39bn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.isegoria.app",
+            "certificate_hash": "c24efc99f59dbce105934d626cb87efb1e084341"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4Wn8XepiRsLrZKgyEDX_eU1oX23OCot0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-91233938-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

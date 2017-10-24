@@ -15,6 +15,7 @@ import android.widget.TimePicker;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.election.SelfEfficacyQuestionsFragment;
 import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.R;
 
@@ -65,6 +66,19 @@ public class VoteFragmentPledge extends Fragment {
                 long date = calendar.getTimeInMillis();
 
                 network.addVoteReminder(location, date);
+            }
+        });
+
+        Button selfEfficacyStartButton = rootView.findViewById(R.id.selfEfficacyStartButton);
+        selfEfficacyStartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
+                getChildFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.container, selfEfficacyQuestionsFragment)
+                        .commit();
             }
         });
 

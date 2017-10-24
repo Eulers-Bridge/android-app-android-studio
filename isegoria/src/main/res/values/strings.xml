@@ -43,6 +43,7 @@
     <!-- Voting -->
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
     <string name="vote_sign_pledge_next_button">Next</string>
+    <string name="vote_sign_pledge_self_efficacy_button">Start Survey</string>
     <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
     <string name="vote_done_message">You\'re ready to go! Make sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!</string>
 
