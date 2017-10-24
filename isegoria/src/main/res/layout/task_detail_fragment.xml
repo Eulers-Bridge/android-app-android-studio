@@ -71,7 +71,6 @@
                     android:background="#64d3d3d3" >
 
                     <TextView
-                        android:id="@+id/taskLevelField"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"

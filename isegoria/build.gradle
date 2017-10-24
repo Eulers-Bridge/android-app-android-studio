@@ -32,7 +32,7 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.release
@@ -54,7 +54,6 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
-//    compile 'com.amazonaws:aws-android-sdk-core:2.4.0'
     compile 'com.amazonaws:aws-android-sdk-s3:2.4.0'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.4.0'
     compile 'com.amazonaws:aws-android-sdk-sns:2.4.0'
