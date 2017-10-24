@@ -25,9 +25,26 @@ import android.view.View;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.election.ElectionMasterFragment;
+import com.eulersbridge.isegoria.feed.FeedFragment;
+import com.eulersbridge.isegoria.login.LoginScreenFragment;
+import com.eulersbridge.isegoria.login.UserConsentAgreementFragment;
+import com.eulersbridge.isegoria.login.UserSignupFragment;
+import com.eulersbridge.isegoria.models.CountryInfo;
+import com.eulersbridge.isegoria.models.InstitutionInfo;
+import com.eulersbridge.isegoria.poll.PollFragment;
+import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
+import com.eulersbridge.isegoria.profile.UserSettingsFragment;
+import com.eulersbridge.isegoria.vote.VoteFragmentDone;
+import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
+import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+	public static Boolean inBackground = true;
+
 	private Fragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
@@ -61,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (savedInstanceState != null)
 			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
 
-		if (mContent == null) mContent = new MainView();
+		if (mContent == null) mContent = new FeedFragment();
 
 		setupToolbarAndNavigation();
 		coordinatorLayout = findViewById(R.id.coordinatorLayout);
@@ -109,11 +126,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		toolbarTitleTextView.setVisibility(visible? View.VISIBLE : View.GONE);
 	}
 
-	void setToolbarTitle(String title) {
+	public void setToolbarTitle(String title) {
 		toolbarTitleTextView.setText(title);
 	}
 
-	void setToolbarVisible(boolean visible) {
+	public void setToolbarVisible(boolean visible) {
 		if (visible) {
 			getSupportActionBar().show();
 		} else {

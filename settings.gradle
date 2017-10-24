@@ -1,3 +1,1 @@
 include ':isegoria'
-
-include ':dateSlider'

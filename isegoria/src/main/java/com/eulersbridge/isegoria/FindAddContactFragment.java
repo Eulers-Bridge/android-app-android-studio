@@ -1,8 +1,5 @@
 package com.eulersbridge.isegoria;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -31,6 +28,9 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.utilities.Utils;
+
 public class FindAddContactFragment extends Fragment {
     private View rootView;
 
@@ -40,7 +40,6 @@ public class FindAddContactFragment extends Fragment {
 
     private float dpWidth;
 
-    private FindAddContactFragment findAddContactFragment;
     private Network network;
 
     private MainActivity mainActivity;
@@ -48,7 +47,6 @@ public class FindAddContactFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        findAddContactFragment = this;
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
 
@@ -70,7 +68,8 @@ public class FindAddContactFragment extends Fragment {
 
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.findFriends(this);
-        network.findPendingContacts(this);
+        network.getFriendRequestsSent(this);
+        network.getFriendRequestsReceived(this);
 
         return rootView;
     }
@@ -83,7 +82,7 @@ public class FindAddContactFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
 
         SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         // Set max width, remove left padding to assist in getting search view text aligned
         // with where Toolbar title previously was
@@ -98,6 +97,11 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 mainActivity.setToolbarShowsTitle(!hasFocus);
+
+                if (!hasFocus) {
+                    clearSearchResults();
+                    hideSearchResultsSection();
+                }
             }
         });
 
@@ -105,7 +109,7 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(query).matches()) {
-                    network.findContacts(query, findAddContactFragment);
+                    network.findContacts(query, FindAddContactFragment.this);
                     return true;
                 }
                 return false;
@@ -114,7 +118,7 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(newText).matches()) {
-                    network.findContacts(newText, findAddContactFragment);
+                    network.findContacts(newText, FindAddContactFragment.this);
                     return true;
                 }
 
@@ -131,26 +135,40 @@ public class FindAddContactFragment extends Fragment {
         usersAllTableLayout.removeAllViews();
     }
 
+    private void hideSearchResultsSection() {
+        LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
+        searchResultsLinearLayout.setVisibility(ViewGroup.GONE);
+    }
+
     public void addUser(User user) {
-        addTableRow(-1, usersAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 1);
+        addTableRow(usersAllTableLayout, user, null, 1);
+
         LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
         searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
-    public void addFriend(int userId, User user) {
-        addTableRow(userId, friendsAllTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 2);
+    public void addFriend(User user) {
+        addTableRow(friendsAllTableLayout, user, null, 2);
     }
 
-    public void addPendingFriend(int userId, User user) {
+    public void addFriendRequestSent(User user) {
+        addTableRow(pendingTableLayout, user, null, 3);
+
         LinearLayout pendingRequestsLinearLayout = rootView.findViewById(R.id.pendingRequestsLinearLayout);
         pendingRequestsLinearLayout.setVisibility(ViewGroup.VISIBLE);
-        addTableRow(userId, pendingTableLayout, user.getFullName(), user.getEmail(), "The University of Melbourne", user.getProfilePhotoURL(), 3);
+    }
+
+    public void addFriendRequestReceived(User user, String contactRequestId) {
+        addTableRow(pendingTableLayout, user, contactRequestId, 3);
+
+        LinearLayout pendingRequestsLinearLayout = rootView.findViewById(R.id.pendingRequestsLinearLayout);
+        pendingRequestsLinearLayout.setVisibility(ViewGroup.VISIBLE);
     }
 
     // 1 = Search
     // 2 = Current Contact
     // 3 = Pending Contact
-    private void addTableRow(final int userId, TableLayout tableLayout, final String name, final String email, final String institution, final String url, int type) {
+    private void addTableRow(TableLayout tableLayout, final User user, final String contactRequestId, int type) {
         final TableRow tr;
 
         final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -173,22 +191,22 @@ public class FindAddContactFragment extends Fragment {
         candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
         //network.getFirstPhoto(0, userId, candidateProfileView);
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
-        network.getPictureVolley(url, candidateProfileView);
+        network.getPictureVolley(user.getProfilePhotoURL(), candidateProfileView);
 
         final ImageView viewProfileImage = new ImageView(getActivity());
         viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
-        viewProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
+        viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
         viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         viewProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
+                viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
                 FragmentManager fragmentManager2 = getFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 ContactProfileFragment fragment2 = new ContactProfileFragment();
                 Bundle args = new Bundle();
-                args.putInt("ProfileId", userId);
+                args.putInt("ProfileId", Integer.valueOf(user.getId()));
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.replace(android.R.id.content, fragment2);
@@ -199,7 +217,7 @@ public class FindAddContactFragment extends Fragment {
         final ImageView candidateProfileImage = new ImageView(getActivity());
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-        candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+        candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         candidateProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,14 +232,14 @@ public class FindAddContactFragment extends Fragment {
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.replace(android.R.id.content, fragment2);
                 fragmentTransaction2.commit();*/
-                network.addFriend(String.valueOf(userId), findAddContactFragment);
+                network.addFriend(user.getEmail(), FindAddContactFragment.this);
             }
         });
 
         final ImageView acceptImage = new ImageView(getActivity());
         acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         acceptImage.setScaleType(ScaleType.CENTER_CROP);
-        acceptImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+        acceptImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         acceptImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,15 +255,15 @@ public class FindAddContactFragment extends Fragment {
                 fragmentTransaction2.replace(android.R.id.content, fragment2);
                 fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
-                findAddContactFragment.addTableRow(userId, friendsAllTableLayout, name, email, institution, url, 2);
-                network.acceptContact(String.valueOf(userId), findAddContactFragment);
+                FindAddContactFragment.this.addTableRow(friendsAllTableLayout, user, contactRequestId, 2);
+                network.acceptContact(String.valueOf(user.getId()), FindAddContactFragment.this);
             }
         });
 
         final ImageView denyImage = new ImageView(getActivity());
         denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         denyImage.setScaleType(ScaleType.CENTER_CROP);
-        denyImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+        denyImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         denyImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,21 +279,21 @@ public class FindAddContactFragment extends Fragment {
                 fragmentTransaction2.replace(android.R.id.content, fragment2);
                 fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
-                network.denyContact(String.valueOf(userId), findAddContactFragment);
+                network.denyContact(String.valueOf(user.getId()), FindAddContactFragment.this);
             }
         });
 
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(16.0f);
-        textViewCandidate.setText(name);
+        textViewCandidate.setText(user.getFullName());
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewCandidate.setGravity(Gravity.START);
 
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(12.0f);
-        textViewPosition.setText(institution);
+        textViewPosition.setText("The University of Melbourne");
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
@@ -339,21 +357,5 @@ public class FindAddContactFragment extends Fragment {
 
     public void showDenyMessage() {
         Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
-    }
-
-    private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                          int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
     }
 }

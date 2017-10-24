@@ -7,14 +7,25 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 
+import com.eulersbridge.isegoria.feed.FeedFragment;
+import com.eulersbridge.isegoria.login.EmailVerificationFragment;
+import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
+import com.eulersbridge.isegoria.models.CountryInfo;
+import com.eulersbridge.isegoria.models.User;
+
 import java.util.ArrayList;
 
 public class Isegoria extends Application {
+
 	private MainActivity mainActivity;
 	private Network network;
-	private boolean loggedIn = false;
+
+	private boolean isLoggedIn = false;
+	private User loggedInUser;
+
 	private String username = "";
 	private String password = "";
+
 	private ArrayList<CountryInfo> countryObjects;
 	
 	public Isegoria() {
@@ -111,23 +122,36 @@ public class Isegoria extends Application {
 	}
 
 	public boolean isLoggedIn() {
-		return loggedIn;
+		return isLoggedIn;
 	}
 
 	public void setLoggedIn(boolean loggedIn) {
-		this.loggedIn = loggedIn;
+		isLoggedIn = loggedIn;
 	}
 
-	public String getUsername() {
-		return username;
+	public User getLoggedInUser() {
+		return loggedInUser;
+	}
+
+	public void setLoggedInUser(User user) {
+		loggedInUser = user;
+
+		getSharedPreferences("Preferences", MODE_PRIVATE)
+				.edit()
+				.putString("userEmail", loggedInUser.getEmail())
+				.apply();
+	}
+
+	public void setTrackingOff(boolean trackingOff) {
+		loggedInUser.setTrackingOff(trackingOff);
+	}
+
+	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
+		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
 	}
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	public void setPassword(String password) {

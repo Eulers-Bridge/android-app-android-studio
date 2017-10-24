@@ -13,4 +13,6 @@
     <dimen name="newsPointsSize">15sp</dimen>
     <dimen name="eventLocationSize">16sp</dimen>
 
+    <dimen name="login_text_field_corner_radius">2dp</dimen>
+
 </resources>

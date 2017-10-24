@@ -19,6 +19,9 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.models.Event;
+import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 public class EventsFragment extends Fragment {
 	private TableLayout newsTableLayout;
     private EventsFragment eventsFragment;

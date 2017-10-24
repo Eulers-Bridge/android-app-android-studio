@@ -18,8 +18,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 public class PhotoAlbumFragment extends Fragment {
-	private View rootView;
-	private TableLayout photosAlbumTableLayout;
+    private TableLayout photosAlbumTableLayout;
 	private TableRow tr;
 
 	private int photosPerRow = -1;
@@ -40,8 +39,8 @@ public class PhotoAlbumFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
-		getActivity().setTitle("Isegoria");
+        View rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
+		getActivity().setTitle(getString(R.string.app_name));
 		Bundle bundle = this.getArguments();
 		photoAlbumName = bundle.getString("Album");
 

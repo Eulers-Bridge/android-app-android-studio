@@ -5,7 +5,7 @@
     android:orientation="vertical"
     >
 
-    <com.eulersbridge.isegoria.NonSwipeableViewPager
+    <com.eulersbridge.isegoria.utilities.NonSwipeableViewPager
         android:id="@+id/voteViewPagerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 public class NewsArticleFragment extends Fragment {
 	private View rootView;
     private View newsArticleDivider;
@@ -107,7 +109,7 @@ public class NewsArticleFragment extends Fragment {
 					newsText.setText(content);
 					
 					TextView newsArticleDate = rootView.findViewById(R.id.newsArticleDate);
-					newsArticleDate.setText(TimeConverter.convertTimestampToString(date));				
+					newsArticleDate.setText(TimeConverter.convertTimestampToString(date));
 					
 					final ImageView flagView = rootView.findViewById(R.id.flagView);
 					flagView.setOnClickListener(new OnClickListener() {

@@ -228,7 +228,7 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
 
-                <com.eulersbridge.isegoria.CircularSeekBar
+                <com.eulersbridge.isegoria.views.CircularSeekBar
                     android:id="@+id/circularSeekBar1"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -252,7 +252,7 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical" >
 
-                <com.eulersbridge.isegoria.CircularSeekBar
+                <com.eulersbridge.isegoria.views.CircularSeekBar
                     android:id="@+id/circularSeekBar2"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -277,7 +277,7 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical" >
 
-                <com.eulersbridge.isegoria.CircularSeekBar
+                <com.eulersbridge.isegoria.views.CircularSeekBar
                     android:id="@+id/circularSeekBar3"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -301,7 +301,7 @@
                 android:gravity="center_horizontal"
                 android:orientation="vertical" >
 
-                <com.eulersbridge.isegoria.CircularSeekBar
+                <com.eulersbridge.isegoria.views.CircularSeekBar
                     android:id="@+id/circularSeekBar4"
                     android:layout_width="80dp"
                     android:layout_height="80dp"

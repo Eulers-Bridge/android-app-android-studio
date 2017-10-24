@@ -22,6 +22,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 public class NewsFragment extends Fragment {
 	private TableLayout newsTableLayout;
 	
