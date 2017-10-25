@@ -35,9 +35,8 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private TimePicker timePicker;
 
     private ViewPager mPager;
-    private Network network;
 
-	@Override
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_fragment, container, false);
 		
@@ -64,7 +63,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         });
         
         MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        Network network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getVoteLocations(this);
         network.getLatestElection(this);
 

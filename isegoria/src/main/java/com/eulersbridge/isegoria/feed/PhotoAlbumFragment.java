@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +16,10 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 
 public class PhotoAlbumFragment extends Fragment {
     private TableLayout photosAlbumTableLayout;

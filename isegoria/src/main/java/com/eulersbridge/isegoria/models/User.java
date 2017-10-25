@@ -8,6 +8,8 @@ import org.json.JSONObject;
 
 public class User implements Parcelable {
 
+    private String password;
+
     private String id;
 
     private String email;
@@ -152,6 +154,14 @@ public class User implements Parcelable {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getGivenName() {

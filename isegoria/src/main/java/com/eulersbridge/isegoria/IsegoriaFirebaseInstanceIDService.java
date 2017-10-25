@@ -8,6 +8,7 @@ import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.securepreferences.SecurePreferences;
 
 /**
  * Created by Seb on 24/10/2017.
@@ -42,7 +43,7 @@ public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService
 
         CreatePlatformEndpointResult result = getSNSClient().createPlatformEndpoint(request);
         if (result != null) {
-            getSharedPreferences("Preferences", MODE_PRIVATE)
+            new SecurePreferences(getApplicationContext())
                     .edit()
                     .putString("endpointArn", result.getEndpointArn())
                     .apply();

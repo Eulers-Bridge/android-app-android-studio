@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 
 import android.graphics.Bitmap;
@@ -22,14 +22,15 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 
 public class NewsFragment extends Fragment {
 	private TableLayout newsTableLayout;
 	
 	private float dpWidth;
-
-	private NewsFragment newsFragment;
 	
 	private int[] drawables = new int[14];
 	private int drawableInt = 0;
@@ -57,13 +58,17 @@ public class NewsFragment extends Fragment {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		View rootView = inflater.inflate(R.layout.news_fragment, container, false);
 		newsTableLayout = rootView.findViewById(R.id.newsTableLayout);
+
         swipeContainerNews = rootView.findViewById(R.id.swipeContainerNews);
+		swipeContainerNews.setColorSchemeResources(R.color.lightBlue);
         swipeContainerNews.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                newsFragment.clearTable();
-                network.getNewsArticles(newsFragment);
-                swipeContainerNews.setRefreshing(true);
+				swipeContainerNews.setRefreshing(true);
+
+				NewsFragment.this.clearTable();
+                network.getNewsArticles(NewsFragment.this);
+
                 ( new android.os.Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -74,7 +79,6 @@ public class NewsFragment extends Fragment {
         });
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        this.newsFragment = this;
         
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -98,7 +102,7 @@ public class NewsFragment extends Fragment {
 			    	 try {			    	  
 				    	 if(doubleCell == 0) {
 				    		 doubleCell = 1;
-				    		 newsFragment.addTableRow(articleId, -1, pictureURL, null, false, false, title, TimeConverter.convertTimestampToString(date), "", "");
+				    		 NewsFragment.this.addTableRow(articleId, -1, pictureURL, null, false, false, title, TimeConverter.convertTimestampToString(date), "", "");
 				     	 }
 				    	 else if(doubleCell == 1) {
 				    		 doubleCell = 2;
@@ -115,7 +119,7 @@ public class NewsFragment extends Fragment {
 				    	 }
 				    	 else if(doubleCell == 2) {
 				    		 doubleCell = 0;
-				    		 newsFragment.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
+				    		 NewsFragment.this.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
 				    	 }
 				     } catch(Exception ignored) {
 				    	 
@@ -133,7 +137,7 @@ public class NewsFragment extends Fragment {
 		String colour = "#F8F8F8";
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 3.2, getResources().getDisplayMetrics());
+                (float) 4, getResources().getDisplayMetrics());
         int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 90, getResources().getDisplayMetrics());
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -161,27 +165,27 @@ public class NewsFragment extends Fragment {
 				colour = "#000000";
 			}
 			
-	        TextView textViewArticle = new TextView(getActivity());
-	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
-	        textViewArticle.setText(articleTitle1);
-	        textViewArticle.setPadding(paddingMargin5, 0, paddingMargin5, 0);
-	        textViewArticle.setGravity(Gravity.CENTER);
+	        TextView titleTextView = new TextView(getActivity());
+			titleTextView.setTextColor(Color.parseColor(colour));
+			titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
+			titleTextView.setText(articleTitle1);
+			titleTextView.setPadding(paddingMargin5, 0, paddingMargin5, 0);
+			titleTextView.setGravity(Gravity.CENTER);
 	        
-	        TextView textViewArticleTime = new TextView(getActivity());
-	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        textViewArticleTime.setText(articleTime1);
-	        textViewArticleTime.setPadding(0, paddingMargin2, 0, 0);
-	        textViewArticleTime.setGravity(Gravity.CENTER);
+	        TextView titleTextViewTime = new TextView(getActivity());
+	        titleTextViewTime.setTextColor(Color.parseColor(colour));
+	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+	        titleTextViewTime.setText(articleTime1);
+	        titleTextViewTime.setPadding(0, paddingMargin2, 0, 0);
+	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
 	        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params1.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 	        
 	        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params2.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 			
 			ImageView view = new ImageView(getActivity());
 			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
@@ -204,8 +208,8 @@ public class NewsFragment extends Fragment {
 	         });
 	        
 	        relativeLayout.addView(view);
-	        relativeLayout.addView(textViewArticle, params1);
-	        relativeLayout.addView(textViewArticleTime, params2);
+	        relativeLayout.addView(titleTextView, params1);
+	        relativeLayout.addView(titleTextViewTime, params2);
             relativeLayout.setBackgroundColor(Color.GRAY);
 	        tr.addView(relativeLayout);
 	        
@@ -221,27 +225,27 @@ public class NewsFragment extends Fragment {
 				colour = "#000000";
 			}
 			
-	        textViewArticle = new TextView(getActivity());
-	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
-	        textViewArticle.setText(articleTitle2);
-	        textViewArticle.setPadding(paddingMargin5, 0, paddingMargin5, 0);
-	        textViewArticle.setGravity(Gravity.CENTER);
+	        titleTextView = new TextView(getActivity());
+	        titleTextView.setTextColor(Color.parseColor(colour));
+	        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
+	        titleTextView.setText(articleTitle2);
+	        titleTextView.setPadding(paddingMargin5, 0, paddingMargin5, 0);
+	        titleTextView.setGravity(Gravity.CENTER);
 	        
-	        textViewArticleTime = new TextView(getActivity());
-	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        textViewArticleTime.setText(articleTime2);
-	        textViewArticleTime.setPadding(0, paddingMargin2, 0, 0);
-	        textViewArticleTime.setGravity(Gravity.CENTER);
+	        titleTextViewTime = new TextView(getActivity());
+	        titleTextViewTime.setTextColor(Color.parseColor(colour));
+	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+	        titleTextViewTime.setText(articleTime2);
+	        titleTextViewTime.setPadding(0, paddingMargin2, 0, 0);
+	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
 	        params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params1.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 	        
 	        params2 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params2.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 			
 			view = new ImageView(getActivity());
 			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
@@ -264,8 +268,8 @@ public class NewsFragment extends Fragment {
 	         });
 	        
 	        relativeLayout.addView(view);
-	        relativeLayout.addView(textViewArticle, params1);
-	        relativeLayout.addView(textViewArticleTime, params2);
+	        relativeLayout.addView(titleTextView, params1);
+	        relativeLayout.addView(titleTextViewTime, params2);
 	        tr.addView(relativeLayout);
 	        
 	        newsTableLayout.addView(tr);
@@ -308,30 +312,30 @@ public class NewsFragment extends Fragment {
 	            }
 	         });
 	        
-	        TextView textViewArticle = new TextView(getActivity());
-	        textViewArticle.setTextColor(Color.parseColor(colour));
-	        textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
-	        textViewArticle.setText(articleTitle1);
-	        textViewArticle.setGravity(Gravity.CENTER);
+	        TextView titleTextView = new TextView(getActivity());
+	        titleTextView.setTextColor(Color.parseColor(colour));
+	        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
+	        titleTextView.setText(articleTitle1);
+	        titleTextView.setGravity(Gravity.CENTER);
 	        
-	        TextView textViewArticleTime = new TextView(getActivity());
-	        textViewArticleTime.setTextColor(Color.parseColor(colour));
-	        textViewArticleTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        textViewArticleTime.setText(articleTime1);
-	        textViewArticleTime.setPadding(0, 100, 0, 0);
-	        textViewArticleTime.setGravity(Gravity.CENTER);
+	        TextView titleTextViewTime = new TextView(getActivity());
+	        titleTextViewTime.setTextColor(Color.parseColor(colour));
+	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+	        titleTextViewTime.setText(articleTime1);
+	        titleTextViewTime.setPadding(0, 100, 0, 0);
+	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
 	        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params1.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 	        
 	        RelativeLayout.LayoutParams params2 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewArticle.getId());
-	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewArticle.getId());
+	        params2.addRule(RelativeLayout.CENTER_HORIZONTAL, titleTextView.getId());
+	        params2.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 	        
 	        relativeLayout.addView(view);
-	        relativeLayout.addView(textViewArticle, params1);
-	        relativeLayout.addView(textViewArticleTime, params2);
+	        relativeLayout.addView(titleTextView, params1);
+	        relativeLayout.addView(titleTextViewTime, params2);
 	        
 	        tr.addView(relativeLayout);	
 	        newsTableLayout.addView(tr);

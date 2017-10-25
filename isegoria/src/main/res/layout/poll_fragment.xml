@@ -4,7 +4,7 @@
     android:id="@+id/scrollView1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="10dp" >
+    android:paddingTop="10dp">
 
         <TableLayout
             android:id="@+id/pollTableLayout"
@@ -12,6 +12,5 @@
             android:layout_height="wrap_content"
             android:shrinkColumns="1"
             android:stretchColumns="0" >
-
         </TableLayout>
 </ScrollView>

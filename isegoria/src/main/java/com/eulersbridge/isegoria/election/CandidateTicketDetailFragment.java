@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.election;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -31,6 +31,10 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 @SuppressWarnings("deprecation")

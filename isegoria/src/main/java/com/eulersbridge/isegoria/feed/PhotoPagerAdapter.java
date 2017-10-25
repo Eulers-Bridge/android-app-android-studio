@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,7 +12,7 @@ import java.util.List;
 class PhotoPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> fragments;
 
-    public PhotoPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+    PhotoPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }

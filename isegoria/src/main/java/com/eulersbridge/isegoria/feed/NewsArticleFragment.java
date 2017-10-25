@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 
 import android.graphics.Bitmap;
@@ -20,15 +20,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 
 public class NewsArticleFragment extends Fragment {
 	private View rootView;
     private View newsArticleDivider;
     private ImageView newsArticleAuthorImage;
-    private Isegoria isegoria;
-	private int articleId;
-    private NewsArticleFragment newsArticleFragment;
+    private int articleId;
 
     private boolean setLiked = false;
     private Network network;
@@ -36,8 +38,8 @@ public class NewsArticleFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
 		rootView = inflater.inflate(R.layout.news_article_fragment, container, false);
-        newsArticleFragment = this;
-		this.isegoria = (Isegoria) getActivity().getApplication();
+
+        Isegoria isegoria = (Isegoria) getActivity().getApplication();
 		Bundle bundle = this.getArguments();
 		
 		isegoria.getNetwork().getNewsArticle(this, bundle.getInt("ArticleId"));
@@ -47,7 +49,6 @@ public class NewsArticleFragment extends Fragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getNewsArticleLiked(this);
 
-        newsArticleDivider = rootView.findViewById(R.id.newsArticleDivider);
         newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
 
 		return rootView;
@@ -130,7 +131,7 @@ public class NewsArticleFragment extends Fragment {
                             if(!setLiked) {
                                 setLiked = true;
                                 starView.setImageResource(R.drawable.star);
-                                network.likeArticle(articleId, newsArticleFragment);
+                                network.likeArticle(articleId, NewsArticleFragment.this);
                                 int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
                                 likes = likes + 1;
                                 newsArticleLikesView.setText(String.valueOf(likes));
@@ -138,7 +139,7 @@ public class NewsArticleFragment extends Fragment {
                             else {
                                 setLiked = false;
                                 starView.setImageResource(R.drawable.stardefault);
-                                network.unlikeArticle(articleId, newsArticleFragment);
+                                network.unlikeArticle(articleId, NewsArticleFragment.this);
                                 int likes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
                                 likes = likes - 1;
                                 newsArticleLikesView.setText(String.valueOf(likes));
@@ -149,7 +150,6 @@ public class NewsArticleFragment extends Fragment {
                     //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
                     //network.getFirstPhotoImage(email, headShotImageView);
 
-                    newsArticleDivider.setVisibility(ViewGroup.VISIBLE);
                     newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
 				}
 			});

@@ -18,13 +18,9 @@ public class ElectionOverviewFragment extends Fragment {
     private TextView electionTitle;
     private TextView electionProcess;
     private TextView electionDate;
-    private TextView overviewTextField;
-    private TextView processTextField;
     private int electionId;
 
-    private Network network;
-
-	@Override
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
@@ -33,11 +29,9 @@ public class ElectionOverviewFragment extends Fragment {
         electionTitle = rootView.findViewById(R.id.electionTitle);
         electionDate = rootView.findViewById(R.id.electionDate);
         electionProcess = rootView.findViewById(R.id.electionProcess);
-        overviewTextField = rootView.findViewById(R.id.overviewTextField);
-        processTextField = rootView.findViewById(R.id.processTextField);
 
         MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        Network network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getLatestElection(this);
 		
 		return rootView;
@@ -47,8 +41,6 @@ public class ElectionOverviewFragment extends Fragment {
                                String process) {
         this.electionId = electionId;
 
-        overviewTextField.setText("Overview");
-        processTextField.setText("Process");
         electionTitle.setText(title);
         electionIntroduction.setText(introduction);
         electionDate.setText(date);

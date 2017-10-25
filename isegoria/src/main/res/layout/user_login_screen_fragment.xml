@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/loginBackground"
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
 	android:gravity="center_vertical"
+	android:id="@+id/loginContainer"
 	android:paddingStart="@dimen/activity_horizontal_margin"
 	android:paddingEnd="@dimen/activity_horizontal_margin"
 	android:paddingHorizontal="@dimen/activity_horizontal_margin">
 	
 	<ImageView
-		android:id="@+id/imageView1"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_horizontal"
@@ -21,9 +21,8 @@
 		android:id="@+id/isegoriaLabel"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="4dp"
+		android:layout_marginTop="8dp"
 		android:layout_gravity="center_horizontal"
-		android:ems="10"
 		android:gravity="center"
 		android:text="@string/app_name"
 		android:textAppearance="@style/LoginHeadingTextAppearance"  />
@@ -32,9 +31,8 @@
 		android:id="@+id/username"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginTop="16dp"
+		android:layout_marginTop="48dp"
 		android:background="@drawable/text_field_rounded_top"
-		android:ems="10"
 		android:inputType="textEmailAddress"
 		android:minHeight="40dp"
 		android:paddingLeft="8dp"
@@ -46,6 +44,7 @@
 		android:layout_marginStart="4dp"
 		android:layout_marginRight="4dp"
 		android:layout_marginEnd="4dp"
+		android:layout_marginHorizontal="4dp"
 		android:maxLines="1"
 		android:textColor="@color/grey"
 		android:hint="@string/user_login_email_hint"
@@ -107,7 +106,7 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
-		android:layout_marginTop="16dp"
+		android:layout_marginTop="32dp"
 		android:gravity="center"
 		android:text="@string/login_small_print"
 		style="@style/LoginSignUpSmallPrintText" />

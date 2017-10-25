@@ -51,7 +51,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_margin="3dp"
                     android:background="@color/greenButtonBackground"
-                    android:text="Post"
+                    android:text="@string/poll_vote_submit_button"
                     android:textColor="@color/white" />
 
             </RelativeLayout>

@@ -5,8 +5,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.eulersbridge.isegoria.EventsFragment;
-import com.eulersbridge.isegoria.NewsFragment;
-import com.eulersbridge.isegoria.PhotosFragment;
 
 class FeedViewPagerAdapter extends FragmentPagerAdapter {
 

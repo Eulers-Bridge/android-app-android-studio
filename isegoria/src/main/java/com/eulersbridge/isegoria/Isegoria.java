@@ -12,6 +12,7 @@ import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.models.CountryInfo;
 import com.eulersbridge.isegoria.models.User;
+import com.securepreferences.SecurePreferences;
 
 import java.util.ArrayList;
 
@@ -136,9 +137,10 @@ public class Isegoria extends Application {
 	public void setLoggedInUser(User user) {
 		loggedInUser = user;
 
-		getSharedPreferences("Preferences", MODE_PRIVATE)
+		new SecurePreferences(getApplicationContext())
 				.edit()
 				.putString("userEmail", loggedInUser.getEmail())
+				.putString("userPassword", loggedInUser.getPassword())
 				.apply();
 	}
 

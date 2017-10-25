@@ -45,7 +45,7 @@
     <string name="vote_sign_pledge_next_button">Next</string>
     <string name="vote_sign_pledge_self_efficacy_button">Start Survey</string>
     <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
-    <string name="vote_done_message">You\'re ready to go! Make sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!</string>
+    <string name="vote_done_message">You\'re ready to go!\n\nMake sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!</string>
 
     <string name="event_add_to_calendar">Add to Calendar</string>
 
@@ -117,5 +117,9 @@
     <string name="contact_profile_picture_content_description">Contact profile picture</string>
     <string name="friends_search_title">Search</string>
     <string name="poll_asked_by">Asked by %s</string>
+    <string name="election_overview_subheading">Overview</string>
+    <string name="election_overview_process_subheading">Process</string>
+    <string name="poll_vote_submit_button">Post</string>
+    <string name="vote_done_heading">Done and done.</string>
 
 </resources>

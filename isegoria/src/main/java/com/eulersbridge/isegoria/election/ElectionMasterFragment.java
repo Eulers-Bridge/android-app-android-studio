@@ -8,13 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.CandidateFragment;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 
 public class ElectionMasterFragment extends Fragment {
 
-	private ElectionFragment electionFragment;
+	private ElectionOverviewFragment overviewFragment;
 	private CandidateFragment candidateFragment;
 
 	private TabLayout tabLayout;
@@ -25,7 +24,7 @@ public class ElectionMasterFragment extends Fragment {
 
 		((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_election));
 
-		electionFragment = new ElectionFragment();
+		overviewFragment = new ElectionOverviewFragment();
 		candidateFragment = new CandidateFragment();
 
 		setupTabLayout();
@@ -46,11 +45,14 @@ public class ElectionMasterFragment extends Fragment {
 	}
 
 	private void showFirstTab() {
-		showTabFragment(electionFragment);
+		showTabFragment(overviewFragment);
 	}
 
 	private void showTabFragment(@NonNull Fragment fragment) {
-		getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_election_frame1, fragment).commitAllowingStateLoss();
+		getActivity().getSupportFragmentManager()
+				.beginTransaction()
+				.replace(R.id.election_frame, fragment)
+				.commitAllowingStateLoss();
 	}
 
 	private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -58,10 +60,10 @@ public class ElectionMasterFragment extends Fragment {
 		public void onTabSelected(TabLayout.Tab tab) {
 			Fragment subFragment = null;
 
-			if (tab.getText().equals("Election")) {
-				subFragment = electionFragment;
+			if (tab.getPosition() == 0) {
+				subFragment = overviewFragment;
 
-			} else if (tab.getText().equals("Candidates")) {
+			} else if (tab.getPosition() == 1) {
 				subFragment = candidateFragment;
 			}
 
@@ -81,7 +83,7 @@ public class ElectionMasterFragment extends Fragment {
 
 		tabLayout.removeAllTabs();
 
-		final String[] tabNames = {"Election", "Candidates"};
+		final String[] tabNames = {"Overview", "Candidates"};
 
 		for (String tabName : tabNames) {
 			tabLayout.addTab(tabLayout.newTab().setText(tabName));

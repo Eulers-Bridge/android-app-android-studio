@@ -38,6 +38,7 @@ import com.eulersbridge.isegoria.profile.UserSettingsFragment;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
 import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
+import com.securepreferences.SecurePreferences;
 
 import java.util.ArrayList;
 
@@ -85,7 +86,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		setNavigationDrawerEnabled(false);
 
-		switchContent(new LoginScreenFragment());
+		String userEmail = new SecurePreferences(this).getString("userEmail", null);
+		String userPassword = new SecurePreferences(this).getString("userPassword", null);
+
+		if (userEmail != null && userPassword != null) {
+			login(userEmail, userPassword);
+
+		} else {
+			switchContent(new LoginScreenFragment());
+		}
         //switchContent(new PersonalityQuestionsFragment());
 	}
 
@@ -235,12 +244,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		switchContent(new UserSignupFragment(), false);
 	}
 	
-	public void login(View v) {
-		TextView userNameField = findViewById(R.id.username);
-		TextView passwordField = findViewById(R.id.password);
-		
-		application.setUsername(userNameField.getText().toString());
-		application.setPassword(passwordField.getText().toString());
+	public void login(String email, String password) {
+		application.setUsername(email);
+		application.setPassword(password);
 		
 		application.login();
 		
@@ -252,6 +258,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void showLoginFailed() {
+
+		if (mContent.getClass() != LoginScreenFragment.class) {
+			//Tried to login user based on stored email/password, but they since deleted account
+			//or the login otherwise failed. Not currently showing the Login fragment so we need to.
+			switchContent(new LoginScreenFragment());
+		}
+
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Login Failed");

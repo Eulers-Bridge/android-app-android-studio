@@ -2,9 +2,9 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -19,16 +19,36 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
+
+import java.util.ArrayList;
 
 public class EventsFragment extends Fragment {
 	private TableLayout newsTableLayout;
     private EventsFragment eventsFragment;
 
-	private EventsDetailFragment fragment2;
+	private EventsDetailFragment detailFragment;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerEvents;
     private Network network;
+
+	private final Network.FetchEventsListener eventsListener = new Network.FetchEventsListener() {
+		@Override
+		public void onFetchSuccess(final ArrayList<Event> events) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					for (Event event : events) {
+						addTableRow(event);
+					}
+				}
+			});
+		}
+
+		@Override
+		public void onFetchFailure(VolleyError error) {}
+	};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,9 +61,11 @@ public class EventsFragment extends Fragment {
             @Override
             public void onRefresh() {
                 eventsFragment.clearTable();
-                network.getEvents(eventsFragment);
+
+                network.getEvents(eventsListener);
+
                 swipeContainerEvents.setRefreshing(true);
-                ( new android.os.Handler()).postDelayed(new Runnable() {
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeContainerEvents.setRefreshing(false);
@@ -54,7 +76,7 @@ public class EventsFragment extends Fragment {
 	
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getEvents(this);
+        network.getEvents(eventsListener);
 
 		return rootView;
 	}
@@ -62,11 +84,8 @@ public class EventsFragment extends Fragment {
     private void clearTable() {
         newsTableLayout.removeAllViews();
     }
-	
-	public void addEvent(Event event) {
-        addTableRow(event);
-	}
-	
+
+	@UiThread
 	private void addTableRow(final Event event) {
 		TableRow tr;
 		String colour = "#F8F8F8";
@@ -106,15 +125,16 @@ public class EventsFragment extends Fragment {
 		view.setOnClickListener(new View.OnClickListener() {        
             @Override
             public void onClick(View view) {
-		    		FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-		    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-		    		fragment2 = new EventsDetailFragment();
-		    		Bundle args = new Bundle();
-		    		args.putParcelable("event", event);
-		    		fragment2.setArguments(args);
-		    		fragmentTransaction2.add(R.id.eventsFrameLayout, fragment2);
-                    fragmentTransaction2.addToBackStack("");
-		    		fragmentTransaction2.commit();
+				detailFragment = new EventsDetailFragment();
+				Bundle args = new Bundle();
+				args.putParcelable("event", event);
+				detailFragment.setArguments(args);
+
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.add(R.id.eventsFrameLayout, detailFragment)
+						.addToBackStack(null)
+						.commit();
             }
          });
 	        

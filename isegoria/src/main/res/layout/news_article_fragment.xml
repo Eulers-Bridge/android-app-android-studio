@@ -1,200 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:gravity="top"
-    android:clickable="true"
-    android:orientation="vertical" >
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/scrollView1"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@android:color/white"
+	android:gravity="top"
+	android:clickable="true"
+	android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/scrollView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@android:color/white"
+		android:gravity="top"
+		android:clickable="true"
+		android:orientation="vertical">
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:gravity="top"
-            android:clickable="true"
-            android:orientation="vertical" >
+		<LinearLayout
+			android:id="@+id/topBackgroundNews"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@color/white"
+			android:gravity="bottom"
+			android:orientation="vertical"
+			android:paddingBottom="16dp">
 
-    <LinearLayout
-        android:id="@+id/topBackgroundNews"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:gravity="bottom"
-        android:orientation="vertical"
-        android:paddingBottom="12dp"
-    >
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="0dp"
+				android:layout_weight="1"
+				android:gravity="bottom"
+				android:orientation="horizontal"
+				android:paddingLeft="16dp"
+				android:paddingStart="16dp"
+				android:paddingRight="16dp"
+				android:paddingEnd="16dp"
+				android:paddingHorizontal="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:orientation="horizontal"
-            android:paddingLeft="12dp"
-			android:paddingStart="12dp"
-            android:paddingRight="6dp"
-			android:paddingEnd="6dp"
-            android:paddingTop="6dp" >
-            
-        <TextView
-            android:id="@+id/newsArticleTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="Labor pulls ahead in Nielson poll"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
+			<TextView
+				android:id="@+id/newsArticleTitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom"
+				android:text="Labor pulls ahead in Nielson poll"
+				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+				android:textColor="@color/white" />
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="vertical"
+				android:gravity="bottom"
+				android:paddingLeft="16dp"
+				android:paddingStart="16dp"
+				android:paddingHorizontal="16dp">
+
+				<RelativeLayout
+					android:id="@+id/RelativeLayout01"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					android:paddingTop="16dp">
+
+					<LinearLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:layout_alignParentLeft="true"
+						android:layout_alignParentStart="true"
+						android:gravity="bottom">
+
+						 <ImageView
+							android:id="@+id/newsArticleAuthorImage"
+							android:layout_width="0dp"
+							android:layout_height="50dp"
+							android:layout_gravity="center_vertical"
+							android:layout_weight="1"
+							android:paddingRight="5dp"
+							 android:paddingEnd="5dp"
+							 android:paddingHorizontal="5dp"
+							 android:background="#ff3f3f3f"
+							 android:layout_marginRight="5dp"
+							 android:layout_marginEnd="5dp"
+							 android:layout_marginHorizontal="5dp"
+							 android:visibility="gone" />
+
+						<LinearLayout
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:gravity="bottom"
+							android:layout_gravity="center_vertical">
+
+								<TextView
+									android:id="@+id/photoTitle"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:textAppearance="?android:attr/textAppearanceSmall"
+									android:textColor="@color/white"
+									android:textSize="@dimen/newsArticleName" />
+
+								<TextView
+									android:id="@+id/newsArticleDate"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_marginTop="8dp"
+									android:text="Yesterday, 9:00 AM"
+									android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+									android:textColor="@color/white" />
+						</LinearLayout>
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:orientation="horizontal"
+						android:layout_gravity="center_vertical"
+						android:layout_alignParentRight="true"
+						android:layout_alignParentEnd="true">
+
+							 <TextView
+								 android:id="@+id/newsArticleLikes"
+								 android:layout_width="wrap_content"
+								 android:layout_height="wrap_content"
+								 android:layout_gravity="center_vertical"
+								 android:layout_weight="1"
+								 android:gravity="end"
+								 android:text="205"
+								 android:textAppearance="?android:attr/textAppearanceSmall"
+								 android:textColor="@color/white"
+								 android:textSize="@dimen/newsPointsSize" />
+
+							<ImageView
+								android:id="@+id/starView"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:src="@drawable/stardefault"
+								android:contentDescription="@string/news_article_star_content_description" />
+
+							<ImageView
+								android:id="@+id/flagView"
+								android:layout_width="wrap_content"
+								android:layout_height="wrap_content"
+								android:layout_weight="1"
+								android:src="@drawable/flagdefault"
+								android:contentDescription="@string/news_article_flag_content_description" />
+					</LinearLayout>
+				</RelativeLayout>
+			</LinearLayout>
 		</LinearLayout>
-                
-        <LinearLayout
-        	android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="bottom"
-            android:paddingLeft="12dp"
-			android:paddingStart="12dp">
-        
-            <LinearLayout
-	        	android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1"
-	            android:orientation="vertical"
-	            android:gravity="bottom"
-	            android:paddingTop="6dp"
-	            android:paddingRight="6dp"
-				android:paddingEnd="6dp"
-                android:id="@+id/newsArticleDivider"
-                android:visibility="invisible">
-	            
-	            <View
-	            	android:layout_width="match_parent"
-	                android:layout_height="1dip"
-	                android:background="#676475" />
-	        </LinearLayout>   
-	         
-            <RelativeLayout
-			    android:id="@+id/RelativeLayout01" 
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent"
-			    android:paddingTop="10dp"
-			    >
-	            <LinearLayout
-		        	android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:orientation="horizontal"
-		            android:layout_alignParentLeft="true"
-					android:layout_alignParentStart="true"
-		            android:gravity="bottom"
-		             >  
-		             
-		             <ImageView
-		            	    android:id="@+id/newsArticleAuthorImage"
-		            	    android:layout_width="0dp"
-		            	    android:layout_height="50dp"
-		            	    android:layout_gravity="center_vertical"
-		            	    android:layout_weight="1"
-		            	    android:paddingRight="5dp"
-						 android:paddingEnd="5dp"
-                         android:background="#ff3f3f3f"
-                         android:layout_marginRight="5dp"
-						 android:layout_marginEnd="5dp"
-                         android:visibility="gone" />
-		             
-			        <LinearLayout
-			        	android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:orientation="vertical"
-			            android:gravity="bottom"
-			            android:layout_gravity="center_vertical"
-			             >       
-			                         	               
-				            <TextView
-				                android:id="@+id/photoTitle"
-				                android:layout_width="wrap_content"
-				                android:layout_height="wrap_content"
-				                android:ems="10"
-				                android:text=""
-				                android:textAppearance="?android:attr/textAppearanceSmall"
-				                android:textColor="@color/white"
-				                android:textSize="@dimen/newsArticleName" />
-				                    
-				            <TextView
-				                android:id="@+id/newsArticleDate"
-				                android:layout_width="wrap_content"
-				                android:layout_height="wrap_content"
-				                android:ems="10"
-				                android:text="Yesterday, 9:00 AM"
-				                android:textAppearance="?android:attr/textAppearanceSmall"
-				                android:textColor="@color/white"
-				                android:textSize="@dimen/newsTimeSize" />
-			      	
-			        </LinearLayout> 
-		        </LinearLayout> 
-		        <LinearLayout
-		        	android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:orientation="horizontal"
-		            android:layout_gravity="center_vertical"
-		            android:layout_alignParentRight="true"
-					android:layout_alignParentEnd="true"
-		             >       
-		             
-		            	 <TextView
-		            	     android:id="@+id/newsArticleLikes"
-		            	     android:layout_width="wrap_content"
-		            	     android:layout_height="wrap_content"
-		            	     android:layout_gravity="center_vertical"
-		            	     android:layout_weight="1"
-		            	     android:ems="10"
-		            	     android:gravity="end"
-		            	     android:text="205"
-		            	     android:textAppearance="?android:attr/textAppearanceSmall"
-		            	     android:textColor="@color/white"
-		            	     android:textSize="@dimen/newsPointsSize" />
 
-			            <ImageView
-			                android:id="@+id/starView"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:layout_weight="1"
-			                android:src="@drawable/stardefault"
-							android:contentDescription="@string/news_article_star_content_description" />
-			            
-			            <ImageView
-			                android:id="@+id/flagView"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:layout_weight="1"
-			                android:src="@drawable/flagdefault"
-							android:contentDescription="@string/news_article_flag_content_description" />
-		      	
-		        </LinearLayout> 
-	        </RelativeLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" >
-                <TextView
-        android:id="@+id/textNews"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:ems="10"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:textSize="@dimen/newsArticleSize" />
-        </LinearLayout>
-    </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+		<TextView
+			android:id="@+id/textNews"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="@dimen/activity_horizontal_margin"
+			android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+			android:lineSpacingMultiplier="1.2"/>
+	</LinearLayout>
+</ScrollView>

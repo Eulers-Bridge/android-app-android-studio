@@ -4,80 +4,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/white"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:padding="@dimen/activity_horizontal_margin">
 
     <TextView
-        android:id="@+id/Text2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:ems="10"
         android:gravity="center"
-        android:inputType="textMultiLine"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:text="Done and done."
+        android:text="@string/vote_done_heading"
         android:textColor="#757581"
-        android:textSize="20sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
-
-    </LinearLayout>
+        android:textSize="24sp" />
 
     <TextView
-        android:id="@+id/Text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:background="@android:color/white"
-        android:ems="10"
         android:gravity="center"
-        android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:text="@string/vote_done_message"
         android:textColor="#757581"
-        android:textSize="15sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-    </LinearLayout>
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/addToCalButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:background="#52BB42"
-        android:minHeight="40dip"
+        android:layout_marginTop="32dp"
+        android:minHeight="48dip"
         android:text="@string/vote_done_add_to_calendar"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal" />
+        android:theme="@style/PositiveButton"/>
 
 </LinearLayout>

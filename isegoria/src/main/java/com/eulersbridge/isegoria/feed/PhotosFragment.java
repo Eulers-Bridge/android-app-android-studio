@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,11 +18,14 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
+
 public class PhotosFragment extends Fragment {
 	private TableLayout photosTableLayout;
 
 	private boolean insertedFirstRow = false;
-    private PhotosFragment photosFragment;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerPhotos;
     private Network network;
 	
@@ -33,8 +36,6 @@ public class PhotosFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
-		getActivity().setTitle("Isegoria");
-        photosFragment = this;
 
 		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
 
@@ -43,8 +44,8 @@ public class PhotosFragment extends Fragment {
             @Override
             public void onRefresh() {
                 swipeContainerPhotos.setRefreshing(true);
-                photosFragment.clearTable();
-                network.getPhotoAlbums(photosFragment);
+                PhotosFragment.this.clearTable();
+                network.getPhotoAlbums(PhotosFragment.this);
                 ( new android.os.Handler()).postDelayed(new Runnable() {
                     @Override
                     public void run() {
