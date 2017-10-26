@@ -602,13 +602,7 @@ public class CircularSeekBar extends View implements Runnable {
             mProgress = mProgress + 1;
             recalculateAll();
             try {
-                 mainActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        invalidate();
-                    }
-                });
+                 mainActivity.runOnUiThread(this::invalidate);
                 Thread.sleep(15);
             } catch (InterruptedException e) {
                 e.printStackTrace();

@@ -19,7 +19,7 @@ public class ElectionMasterFragment extends Fragment {
 	private TabLayout tabLayout;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {  
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.election_master_layout, container, false);
 
 		((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_election));

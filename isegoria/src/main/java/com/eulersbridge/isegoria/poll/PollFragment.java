@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.poll;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.TabLayout;
@@ -37,7 +38,7 @@ public class PollFragment extends Fragment {
     private boolean expanded = false;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.poll_vote_fragment, container, false);
 
         ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_poll));
@@ -55,12 +56,9 @@ public class PollFragment extends Fragment {
         setupViewPager(rootView);
         setupTabLayout();
 
-        rootView.findViewById(R.id.voteButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PollVoteFragment fragment = (PollVoteFragment)fragments.get(viewPager.getCurrentItem());
-                fragment.postVote();
-            }
+        rootView.findViewById(R.id.voteButton).setOnClickListener(view -> {
+            PollVoteFragment fragment = (PollVoteFragment)fragments.get(viewPager.getCurrentItem());
+            fragment.postVote();
         });
 		
 		return rootView;
@@ -141,16 +139,13 @@ public class PollFragment extends Fragment {
 
     public void addQuestion(final int nodeId, @Nullable final User creator, final String question, final ArrayList<PollOption> options) {
 		try {
-			getActivity().runOnUiThread(new Runnable() {
-			     @Override
-			     public void run() {
-			    	 PollVoteFragment pollVoteFragment = new PollVoteFragment();
-			    	 pollVoteFragment.setData(nodeId, creator, question, options);
+			getActivity().runOnUiThread(() -> {
+                PollVoteFragment pollVoteFragment = new PollVoteFragment();
+                pollVoteFragment.setData(nodeId, creator, question, options);
 
-                     fragments.add(pollVoteFragment);
-                     updateTabs();
-			     }
-			});
+                fragments.add(pollVoteFragment);
+                updateTabs();
+            });
 		} catch(Exception e) {
             Log.d("Error", e.toString());
         }

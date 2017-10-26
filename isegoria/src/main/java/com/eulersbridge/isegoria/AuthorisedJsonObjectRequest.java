@@ -1,7 +1,6 @@
 package com.eulersbridge.isegoria;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;

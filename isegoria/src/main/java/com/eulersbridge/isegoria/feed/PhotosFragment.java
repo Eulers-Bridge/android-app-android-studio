@@ -2,10 +2,10 @@ package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -34,26 +34,20 @@ public class PhotosFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
 
 		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
 
         swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
-        swipeContainerPhotos.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeContainerPhotos.setRefreshing(true);
-                PhotosFragment.this.clearTable();
-                network.getPhotoAlbums(PhotosFragment.this);
-                ( new android.os.Handler()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        insertedFirstRow = false;
-                        swipeContainerPhotos.setRefreshing(false);
-                    }
-                }, 7000);
-            }
+        swipeContainerPhotos.setOnRefreshListener(() -> {
+            swipeContainerPhotos.setRefreshing(true);
+            PhotosFragment.this.clearTable();
+            network.getPhotoAlbums(PhotosFragment.this);
+            ( new android.os.Handler()).postDelayed(() -> {
+                insertedFirstRow = false;
+                swipeContainerPhotos.setRefreshing(false);
+            }, 7000);
         });
         
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -108,35 +102,29 @@ public class PhotosFragment extends Fragment {
 	        textViewArticle.setText(label);
 	        textViewArticle.setGravity(Gravity.START);
 
-	        textViewArticle.setOnClickListener(new View.OnClickListener() {
-	            @Override
-	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
-			    		Bundle args = new Bundle();
-			    		args.putString("Album", String.valueOf(albumId));
-			    		fragment2.setArguments(args);
-			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
-			    		fragmentTransaction2.commit();
-	            }
-	       });
+	        textViewArticle.setOnClickListener(view12 -> {
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
+                    Bundle args = new Bundle();
+                    args.putString("Album", String.valueOf(albumId));
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
+                    fragmentTransaction2.commit();
+            });
 	        
-	       view.setOnClickListener(new View.OnClickListener() {        
-	            @Override
-	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-			    		PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
-			    		Bundle args = new Bundle();
-			    		args.putString("Album", String.valueOf(albumId));
-			    		fragment2.setArguments(args);
-			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
-			    		fragmentTransaction2.commit();
-	            }
-	         });
+	       view.setOnClickListener(view1 -> {
+                   FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                   FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                   PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
+                   Bundle args = new Bundle();
+                   args.putString("Album", String.valueOf(albumId));
+                   fragment2.setArguments(args);
+                   fragmentTransaction2.addToBackStack(null);
+                   fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
+                   fragmentTransaction2.commit();
+           });
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
 	        textViewArticleTime.setTextColor(Color.parseColor("#000000"));

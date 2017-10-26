@@ -11,18 +11,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
@@ -44,7 +43,7 @@ public class UserSettingsFragment extends Fragment {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
 
         mainActivity = (MainActivity) getActivity();
@@ -59,20 +58,14 @@ public class UserSettingsFragment extends Fragment {
         photoImageView.setLayoutParams(layoutParams);
 
         final Switch doNotTrackSwitch = rootView.findViewById(R.id.doNotTrackSwitch);
-        doNotTrackSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                network.setTrackingOff(isChecked);
-                network.updateUserDetails();
-            }
+        doNotTrackSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            network.setTrackingOff(isChecked);
+            network.updateUserDetails();
         });
         final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
-        optOutDataCollectionSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                network.setOptedOutOfDataCollection(isChecked);
-                network.updateUserDetails();
-            }
+        optOutDataCollectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            network.setOptedOutOfDataCollection(isChecked);
+            network.updateUserDetails();
         });
 
         User loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
@@ -84,28 +77,22 @@ public class UserSettingsFragment extends Fragment {
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
         final TextView aboutThisAppButton = rootView.findViewById(R.id.aboutThisAppButton);
-        aboutThisAppButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        aboutThisAppButton.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 
-                fragmentManager
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, new AboutScreenFragment())
-                        .commit();
-            }
+            fragmentManager
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.container, new AboutScreenFragment())
+                    .commit();
         });
 
         final TextView changePhotoButton = rootView.findViewById(R.id.changePhotoButton);
-        changePhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-            }
+        changePhotoButton.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
         });
 
        // network.s3Auth();

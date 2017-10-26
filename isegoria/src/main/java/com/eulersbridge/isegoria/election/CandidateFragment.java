@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.election;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -16,7 +17,7 @@ import java.util.Vector;
 public class CandidateFragment extends Fragment {
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.candidate_fragment, container, false);
 
 		final List<Fragment> fragments = new Vector<>();

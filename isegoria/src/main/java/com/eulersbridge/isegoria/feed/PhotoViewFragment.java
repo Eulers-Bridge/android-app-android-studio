@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ public class PhotoViewFragment extends Fragment {
     private boolean setLiked = false;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
 
@@ -50,25 +51,22 @@ public class PhotoViewFragment extends Fragment {
         photoLikes = rootView.findViewById(R.id.photoLikes);
 
         final ImageView starView = rootView.findViewById(R.id.photoStar);
-        starView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!setLiked) {
-                    setLiked = true;
-                    starView.setImageResource(R.drawable.star);
-                    network.likePhoto(photoPath, PhotoViewFragment.this);
-                    int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
-                    likes = likes + 1;
-                    photoLikes.setText(String.valueOf(likes));
-                }
-                else {
-                    setLiked = false;
-                    starView.setImageResource(R.drawable.stardefault);
-                    network.unlikePhoto(photoPath, PhotoViewFragment.this);
-                    int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
-                    likes = likes - 1;
-                    photoLikes.setText(String.valueOf(likes));
-                }
+        starView.setOnClickListener(view -> {
+            if(!setLiked) {
+                setLiked = true;
+                starView.setImageResource(R.drawable.star);
+                network.likePhoto(photoPath, PhotoViewFragment.this);
+                int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
+                likes = likes + 1;
+                photoLikes.setText(String.valueOf(likes));
+            }
+            else {
+                setLiked = false;
+                starView.setImageResource(R.drawable.stardefault);
+                network.unlikePhoto(photoPath, PhotoViewFragment.this);
+                int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
+                likes = likes - 1;
+                photoLikes.setText(String.valueOf(likes));
             }
         });
 
@@ -116,23 +114,20 @@ public class PhotoViewFragment extends Fragment {
 	
 	private void addPhoto(final String title, final Bitmap bitmap) {
 		try {
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					TextView photoTitle = rootView.findViewById(R.id.photoTitle);
-					photoTitle.setText(title);
-					ImageView photoImageView = rootView.findViewById(R.id.photoView);
-					try {
-						photoImageView.setScaleType(ScaleType.CENTER_CROP);
-						photoImageView.setImageBitmap(bitmap);
-						photoImageView.getLayoutParams().width = displayMetrics.widthPixels;
-						photoImageView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
-						photoImageView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}   
-				}
-			});
+			getActivity().runOnUiThread(() -> {
+                TextView photoTitle = rootView.findViewById(R.id.photoTitle);
+                photoTitle.setText(title);
+                ImageView photoImageView = rootView.findViewById(R.id.photoView);
+                try {
+                    photoImageView.setScaleType(ScaleType.CENTER_CROP);
+                    photoImageView.setImageBitmap(bitmap);
+                    photoImageView.getLayoutParams().width = displayMetrics.widthPixels;
+                    photoImageView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
+                    photoImageView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
 		} catch(Exception ignored) {
 			
 		}

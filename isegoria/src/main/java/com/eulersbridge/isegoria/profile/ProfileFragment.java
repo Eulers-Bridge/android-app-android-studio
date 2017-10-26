@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.profile;
 import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -37,7 +38,7 @@ public class ProfileFragment extends Fragment {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -57,12 +58,7 @@ public class ProfileFragment extends Fragment {
         network.getRemainingBadgeCount(new Network.RemainingBadgeCountListener() {
             @Override
             public void onFetchSuccess(final long remainingBadgeCount) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateRemainingBadgesCount(remainingBadgeCount);
-                    }
-                });
+                getActivity().runOnUiThread(() -> updateRemainingBadgesCount(remainingBadgeCount));
             }
 
             @Override
@@ -78,19 +74,16 @@ public class ProfileFragment extends Fragment {
         });*/
 
         final TextView personalityTestButton = rootView.findViewById(R.id.personalityTestButton);
-        personalityTestButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        personalityTestButton.setOnClickListener(view -> {
 
-                PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-                personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+            PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
+            personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
 
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, personalityQuestionsFragment)
-                        .commit();
-            }
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.container, personalityQuestionsFragment)
+                    .commit();
         });
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);

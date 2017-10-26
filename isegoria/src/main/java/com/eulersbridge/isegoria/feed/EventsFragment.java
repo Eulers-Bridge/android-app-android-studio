@@ -1,11 +1,13 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.ArrayList;
 
@@ -39,14 +42,11 @@ public class EventsFragment extends Fragment {
 	private final Network.FetchEventsListener eventsListener = new Network.FetchEventsListener() {
 		@Override
 		public void onFetchSuccess(final ArrayList<Event> events) {
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					for (Event event : events) {
-						addTableRow(event);
-					}
-				}
-			});
+			getActivity().runOnUiThread(() -> {
+                for (Event event : events) {
+                    addTableRow(event);
+                }
+            });
 		}
 
 		@Override
@@ -54,27 +54,19 @@ public class EventsFragment extends Fragment {
 	};
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.events_fragment, container, false);
 		newsTableLayout = rootView.findViewById(R.id.eventsTableLayout);
         eventsFragment = this;
 
 		swipeContainerEvents = rootView.findViewById(R.id.swipeContainerEvents);
-        swipeContainerEvents.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                eventsFragment.clearTable();
+        swipeContainerEvents.setOnRefreshListener(() -> {
+            eventsFragment.clearTable();
 
-                network.getEvents(eventsListener);
+            network.getEvents(eventsListener);
 
-                swipeContainerEvents.setRefreshing(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeContainerEvents.setRefreshing(false);
-                    }
-                }, 7000);
-            }
+            swipeContainerEvents.setRefreshing(true);
+            new Handler().postDelayed(() -> swipeContainerEvents.setRefreshing(false), 7000);
         });
 	
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -119,27 +111,33 @@ public class EventsFragment extends Fragment {
 		((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
 		((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin1, paddingMargin1, paddingMargin1, 0);
 			
-		ImageView view = new ImageView(getActivity());
+		final ImageView view = new ImageView(getActivity());
 		view.setColorFilter(Color.argb(paddingMargin2, paddingMargin3, paddingMargin3, paddingMargin3));
 		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 		view.setScaleType(ScaleType.CENTER_CROP);
-		network.getPictureVolley(event.getImageUrl(), view);
-		
-		view.setOnClickListener(new View.OnClickListener() {        
-            @Override
-            public void onClick(View view) {
-				detailFragment = new EventsDetailFragment();
-				Bundle args = new Bundle();
-				args.putParcelable("event", event);
-				detailFragment.setArguments(args);
+		network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
+			@Override
+			public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+				Bitmap tintedBitmap = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
+				view.setImageBitmap(tintedBitmap);
+			}
 
-				getActivity().getSupportFragmentManager()
-						.beginTransaction()
-						.add(R.id.eventsFrameLayout, detailFragment)
-						.addToBackStack(null)
-						.commit();
-            }
-         });
+			@Override
+			public void onDownloadFailed(String url, VolleyError error) {}
+		});
+		
+		view.setOnClickListener(view1 -> {
+            detailFragment = new EventsDetailFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("event", event);
+            detailFragment.setArguments(args);
+
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.eventsFrameLayout, detailFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 	        
 	    TextView textViewArticle = new TextView(getActivity());
 	    textViewArticle.setTextColor(Color.parseColor(colour));

@@ -88,7 +88,6 @@
 		android:layout_height="wrap_content"
 		android:layout_marginTop="8dp"
 		android:minHeight="48dip"
-		android:onClick="login"
 		android:text="@string/user_login_button"
 		android:theme="@style/LoginButton" />
 

@@ -1,7 +1,7 @@
 package com.eulersbridge.isegoria.utilities;
 
-/**
- * Created by Anthony on 02/04/2015.
+/*
+  Created by Anthony on 02/04/2015.
  */
 import android.content.Context;
 import android.support.v4.view.ViewPager;

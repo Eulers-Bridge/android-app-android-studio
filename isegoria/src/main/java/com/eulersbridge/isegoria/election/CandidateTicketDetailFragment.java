@@ -12,6 +12,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -55,7 +56,7 @@ public class CandidateTicketDetailFragment extends Fragment {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         candidateTicketDetailFragment = this;
 		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
 		Bundle bundle = this.getArguments();
@@ -96,23 +97,20 @@ public class CandidateTicketDetailFragment extends Fragment {
             ticketSupportButton.setText("Unsupport");
         }
 
-        ticketSupportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(ticketSupportButton.getText().equals("Support")) {
-                    network.supportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
-                    String value = String.valueOf(partyDetailSupporters.getText());
-                    partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
-                    ticketSupportButton.setText("Unsupport");
-                }
-                else if(ticketSupportButton.getText().equals("Unsupport")) {
-                    network.unsupportTicket(ticketId, candidateTicketDetailFragment);
-                    TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
-                    String value = String.valueOf(partyDetailSupporters.getText());
-                    partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
-                    ticketSupportButton.setText("Support");
-                }
+        ticketSupportButton.setOnClickListener(view -> {
+            if(ticketSupportButton.getText().equals("Support")) {
+                network.supportTicket(ticketId, candidateTicketDetailFragment);
+                TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
+                String value = String.valueOf(partyDetailSupporters.getText());
+                partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
+                ticketSupportButton.setText("Unsupport");
+            }
+            else if(ticketSupportButton.getText().equals("Unsupport")) {
+                network.unsupportTicket(ticketId, candidateTicketDetailFragment);
+                TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
+                String value = String.valueOf(partyDetailSupporters.getText());
+                partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
+                ticketSupportButton.setText("Support");
             }
         });
 
@@ -168,19 +166,16 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageHeight, imageHeight));
 		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
-                Bundle args = new Bundle();
-                args.putInt("ProfileId", profileDrawable);
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();
-            }
+        candidateProfileImage.setOnClickListener(view -> {
+            FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+            ContactProfileFragment fragment2 = new ContactProfileFragment();
+            Bundle args = new Bundle();
+            args.putInt("ProfileId", profileDrawable);
+            fragment2.setArguments(args);
+            fragmentTransaction2.addToBackStack(null);
+            fragmentTransaction2.replace(android.R.id.content, fragment2);
+            fragmentTransaction2.commit();
         });
 		
         TextView textViewParty = new TextView(getActivity());

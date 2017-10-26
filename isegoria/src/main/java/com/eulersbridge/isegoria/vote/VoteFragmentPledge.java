@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.vote;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -33,7 +34,7 @@ public class VoteFragmentPledge extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_fragment_pledge, container, false);
 
         //TODO: No Tabs
@@ -42,45 +43,38 @@ public class VoteFragmentPledge extends Fragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
         Button voteNextButton = rootView.findViewById(R.id.voteNextButton);
-        voteNextButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public void onClick(View view) {
-                mPager.setCurrentItem(2);
+        voteNextButton.setOnClickListener(view -> {
+            mPager.setCurrentItem(2);
 
-                Spinner voteSpinner = voteFragment.getSpinnerLocation();
-                DatePicker datePicker = voteFragment.getDatePicker();
-                TimePicker timePicker = voteFragment.getTimePicker();
+            Spinner voteSpinner = voteFragment.getSpinnerLocation();
+            DatePicker datePicker = voteFragment.getDatePicker();
+            TimePicker timePicker = voteFragment.getTimePicker();
 
-                String location = voteSpinner.getSelectedItem().toString();
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+            String location = voteSpinner.getSelectedItem().toString();
+            Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-                    calendar.set(Calendar.MINUTE, timePicker.getMinute());
-                } else {
-                    calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
-                    calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
-                }
-
-                long date = calendar.getTimeInMillis();
-
-                network.addVoteReminder(location, date);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                calendar.set(Calendar.MINUTE, timePicker.getMinute());
+            } else {
+                calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
+                calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
             }
+
+            long date = calendar.getTimeInMillis();
+
+            network.addVoteReminder(location, date);
         });
 
         Button selfEfficacyStartButton = rootView.findViewById(R.id.selfEfficacyStartButton);
-        selfEfficacyStartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
+        selfEfficacyStartButton.setOnClickListener(view -> {
+            SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
 
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, selfEfficacyQuestionsFragment)
-                        .commit();
-            }
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .add(R.id.container, selfEfficacyQuestionsFragment)
+                    .commit();
         });
 
         return rootView;

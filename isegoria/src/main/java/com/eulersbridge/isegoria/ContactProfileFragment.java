@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria;
 import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -35,7 +36,7 @@ public class ContactProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar4;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
 
         //TODO: Hide tab layout

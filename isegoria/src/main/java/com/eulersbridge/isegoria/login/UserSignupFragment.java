@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.login;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,7 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
 
 		//TODO: Hide tabs
@@ -87,14 +88,11 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	public void addCountry(final CountryInfo countryInfo) {
 		Activity activity = getActivity();
 		if (activity != null) {
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					spinnerArrayAdapter.add(countryInfo.getCountry());
-					countries.add(countryInfo.getCountry());
-					countryObjects.add(countryInfo);
-				}
-			});
+			activity.runOnUiThread(() -> {
+                spinnerArrayAdapter.add(countryInfo.getCountry());
+                countries.add(countryInfo.getCountry());
+                countryObjects.add(countryInfo);
+            });
 		}
 	}
 	

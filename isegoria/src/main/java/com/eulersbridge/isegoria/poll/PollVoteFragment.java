@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
@@ -15,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -68,7 +68,7 @@ public class PollVoteFragment extends Fragment {
     }
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.poll_fragment, container, false);
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
@@ -95,12 +95,7 @@ public class PollVoteFragment extends Fragment {
                     public void onDownloadFinished(String url, @Nullable final Bitmap bitmap) {
 
                         if (bitmap != null && getActivity() != null) {
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    updateTableRowImage(finalIndex, bitmap);
-                                }
-                            });
+                            getActivity().runOnUiThread(() -> updateTableRowImage(finalIndex, bitmap));
                         }
                     }
 
@@ -125,12 +120,7 @@ public class PollVoteFragment extends Fragment {
                 public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
                     creatorPhoto = bitmap;
 
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateCreatorPhoto();
-                        }
-                    });
+                    getActivity().runOnUiThread(() -> updateCreatorPhoto());
                 }
 
                 @Override
@@ -355,17 +345,14 @@ public class PollVoteFragment extends Fragment {
 
         tickBoxes.add(tickImageView);
 
-        tickImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                for (int i=0; i < tickBoxes.size(); i++) {
-                    tickBoxes.get(i).setImageResource(R.drawable.tickempty);
-                }
-                ((ImageView) view).setImageResource(R.drawable.tickgreen);
-
-                PollVoteFragment self = PollVoteFragment.this;
-                self.network.answerPoll(nodeId, (int)option.getId(), self);
+        tickImageView.setOnClickListener(view -> {
+            for (int i=0; i < tickBoxes.size(); i++) {
+                tickBoxes.get(i).setImageResource(R.drawable.tickempty);
             }
+            ((ImageView) view).setImageResource(R.drawable.tickgreen);
+
+            PollVoteFragment self = PollVoteFragment.this;
+            self.network.answerPoll(nodeId, (int)option.getId(), self);
         });
 		
         tr.addView(tickImageView);

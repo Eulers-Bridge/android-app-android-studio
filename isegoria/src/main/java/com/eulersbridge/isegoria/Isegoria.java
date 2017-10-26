@@ -50,54 +50,45 @@ public class Isegoria extends Application {
 	}
 
 	public void setFeedFragment() {
-		mainActivity.runOnUiThread(new Runnable() {
-		     @Override
-		     public void run() {
-                 mainActivity.hideDialog();
+		mainActivity.runOnUiThread(() -> {
+            mainActivity.hideDialog();
 
-                 mainActivity.setNavigationDrawerEnabled(true);
-				 mainActivity.setToolbarVisible(true);
+            mainActivity.setNavigationDrawerEnabled(true);
+            mainActivity.setToolbarVisible(true);
 
-				 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-					 int color = ContextCompat.getColor(mainActivity, R.color.darkBlue);
-					 mainActivity.getWindow().setStatusBarColor(color);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                int color = ContextCompat.getColor(mainActivity, R.color.darkBlue);
+                mainActivity.getWindow().setStatusBarColor(color);
 
-					 //Set color of multitasking bar (have to pass in app name and icon again however)
+                //Set color of multitasking bar (have to pass in app name and icon again however)
 
-					 Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
-					 mainActivity.setTaskDescription(
-					 		new ActivityManager.TaskDescription(getString(R.string.app_name), icon, color));
-					 icon.recycle();
-				 }
+                Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
+                mainActivity.setTaskDescription(
+                        new ActivityManager.TaskDescription(getString(R.string.app_name), icon, color));
+                icon.recycle();
+            }
 
-				 final FeedFragment feedFragment = new FeedFragment();
-                 feedFragment.setTabLayout(mainActivity.getTabLayout());
+            final FeedFragment feedFragment = new FeedFragment();
+            feedFragment.setTabLayout(mainActivity.getTabLayout());
 
-                 mainActivity.switchContent(feedFragment);
-		     }
-		});
+            mainActivity.switchContent(feedFragment);
+        });
 	}
 
     public void setVerification() {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mainActivity.hideDialog();
-                mainActivity.switchContent(new EmailVerificationFragment());
-            }
+        mainActivity.runOnUiThread(() -> {
+            mainActivity.hideDialog();
+            mainActivity.switchContent(new EmailVerificationFragment());
         });
     }
 
     public void setPersonality() {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mainActivity.hideDialog();
+        mainActivity.runOnUiThread(() -> {
+            mainActivity.hideDialog();
 
-				PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-				personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
-                mainActivity.switchContent(personalityQuestionsFragment);
-            }
+            PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
+            personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+            mainActivity.switchContent(personalityQuestionsFragment);
         });
     }
 

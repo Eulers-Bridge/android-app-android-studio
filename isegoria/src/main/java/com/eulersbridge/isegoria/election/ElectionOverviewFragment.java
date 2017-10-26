@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.election;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ public class ElectionOverviewFragment extends Fragment {
     private int electionId;
 
     @Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.election_overview_fragment, container, false);
 

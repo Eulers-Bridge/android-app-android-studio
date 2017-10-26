@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -38,7 +39,7 @@ public class CandidatePositionFragment extends Fragment {
     private Network network;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
         Bundle bundle = this.getArguments();
@@ -89,19 +90,16 @@ public class CandidatePositionFragment extends Fragment {
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
 		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager2 = getFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
-                Bundle args = new Bundle();
-                args.putInt("ProfileId", userId);
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();
-            }
+        candidateProfileImage.setOnClickListener(view -> {
+            FragmentManager fragmentManager2 = getFragmentManager();
+            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+            ContactProfileFragment fragment2 = new ContactProfileFragment();
+            Bundle args = new Bundle();
+            args.putInt("ProfileId", userId);
+            fragment2.setArguments(args);
+            fragmentTransaction2.addToBackStack(null);
+            fragmentTransaction2.replace(android.R.id.content, fragment2);
+            fragmentTransaction2.commit();
         });
 
         TextView textViewParty = new TextView(getActivity());

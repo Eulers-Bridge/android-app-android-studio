@@ -5,6 +5,7 @@ import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -27,7 +28,7 @@ public class TaskDetailProgressFragment extends Fragment {
     private Network network;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.task_detail_fragment, container, false);
 
         MainActivity mainActivity = (MainActivity) getActivity();

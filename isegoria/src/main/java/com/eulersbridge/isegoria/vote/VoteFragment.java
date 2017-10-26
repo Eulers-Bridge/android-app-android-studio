@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.vote;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private ViewPager mPager;
 
     @Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_fragment, container, false);
 		
         spinnerLocation = rootView.findViewById(R.id.voteLocation);
@@ -55,12 +56,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         voteText = rootView.findViewById(R.id.voteText);
 
         Button voteOkButton = rootView.findViewById(R.id.voteOkButton);
-        voteOkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPager.setCurrentItem(1);
-            }
-        });
+        voteOkButton.setOnClickListener(view -> mPager.setCurrentItem(1));
         
         MainActivity mainActivity = (MainActivity) getActivity();
         Network network = mainActivity.getIsegoriaApplication().getNetwork();

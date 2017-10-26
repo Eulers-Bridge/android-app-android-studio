@@ -7,6 +7,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -44,7 +45,7 @@ public class CandidateTicketFragment extends Fragment {
     private int addedCounter = 0;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {   
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
 		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
@@ -143,25 +144,22 @@ public class CandidateTicketFragment extends Fragment {
 			} else {
 				view.setBackgroundDrawable(rectShapeDrawable);
 			}
-	        view.setOnClickListener(new View.OnClickListener() {        
-	            @Override
-	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
-			    		Bundle args = new Bundle();
-                        args.putInt("TicketId", lastTicketId);
-                        args.putString("TicketName", title1);
-                        args.putString("Colour", colour1);
-                        args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
-                        args.putString("Logo", logo1);
+	        view.setOnClickListener(view12 -> {
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("TicketId", lastTicketId);
+                    args.putString("TicketName", title1);
+                    args.putString("Colour", colour1);
+                    args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
+                    args.putString("Logo", logo1);
 
-			    		fragment2.setArguments(args);
-			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
-			    		fragmentTransaction2.commit();
-	            }
-	         });
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.commit();
+            });
 
 	        LinearLayout linLayout = new LinearLayout(getActivity());
 	        linLayout.setOrientation(LinearLayout.VERTICAL);
@@ -218,24 +216,21 @@ public class CandidateTicketFragment extends Fragment {
 			} else {
 				view.setBackgroundDrawable(rect2ShapeDrawable);
 			}
-	        view.setOnClickListener(new View.OnClickListener() {        
-	            @Override
-	            public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-			    		FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-			    		CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
-			    		Bundle args = new Bundle();
-                        args.putInt("TicketId", ticketId);
-                        args.putString("TicketName", title2);
-                        args.putString("Colour", colour2);
-                        args.putInt("NoOfSupporters", Integer.parseInt(supporters2));
-                        args.putString("Logo", logo2);
-			    		fragment2.setArguments(args);
-			    		fragmentTransaction2.addToBackStack(null);
-			    		fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
-			    		fragmentTransaction2.commit();
-	            }
-	         });
+	        view.setOnClickListener(view1 -> {
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("TicketId", ticketId);
+                    args.putString("TicketName", title2);
+                    args.putString("Colour", colour2);
+                    args.putInt("NoOfSupporters", Integer.parseInt(supporters2));
+                    args.putString("Logo", logo2);
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.commit();
+            });
 	        
 	        relativeLayout.addView(view);
 	        relativeLayout.addView(linLayout, params1);
@@ -337,24 +332,21 @@ public class CandidateTicketFragment extends Fragment {
 				view.setBackgroundDrawable(rectShapeDrawable);
 			}
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
-                    Bundle args = new Bundle();
-                    args.putInt("TicketId", lastTicketId);
-                    args.putString("TicketName", title1);
-                    args.putString("Colour", colour1);
-                    args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
-                    args.putString("Logo", logo1);
+            view.setOnClickListener(view1 -> {
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
+                Bundle args = new Bundle();
+                args.putInt("TicketId", lastTicketId);
+                args.putString("TicketName", title1);
+                args.putString("Colour", colour1);
+                args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
+                args.putString("Logo", logo1);
 
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
-                    fragmentTransaction2.commit();
-                }
+                fragment2.setArguments(args);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                fragmentTransaction2.commit();
             });
 
             LinearLayout linLayout = new LinearLayout(getActivity());

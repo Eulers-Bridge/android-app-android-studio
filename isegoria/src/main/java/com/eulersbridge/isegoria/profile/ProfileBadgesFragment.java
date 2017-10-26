@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.profile;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -45,7 +46,7 @@ public class ProfileBadgesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_badges_layout, container, false);
         getActivity().setTitle("Isegoria");
         Bundle bundle = this.getArguments();
@@ -167,20 +168,17 @@ public class ProfileBadgesFragment extends Fragment {
             linearLayout.addView(linearLayout2);
 
             if(targetLevel < maxLevel) {
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                        FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                        ProfileBadgesFragment fragment2 = new ProfileBadgesFragment();
-                        Bundle args = new Bundle();
-                        args.putString("name", name);
-                        args.putInt("level", targetLevel + 1);
-                        fragment2.setArguments(args);
-                        fragmentTransaction2.addToBackStack(null);
-                        fragmentTransaction2.add(R.id.profileFrameLayout, fragment2);
-                        fragmentTransaction2.commit();
-                    }
+                view.setOnClickListener(view1 -> {
+                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                    ProfileBadgesFragment fragment2 = new ProfileBadgesFragment();
+                    Bundle args = new Bundle();
+                    args.putString("name", name);
+                    args.putInt("level", targetLevel + 1);
+                    fragment2.setArguments(args);
+                    fragmentTransaction2.addToBackStack(null);
+                    fragmentTransaction2.add(R.id.profileFrameLayout, fragment2);
+                    fragmentTransaction2.commit();
                 });
             }
 

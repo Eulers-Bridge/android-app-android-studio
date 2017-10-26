@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -18,7 +19,7 @@ public class FeedFragment extends Fragment {
     private ViewPager viewPager;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
 
         ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_feed));

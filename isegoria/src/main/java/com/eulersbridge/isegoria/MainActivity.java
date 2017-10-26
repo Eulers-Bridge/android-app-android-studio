@@ -4,12 +4,10 @@ package com.eulersbridge.isegoria;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -44,13 +42,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-	public static Boolean inBackground = true;
-
 	private Fragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
 
-	private CoordinatorLayout coordinatorLayout;
 	private TextView toolbarTitleTextView;
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle drawerToggle;
@@ -82,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		if (mContent == null) mContent = new FeedFragment();
 
 		setupToolbarAndNavigation();
-		coordinatorLayout = findViewById(R.id.coordinatorLayout);
 
 		setNavigationDrawerEnabled(false);
 
@@ -120,13 +114,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
 		drawerLayout.addDrawerListener(drawerToggle);
 		drawerToggle.syncState();
-		drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onBackPressed();
-				setShowNavigationBackButton(false);
-			}
-		});
+		drawerToggle.setToolbarNavigationClickListener(view -> {
+            onBackPressed();
+            setShowNavigationBackButton(false);
+        });
 
 		tabLayout = findViewById(R.id.tabLayout);
 	}
@@ -140,10 +131,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 
 	public void setToolbarVisible(boolean visible) {
-		if (visible) {
-			getSupportActionBar().show();
-		} else {
-			getSupportActionBar().hide();
+		if (getSupportActionBar() != null) {
+			if (visible) {
+				getSupportActionBar().show();
+			} else {
+				getSupportActionBar().hide();
+			}
 		}
 	}
 
@@ -268,11 +261,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Login Failed");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				      
-				}
-			});
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
+
+            });
 		alertDialog.show();
 	}
 	
@@ -283,11 +274,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Signup Succeeded");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				      
-				}
-			});
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
+
+            });
 		alertDialog.show();
 	}
 	
@@ -295,11 +284,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
 		alertDialog.setTitle("Isegoria");
 		alertDialog.setMessage("Signup Failed");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				      
-				}
-			});
+		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
+
+            });
 		alertDialog.show();
 	}
 	

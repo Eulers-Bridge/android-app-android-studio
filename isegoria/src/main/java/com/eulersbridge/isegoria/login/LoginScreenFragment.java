@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -26,7 +27,7 @@ public class LoginScreenFragment extends Fragment {
 
     @SuppressWarnings("deprecation")
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_login_screen_fragment, container, false);
 
         final MainActivity mainActivity = (MainActivity) getActivity();
@@ -42,14 +43,11 @@ public class LoginScreenFragment extends Fragment {
 
 		Bitmap backgroundBitmap = Bitmap.createScaledBitmap(original, (int) dpWidth, (int) dpHeight /2, false);
 		final Drawable backgroundDrawable = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(backgroundBitmap, 25));
-        loginContainer.post(new Runnable() {
-            @Override
-            public void run() {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    loginContainer.setBackground(backgroundDrawable);
-                } else {
-                    loginContainer.setBackgroundDrawable(backgroundDrawable);
-                }
+        loginContainer.post(() -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                loginContainer.setBackground(backgroundDrawable);
+            } else {
+                loginContainer.setBackgroundDrawable(backgroundDrawable);
             }
         });
 
@@ -62,17 +60,16 @@ public class LoginScreenFragment extends Fragment {
         final EditText passwordField = rootView.findViewById(R.id.password);
 
         Button loginButton = rootView.findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainActivity.login(emailField.getText().toString(), passwordField.getText().toString());
-            }
-        });
+        loginButton.setOnClickListener(view -> mainActivity.login(emailField.getText().toString(), passwordField.getText().toString()));
 
         // If the user previously logged in, pre-fill the email and password fields
         String userEmail = new SecurePreferences(getContext()).getString("userEmail", null);
         if (userEmail != null) {
             emailField.setText(userEmail);
+
+        } else {
+            emailField.requestFocus();
+            Utils.showKeyboard(mainActivity.getWindow());
         }
 
         String userPassword = new SecurePreferences(getContext()).getString("userPassword", null);
@@ -81,9 +78,10 @@ public class LoginScreenFragment extends Fragment {
 
             loginButton.requestFocus();
 
-        } else {
+        } else if (userEmail != null) {
             //No password stored for whatever reason, focus the password field
-            rootView.findViewById(R.id.password).requestFocus();
+            passwordField.requestFocus();
+            Utils.showKeyboard(mainActivity.getWindow());
         }
 		
 		return rootView;

@@ -24,7 +24,6 @@ import com.android.volley.Cache;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
@@ -143,136 +142,120 @@ public class Network {
     }
 
 	public void login() {
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("/login");
-				try {
+        Runnable r = () -> {
+            String response = getRequest("/login");
+            try {
 
-                    if (response.startsWith("HTTP Status 401 - User is disabled")) {
-                        application.setVerification();
+                if (response.startsWith("HTTP Status 401 - User is disabled")) {
+                    application.setVerification();
+
+                } else {
+                    JSONObject jObject = new JSONObject(response);
+                    String userId = jObject.getString("userId");
+
+                    JSONObject userObject = jObject.getJSONObject("user");
+
+                    User user = new User(userObject);
+                    user.setId(userId);
+                    user.setPassword(password);
+
+                    setLoggedInUser(user);
+
+                    if (user.isAccountVerified()) {
+                        application.setLoggedIn(true);
+
+                        if (user.hasPersonality()) {
+                            application.setFeedFragment();
+                        } else {
+                            application.setPersonality();
+                        }
+
+                        getLatestElection();
+                        getUserDPId();
 
                     } else {
-                        JSONObject jObject = new JSONObject(response);
-                        String userId = jObject.getString("userId");
-
-                        JSONObject userObject = jObject.getJSONObject("user");
-
-                        User user = new User(userObject);
-                        user.setId(userId);
-                        user.setPassword(password);
-
-                        setLoggedInUser(user);
-
-                        if (user.isAccountVerified()) {
-                            application.setLoggedIn(true);
-
-                            if (user.hasPersonality()) {
-                                application.setFeedFragment();
-                            } else {
-                                application.setPersonality();
-                            }
-
-                            getLatestElection();
-                            getUserDPId();
-
-                        } else {
-                            application.setVerification();
-                        }
+                        application.setVerification();
                     }
-                } catch (JSONException e) {
-					e.printStackTrace();
-					application.getMainActivity().runOnUiThread(new Runnable() {
-						public void run() {
-							application.loginFailed();
-						}
-					});
-				}
-			}
-		};
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                application.getMainActivity().runOnUiThread(application::loginFailed);
+            }
+        };
 
-		Thread t = new Thread(r);
-		t.start();
-	}
+        Thread t = new Thread(r);
+        t.start();
+    }
 
     void signup(final String firstName, final String lastName, final String gender, final String country, final String yearOfBirth, final String email, final String password, String confirmPassword, final String institution) {
-        Runnable r = new Runnable() {
-            public void run() {
-                StringBuilder stringBuffer = new StringBuilder();
-                BufferedReader bufferedReader = null;
+        Runnable r = () -> {
+            StringBuilder stringBuffer = new StringBuilder();
+            BufferedReader bufferedReader = null;
 
+            try {
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpParams httpParameters = httpClient.getParams();
+                HttpConnectionParams.setTcpNoDelay(httpParameters, true);
+                HttpPost httpPost = new HttpPost();
+
+                URI uri = new URI(SERVER_URL + "/signUp");
+                httpPost.setURI(uri);
+                httpPost.addHeader("Accept", "application/json");
+                httpPost.addHeader("Content-type", "application/json");
+
+                JSONObject signup = new JSONObject();
+                String json = "";
                 try {
-                    HttpClient httpClient = new DefaultHttpClient();
-                    HttpParams httpParameters = httpClient.getParams();
-                    HttpConnectionParams.setTcpNoDelay(httpParameters, true);
-                    HttpPost httpPost = new HttpPost();
+                    signup.put("email", email);
+                    signup.put("givenName", firstName);
+                    signup.put("familyName", lastName);
+                    signup.put("gender", gender);
+                    signup.put("nationality", country);
+                    signup.put("yearOfBirth",yearOfBirth);
+                    signup.put("accountVerified", "false");
+                    signup.put("password", password);
+                    signup.put("institutionId", String.valueOf(institution));
 
-                    URI uri = new URI(SERVER_URL + "/signUp");
-                    httpPost.setURI(uri);
-                    httpPost.addHeader("Accept", "application/json");
-                    httpPost.addHeader("Content-type", "application/json");
+                    json = signup.toString();
 
-                    JSONObject signup = new JSONObject();
-                    String json = "";
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                StringEntity se = new StringEntity(json);
+                httpPost.setEntity(se);
+
+                HttpResponse httpResponse = httpClient.execute(httpPost);
+                InputStream inputStream = httpResponse.getEntity().getContent();
+                bufferedReader = new BufferedReader(new InputStreamReader(
+                        inputStream));
+
+                String readLine = bufferedReader.readLine();
+                while (readLine != null) {
+                    stringBuffer.append(readLine);
+                    stringBuffer.append("\n");
+                    readLine = bufferedReader.readLine();
+                }
+
+                if(stringBuffer.toString().contains(email)) {
+                    application.getMainActivity().runOnUiThread(application::signupSucceeded);
+                }
+                else {
+                    application.getMainActivity().runOnUiThread(application::signupFailed);
+                }
+
+            } catch (Exception e) {
+                Log.e("Isegoria", "exception", e);
+            } finally {
+                if (bufferedReader != null) {
                     try {
-                        signup.put("email", email);
-                        signup.put("givenName", firstName);
-                        signup.put("familyName", lastName);
-                        signup.put("gender", gender);
-                        signup.put("nationality", country);
-                        signup.put("yearOfBirth",yearOfBirth);
-                        signup.put("accountVerified", "false");
-                        signup.put("password", password);
-                        signup.put("institutionId", String.valueOf(institution));
-
-                        json = signup.toString();
-
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        Log.e("Isegoria", "exception", e);
                     }
-
-                    StringEntity se = new StringEntity(json);
-                    httpPost.setEntity(se);
-
-                    HttpResponse httpResponse = httpClient.execute(httpPost);
-                    InputStream inputStream = httpResponse.getEntity().getContent();
-                    bufferedReader = new BufferedReader(new InputStreamReader(
-                            inputStream));
-
-                    String readLine = bufferedReader.readLine();
-                    while (readLine != null) {
-                        stringBuffer.append(readLine);
-                        stringBuffer.append("\n");
-                        readLine = bufferedReader.readLine();
-                    }
-
-                    if(stringBuffer.toString().contains(email)) {
-                        application.getMainActivity().runOnUiThread(new Runnable() {
-                            public void run() {
-                                application.signupSucceeded();
-                            }
-                        });
-                    }
-                    else {
-                        application.getMainActivity().runOnUiThread(new Runnable() {
-                            public void run() {
-                                application.signupFailed();
-                            }
-                        });
-                    }
-
-                } catch (Exception e) {
-                    Log.e("Isegoria", "exception", e);
-                } finally {
-                    if (bufferedReader != null) {
-                        try {
-                            bufferedReader.close();
-    	                } catch (IOException e) {
-    	                	Log.e("Isegoria", "exception", e);
-    	                }
-    	            }
-    	        }
-    	   }
+                }
+            }
        };
 
        Thread t = new Thread(r);
@@ -280,35 +263,33 @@ public class Network {
 	}
 
 	public void getGeneralInfo(final UserSignupFragment userSignupFragment) {
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("/general-info", false);
-				try {
-					JSONObject jObject = new JSONObject(response);
-					JSONArray jArray = jObject.getJSONArray("countrys");
+		Runnable r = () -> {
+            String response = getRequest("/general-info", false);
+            try {
+                JSONObject jObject = new JSONObject(response);
+                JSONArray jArray = jObject.getJSONArray("countrys");
 
-					for (int i=0; i<jArray.length(); i++) {
-						JSONObject currentCountry = jArray.getJSONObject(i);
-						String country = currentCountry.getString("countryName");
+                for (int i=0; i<jArray.length(); i++) {
+                    JSONObject currentCountry = jArray.getJSONObject(i);
+                    String country = currentCountry.getString("countryName");
 
-						CountryInfo countryInfo = new CountryInfo(country);
-						userSignupFragment.addCountry(countryInfo);
+                    CountryInfo countryInfo = new CountryInfo(country);
+                    userSignupFragment.addCountry(countryInfo);
 
-						JSONArray institutionsArray = currentCountry.getJSONArray("institutions");
-						for (int j=0; j<institutionsArray.length(); j++) {
-							JSONObject currentInstitution = institutionsArray.getJSONObject(j);
+                    JSONArray institutionsArray = currentCountry.getJSONArray("institutions");
+                    for (int j=0; j<institutionsArray.length(); j++) {
+                        JSONObject currentInstitution = institutionsArray.getJSONObject(j);
 
-							String institutionId = currentInstitution.getString("institutionId");
-							String institution = currentInstitution.getString("institutionName");
-							countryInfo.addInstituion(institutionId, institution);
-						}
-					}
+                        String institutionId = currentInstitution.getString("institutionId");
+                        String institution = currentInstitution.getString("institutionName");
+                        countryInfo.addInstituion(institutionId, institution);
+                    }
+                }
 
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        };
 
 		Thread t = new Thread(r);
 		t.start();
@@ -319,46 +300,38 @@ public class Network {
         String url = SERVER_URL + "/newsArticles/26";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jArray = response.getJSONArray("foundObjects");
+                response -> {
+                    try {
+                        JSONArray jArray = response.getJSONArray("foundObjects");
 
-                            for (int i=0; i<jArray.length(); i++) {
-                                try {
-                                    JSONObject currentArticle = jArray.getJSONObject(i);
-                                    int articleId = currentArticle.getInt("articleId");
-                                    int institutionId = currentArticle.getInt("institutionId");
-                                    String title = currentArticle.getString("title");
-                                    String content = currentArticle.getString("content");
-                                    JSONArray photos = currentArticle.getJSONArray("photos");
-                                    String picture = photos.getJSONObject(0).getString("url");
-                                    picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
-                                    Bitmap bitmapPicture = null;
+                        for (int i=0; i<jArray.length(); i++) {
+                            try {
+                                JSONObject currentArticle = jArray.getJSONObject(i);
+                                int articleId = currentArticle.getInt("articleId");
+                                int institutionId = currentArticle.getInt("institutionId");
+                                String title = currentArticle.getString("title");
+                                String content = currentArticle.getString("content");
+                                JSONArray photos = currentArticle.getJSONArray("photos");
+                                String picture = photos.getJSONObject(0).getString("url");
+                                picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
+                                Bitmap bitmapPicture = null;
 
-                                    String likes = currentArticle.optString("likes");
-                                    long date = currentArticle.getLong("date");
-                                    date = TimeConverter.convertTimestampTimezone(date);
-                                    String creatorEmail = currentArticle.optString("creatorEmail");
-                                    String studentYear = "";
-                                    String link = null;
+                                String likes = currentArticle.optString("likes");
+                                long date = currentArticle.getLong("date");
+                                date = TimeConverter.convertTimestampTimezone(date);
+                                String creatorEmail = currentArticle.optString("creatorEmail");
+                                String studentYear = "";
+                                String link = null;
 
-                                    newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likes, date, creatorEmail, studentYear, link);
-                                } catch (JSONException e1) {
-                                    e1.printStackTrace();
-                                }
+                                newsFragment.addNewsArticle(articleId, institutionId, title, content, picture, likes, date, creatorEmail, studentYear, link);
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -366,49 +339,47 @@ public class Network {
 	}
 
 	public void getNewsArticle(final NewsArticleFragment newsArticleFragment, final int articleId) {
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("/newsArticle/" + String.valueOf(articleId));
-				try {
-					JSONObject currentArticle = new JSONObject(response);
+		Runnable r = () -> {
+            String response = getRequest("/newsArticle/" + String.valueOf(articleId));
+            try {
+                JSONObject currentArticle = new JSONObject(response);
 
-					int articleId = currentArticle.getInt("articleId");
-					final String title = currentArticle.getString("title");
-					final String likes = currentArticle.getString("likes");
-					final String content = currentArticle.getString("content");
-                    JSONArray photos = currentArticle.getJSONArray("photos");
-                    String picture = photos.getJSONObject(0).getString("url");
-					String email = currentArticle.getString("creatorEmail");
-					picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
+                int articleId1 = currentArticle.getInt("articleId");
+                final String title = currentArticle.getString("title");
+                final String likes = currentArticle.getString("likes");
+                final String content = currentArticle.getString("content");
+                JSONArray photos = currentArticle.getJSONArray("photos");
+                String picture = photos.getJSONObject(0).getString("url");
+                String email = currentArticle.getString("creatorEmail");
+                picture = picture.replace("[", "").replace("]", "").replace("\"", "").replace("\\", "");
 
-                    final boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
+                final boolean inappropriateContent = currentArticle.getBoolean("inappropriateContent");
 
-					String likers = currentArticle.getString("likes");
-					long date = currentArticle.getLong("date");
-					final long convertedDate = TimeConverter.convertTimestampTimezone(date);
-					String link = null;
+                String likers = currentArticle.getString("likes");
+                long date = currentArticle.getLong("date");
+                final long convertedDate = TimeConverter.convertTimestampTimezone(date);
+                String link = null;
 
-                    final String callbackEmail = email;
+                final String callbackEmail = email;
 
-                    getPicture(picture, new PictureDownloadListener() {
-                        @Override
-                        public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                            newsArticleFragment.populateContent(title, content, likes, convertedDate, bitmap, callbackEmail, inappropriateContent);
-                            getUser(newsArticleFragment, callbackEmail);
-                        }
+                getPicture(picture, new PictureDownloadListener() {
+                    @Override
+                    public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                        newsArticleFragment.populateContent(title, content, likes, convertedDate, bitmap, callbackEmail, inappropriateContent);
+                        getUser(newsArticleFragment, callbackEmail);
+                    }
 
-                        @Override
-                        public void onDownloadFailed(String url, VolleyError error) {
-                            newsArticleFragment.populateContent(title, content, likes, convertedDate, null, callbackEmail, inappropriateContent);
-                            getUser(newsArticleFragment, callbackEmail);
-                        }
-                    });
+                    @Override
+                    public void onDownloadFailed(String url, VolleyError error) {
+                        newsArticleFragment.populateContent(title, content, likes, convertedDate, null, callbackEmail, inappropriateContent);
+                        getUser(newsArticleFragment, callbackEmail);
+                    }
+                });
 
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        };
 
 		Thread t = new Thread(r);
 		t.start();
@@ -420,37 +391,35 @@ public class Network {
             newsArticleFragment.populateUserContent(loggedInUser.getFullName(), loggedInUser.getProfilePhotoURL());
 
         } else {
-            Runnable r = new Runnable() {
-                public void run() {
-                    String response = getRequest(String.format("/contact/%s/", String.valueOf(userEmail)));
-                    try {
-                        JSONObject userObject = new JSONObject(response);
+            Runnable r = () -> {
+                String response = getRequest(String.format("/contact/%s/", String.valueOf(userEmail)));
+                try {
+                    JSONObject userObject = new JSONObject(response);
 
-                        User user = new User(userObject);
+                    User user = new User(userObject);
 
-                        JSONArray photos = userObject.optJSONArray("photos");
+                    JSONArray photos = userObject.optJSONArray("photos");
 
-                        String photoURL = null;
+                    String photoURL = null;
 
-                        if (photos != null) {
-                            int index=0;
-                            for(int i=0; i<photos.length(); i++) {
-                                JSONObject currentObject = photos.getJSONObject(i);
-                                String currentSeq = currentObject.getString("sequence");
+                    if (photos != null) {
+                        int index=0;
+                        for(int i=0; i<photos.length(); i++) {
+                            JSONObject currentObject = photos.getJSONObject(i);
+                            String currentSeq = currentObject.getString("sequence");
 
-                                if(currentSeq.equals("0")) {
-                                    index = i;
-                                    break;
-                                }
+                            if(currentSeq.equals("0")) {
+                                index = i;
+                                break;
                             }
-
-                            photoURL = (userObject.getJSONArray("photos").getJSONObject(index).getString("url"));
                         }
 
-                        newsArticleFragment.populateUserContent(user.getFullName(), photoURL);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        photoURL = (userObject.getJSONArray("photos").getJSONObject(index).getString("url"));
                     }
+
+                    newsArticleFragment.populateUserContent(user.getFullName(), photoURL);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             };
 
@@ -470,21 +439,19 @@ public class Network {
             callback.onFetchSuccess(loggedInUser);
 
         } else {
-            Runnable r = new Runnable() {
-                public void run() {
-                    String response = getRequest(String.format("/contact/%s/", String.valueOf(userEmail)));
-                    try {
+            Runnable r = () -> {
+                String response = getRequest(String.format("/contact/%s/", String.valueOf(userEmail)));
+                try {
 
-                        JSONObject jsonObject = new JSONObject(response);
+                    JSONObject jsonObject = new JSONObject(response);
 
-                        User user = new User(jsonObject);
+                    User user = new User(jsonObject);
 
-                        callback.onFetchSuccess(user);
+                    callback.onFetchSuccess(user);
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        callback.onFetchFailure(userEmail, e);
-                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callback.onFetchFailure(userEmail, e);
                 }
             };
 
@@ -508,71 +475,53 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/contacts", SERVER_URL);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    Log.d("Isegoria", "" + jArray.toString());
+                for(int i = 0; i < jArray.length(); i++) {
+                    try {
+                        JSONObject userObject = jArray.getJSONObject(i);
 
-                    for(int i = 0; i < jArray.length(); i++) {
-                        try {
-                            JSONObject userObject = jArray.getJSONObject(i);
+                        User user = new User(userObject);
+                        findAddContactFragment.addFriend(user);
 
-                            User user = new User(userObject);
-                            findAddContactFragment.addFriend(user);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 
         url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contactRequests";
-        req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray friends = response.getJSONArray("foundObjects");
-                    for(int i=0; i<friends.length(); i++) {
-                        try {
-                            JSONObject resp = friends.getJSONObject(i);
+        req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray friends = response.getJSONArray("foundObjects");
+                for(int i=0; i<friends.length(); i++) {
+                    try {
+                        JSONObject resp = friends.getJSONObject(i);
 
-                            int userId = resp.getInt("userId");
-                            boolean acceptedBoolean = resp.getBoolean("accepted");
-                            String contactDetails = resp.getString("contactDetails");
+                        int userId = resp.getInt("userId");
+                        boolean acceptedBoolean = resp.getBoolean("accepted");
+                        String contactDetails = resp.getString("contactDetails");
 
-                            if(acceptedBoolean) {
-                                Network.this.findContactFriend(String.valueOf(userId), findAddContactFragment);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if(acceptedBoolean) {
+                            Network.this.findContactFriend(String.valueOf(userId), findAddContactFragment);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -583,29 +532,21 @@ public class Network {
         findAddContactFragment.clearSearchResults();
         String url = String.format("%s/searchUserProfile/%s/", SERVER_URL, String.valueOf(query));
 
-        AuthorisedJsonArrayRequest req = new AuthorisedJsonArrayRequest(url, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray jsonArray) {
-                try {
-                    ArrayList<User> usersFound = new ArrayList<>();
+        AuthorisedJsonArrayRequest req = new AuthorisedJsonArrayRequest(url, jsonArray -> {
+            try {
+                ArrayList<User> usersFound = new ArrayList<>();
 
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject userObject = jsonArray.getJSONObject(i);
-                        User user = new User(userObject);
-                        usersFound.add(user);
-                    }
-
-                    findAddContactFragment.addUsers(usersFound);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject userObject = jsonArray.getJSONObject(i);
+                    User user = new User(userObject);
+                    usersFound.add(user);
                 }
+
+                findAddContactFragment.addUsers(usersFound);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -616,25 +557,17 @@ public class Network {
 
         String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    User user = new User(response);
-                    user.setId(String.valueOf(contactId));
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                User user = new User(response);
+                user.setId(String.valueOf(contactId));
 
-                    findAddContactFragment.addFriendRequestSent(user);
+                findAddContactFragment.addFriendRequestSent(user);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -645,34 +578,26 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/contact/%s", SERVER_URL, String.valueOf(loggedInUser.getEmail()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray foundObjects = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray foundObjects = response.getJSONArray("foundObjects");
 
-                    int numOfContacts = 0;
-                    int totalTasks = 0;
+                int numOfContacts = 0;
+                int totalTasks = 0;
 
-                    if (foundObjects.length() > 0) {
-                        JSONObject currentObject = foundObjects.getJSONObject(0);
+                if (foundObjects.length() > 0) {
+                    JSONObject currentObject = foundObjects.getJSONObject(0);
 
-                        numOfContacts = currentObject.getInt("numOfContacts");
-                        totalTasks = currentObject.getInt("totalTasks");
-                    }
-
-                    profileFragment.updateStats(numOfContacts, totalTasks);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    numOfContacts = currentObject.getInt("numOfContacts");
+                    totalTasks = currentObject.getInt("totalTasks");
                 }
+
+                profileFragment.updateStats(numOfContacts, totalTasks);
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -689,25 +614,17 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/badges/remaining/%s", SERVER_URL, String.valueOf(loggedInUser.getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    callback.onFetchSuccess(jArray.length());
+                callback.onFetchSuccess(jArray.length());
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    callback.onFetchFailure(e);
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                callback.onFetchFailure(e);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -718,32 +635,24 @@ public class Network {
                                   int profileUserId) {
         String url = String.format("%s/contacts/%s", SERVER_URL, String.valueOf(profileUserId));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    JSONObject currentObject = jArray.getJSONObject(0);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                JSONObject currentObject = jArray.getJSONObject(0);
 
-                    int numOfContacts = currentObject.getInt("numOfContacts");
-                    int numOfCompBadges = currentObject.getInt("numOfCompBadges");
-                    int numOfCompTasks = currentObject.getInt("numOfCompTasks");
-                    int totalBadges = currentObject.getInt("totalBadges");
-                    int totalTasks = currentObject.getInt("totalTasks");
+                int numOfContacts = currentObject.getInt("numOfContacts");
+                int numOfCompBadges = currentObject.getInt("numOfCompBadges");
+                int numOfCompTasks = currentObject.getInt("numOfCompTasks");
+                int totalBadges = currentObject.getInt("totalBadges");
+                int totalTasks = currentObject.getInt("totalTasks");
 
-                    contactProfileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
-                            totalBadges, totalTasks);
+                contactProfileFragment.updateStats(numOfContacts, numOfCompBadges, numOfCompTasks,
+                        totalBadges, totalTasks);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -753,27 +662,19 @@ public class Network {
     private void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
         String url = String.format("%s/user/%s/", SERVER_URL, String.valueOf(query));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    User user = new User(response);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                User user = new User(response);
 
-                    int userId = Integer.parseInt(query);
-                    user.setId(String.valueOf(userId));
+                int userId = Integer.parseInt(query);
+                user.setId(String.valueOf(userId));
 
-                    findAddContactFragment.addFriend(user);
+                findAddContactFragment.addFriend(user);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -786,21 +687,13 @@ public class Network {
         String url = String.format("%s/user/%s/contactRequest/%s/", SERVER_URL, String.valueOf(loggedInUser.getId()), String.valueOf(email));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            findAddContactFragment.showAddedMessage();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        findAddContactFragment.showAddedMessage();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -816,21 +709,13 @@ public class Network {
         HashMap<String, Integer> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            findAddContactFragment.showAcceptMessage();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        findAddContactFragment.showAcceptMessage();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -846,21 +731,13 @@ public class Network {
         HashMap<String, Integer> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            findAddContactFragment.showDenyMessage();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        findAddContactFragment.showDenyMessage();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -874,37 +751,29 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/user/%s/contactRequests", SERVER_URL, String.valueOf(loggedInUser.getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.optJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.optJSONArray("foundObjects");
 
-                    if (jArray != null) {
-                        for (int i=0; i<jArray.length(); i++) {
-                            JSONObject currentObject = jArray.getJSONObject(i);
+                if (jArray != null) {
+                    for (int i=0; i<jArray.length(); i++) {
+                        JSONObject currentObject = jArray.getJSONObject(i);
 
-                            int nodeId = currentObject.getInt("nodeId");
-                            int userId = currentObject.getInt("userId");
-                            //boolean acceptedContact = response.getBoolean("accepted");
-                            // boolean rejectedContact = response.getBoolean("rejected");
-                            if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
-                                String contactDetails = currentObject.getString("contactDetails");
+                        int nodeId = currentObject.getInt("nodeId");
+                        int userId = currentObject.getInt("userId");
+                        //boolean acceptedContact = response.getBoolean("accepted");
+                        // boolean rejectedContact = response.getBoolean("rejected");
+                        if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
+                            String contactDetails = currentObject.getString("contactDetails");
 
-                                Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
-                            }
+                            Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -915,36 +784,28 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/user/%s/contactRequests/rec", SERVER_URL, String.valueOf(loggedInUser.getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.optJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.optJSONArray("foundObjects");
 
-                    if (jArray != null) {
-                        for(int i=0; i<jArray.length(); i++) {
-                            JSONObject currentObject = jArray.getJSONObject(i);
+                if (jArray != null) {
+                    for(int i=0; i<jArray.length(); i++) {
+                        JSONObject currentObject = jArray.getJSONObject(i);
 
-                            int nodeId = currentObject.getInt("nodeId");
-                            int userId = currentObject.getInt("userId");
-                            //boolean acceptedContact = response.getBoolean("accepted");
-                            // boolean rejectedContact = response.getBoolean("rejected");
-                            if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
-                                String contactDetails = currentObject.getString("contactDetails");
-                                Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
-                            }
+                        int nodeId = currentObject.getInt("nodeId");
+                        int userId = currentObject.getInt("userId");
+                        //boolean acceptedContact = response.getBoolean("accepted");
+                        // boolean rejectedContact = response.getBoolean("rejected");
+                        if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
+                            String contactDetails = currentObject.getString("contactDetails");
+                            Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -965,21 +826,9 @@ public class Network {
         setVoteReminderLocation(location);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
+                response -> {
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -998,35 +847,29 @@ public class Network {
         String url = String.format("%s/events/26/", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        try {
-                            JSONArray eventsList = jObject.getJSONArray("foundObjects");
+                jObject -> {
+                    try {
+                        JSONArray eventsList = jObject.getJSONArray("foundObjects");
 
-                            ArrayList<Event> events = new ArrayList<>();
+                        ArrayList<Event> events = new ArrayList<>();
 
-                            for (int i=0; i < eventsList.length(); i++) {
-                                JSONObject eventItem = eventsList.getJSONObject(i);
+                        for (int i=0; i < eventsList.length(); i++) {
+                            JSONObject eventItem = eventsList.getJSONObject(i);
 
-                                Event event = new Event(eventItem);
-                                events.add(event);
-                            }
-
-                            callback.onFetchSuccess(events);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            callback.onFetchFailure(null);
+                            Event event = new Event(eventItem);
+                            events.add(event);
                         }
+
+                        callback.onFetchSuccess(events);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callback.onFetchFailure(null);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-                callback.onFetchFailure(error);
-            }
-        });
+                }, error -> {
+                    Log.d("Volley", error.toString());
+                    callback.onFetchFailure(error);
+                });
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1038,17 +881,9 @@ public class Network {
         String url = String.format("%s/emailVerification/%s/resend", SERVER_URL, String.valueOf(getLoggedInUser().getEmail()));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        String test = ":)";
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                jObject -> {
+                    String test = ":)";
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1060,23 +895,12 @@ public class Network {
         String url = SERVER_URL + "/contact/" + String.valueOf(email) + "/";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        try {
+                jObject -> {
 
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-                eventsDetailFragment.addCandidate(email);
-            }
-        });
+                }, error -> {
+                    Log.d("Volley", error.toString());
+                    eventsDetailFragment.addCandidate(email);
+                });
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1088,25 +912,17 @@ public class Network {
         String url = String.format("%s/contact/%s/", SERVER_URL, String.valueOf(email));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        try {
-                            JSONObject photo = jObject.getJSONObject("profilePhoto");
+                jObject -> {
+                    try {
+                        JSONObject photo = jObject.getJSONObject("profilePhoto");
 
-                            String url = photo.getString("url");
-                            getFirstPhotoImage(url, imageView);
+                        String url1 = photo.getString("url");
+                        getFirstPhotoImage(url1, imageView);
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1118,32 +934,24 @@ public class Network {
         String url = String.format("%s/photoAlbums/7449", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        try {
-                            JSONArray jArray = jObject.getJSONArray("foundObjects");
+                jObject -> {
+                    try {
+                        JSONArray jArray = jObject.getJSONArray("foundObjects");
 
-                            for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentAlbum = jArray.getJSONObject(i);
+                        for (int i=0; i<jArray.length(); i++) {
+                            JSONObject currentAlbum = jArray.getJSONObject(i);
 
-                                int nodeId = currentAlbum.getInt("nodeId");
-                                String name = currentAlbum.getString("name");
-                                String description = currentAlbum.getString("description");
-                                String thumbNailUrl = currentAlbum.getString("thumbNailUrl");
+                            int nodeId = currentAlbum.getInt("nodeId");
+                            String name = currentAlbum.getString("name");
+                            String description = currentAlbum.getString("description");
+                            String thumbNailUrl = currentAlbum.getString("thumbNailUrl");
 
-                                photosFragment.addPhotoAlbum(nodeId, name, description, thumbNailUrl);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            photosFragment.addPhotoAlbum(nodeId, name, description, thumbNailUrl);
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1155,32 +963,24 @@ public class Network {
 		String url = String.format("%s/photos/%s?pageSize=100", SERVER_URL, String.valueOf(albumId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jObject) {
-                        try {
-                            JSONArray jArray = jObject.getJSONArray("photos");
+                jObject -> {
+                    try {
+                        JSONArray jArray = jObject.getJSONArray("photos");
 
-                            for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentAlbum = jArray.getJSONObject(i);
+                        for (int i=0; i<jArray.length(); i++) {
+                            JSONObject currentAlbum = jArray.getJSONObject(i);
 
-                                int nodeId = currentAlbum.getInt("nodeId");
-                                String title = currentAlbum.getString("title");
-                                String description = currentAlbum.getString("description");
-                                String thumbNailUrl = currentAlbum.getString("url");
+                            int nodeId = currentAlbum.getInt("nodeId");
+                            String title = currentAlbum.getString("title");
+                            String description = currentAlbum.getString("description");
+                            String thumbNailUrl = currentAlbum.getString("url");
 
-                                photoAlbumFragment.addPhotoThumb(thumbNailUrl, nodeId);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            photoAlbumFragment.addPhotoThumb(thumbNailUrl, nodeId);
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1191,56 +991,48 @@ public class Network {
     public void getProfileBadgesComplete(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
         String url = String.format("%s/badges/complete/%s", SERVER_URL, String.valueOf(getLoggedInUser().getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jArray = response.getJSONArray("foundObjects");
-                            for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentBadge = jArray.getJSONObject(i);
-                                int badgeId = currentBadge.getInt("badgeId");
-                                String name = currentBadge.getString("name");
-                                String description = currentBadge.getString("description");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+                    try {
+                        JSONArray jArray = response.getJSONArray("foundObjects");
+                        for (int i=0; i<jArray.length(); i++) {
+                            JSONObject currentBadge = jArray.getJSONObject(i);
+                            int badgeId = currentBadge.getInt("badgeId");
+                            String name = currentBadge.getString("name");
+                            String description = currentBadge.getString("description");
 
-                                int maxLevel = 0;
-                                //Get the max level for each badge
-                                for (int j=0; j<jArray.length(); j++) {
-                                    JSONObject currentBadgeLevel = jArray.getJSONObject(j);
-                                    String nameLevel = currentBadgeLevel.getString("name");
+                            int maxLevel = 0;
+                            //Get the max level for each badge
+                            for (int j=0; j<jArray.length(); j++) {
+                                JSONObject currentBadgeLevel = jArray.getJSONObject(j);
+                                String nameLevel = currentBadgeLevel.getString("name");
 
-                                    if(name.equals(nameLevel)) {
-                                        if (!currentBadgeLevel.isNull("level")) {
-                                            if (currentBadgeLevel.getInt("level") > maxLevel) {
-                                                maxLevel = currentBadgeLevel.getInt("level");
-                                            }
+                                if(name.equals(nameLevel)) {
+                                    if (!currentBadgeLevel.isNull("level")) {
+                                        if (currentBadgeLevel.getInt("level") > maxLevel) {
+                                            maxLevel = currentBadgeLevel.getInt("level");
                                         }
-                                    }
-                                }
-
-                                if(currentBadge.isNull("level") && targetName.equals("")) {
-                                    profileBadgesFragment.addBadgeComplete(badgeId, name, description,
-                                            maxLevel);
-                                }
-                                else if(targetName.equals(name) && !currentBadge.isNull("level")) {
-                                    int level = currentBadge.getInt("level");
-                                    if(level == targetLevel) {
-                                        profileBadgesFragment.addBadgeComplete(badgeId, name, description,
-                                                maxLevel);
                                     }
                                 }
                             }
 
-                            Network.this.getProfileBadgesRemaining(profileBadgesFragment, targetName, targetLevel);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            if(currentBadge.isNull("level") && targetName.equals("")) {
+                                profileBadgesFragment.addBadgeComplete(badgeId, name, description,
+                                        maxLevel);
+                            }
+                            else if(targetName.equals(name) && !currentBadge.isNull("level")) {
+                                int level = currentBadge.getInt("level");
+                                if(level == targetLevel) {
+                                    profileBadgesFragment.addBadgeComplete(badgeId, name, description,
+                                            maxLevel);
+                                }
+                            }
                         }
+
+                        Network.this.getProfileBadgesRemaining(profileBadgesFragment, targetName, targetLevel);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1251,54 +1043,46 @@ public class Network {
     private void getProfileBadgesRemaining(final ProfileBadgesFragment profileBadgesFragment, final String targetName, final int targetLevel) {
         String url = String.format("%s/badges/remaining/%s", SERVER_URL, String.valueOf(getLoggedInUser().getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for (int i=0; i<jArray.length(); i++) {
-                        JSONObject currentBadge = jArray.getJSONObject(i);
-                        int badgeId = currentBadge.getInt("badgeId");
-                        String name = currentBadge.getString("name");
-                        String description = currentBadge.getString("description");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for (int i=0; i<jArray.length(); i++) {
+                    JSONObject currentBadge = jArray.getJSONObject(i);
+                    int badgeId = currentBadge.getInt("badgeId");
+                    String name = currentBadge.getString("name");
+                    String description = currentBadge.getString("description");
 
-                        int maxLevel = 0;
-                        //Get the max level for each badge
-                        for (int j=0; j<jArray.length(); j++) {
-                            JSONObject currentBadgeLevel = jArray.getJSONObject(j);
-                            String nameLevel = currentBadgeLevel.getString("name");
+                    int maxLevel = 0;
+                    //Get the max level for each badge
+                    for (int j=0; j<jArray.length(); j++) {
+                        JSONObject currentBadgeLevel = jArray.getJSONObject(j);
+                        String nameLevel = currentBadgeLevel.getString("name");
 
-                            if(name.equals(nameLevel)) {
-                                if (!currentBadgeLevel.isNull("level")) {
-                                    if (currentBadgeLevel.getInt("level") > maxLevel) {
-                                        maxLevel = currentBadgeLevel.getInt("level");
-                                    }
+                        if(name.equals(nameLevel)) {
+                            if (!currentBadgeLevel.isNull("level")) {
+                                if (currentBadgeLevel.getInt("level") > maxLevel) {
+                                    maxLevel = currentBadgeLevel.getInt("level");
                                 }
                             }
                         }
+                    }
 
-                        if(currentBadge.isNull("level") && targetName.equals("")) {
+                    if(currentBadge.isNull("level") && targetName.equals("")) {
+                        profileBadgesFragment.addBadgeRemaining(badgeId, name, description,
+                                maxLevel);
+                    }
+                    else if(targetName.equals(name) && !currentBadge.isNull("level")) {
+                        int level = currentBadge.getInt("level");
+                        if(level == targetLevel) {
                             profileBadgesFragment.addBadgeRemaining(badgeId, name, description,
                                     maxLevel);
                         }
-                        else if(targetName.equals(name) && !currentBadge.isNull("level")) {
-                            int level = currentBadge.getInt("level");
-                            if(level == targetLevel) {
-                                profileBadgesFragment.addBadgeRemaining(badgeId, name, description,
-                                        maxLevel);
-                            }
-                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1310,31 +1094,23 @@ public class Network {
 		String url = String.format("%s/photo/%s", SERVER_URL, String.valueOf(photoId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            int nodeId = response.getInt("nodeId");
-                            String title = response.getString("title");
-                            String description = response.getString("description");
-                            long date = response.getLong("date");
-                            date = TimeConverter.convertTimestampTimezone(date);
-                            String url = response.getString("url");
-                            boolean inappropriateContent = response.getBoolean("inappropriateContent");
-                            int numOfLikes = response.getInt("numOfLikes");
+                response -> {
+                    try {
+                        int nodeId = response.getInt("nodeId");
+                        String title = response.getString("title");
+                        String description = response.getString("description");
+                        long date = response.getLong("date");
+                        date = TimeConverter.convertTimestampTimezone(date);
+                        String url1 = response.getString("url");
+                        boolean inappropriateContent = response.getBoolean("inappropriateContent");
+                        int numOfLikes = response.getInt("numOfLikes");
 
-                            photoViewFragment.setData(title, date, inappropriateContent,
-                                    numOfLikes);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        photoViewFragment.setData(title, date, inappropriateContent,
+                                numOfLikes);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1346,25 +1122,17 @@ public class Network {
         String url = SERVER_URL + "/newsArticle/"
                 + String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + String.valueOf(getLoggedInUser().getEmail()) + "/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    boolean success = response.getBoolean("success");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, response -> {
+            try {
+                boolean success = response.getBoolean("success");
 
-                    if(success) {
-                        newsArticleFragment.initiallyLiked();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(success) {
+                    newsArticleFragment.initiallyLiked();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1373,31 +1141,29 @@ public class Network {
     }
 
 	public void getVoteRecords(final VoteFragment voteFragment) {
-		Runnable r = new Runnable() {
-			public void run() {
-				String response = getRequest("/voteRecord");
-				try {
-					JSONObject jObject = new JSONObject(response);
-					JSONArray jArray = jObject.getJSONArray("photoAlbums");
+		Runnable r = () -> {
+            String response = getRequest("/voteRecord");
+            try {
+                JSONObject jObject = new JSONObject(response);
+                JSONArray jArray = jObject.getJSONArray("photoAlbums");
 
-					for (int i=0; i<jArray.length(); i++) {
-						JSONObject currentVoteRecord = jArray.getJSONObject(i);
+                for (int i=0; i<jArray.length(); i++) {
+                    JSONObject currentVoteRecord = jArray.getJSONObject(i);
 
-						int nodeId = currentVoteRecord.getInt("nodeId");
-						String name = currentVoteRecord.getString("name");
-						String description = currentVoteRecord.getString("description");
-						//String responseBitmap = getRequest("photos/" + String.valueOf(nodeId));
-						//JSONObject responseJSON = new JSONObject(responseBitmap);
-						//String pictureURL = responseJSON.getString("url");
+                    int nodeId = currentVoteRecord.getInt("nodeId");
+                    String name = currentVoteRecord.getString("name");
+                    String description = currentVoteRecord.getString("description");
+                    //String responseBitmap = getRequest("photos/" + String.valueOf(nodeId));
+                    //JSONObject responseJSON = new JSONObject(responseBitmap);
+                    //String pictureURL = responseJSON.getString("url");
 
-						//Bitmap bitmapPicture;
-						//bitmapPicture = getPicture();
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
+                    //Bitmap bitmapPicture;
+                    //bitmapPicture = getPicture();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        };
 
 		Thread t = new Thread(r);
 		t.start();
@@ -1407,61 +1173,53 @@ public class Network {
 		String url = String.format("%s/polls/26", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
+                response -> {
 
-                        try {
-                            JSONArray polls = response.getJSONArray("polls");
+                    try {
+                        JSONArray polls = response.getJSONArray("polls");
 
-                            for (int i=0; i < polls.length(); i++) {
-                                JSONObject jsonObject = polls.getJSONObject(i);
+                        for (int i=0; i < polls.length(); i++) {
+                            JSONObject jsonObject = polls.getJSONObject(i);
 
-                                final int nodeId = jsonObject.getInt("nodeId");
-                                String creatorEmail = jsonObject.getString("creatorEmail");
-                                final String question = jsonObject.getString("question");
-                                final String answers = jsonObject.optString("answers");
+                            final int nodeId = jsonObject.getInt("nodeId");
+                            String creatorEmail = jsonObject.getString("creatorEmail");
+                            final String question = jsonObject.getString("question");
+                            final String answers = jsonObject.optString("answers");
 
-                                JSONArray pollOptionsJson = jsonObject.getJSONArray("pollOptions");
+                            JSONArray pollOptionsJson = jsonObject.getJSONArray("pollOptions");
 
-                                final ArrayList<PollOption> options = new ArrayList<>();
+                            final ArrayList<PollOption> options = new ArrayList<>();
 
-                                for (int j = 0; j < pollOptionsJson.length(); j++) {
-                                    JSONObject optionObject = pollOptionsJson.getJSONObject(j);
-                                    PollOption option = new PollOption(optionObject);
-                                    options.add(option);
-                                }
-
-                                if (!String.valueOf(creatorEmail).equals("null")) {
-                                    getUser(creatorEmail, new UserInfoListener() {
-                                        @Override
-                                        public void onFetchSuccess(User user) {
-                                            pollFragment.addQuestion(nodeId, user, question,
-                                                    options);
-                                        }
-
-                                        @Override
-                                        public void onFetchFailure(String userEmail, Exception e) {
-                                            pollFragment.addQuestion(nodeId, null, question,
-                                                    options);
-                                        }
-                                    });
-
-                                } else {
-                                    pollFragment.addQuestion(nodeId, null, question,
-                                            options);
-                                }
+                            for (int j = 0; j < pollOptionsJson.length(); j++) {
+                                JSONObject optionObject = pollOptionsJson.getJSONObject(j);
+                                PollOption option = new PollOption(optionObject);
+                                options.add(option);
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+
+                            if (!String.valueOf(creatorEmail).equals("null")) {
+                                getUser(creatorEmail, new UserInfoListener() {
+                                    @Override
+                                    public void onFetchSuccess(User user) {
+                                        pollFragment.addQuestion(nodeId, user, question,
+                                                options);
+                                    }
+
+                                    @Override
+                                    public void onFetchFailure(String userEmail, Exception e) {
+                                        pollFragment.addQuestion(nodeId, null, question,
+                                                options);
+                                    }
+                                });
+
+                            } else {
+                                pollFragment.addQuestion(nodeId, null, question,
+                                        options);
+                            }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1473,28 +1231,20 @@ public class Network {
         String url = SERVER_URL + "/poll/" + String.valueOf(nodeId) + "/results";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jArray = response.getJSONArray("answers");
+                response -> {
+                    try {
+                        JSONArray jArray = response.getJSONArray("answers");
 
-                            for (int i=0; i<jArray.length(); i++) {
-                                JSONObject currentPollAnswers = jArray.getJSONObject(i);
-                                int count = currentPollAnswers.getInt("count");
+                        for (int i=0; i<jArray.length(); i++) {
+                            JSONObject currentPollAnswers = jArray.getJSONObject(i);
+                            int count = currentPollAnswers.getInt("count");
 
-                                pollVoteFragment.setPollResult(i, count);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            pollVoteFragment.setPollResult(i, count);
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1513,22 +1263,14 @@ public class Network {
         params.put("q4", q4);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //TODO: Redirect the user to the correct location
-                            application.setFeedFragment();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        //TODO: Redirect the user to the correct location
+                        application.setFeedFragment();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1549,21 +1291,13 @@ public class Network {
         params.put("openess", openness);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            application.setFeedFragment();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        application.setFeedFragment();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1577,21 +1311,13 @@ public class Network {
         String url = String.format("%s/poll/%s/vote/%s", SERVER_URL, String.valueOf(pollId), String.valueOf(answerIndex));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            getPollResults(pollVoteFragment.getNodeId(), pollVoteFragment);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        getPollResults(pollVoteFragment.getNodeId(), pollVoteFragment);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1604,32 +1330,24 @@ public class Network {
     public void getVoteLocations(final VoteFragment voteFragment) {
 
         String url = String.format("%s/votingLocations/26", SERVER_URL);
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                           JSONArray jArray = response.getJSONArray("foundObjects");
-                           for(int i=0; i<jArray.length(); i++) {
-                               String ownerId = jArray.getJSONObject(i).getString("ownerId");
-                               String votingLocationId = jArray.getJSONObject(i).getString("votingLocationId");
-                               String name = jArray.getJSONObject(i).getString("name");
-                               String information = jArray.getJSONObject(i).getString("information");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+               JSONArray jArray = response.getJSONArray("foundObjects");
+               for(int i=0; i<jArray.length(); i++) {
+                   String ownerId = jArray.getJSONObject(i).getString("ownerId");
+                   String votingLocationId = jArray.getJSONObject(i).getString("votingLocationId");
+                   String name = jArray.getJSONObject(i).getString("name");
+                   String information = jArray.getJSONObject(i).getString("information");
 
-                               voteFragment.addVoteLocations(ownerId, votingLocationId,
-                                       name, information);
-                            }
+                   voteFragment.addVoteLocations(ownerId, votingLocationId,
+                           name, information);
+                }
 
-                            voteFragment.showAll();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
+                voteFragment.showAll();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1640,23 +1358,15 @@ public class Network {
     public void getVoteLocation(final VoteFragment voteFragment, final String pos) {
 
         String url = String.format("%s/votingLocation/%s", SERVER_URL, String.valueOf(pos));
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    for(int i=0; i<response.length(); i++) {
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                for(int i=0; i<response.length(); i++) {
 
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1667,26 +1377,18 @@ public class Network {
     private void getLatestElection() {
         String url = String.format("%s/elections/26", SERVER_URL);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray foundObject = response.getJSONArray("foundObjects");
-                    JSONObject electionObject = foundObject.getJSONObject(0);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray foundObject = response.getJSONArray("foundObjects");
+                JSONObject electionObject = foundObject.getJSONObject(0);
 
-                    Network.this.electionId = electionObject.getInt("electionId");
+                Network.this.electionId = electionObject.getInt("electionId");
 
-                    alreadySetVoteReminder();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                alreadySetVoteReminder();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1697,33 +1399,25 @@ public class Network {
     public void getLatestElection(final ElectionOverviewFragment electionOverviewFragment) {
         String url = String.format("%s/elections/26", SERVER_URL);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray jArray = response.getJSONArray("foundObjects");
-                            JSONObject electionObject = jArray.getJSONObject(0);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                JSONObject electionObject = jArray.getJSONObject(0);
 
-                            int electionId = electionObject.getInt("electionId");
-                            Network.this.electionId = electionId;
+                int electionId = electionObject.getInt("electionId");
+                Network.this.electionId = electionId;
 
-                            String title = electionObject.getString("title");
-                            String introduction = electionObject.getString("introduction");
-                            String date = "";
-                            String process = electionObject.getString("process");
+                String title = electionObject.getString("title");
+                String introduction = electionObject.getString("introduction");
+                String date = "";
+                String process = electionObject.getString("process");
 
-                            electionOverviewFragment.updateEntities(electionId, title, introduction, date, process);
+                electionOverviewFragment.updateEntities(electionId, title, introduction, date, process);
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1734,28 +1428,20 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/user/%s/support/", SERVER_URL, String.valueOf(loggedInUser.getId()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    userTickets.clear();
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject currentObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                userTickets.clear();
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject currentObject = jArray.getJSONObject(i);
 
-                        int ticketId = currentObject.getInt("ticketId");
-                        userTickets.add(ticketId);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    int ticketId = currentObject.getInt("ticketId");
+                    userTickets.add(ticketId);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1766,31 +1452,23 @@ public class Network {
     public void getLatestElection(final VoteFragment voteFragment) {
         String url = SERVER_URL + "/elections/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    JSONObject electionObject = jArray.getJSONObject(0);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                JSONObject electionObject = jArray.getJSONObject(0);
 
-                    Network.this.electionId = electionObject.getInt("electionId");
+                Network.this.electionId = electionObject.getInt("electionId");
 
-                    long startVoting = electionObject.getLong("startVoting");
-                    long endVoting = electionObject.getLong("endVoting");
+                long startVoting = electionObject.getLong("startVoting");
+                long endVoting = electionObject.getLong("endVoting");
 
-                    voteFragment.datePicker.setMinDate(startVoting);
-                    voteFragment.datePicker.setMaxDate(endVoting);
+                voteFragment.datePicker.setMinDate(startVoting);
+                voteFragment.datePicker.setMaxDate(endVoting);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1801,24 +1479,16 @@ public class Network {
     public void getCandidates(final CandidatePositionsFragment candidatePositionsFragment) {
         String url = SERVER_URL + "/candidates/26";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    JSONObject candidateObject = jArray.getJSONObject(0);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                JSONObject candidateObject = jArray.getJSONObject(0);
 
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1829,37 +1499,29 @@ public class Network {
     public void getCandidates(final CandidateAllFragment candidateAllFragment) {
         String url = SERVER_URL + "/candidates/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject candidateObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject candidateObject = jArray.getJSONObject(i);
 
-                        int candidateId = candidateObject.getInt("candidateId");
-                        int ticketId = candidateObject.getInt("ticketId");
-                        int positionId = candidateObject.getInt("positionId");
-                        int userId = candidateObject.getInt("userId");
-                        String familyName = candidateObject.getString("familyName");
-                        String givenName = candidateObject.getString("givenName");
-                        String policyStatement = candidateObject.getString("policyStatement");
-                        String information = candidateObject.getString("information");
+                    int candidateId = candidateObject.getInt("candidateId");
+                    int ticketId = candidateObject.getInt("ticketId");
+                    int positionId = candidateObject.getInt("positionId");
+                    int userId = candidateObject.getInt("userId");
+                    String familyName = candidateObject.getString("familyName");
+                    String givenName = candidateObject.getString("givenName");
+                    String policyStatement = candidateObject.getString("policyStatement");
+                    String information = candidateObject.getString("information");
 
-                        candidateAllFragment.addCandidate(userId, ticketId, positionId, candidateId,
-                                givenName, familyName);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    candidateAllFragment.addCandidate(userId, ticketId, positionId, candidateId,
+                            givenName, familyName);
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1870,37 +1532,29 @@ public class Network {
     public void getCandidatesPosition(final CandidatePositionFragment candidatePositionFragment, final int selectedPositionId) {
         String url = SERVER_URL + "/position/" + String.valueOf(selectedPositionId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject candidateObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject candidateObject = jArray.getJSONObject(i);
 
-                        int candidateId = candidateObject.getInt("candidateId");
-                        int ticketId = candidateObject.getInt("ticketId");
-                        int positionId = candidateObject.getInt("positionId");
-                        int userId = candidateObject.getInt("userId");
-                        String familyName = candidateObject.getString("familyName");
-                        String givenName = candidateObject.getString("givenName");
-                        String policyStatement = candidateObject.getString("policyStatement");
-                        String information = candidateObject.getString("information");
+                    int candidateId = candidateObject.getInt("candidateId");
+                    int ticketId = candidateObject.getInt("ticketId");
+                    int positionId = candidateObject.getInt("positionId");
+                    int userId = candidateObject.getInt("userId");
+                    String familyName = candidateObject.getString("familyName");
+                    String givenName = candidateObject.getString("givenName");
+                    String policyStatement = candidateObject.getString("policyStatement");
+                    String information = candidateObject.getString("information");
 
-                        candidatePositionFragment.addCandidate(userId, ticketId, positionId, candidateId,
-                                givenName, familyName);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    candidatePositionFragment.addCandidate(userId, ticketId, positionId, candidateId,
+                            givenName, familyName);
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1911,25 +1565,17 @@ public class Network {
     public void getTicketLabel(final TextView textView, final int tickedId) {
         String url = SERVER_URL + "/ticket/" + String.valueOf(tickedId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    String colour = response.getString("colour");
-                    String code = response.getString("code");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                String colour = response.getString("colour");
+                String code = response.getString("code");
 
-                    textView.setText(code);
-                    textView.setBackgroundColor(Color.parseColor(colour));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                textView.setText(code);
+                textView.setBackgroundColor(Color.parseColor(colour));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1940,42 +1586,34 @@ public class Network {
     public void getTickets(final CandidateTicketFragment candidateTicketFragment) {
         String url = SERVER_URL + "/tickets/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject ticketObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject ticketObject = jArray.getJSONObject(i);
 
-                        int ticketId = ticketObject.getInt("ticketId");
-                        String name = ticketObject.getString("name");
-                        String numberOfSupporters = ticketObject.getString("numberOfSupporters");
-                        String information = ticketObject.getString("information");
-                        String logo = ticketObject.getString("logo");
-                        String colour;
+                    int ticketId = ticketObject.getInt("ticketId");
+                    String name = ticketObject.getString("name");
+                    String numberOfSupporters = ticketObject.getString("numberOfSupporters");
+                    String information = ticketObject.getString("information");
+                    String logo = ticketObject.getString("logo");
+                    String colour;
 
-                        if(ticketObject.isNull("colour")) {
-                            colour = "#000000";
-                        }
-                        else {
-                            colour = ticketObject.getString("colour");
-                        }
-
-                        candidateTicketFragment.addTicket(ticketId, name, information,
-                                numberOfSupporters, colour, logo, jArray.length());
+                    if(ticketObject.isNull("colour")) {
+                        colour = "#000000";
+                    }
+                    else {
+                        colour = ticketObject.getString("colour");
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    candidateTicketFragment.addTicket(ticketId, name, information,
+                            numberOfSupporters, colour, logo, jArray.length());
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1986,37 +1624,29 @@ public class Network {
     public void getTicketDetail(int ticketId, final CandidateTicketDetailFragment candidateTicketDetailFragment) {
         String url = SERVER_URL + "/ticket/" + String.valueOf(ticketId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject currentObject = jArray.getJSONObject(i);
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject currentObject = jArray.getJSONObject(i);
 
-                        int ticketId = currentObject.getInt("ticketId");
-                        String givenName = currentObject.getString("givenName");
-                        String familyName = currentObject.getString("familyName");
-                        String name = givenName + " " + familyName;
-                        String code = "";
-                        String colour = "#000000";
-                        String information = "";
-                        String logo = "";
+                    int ticketId1 = currentObject.getInt("ticketId");
+                    String givenName = currentObject.getString("givenName");
+                    String familyName = currentObject.getString("familyName");
+                    String name = givenName + " " + familyName;
+                    String code = "";
+                    String colour = "#000000";
+                    String information = "";
+                    String logo = "";
 
-                        candidateTicketDetailFragment.updateInformation(ticketId,
-                                Network.this.electionId, name, code, information, colour);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    candidateTicketDetailFragment.updateInformation(ticketId1,
+                            Network.this.electionId, name, code, information, colour);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2027,41 +1657,33 @@ public class Network {
     public void getTicketCandidates(final CandidateTicketDetailFragment candidateTicketDetailFragment, final int selectedTickedId) {
         String url = SERVER_URL + "/ticket/" + String.valueOf(selectedTickedId) + "/candidates";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject candidateObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject candidateObject = jArray.getJSONObject(i);
 
-                        int candidateId = candidateObject.getInt("candidateId");
-                        int ticketId = candidateObject.getInt("ticketId");
-                        if(selectedTickedId != ticketId) {
-                            continue;
-                        }
-
-                        int positionId = candidateObject.getInt("positionId");
-                        int userId = candidateObject.getInt("userId");
-                        String familyName = candidateObject.getString("familyName");
-                        String givenName = candidateObject.getString("givenName");
-                        String policyStatement = candidateObject.getString("policyStatement");
-                        String information = candidateObject.getString("information");
-
-                        candidateTicketDetailFragment.addCandidate(userId, ticketId, positionId, candidateId,
-                                givenName, familyName);
+                    int candidateId = candidateObject.getInt("candidateId");
+                    int ticketId = candidateObject.getInt("ticketId");
+                    if(selectedTickedId != ticketId) {
+                        continue;
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    int positionId = candidateObject.getInt("positionId");
+                    int userId = candidateObject.getInt("userId");
+                    String familyName = candidateObject.getString("familyName");
+                    String givenName = candidateObject.getString("givenName");
+                    String policyStatement = candidateObject.getString("policyStatement");
+                    String information = candidateObject.getString("information");
+
+                    candidateTicketDetailFragment.addCandidate(userId, ticketId, positionId, candidateId,
+                            givenName, familyName);
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2073,25 +1695,17 @@ public class Network {
         String url = SERVER_URL + "/position/" + String.valueOf(positionId);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String name = response.getString("name");
-                            String description = response.getString("description");
+                response -> {
+                    try {
+                        String name = response.getString("name");
+                        String description = response.getString("description");
 
-                            positionTextView.setText(name);
+                        positionTextView.setText(name);
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2102,33 +1716,25 @@ public class Network {
     public void getPositions(final CandidatePositionsFragment candidatePositionsFragment) {
         String url = SERVER_URL + "/positions/" + String.valueOf(electionId);
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject positionObject = jArray.getJSONObject(i);
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject positionObject = jArray.getJSONObject(i);
 
-                        int electionId = positionObject.optInt("electionId", 0);
-                        int positionId = positionObject.getInt("positionId");
-                        String name = positionObject.getString("name");
-                        String desc = positionObject.getString("description");
+                    int electionId = positionObject.optInt("electionId", 0);
+                    int positionId = positionObject.getInt("positionId");
+                    String name = positionObject.getString("name");
+                    String desc = positionObject.getString("description");
 
-                        candidatePositionsFragment.addPosition(electionId, positionId,
-                                name, desc, jArray.length());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    candidatePositionsFragment.addPosition(electionId, positionId,
+                            name, desc, jArray.length());
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2146,21 +1752,13 @@ public class Network {
         params.put("electionId", String.valueOf(Network.this.electionId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2175,37 +1773,29 @@ public class Network {
         String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminders/";
         HashMap<String, String> params = new HashMap<>();
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray foundObjects = response.getJSONArray("foundObjects");
-                    for(int i=0; i<foundObjects.length(); i++) {
-                        JSONObject voteReminder = foundObjects.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray foundObjects = response.getJSONArray("foundObjects");
+                for(int i=0; i<foundObjects.length(); i++) {
+                    JSONObject voteReminder = foundObjects.getJSONObject(i);
 
-                        int voteElectionId = voteReminder.getInt("electionId");
-                        long timestamp = voteReminder.getLong("timestamp");
-                        String userEmail = voteReminder.getString("userEmail");
-                        String location = voteReminder.getString("location");
-                        long date = voteReminder.getLong("date");
+                    int voteElectionId = voteReminder.getInt("electionId");
+                    long timestamp = voteReminder.getLong("timestamp");
+                    String userEmail = voteReminder.getString("userEmail");
+                    String location = voteReminder.getString("location");
+                    long date = voteReminder.getLong("date");
 
-                        if(voteElectionId == electionId) {
-                            reminderSet = true;
-                            voteReminderLocation = location;
-                            voteReminderDate = date;
-                        }
+                    if(voteElectionId == electionId) {
+                        reminderSet = true;
+                        voteReminderLocation = location;
+                        voteReminderDate = date;
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2220,23 +1810,15 @@ public class Network {
         userTickets.add(ticketId);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2252,23 +1834,15 @@ public class Network {
         userTickets.remove(Integer.valueOf(ticketId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2282,25 +1856,17 @@ public class Network {
         String url = String.format("%s/photo/%s/likedBy/%s/", SERVER_URL, String.valueOf(photoViewFragment.getPhotoPath()),
                 String.valueOf(loggedInUser.getEmail()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    boolean success = response.getBoolean("success");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.GET, url, null, response -> {
+            try {
+                boolean success = response.getBoolean("success");
 
-                    if(success) {
-                        photoViewFragment.initiallyLiked();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(success) {
+                    photoViewFragment.initiallyLiked();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2315,23 +1881,15 @@ public class Network {
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2347,23 +1905,15 @@ public class Network {
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2379,23 +1929,15 @@ public class Network {
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2410,23 +1952,15 @@ public class Network {
         HashMap<String, String> params = new HashMap<>();
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            //If we land in here the vote was submitted successfully
-                            String test = "";
+                response -> {
+                    try {
+                        //If we land in here the vote was submitted successfully
+                        String test = "";
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2438,31 +1972,23 @@ public class Network {
     public void getTasks(final ProfileFragment profileFragment) {
         String url = SERVER_URL + "/tasks/";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject taskObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject taskObject = jArray.getJSONObject(i);
 
-                        long taskId = taskObject.getLong("taskId");
-                        String action = taskObject.getString("action");
-                        long xpValue = taskObject.getLong("xpValue");
+                    long taskId = taskObject.getLong("taskId");
+                    String action = taskObject.getString("action");
+                    long xpValue = taskObject.getLong("xpValue");
 
-                        profileFragment.addTask(taskId, action, xpValue);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    profileFragment.addTask(taskId, action, xpValue);
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2473,32 +1999,24 @@ public class Network {
     void getTasks(final ContactProfileFragment contactProfileFragment) {
         String url = SERVER_URL + "/tasks/complete";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jArray = response.getJSONArray("foundObjects");
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                JSONArray jArray = response.getJSONArray("foundObjects");
 
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject taskObject = jArray.getJSONObject(i);
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject taskObject = jArray.getJSONObject(i);
 
-                        long taskId = taskObject.getLong("taskId");
-                        String action = taskObject.getString("action");
-                        long xpValue = taskObject.getLong("xpValue");
+                    long taskId = taskObject.getLong("taskId");
+                    String action = taskObject.getString("action");
+                    long xpValue = taskObject.getLong("xpValue");
 
-                        contactProfileFragment.addTask(taskId, action, xpValue);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    contactProfileFragment.addTask(taskId, action, xpValue);
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2510,34 +2028,26 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = SERVER_URL + "/tasks/complete/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    long totalXp = 0;
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject taskObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                long totalXp = 0;
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject taskObject = jArray.getJSONObject(i);
 
-                        long taskId = taskObject.getLong("taskId");
-                        String action = taskObject.getString("action");
-                        long xpValue = taskObject.getLong("xpValue");
+                    long taskId = taskObject.getLong("taskId");
+                    String action = taskObject.getString("action");
+                    long xpValue = taskObject.getLong("xpValue");
 
-                        totalXp = totalXp + xpValue;
-                        taskDetailProgressFragment.addCompletedTask(taskId, action, xpValue);
-                    }
-
-                    taskDetailProgressFragment.setLevel(totalXp);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    totalXp = totalXp + xpValue;
+                    taskDetailProgressFragment.addCompletedTask(taskId, action, xpValue);
                 }
+
+                taskDetailProgressFragment.setLevel(totalXp);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2548,34 +2058,26 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = SERVER_URL + "/tasks/remaining/"+String.valueOf(loggedInUser.getId()) + "?pageSize=20";
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    long totalXp = 0;
-                    JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject taskObject = jArray.getJSONObject(i);
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
+            try {
+                long totalXp = 0;
+                JSONArray jArray = response.getJSONArray("foundObjects");
+                for(int i=0; i<jArray.length(); i++) {
+                    JSONObject taskObject = jArray.getJSONObject(i);
 
-                        long taskId = taskObject.getLong("taskId");
-                        String action = taskObject.getString("action");
-                        long xpValue = taskObject.getLong("xpValue");
+                    long taskId = taskObject.getLong("taskId");
+                    String action = taskObject.getString("action");
+                    long xpValue = taskObject.getLong("xpValue");
 
-                        totalXp = totalXp + xpValue;
-                        taskDetailProgressFragment.addRemainingTask(taskId, action, xpValue);
-                    }
-
-                    taskDetailProgressFragment.setLevel(totalXp);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    totalXp = totalXp + xpValue;
+                    taskDetailProgressFragment.addRemainingTask(taskId, action, xpValue);
                 }
+
+                taskDetailProgressFragment.setLevel(totalXp);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+        }, error -> Log.d("Volley", error.toString()));
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2583,16 +2085,14 @@ public class Network {
     }
 
 	public void likeNewsArticle(final NewsArticleFragment newsArticleFragment) {
-		Runnable r = new Runnable() {
-			public void run() {
-				try {
-					String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + getLoggedInUser().getEmail() + "/");
+		Runnable r = () -> {
+            try {
+                String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + getLoggedInUser().getEmail() + "/");
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
 
 		Thread t = new Thread(r);
 		t.start();
@@ -2662,17 +2162,10 @@ public class Network {
 
 	public void getPicture(final String url, @NonNull final PictureDownloadListener callback) {
         ImageRequest req = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        callback.onDownloadFinished(url, bitmap);
-                    }
-                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                        callback.onDownloadFailed(url, error);
-                    }
+                bitmap -> callback.onDownloadFinished(url, bitmap), 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
+                error -> {
+                    Log.d("Volley", error.toString());
+                    callback.onDownloadFailed(url, error);
                 });
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2684,35 +2177,27 @@ public class Network {
         String url = String.format("%s/photos/%s/", SERVER_URL, String.valueOf(positionId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray photos = response.getJSONArray("photos");
+                response -> {
+                    try {
+                        JSONArray photos = response.getJSONArray("photos");
 
-                            int index=0;
-                            for(int i=0; i<photos.length(); i++) {
-                                JSONObject currentObject = photos.getJSONObject(i);
-                                String currentSeq = currentObject.getString("sequence");
+                        int index=0;
+                        for(int i=0; i<photos.length(); i++) {
+                            JSONObject currentObject = photos.getJSONObject(i);
+                            String currentSeq = currentObject.getString("sequence");
 
-                                if(currentSeq.equals("0")) {
-                                    index = i;
-                                    break;
-                                }
+                            if(currentSeq.equals("0")) {
+                                index = i;
+                                break;
                             }
-
-                            String url = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
-                            getFirstPhotoImage(url, imageView);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
+
+                        String url1 = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
+                        getFirstPhotoImage(url1, imageView);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2725,23 +2210,15 @@ public class Network {
         String url = String.format("%s/photos/%s/", SERVER_URL, String.valueOf(loggedInUser.getEmail()));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            userDPId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
-                            String url = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
+                response -> {
+                    try {
+                        userDPId = (response.getJSONArray("photos").getJSONObject(0).getInt("nodeId"));
+                        String url1 = (response.getJSONArray("photos").getJSONObject(0).getString("url"));
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2751,18 +2228,11 @@ public class Network {
 
     private void getFirstPhotoImage(String url, final ImageView view) {
         ImageRequest req = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        view.setImageBitmap(bitmap);
-                        view.refreshDrawableState();
-                    }
+                bitmap -> {
+                    view.setImageBitmap(bitmap);
+                    view.refreshDrawableState();
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                    }
-                }) {
+                error -> Log.d("Volley", error.toString())) {
         };
 
         
@@ -2775,35 +2245,27 @@ public class Network {
         String url = SERVER_URL + "/photos/" + String.valueOf(positionId) + "/";
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray photos = response.getJSONArray("photos");
+                response -> {
+                    try {
+                        JSONArray photos = response.getJSONArray("photos");
 
-                            int index=0;
-                            for(int i=0; i<photos.length(); i++) {
-                                JSONObject currentObject = photos.getJSONObject(i);
-                                String currentSeq = currentObject.getString("sequence");
+                        int index=0;
+                        for(int i=0; i<photos.length(); i++) {
+                            JSONObject currentObject = photos.getJSONObject(i);
+                            String currentSeq = currentObject.getString("sequence");
 
-                                if(currentSeq.equals("0")) {
-                                    index = i;
-                                    break;
-                                }
+                            if(currentSeq.equals("0")) {
+                                index = i;
+                                break;
                             }
-
-                            String url = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
-                            getFirstPhotoImageBlur(url, imageView);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
+
+                        String url1 = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
+                        getFirstPhotoImageBlur(url1, imageView);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2813,24 +2275,16 @@ public class Network {
 
     private void getFirstPhotoImageBlur(String url, final LinearLayout view) {
         ImageRequest req = new ImageRequest(url,
-                new Response.Listener<Bitmap>() {
-                    @SuppressWarnings("deprecation")
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
-                                Utils.fastBlur(bitmap, 25));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            view.setBackground(d);
-                        } else {
-                            view.setBackgroundDrawable(d);
-                        }
+                bitmap -> {
+                    Drawable d = new BitmapDrawable(application.getMainActivity().getResources(),
+                            Utils.fastBlur(bitmap, 25));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        view.setBackground(d);
+                    } else {
+                        view.setBackgroundDrawable(d);
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                    }
-                });
+                error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2838,21 +2292,11 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getPictureVolley(String params, final ImageView view) {
+    public void getPictureVolley(String params, final ImageView imageView) {
         if (params == null) return;
 
-        ImageRequest req = new ImageRequest(params,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap bitmap) {
-                        view.setImageBitmap(bitmap);
-                    }
-                }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                    }
-                });
+        ImageRequest req = new ImageRequest(params, imageView::setImageBitmap
+                , 0, 0, ImageView.ScaleType.CENTER_INSIDE, null, volleyError -> Log.d("Volley", volleyError.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2862,18 +2306,11 @@ public class Network {
 
     public void getPictureVolley2(String params, final ImageView view, final int squareSize, final PhotoViewFragment fragment) {
         ImageRequest req = new ImageRequest(params,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap srcBmp) {
-                        view.setImageBitmap(srcBmp);
-                        fragment.setImageBitmap(srcBmp);
-                    }
+                srcBmp -> {
+                    view.setImageBitmap(srcBmp);
+                    fragment.setImageBitmap(srcBmp);
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Volley", error.toString());
-                    }
-                });
+                error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -2967,21 +2404,13 @@ public class Network {
         params.put("sequence", String.valueOf("0"));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String result = response.toString();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        String result = response.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -3000,21 +2429,13 @@ public class Network {
         params.put("optOutDataCollection", String.valueOf(loggedInUser.isOptedOutOfDataCollection()));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String responseString = response.toString();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                response -> {
+                    try {
+                        String responseString = response.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("Volley", error.toString());
-            }
-        });
+                }, error -> Log.d("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);

@@ -2,15 +2,12 @@ package com.eulersbridge.isegoria;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -48,7 +45,7 @@ public class FindAddContactFragment extends Fragment {
     private MainActivity mainActivity;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
@@ -96,15 +93,12 @@ public class FindAddContactFragment extends Fragment {
         LinearLayout searchEditFrame = searchView.findViewById(R.id.search_edit_frame);
         ((LinearLayout.LayoutParams) searchEditFrame.getLayoutParams()).leftMargin = 0;
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                mainActivity.setToolbarShowsTitle(!hasFocus);
+        searchView.setOnQueryTextFocusChangeListener((view, hasFocus) -> {
+            mainActivity.setToolbarShowsTitle(!hasFocus);
 
-                if (!hasFocus) {
-                    clearSearchResults();
-                    hideSearchResultsSection();
-                }
+            if (!hasFocus) {
+                clearSearchResults();
+                hideSearchResultsSection();
             }
         });
 
@@ -205,22 +199,19 @@ public class FindAddContactFragment extends Fragment {
         viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
         viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
         viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        viewProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
+        viewProfileImage.setOnClickListener(view -> {
+            viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
 
-                ContactProfileFragment profileFragment = new ContactProfileFragment();
+            ContactProfileFragment profileFragment = new ContactProfileFragment();
 
-                Bundle args = new Bundle();
-                args.putParcelable("profile", user);
-                profileFragment.setArguments(args);
+            Bundle args = new Bundle();
+            args.putParcelable("profile", user);
+            profileFragment.setArguments(args);
 
-                getFragmentManager().beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.container, profileFragment)
-                        .commit();
-            }
+            getFragmentManager().beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.container, profileFragment)
+                    .commit();
         });
 
         final ImageView candidateProfileImage = new ImageView(getActivity());
@@ -228,21 +219,18 @@ public class FindAddContactFragment extends Fragment {
         candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        candidateProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               // candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-                /*FragmentManager fragmentManager2 = getFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
-                Bundle args = new Bundle();
-                //args.putInt("ProfileId", userId);
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();*/
-                network.addFriend(user.getEmail(), FindAddContactFragment.this);
-            }
+        candidateProfileImage.setOnClickListener(view -> {
+           // candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
+            /*FragmentManager fragmentManager2 = getFragmentManager();
+            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+            ContactProfileFragment fragment2 = new ContactProfileFragment();
+            Bundle args = new Bundle();
+            //args.putInt("ProfileId", userId);
+            fragment2.setArguments(args);
+            fragmentTransaction2.addToBackStack(null);
+            fragmentTransaction2.replace(android.R.id.content, fragment2);
+            fragmentTransaction2.commit();*/
+            network.addFriend(user.getEmail(), FindAddContactFragment.this);
         });
 
         final ImageView acceptImage = new ImageView(getActivity());
@@ -250,23 +238,20 @@ public class FindAddContactFragment extends Fragment {
         acceptImage.setScaleType(ScaleType.CENTER_CROP);
         acceptImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        acceptImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-                /*FragmentManager fragmentManager2 = getFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
-                Bundle args = new Bundle();
-                //args.putInt("ProfileId", userId);
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();*/
-                tr.setVisibility(ViewGroup.GONE);
-                FindAddContactFragment.this.addTableRow(friendsAllTableLayout, user, contactRequestId, 2);
-                network.acceptContact(String.valueOf(user.getId()), FindAddContactFragment.this);
-            }
+        acceptImage.setOnClickListener(view -> {
+            //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
+            /*FragmentManager fragmentManager2 = getFragmentManager();
+            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+            ContactProfileFragment fragment2 = new ContactProfileFragment();
+            Bundle args = new Bundle();
+            //args.putInt("ProfileId", userId);
+            fragment2.setArguments(args);
+            fragmentTransaction2.addToBackStack(null);
+            fragmentTransaction2.replace(android.R.id.content, fragment2);
+            fragmentTransaction2.commit();*/
+            tr.setVisibility(ViewGroup.GONE);
+            FindAddContactFragment.this.addTableRow(friendsAllTableLayout, user, contactRequestId, 2);
+            network.acceptContact(String.valueOf(user.getId()), FindAddContactFragment.this);
         });
 
         final ImageView denyImage = new ImageView(getActivity());
@@ -274,22 +259,19 @@ public class FindAddContactFragment extends Fragment {
         denyImage.setScaleType(ScaleType.CENTER_CROP);
         denyImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
         denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        denyImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-                /*FragmentManager fragmentManager2 = getFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
-                Bundle args = new Bundle();
-                //args.putInt("ProfileId", userId);
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();*/
-                tr.setVisibility(ViewGroup.GONE);
-                network.denyContact(String.valueOf(user.getId()), FindAddContactFragment.this);
-            }
+        denyImage.setOnClickListener(view -> {
+            //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
+            /*FragmentManager fragmentManager2 = getFragmentManager();
+            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+            ContactProfileFragment fragment2 = new ContactProfileFragment();
+            Bundle args = new Bundle();
+            //args.putInt("ProfileId", userId);
+            fragment2.setArguments(args);
+            fragmentTransaction2.addToBackStack(null);
+            fragmentTransaction2.replace(android.R.id.content, fragment2);
+            fragmentTransaction2.commit();*/
+            tr.setVisibility(ViewGroup.GONE);
+            network.denyContact(String.valueOf(user.getId()), FindAddContactFragment.this);
         });
 
         TextView textViewCandidate = new TextView(getActivity());

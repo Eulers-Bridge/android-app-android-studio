@@ -22,7 +22,7 @@ public class SliderBarPoint {
         return y;
     }
 
-    public String getAnswer() {
+    String getAnswer() {
         return answer;
     }
 }

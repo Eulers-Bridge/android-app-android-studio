@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -22,7 +23,7 @@ public class PhotoViewPagerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photo_view_pager_fragment, container, false);
 
         FragmentManager fm = getActivity().getSupportFragmentManager();

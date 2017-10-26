@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +43,7 @@ public class PhotoAlbumFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
 		getActivity().setTitle(getString(R.string.app_name));
 		Bundle bundle = this.getArguments();
@@ -117,20 +118,17 @@ public class PhotoAlbumFragment extends Fragment {
             final int index = photoViewPagerFragment.addFragment(fragment2);
             network.getPictureVolley2(bitmap, view, squareSize, fragment2);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    PhotoViewFragment fragment2 = new PhotoViewFragment();
-                    Bundle args = new Bundle();
-                    args.putString("PhotoName", String.valueOf(photoPath));
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);
-                    photoViewPagerFragment.setPosition(index);
-                    fragmentTransaction2.commit();
-                }
+            view.setOnClickListener(view1 -> {
+                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+                PhotoViewFragment fragment21 = new PhotoViewFragment();
+                Bundle args1 = new Bundle();
+                args1.putString("PhotoName", String.valueOf(photoPath));
+                fragment21.setArguments(args1);
+                fragmentTransaction2.addToBackStack(null);
+                fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);
+                photoViewPagerFragment.setPosition(index);
+                fragmentTransaction2.commit();
             });
 
 

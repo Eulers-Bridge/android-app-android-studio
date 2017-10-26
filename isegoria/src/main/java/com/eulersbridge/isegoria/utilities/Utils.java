@@ -5,8 +5,15 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import java.io.InputStream;
@@ -22,8 +29,14 @@ public final class Utils {
         if (currentFocus != null) {
 
             final InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+            if (inputMethodManager != null) {
+                inputMethodManager.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+            }
         }
+    }
+
+    public static void showKeyboard(Window window) {
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
@@ -94,6 +107,18 @@ public final class Utils {
         canvas.drawBitmap(source, null, targetRect, null);
 
         return dest;
+    }
+
+    public static Bitmap tintBitmap(Bitmap bitmap, @ColorInt int color) {
+        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Paint paint = new Paint();
+        paint.setColorFilter(new PorterDuffColorFilter(Color.argb(127, 0,0,0), PorterDuff.Mode.SRC_ATOP));
+
+        Canvas canvas = new Canvas(resultBitmap);
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+
+        return resultBitmap;
     }
 
     public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {
