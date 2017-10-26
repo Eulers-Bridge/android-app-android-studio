@@ -54,6 +54,14 @@ public class PollFragment extends Fragment {
 
         setupViewPager(rootView);
         setupTabLayout();
+
+        rootView.findViewById(R.id.voteButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PollVoteFragment fragment = (PollVoteFragment)fragments.get(viewPager.getCurrentItem());
+                fragment.postVote();
+            }
+        });
 		
 		return rootView;
 	}

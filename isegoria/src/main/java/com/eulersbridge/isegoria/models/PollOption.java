@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.models;
 
+import android.support.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,7 +13,7 @@ public class PollOption {
 
     private long id;
     private String text;
-    private String photoUrl;
+    private @Nullable String photoUrl;
 
     private long votersCount;
     private boolean hasVoted;
@@ -42,6 +44,7 @@ public class PollOption {
         return text;
     }
 
+    @Nullable
     public String getPhotoUrl() {
         return photoUrl;
     }

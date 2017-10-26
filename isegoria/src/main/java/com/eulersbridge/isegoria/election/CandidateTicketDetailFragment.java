@@ -88,7 +88,7 @@ public class CandidateTicketDetailFragment extends Fragment {
         network.getTicketDetail(ticketId, candidateTicketDetailFragment);
 
         ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
-        network.getFirstPhoto(0, ticketId, partyDetailLogo);
+        network.getFirstPhoto(ticketId, partyDetailLogo);
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
@@ -159,7 +159,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-        network.getFirstPhoto(0, userId, candidateProfileView);
+        network.getFirstPhoto(userId, candidateProfileView);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 

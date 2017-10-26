@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -20,6 +20,9 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 

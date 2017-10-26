@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -34,6 +34,11 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
+import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 import com.eulersbridge.isegoria.utilities.Utils;
@@ -200,7 +205,7 @@ public class EventsDetailFragment extends Fragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
         candidateProfileView.setLayoutParams(layoutParams);
         candidateProfileView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        network.getFirstPhoto(0, userId, candidateProfileView);
+        network.getFirstPhoto(userId, candidateProfileView);
         candidateProfileView.setPadding(10, 0, 10, 0);
 
         ImageView candidateProfileImage = new ImageView(getActivity());

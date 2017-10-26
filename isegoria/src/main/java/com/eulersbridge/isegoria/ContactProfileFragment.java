@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
 
 /**
@@ -40,7 +41,7 @@ public class ContactProfileFragment extends Fragment {
         //TODO: Hide tab layout
 
         Bundle bundle = this.getArguments();
-        int profileId = bundle.getInt("ProfileId");
+        User user = bundle.getParcelable("profile");
 
         friendsNumTextView = rootView.findViewById(R.id.contactFriendsNum);
         groupNumTextView = rootView.findViewById(R.id.contactsGroupNum);
@@ -60,10 +61,10 @@ public class ContactProfileFragment extends Fragment {
         //network.getUserFullName(profileId, name, "");
 
         LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-        network.getUserDP(profileId, photoImageView, backgroundLinearLayout);
+        network.getUserDP(Integer.valueOf(user.getId()), photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
-        network.getDashboardStats(this, profileId);
+        network.getDashboardStats(this, Integer.valueOf(user.getId()));
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
@@ -136,7 +137,7 @@ public class ContactProfileFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
+        network.getFirstPhoto((int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);

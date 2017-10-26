@@ -124,7 +124,7 @@ public class CandidatePositionsFragment extends Fragment {
 			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(this.lastElectionId, this.lastPositionId, view);
+            network.getFirstPhoto(this.lastPositionId, view);
 	        view.setOnClickListener(new View.OnClickListener() {        
 	            @Override
 	            public void onClick(View view) {
@@ -169,7 +169,7 @@ public class CandidatePositionsFragment extends Fragment {
             view2.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(electionId, positionId, view2);
+            network.getFirstPhoto(positionId, view2);
             view2.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -272,7 +272,7 @@ public class CandidatePositionsFragment extends Fragment {
             view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(this.lastElectionId, this.lastPositionId, view);
+            network.getFirstPhoto(this.lastPositionId, view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

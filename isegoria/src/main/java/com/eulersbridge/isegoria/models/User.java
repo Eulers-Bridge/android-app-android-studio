@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,7 +11,7 @@ public class User implements Parcelable {
 
     private String password;
 
-    private String id;
+    private @Nullable String id;
 
     private String email;
     private String givenName;
@@ -35,7 +36,7 @@ public class User implements Parcelable {
 
     private long institutionId;
 
-    private String profilePhotoURL;
+    private @Nullable String profilePhotoURL;
 
     public User(JSONObject jsonObject) {
         try {
@@ -60,7 +61,7 @@ public class User implements Parcelable {
             experience = jsonObject.getLong("experience");
             level = jsonObject.getLong("level");
 
-            institutionId = jsonObject.getLong("institutionId");
+            institutionId = jsonObject.optLong("institutionId");
 
             if (jsonObject.has("profilePhoto") && !jsonObject.isNull("profilePhoto")) {
                 profilePhotoURL = jsonObject.getString("profilePhoto");
@@ -148,6 +149,7 @@ public class User implements Parcelable {
         this.id = id;
     }
 
+    @Nullable
     public String getId() {
         return id;
     }
@@ -180,6 +182,7 @@ public class User implements Parcelable {
         return institutionId;
     }
 
+    @Nullable
     public String getProfilePhotoURL() {
         return profilePhotoURL;
     }

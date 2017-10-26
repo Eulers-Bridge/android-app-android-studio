@@ -170,7 +170,7 @@ public class CandidateAllFragment extends Fragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
         candidateProfileView.setLayoutParams(layoutParams);
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-        network.getFirstPhoto(0, userId, candidateProfileView);
+        network.getFirstPhoto(userId, candidateProfileView);
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());

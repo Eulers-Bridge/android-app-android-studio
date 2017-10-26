@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -56,7 +57,7 @@ public class PollVoteFragment extends Fragment {
     private final ArrayList<TextView> pollResults = new ArrayList<>();
     private final ArrayList<ProgressBar> progressBars = new ArrayList<>();
 
-    private int pixelWidth = 0;
+    private int pixelWidth;
 
 	public PollVoteFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -136,6 +137,10 @@ public class PollVoteFragment extends Fragment {
                 public void onDownloadFailed(String url, VolleyError error) { }
             });
         }
+    }
+
+    void postVote() {
+        network.answerPoll(nodeId, -1, this);
     }
 
     @UiThread
@@ -271,7 +276,7 @@ public class PollVoteFragment extends Fragment {
         pollTableLayout.addView(tr);
 	}
 	
-	private void createProgressBar(String color, PollOption option) {
+	private void createProgressBar(String color, final PollOption option) {
 		TableRow tr = new TableRow(getActivity());
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float)  6.666666667, getResources().getDisplayMetrics());
@@ -346,24 +351,20 @@ public class PollVoteFragment extends Fragment {
 		ImageView tickImageView = new ImageView(getActivity());
         tickImageView.setLayoutParams(new TableRow.LayoutParams(tickImageSize, tickImageSize));
         tickImageView.setScaleType(ScaleType.CENTER_INSIDE);
-        tickImageView.setImageResource(R.drawable.tickempty);
+        tickImageView.setImageResource(option.hasVoted()? R.drawable.tickgreen : R.drawable.tickempty);
+
         tickBoxes.add(tickImageView);
 
         tickImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int answerIndex = 0;
-                for(int i=0; i<tickBoxes.size(); i++) {
+                for (int i=0; i < tickBoxes.size(); i++) {
                     tickBoxes.get(i).setImageResource(R.drawable.tickempty);
-
-                    if(tickBoxes.get(i) == view) {
-                        answerIndex = i;
-                    }
                 }
                 ((ImageView) view).setImageResource(R.drawable.tickgreen);
 
                 PollVoteFragment self = PollVoteFragment.this;
-                self.network.answerPoll(nodeId, answerIndex, self);
+                self.network.answerPoll(nodeId, (int)option.getId(), self);
             }
         });
 		

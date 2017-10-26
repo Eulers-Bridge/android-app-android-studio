@@ -128,7 +128,7 @@ public class ProfileBadgesFragment extends Fragment {
             view.setLayoutParams(layoutParams);
             view.setScaleType(ScaleType.FIT_XY);
             //view.setBackgroundColor(Color.GRAY);
-            network.getFirstPhoto(badgeId, badgeId, view);
+            network.getFirstPhoto(badgeId, view);
 
             viewLinearLayout.setPadding(0, 0, 0, paddingMargin);
             viewLinearLayout.addView(view);

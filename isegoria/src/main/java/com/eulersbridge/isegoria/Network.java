@@ -37,6 +37,7 @@ import com.eulersbridge.isegoria.election.CandidatePositionsFragment;
 import com.eulersbridge.isegoria.election.CandidateTicketDetailFragment;
 import com.eulersbridge.isegoria.election.CandidateTicketFragment;
 import com.eulersbridge.isegoria.election.ElectionOverviewFragment;
+import com.eulersbridge.isegoria.feed.EventsDetailFragment;
 import com.eulersbridge.isegoria.feed.NewsArticleFragment;
 import com.eulersbridge.isegoria.feed.NewsFragment;
 import com.eulersbridge.isegoria.feed.PhotoAlbumFragment;
@@ -88,7 +89,6 @@ public class Network {
     private String password;
     private String base64EncodedCredentials;
 
-    private FindAddContactFragment findAddContactFragment;
 	private final Isegoria application;
     private boolean reminderSet = false;
 
@@ -111,6 +111,9 @@ public class Network {
 
         AuthorisedJsonObjectRequest.username = username;
         AuthorisedJsonObjectRequest.password = password;
+
+        AuthorisedJsonArrayRequest.username = username;
+        AuthorisedJsonArrayRequest.password = password;
 
         String formattedCredentials = String.format("%s:%s",username,password);
         base64EncodedCredentials = Base64.encodeToString(formattedCredentials.getBytes(),
@@ -492,36 +495,34 @@ public class Network {
 
     public void getUserDP(ImageView imageView, LinearLayout backgroundLinearLayout) {
         User loggedInUser = getLoggedInUser();
-        this.getFirstPhoto(0, Integer.valueOf(loggedInUser.getId()), imageView);
+        this.getFirstPhoto(Integer.valueOf(loggedInUser.getId()), imageView);
         this.getFirstPhotoBlur(0, Integer.valueOf(loggedInUser.getId()), backgroundLinearLayout);
     }
 
     void getUserDP(int profileId, ImageView imageView, LinearLayout backgroundLinearLayout) {
-        this.getFirstPhoto(0, profileId, imageView);
+        this.getFirstPhoto(profileId, imageView);
         this.getFirstPhotoBlur(0, profileId, backgroundLinearLayout);
     }
 
-    void findFriends(final FindAddContactFragment findAddContactFragment) {
-        this.findAddContactFragment = findAddContactFragment;
-
+    void getFriends(final FindAddContactFragment findAddContactFragment) {
         User loggedInUser = getLoggedInUser();
-        String url = String.format("%s/user/%s/contactRequests", SERVER_URL, String.valueOf(loggedInUser.getId()));
+        String url = String.format("%s/contacts", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     JSONArray jArray = response.getJSONArray("foundObjects");
-                    for(int i=0; i<jArray.length(); i++) {
-                        try {
-                            JSONObject resp = jArray.getJSONObject(i);
 
-                            int userId = resp.getInt("userId");
-                            boolean acceptedBoolean = resp.optBoolean("accepted", false);
-                            if(acceptedBoolean) {
-                                String contactDetails = resp.getString("contactDetails");
-                                Network.this.findContactFriend(String.valueOf(userId), findAddContactFragment);
-                            }
+                    Log.d("Isegoria", "" + jArray.toString());
+
+                    for(int i = 0; i < jArray.length(); i++) {
+                        try {
+                            JSONObject userObject = jArray.getJSONObject(i);
+
+                            User user = new User(userObject);
+                            findAddContactFragment.addFriend(user);
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -579,22 +580,27 @@ public class Network {
     }
 
 	void findContacts(String query, final FindAddContactFragment findAddContactFragment) {
-        this.findAddContactFragment = findAddContactFragment;
-        this.findAddContactFragment.clearSearchResults();
-        String url = String.format("%s/contact/%s/", SERVER_URL, String.valueOf(query));
+        findAddContactFragment.clearSearchResults();
+        String url = String.format("%s/searchUserProfile/%s/", SERVER_URL, String.valueOf(query));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+        AuthorisedJsonArrayRequest req = new AuthorisedJsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(JSONArray jsonArray) {
                 try {
-                    User user = new User(response);
-                    findAddContactFragment.addUser(user);
+                    ArrayList<User> usersFound = new ArrayList<>();
 
-                } catch (Exception e) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject userObject = jsonArray.getJSONObject(i);
+                        User user = new User(userObject);
+                        usersFound.add(user);
+                    }
+
+                    findAddContactFragment.addUsers(usersFound);
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-                }, new Response.ErrorListener() {
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("Volley", error.toString());
@@ -745,7 +751,6 @@ public class Network {
     }
 
     private void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
-        this.findAddContactFragment = findAddContactFragment;
         String url = String.format("%s/user/%s/", SERVER_URL, String.valueOf(query));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, new Response.Listener<JSONObject>() {
@@ -780,9 +785,7 @@ public class Network {
         User loggedInUser = getLoggedInUser();
         String url = String.format("%s/user/%s/contactRequest/%s/", SERVER_URL, String.valueOf(loggedInUser.getId()), String.valueOf(email));
 
-        HashMap<String, Integer> params = new HashMap<>();
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.POST, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -838,7 +841,6 @@ public class Network {
     }
 
     void denyContact(String requestId, final FindAddContactFragment findAddContactFragment) {
-        this.findAddContactFragment = findAddContactFragment;
         String url = String.format("%s/user/contactRequest/%s/reject", SERVER_URL, String.valueOf(requestId));
 
         HashMap<String, Integer> params = new HashMap<>();
@@ -951,12 +953,13 @@ public class Network {
 
     public void addVoteReminder(String location, long date) {
         User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/voteReminder";
+        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getEmail()) + "/voteReminder";
 
         HashMap<String, String> params = new HashMap<>();
+        params.put("userEmail", String.valueOf(loggedInUser.getEmail()));
+        params.put("electionId", String.valueOf(electionId));
         params.put("location", location);
         params.put("date", String.valueOf(date));
-        params.put("electionId", String.valueOf(electionId));
 
         setVoteReminderDate(date);
         setVoteReminderLocation(location);
@@ -986,12 +989,12 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    interface FetchEventsListener {
+    public interface FetchEventsListener {
         void onFetchSuccess(ArrayList<Event> events);
         void onFetchFailure(VolleyError error);
     }
 
-	void getEvents(final FetchEventsListener callback) {
+	public void getEvents(final FetchEventsListener callback) {
         String url = String.format("%s/events/26/", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
@@ -1571,15 +1574,9 @@ public class Network {
     }
 
     public void answerPoll(int pollId, int answerIndex, final PollVoteFragment pollVoteFragment) {
-        User loggedInUser = getLoggedInUser();
         String url = String.format("%s/poll/%s/vote/%s", SERVER_URL, String.valueOf(pollId), String.valueOf(answerIndex));
 
-        HashMap<String, Integer> params = new HashMap<>();
-        params.put("answerIndex", answerIndex);
-        params.put("answererId", Integer.valueOf(loggedInUser.getId()));
-        params.put("pollId", pollId);
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -2683,7 +2680,7 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void getFirstPhoto(int electionId, final int positionId, final ImageView imageView) {
+    public void getFirstPhoto(final int positionId, final ImageView imageView) {
         String url = String.format("%s/photos/%s/", SERVER_URL, String.valueOf(positionId));
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,

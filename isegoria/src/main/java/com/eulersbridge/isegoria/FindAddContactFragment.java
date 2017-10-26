@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -30,6 +31,8 @@ import android.widget.Toast;
 
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import java.util.ArrayList;
 
 public class FindAddContactFragment extends Fragment {
     private View rootView;
@@ -67,7 +70,7 @@ public class FindAddContactFragment extends Fragment {
         mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
 
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.findFriends(this);
+        network.getFriends(this);
         network.getFriendRequestsSent(this);
         network.getFriendRequestsReceived(this);
 
@@ -82,7 +85,7 @@ public class FindAddContactFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.search);
 
         SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
 
         // Set max width, remove left padding to assist in getting search view text aligned
         // with where Toolbar title previously was
@@ -108,7 +111,7 @@ public class FindAddContactFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(query).matches()) {
+                if (query.length() > 2) {
                     network.findContacts(query, FindAddContactFragment.this);
                     return true;
                 }
@@ -117,7 +120,7 @@ public class FindAddContactFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() != 0 && Patterns.EMAIL_ADDRESS.matcher(newText).matches()) {
+                if (newText.length() > 2) {
                     network.findContacts(newText, FindAddContactFragment.this);
                     return true;
                 }
@@ -140,11 +143,15 @@ public class FindAddContactFragment extends Fragment {
         searchResultsLinearLayout.setVisibility(ViewGroup.GONE);
     }
 
-    public void addUser(User user) {
-        addTableRow(usersAllTableLayout, user, null, 1);
+    public void addUsers(ArrayList<User> users) {
+        clearSearchResults();
 
-        LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
-        searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
+        for (User user : users) {
+            addTableRow(usersAllTableLayout, user, null, 1);
+
+            LinearLayout searchResultsLinearLayout = rootView.findViewById(R.id.searchResultsLinearLayout);
+            searchResultsLinearLayout.setVisibility(ViewGroup.VISIBLE);
+        }
     }
 
     public void addFriend(User user) {
@@ -202,15 +209,17 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
-                FragmentManager fragmentManager2 = getFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                ContactProfileFragment fragment2 = new ContactProfileFragment();
+
+                ContactProfileFragment profileFragment = new ContactProfileFragment();
+
                 Bundle args = new Bundle();
-                args.putInt("ProfileId", Integer.valueOf(user.getId()));
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.replace(android.R.id.content, fragment2);
-                fragmentTransaction2.commit();
+                args.putParcelable("profile", user);
+                profileFragment.setArguments(args);
+
+                getFragmentManager().beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, profileFragment)
+                        .commit();
             }
         });
 

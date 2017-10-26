@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonArrayRequest;
 
-import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,16 +14,16 @@ import java.util.Map;
 /**
  * JsonObjectRequest subclass to add username and password authorization headers.
  */
-class AuthorisedJsonObjectRequest extends JsonObjectRequest {
+class AuthorisedJsonArrayRequest extends JsonArrayRequest {
     static String username;
     static String password;
 
-    AuthorisedJsonObjectRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    AuthorisedJsonArrayRequest(int method, String url, JSONArray jsonRequest, Response.Listener<JSONArray> listener, Response.ErrorListener errorListener) {
         super(method, url, jsonRequest, listener, errorListener);
     }
 
-    AuthorisedJsonObjectRequest(String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        super(url, null, listener, errorListener);
+    AuthorisedJsonArrayRequest(String url, Response.Listener<JSONArray> listener, Response.ErrorListener errorListener) {
+        super(url, listener, errorListener);
     }
 
     @Override

@@ -25,36 +25,28 @@
                 android:id="@+id/pollViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center|top">
+            android:background="@color/barBackground"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:paddingRight="16dp"
+            android:paddingEnd="16dp"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp">
 
-            <RelativeLayout
-                android:id="@+id/footer"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:background="@color/barBackground"
-                android:paddingBottom="3dp" >
-
-                <Button
-                    android:id="@+id/postButton"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_margin="3dp"
-                    android:background="@color/greenButtonBackground"
-                    android:text="@string/poll_vote_submit_button"
-                    android:textColor="@color/white" />
-
-            </RelativeLayout>
-        </LinearLayout>
+            <Button
+                android:id="@+id/voteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:theme="@style/PositiveButton"
+                android:text="@string/poll_vote_submit_button" />
+        </RelativeLayout>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </LinearLayout>

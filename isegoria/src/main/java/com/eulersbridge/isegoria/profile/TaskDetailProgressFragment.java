@@ -93,7 +93,7 @@ public class TaskDetailProgressFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
+        network.getFirstPhoto((int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
@@ -158,7 +158,7 @@ public class TaskDetailProgressFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, (int) taskId, iconImage);
+        network.getFirstPhoto((int) taskId, iconImage);
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
