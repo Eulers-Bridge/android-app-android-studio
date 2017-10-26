@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.election;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

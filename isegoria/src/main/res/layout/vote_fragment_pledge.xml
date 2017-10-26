@@ -41,7 +41,6 @@
         android:background="@android:color/white"
         android:ems="10"
         android:gravity="center"
-        android:inputType="textMultiLine"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"
         android:text="@string/vote_sign_pledge_message"

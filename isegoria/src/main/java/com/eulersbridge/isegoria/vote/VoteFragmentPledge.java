@@ -74,7 +74,8 @@ public class VoteFragmentPledge extends Fragment {
             @Override
             public void onClick(View view) {
                 SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
-                getChildFragmentManager()
+
+                getActivity().getSupportFragmentManager()
                         .beginTransaction()
                         .addToBackStack(null)
                         .add(R.id.container, selfEfficacyQuestionsFragment)

@@ -33,7 +33,6 @@ public class PollFragment extends Fragment {
 	private List<Fragment> fragments;
 
     private com.sothree.slidinguppanel.SlidingUpPanelLayout slidingUpPanelLayout;
-    private Network network;
 
     private boolean expanded = false;
 
@@ -46,7 +45,7 @@ public class PollFragment extends Fragment {
 		fragments = new Vector<>();
 		
         MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        Network network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPollQuestions(this);
 
         slidingUpPanelLayout = rootView.findViewById(R.id.sliding_layout);

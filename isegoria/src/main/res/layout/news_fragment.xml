@@ -13,15 +13,14 @@
         <ScrollView
             android:id="@+id/scrollView1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
                 <TableLayout
                     android:id="@+id/newsTableLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:stretchColumns="*"
-                    android:paddingBottom="4dp">
-                </TableLayout>
+                    android:padding="2dp" />
         </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

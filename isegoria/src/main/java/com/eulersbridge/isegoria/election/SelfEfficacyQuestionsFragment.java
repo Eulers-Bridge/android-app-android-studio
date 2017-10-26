@@ -22,9 +22,9 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
+        final MainActivity mainActivity = (MainActivity) getActivity();
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_self_efficacy_questions));
+        mainActivity.setToolbarTitle(getString(R.string.section_title_self_efficacy_questions));
 
         final Network network = mainActivity.getIsegoriaApplication().getNetwork();
 
@@ -42,6 +42,9 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
                         sliderBar3.getScore() + 1,
                         sliderBar4.getScore() + 1
                 );
+
+                mainActivity.getSupportFragmentManager().popBackStack();
+                mainActivity.setToolbarTitle(getString(R.string.section_title_vote));
             }
         });
 

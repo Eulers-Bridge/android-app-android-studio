@@ -24,7 +24,6 @@ import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
 
 public class ProfileBadgesFragment extends Fragment {
-    private View rootView;
     private TableLayout badgesTableLayout;
     private TableRow tr;
 
@@ -47,7 +46,7 @@ public class ProfileBadgesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.profile_badges_layout, container, false);
+        View rootView = inflater.inflate(R.layout.profile_badges_layout, container, false);
         getActivity().setTitle("Isegoria");
         Bundle bundle = this.getArguments();
 

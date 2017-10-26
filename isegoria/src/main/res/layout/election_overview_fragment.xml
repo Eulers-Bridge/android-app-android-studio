@@ -3,78 +3,47 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/electionTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="3dp"
-        android:text=""
-        android:textColor="@android:color/black"
-        android:textSize="18sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Title" />
 
     <TextView
         android:id="@+id/electionDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:ems="10"
-        android:inputType="textMultiLine"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="14sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
 
-    <LinearLayout
-        android:id="@android:id/tabcontent"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:text="@string/election_overview_subheading" />
+
+    <TextView
+        android:id="@+id/electionIntroduction"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:layout_weight="1" >
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="10dp"
-            android:paddingStart="10dp"
-            android:id="@+id/overviewTextField" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:text="@string/election_overview_process_subheading" />
 
-	      <TextView
-	          android:id="@+id/electionIntroduction"
-	          android:layout_width="match_parent"
-	          android:layout_height="wrap_content"
-	          android:paddingLeft="10dp"
-              android:paddingStart="10dp"
-	          android:text="" >
-
-	      </TextView>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="10dp"
-            android:paddingStart="10dp"
-            android:id="@+id/processTextField"
-            />
-
-        <TextView
-            android:id="@+id/electionProcess"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingStart="10dp"
-            android:text=""
-            android:layout_gravity="center" />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/electionProcess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:lineSpacingMultiplier="1.1" />
 </LinearLayout>

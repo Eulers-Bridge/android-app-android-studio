@@ -25,10 +25,7 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	private ArrayList<String> institutions;
 	private ArrayAdapter<String> spinnerArrayAdapter;
 	private ArrayAdapter<String> spinnerInstitutionArrayAdapter;
-	private ArrayAdapter<String> spinnerGenderArrayAdapter;
-	private ArrayAdapter<String> spinnerYearOfBirthArrayAdapter;
-	private Isegoria isegoria;
-	
+
 	public UserSignupFragment() {
 		
 	}
@@ -41,8 +38,8 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 
 		countries = new ArrayList<>();
 		countryObjects = new ArrayList<>();
-		
-		isegoria = (Isegoria) getActivity().getApplication();
+
+		Isegoria isegoria = (Isegoria) getActivity().getApplication();
 		isegoria.setCountryObjects(countryObjects);
         Network network = new Network(isegoria);
         isegoria.setNetwork(network);
@@ -60,14 +57,14 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         spinnerInstitution.setAdapter(spinnerInstitutionArrayAdapter);
         
         Spinner spinnerGender = rootView.findViewById(R.id.gender);
-        spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         spinnerGenderArrayAdapter.add("Male");
         spinnerGenderArrayAdapter.add("Female");
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(spinnerGenderArrayAdapter);
         
         Spinner spinnerYearOfBirth = rootView.findViewById(R.id.yearOfBirth);
-        spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+		ArrayAdapter<String> spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         int cnt = 0;
         for(int i=1900; i<=2014; i++) {
         	spinnerYearOfBirthArrayAdapter.add(String.valueOf(i));

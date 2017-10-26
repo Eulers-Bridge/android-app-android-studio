@@ -1,6 +1,5 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.feed;
 
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,11 +11,13 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 
 public class PhotoViewFragment extends Fragment {
 	private View rootView;
-    private PhotoViewFragment photoViewFragment;
 
     private ImageView photoStar;
     private TextView photoLikes;
@@ -32,7 +33,7 @@ public class PhotoViewFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
-		getActivity().setTitle("Isegoria");
+
 		Bundle bundle = this.getArguments();
 		photoPath = bundle.getInt("PhotoId");
 
@@ -55,7 +56,7 @@ public class PhotoViewFragment extends Fragment {
                 if(!setLiked) {
                     setLiked = true;
                     starView.setImageResource(R.drawable.star);
-                    network.likePhoto(photoPath, photoViewFragment);
+                    network.likePhoto(photoPath, PhotoViewFragment.this);
                     int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
                     likes = likes + 1;
                     photoLikes.setText(String.valueOf(likes));
@@ -63,7 +64,7 @@ public class PhotoViewFragment extends Fragment {
                 else {
                     setLiked = false;
                     starView.setImageResource(R.drawable.stardefault);
-                    network.unlikePhoto(photoPath, photoViewFragment);
+                    network.unlikePhoto(photoPath, PhotoViewFragment.this);
                     int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
                     likes = likes - 1;
                     photoLikes.setText(String.valueOf(likes));
@@ -118,10 +119,9 @@ public class PhotoViewFragment extends Fragment {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					AssetManager assetManager = getActivity().getAssets();
 					TextView photoTitle = rootView.findViewById(R.id.photoTitle);
 					photoTitle.setText(title);
-					ImageView photoImageView = rootView.findViewById(R.id.profilePic);
+					ImageView photoImageView = rootView.findViewById(R.id.photoView);
 					try {
 						photoImageView.setScaleType(ScaleType.CENTER_CROP);
 						photoImageView.setImageBitmap(bitmap);

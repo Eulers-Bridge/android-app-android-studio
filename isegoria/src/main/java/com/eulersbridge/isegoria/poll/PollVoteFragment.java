@@ -47,7 +47,7 @@ public class PollVoteFragment extends Fragment {
 
     private Network network;
 
-    private int pollOptionImageViewId;
+    private final int pollOptionImageViewId;
 
     private ImageView creatorImageView;
     private Bitmap creatorPhoto;
@@ -59,56 +59,10 @@ public class PollVoteFragment extends Fragment {
     private int pixelWidth = 0;
 
 	public PollVoteFragment() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             pollOptionImageViewId = View.generateViewId();
         } else {
             pollOptionImageViewId = new Random().nextInt(0xFFFFFF);
-        }
-    }
-
-	public void setData(int nodeId, @Nullable User creator, String question, ArrayList<PollOption> options) {
-        this.nodeId = nodeId;
-        this.creator = creator;
-		this.question = question;
-        this.options = options;
-
-        if (creator != null) {
-            network.getPicture(creator.getProfilePhotoURL(), new Network.PictureDownloadListener() {
-                @Override
-                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                    creatorPhoto = bitmap;
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateCreatorPhoto();
-                        }
-                    });
-                }
-
-                @Override
-                public void onDownloadFailed(String url, VolleyError error) { }
-            });
-        }
-	}
-
-	@UiThread
-	private void updateCreatorPhoto() {
-        creatorImageView.setImageBitmap(creatorPhoto);
-        creatorImageView.refreshDrawableState();
-    }
-
-    @UiThread
-    private void updateTableRowImage(int index, Bitmap bitmap) {
-        View row = pollTableLayout.getChildAt(index);
-
-        if (row != null) {
-            ImageView imageView = row.findViewById(pollOptionImageViewId);
-
-            if (imageView != null) {
-                imageView.setImageBitmap(bitmap);
-            }
         }
     }
 	
@@ -139,8 +93,7 @@ public class PollVoteFragment extends Fragment {
                     @Override
                     public void onDownloadFinished(String url, @Nullable final Bitmap bitmap) {
 
-                        if (bitmap != null) {
-
+                        if (bitmap != null && getActivity() != null) {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -158,6 +111,51 @@ public class PollVoteFragment extends Fragment {
 
 		return rootView;
 	}
+
+    public void setData(int nodeId, @Nullable User creator, String question, ArrayList<PollOption> options) {
+        this.nodeId = nodeId;
+        this.creator = creator;
+        this.question = question;
+        this.options = options;
+
+        if (creator != null) {
+            network.getPicture(creator.getProfilePhotoURL(), new Network.PictureDownloadListener() {
+                @Override
+                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                    creatorPhoto = bitmap;
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateCreatorPhoto();
+                        }
+                    });
+                }
+
+                @Override
+                public void onDownloadFailed(String url, VolleyError error) { }
+            });
+        }
+    }
+
+    @UiThread
+    private void updateCreatorPhoto() {
+        creatorImageView.setImageBitmap(creatorPhoto);
+        creatorImageView.refreshDrawableState();
+    }
+
+    @UiThread
+    private void updateTableRowImage(int index, Bitmap bitmap) {
+        View row = pollTableLayout.getChildAt(index);
+
+        if (row != null) {
+            ImageView imageView = row.findViewById(pollOptionImageViewId);
+
+            if (imageView != null) {
+                imageView.setImageBitmap(bitmap);
+            }
+        }
+    }
 	
 	private void addTableRow(String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
