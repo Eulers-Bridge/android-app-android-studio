@@ -1,211 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:gravity="top"
-    android:clickable="true"
-    android:orientation="vertical" >
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@color/white">
 
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView6" >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-			android:orientation="vertical">
-
-    <LinearLayout
-        android:id="@+id/topBackgroundNews"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:gravity="bottom"
-        android:orientation="vertical"
-        android:paddingBottom="12dp"
-    >
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:orientation="horizontal"
-            android:paddingLeft="12dp"
-			android:paddingStart="12dp"
-            android:paddingRight="6dp"
-			android:paddingEnd="6dp"
-            android:paddingTop="6dp" >
-            
-        <TextView
-            android:id="@+id/eventTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="Barbeque"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white" />
-		</LinearLayout>
-                
-        <LinearLayout
-        	android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="bottom"
-            android:paddingLeft="12dp"
-			android:paddingStart="12dp">
-        
-            <LinearLayout
-	        	android:layout_width="match_parent"
-	            android:layout_height="0dp"
-	            android:layout_weight="1"
-	            android:orientation="vertical"
-	            android:gravity="bottom"
-	            android:paddingTop="6dp"
-	            android:paddingRight="6dp"
-				android:paddingEnd="6dp"
-                android:visibility="invisible">
-	            
-	            <View
-	            	android:layout_width="match_parent"
-	                android:layout_height="1dip"
-	                android:background="#676475"
-                    android:id="@+id/eventDivider1" />
-	        </LinearLayout>   
-	         
-            <RelativeLayout
-			    android:id="@+id/RelativeLayout01" 
-			    android:layout_width="match_parent"
-			    android:layout_height="match_parent"
-			    android:paddingTop="10dp"
-			    >
-	            <LinearLayout
-		        	android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:orientation="vertical"
-		            android:layout_alignParentLeft="true"
-					android:layout_alignParentStart="true"
-		            android:layout_gravity="center_vertical"
-		             >
-
-   				<TextView
-   				    android:id="@+id/eventTime"
-   				    android:layout_width="wrap_content"
-   				    android:layout_height="0dp"
-   				    android:layout_gravity="center_vertical"
-   				    android:layout_weight="1"
-   				    android:ems="10"
-   				    android:gravity="center_vertical"
-   				    android:minHeight="48dp"
-   				    android:text="Yesterday, 9:00 AM"
-   				    android:textAppearance="?android:attr/textAppearanceSmall"
-   				    android:textColor="@color/white"
-   				    android:textSize="@dimen/newsTimeSize" />
-
-		        </LinearLayout> 
-		        <LinearLayout
-		        	android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:orientation="horizontal"
-		            android:layout_gravity="center_vertical"
-		            android:layout_alignParentRight="true"
-					android:layout_alignParentEnd="true"
-		             >       
-
-		            	 <Button
-		            	     android:id="@+id/addToCalendar"
-		            	     android:layout_width="0dp"
-		            	     android:layout_height="wrap_content"
-		            	     android:layout_gravity="center_vertical"
-		            	     android:layout_marginRight="10dp"
-							 android:layout_marginEnd="10dp"
-		            	     android:layout_weight="1"
-		            	     android:gravity="center_vertical"
-		            	     android:onClick="addToCalendar"
-		            	     android:paddingRight="10dp"
-							 android:paddingEnd="10dp"
-		            	     android:text="@string/event_add_to_calendar"
-		            	     android:textColor="@color/white"
-                             android:visibility="invisible" />
-
-		        </LinearLayout> 
-	        </RelativeLayout>
-        </LinearLayout>
-    </LinearLayout>
-    
-    <LinearLayout
-    	android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        
-        <TextView
-            android:id="@+id/eventLocationLine1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:paddingLeft="10dp"
-			android:paddingStart="10dp"
-			android:paddingRight="10dp"
-			android:paddingEnd="10dp"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/black"
-            android:textSize="@dimen/eventLocationSize" />
-
-		<TextView
-			android:id="@+id/eventLocationLine2"
+		<RelativeLayout
+			android:id="@+id/topBackgroundNews"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_weight="1"
-			android:paddingTop="3dp"
-			android:paddingLeft="10dp"
-			android:paddingStart="10dp"
-			android:paddingBottom="3dp"
-			android:ems="10"
-			android:text="The University of Melbourne, Victoria 3010"
-			android:textAppearance="?android:attr/textAppearanceSmall"
-			android:textColor="@color/black"
-			android:textSize="@dimen/newsTimeSize"
-            android:visibility="invisible" />
-        
-       	 <View
-	     	android:layout_width="match_parent"
-	        android:layout_height="1dip"
-	        android:paddingTop="3dp"
-	        android:background="#676475"
-             android:nestedScrollingEnabled="false"
-             android:id="@+id/eventDivider2"
-             android:visibility="invisible" />
-    </LinearLayout>
+			android:background="@color/white"
+			android:orientation="vertical"
+			android:padding="16dp">
 
+			<TextView
+				android:id="@+id/eventTitle"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:layout_marginTop="16dp"
+				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+				android:lineSpacingMultiplier="1.2"
+				android:textColor="@color/white" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+			<TextView
+				android:id="@+id/eventTime"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentStart="true"
+				android:layout_alignParentBottom="true"
+				android:layout_marginTop="40dp"
+				android:layout_marginBottom="14dp"
+				android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+				android:textColor="@color/white"
+				android:textSize="@dimen/newsTimeSize" />
 
-        <TextView
-            android:id="@+id/eventDetails"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:paddingTop="10dp"
-            android:textSize="@dimen/newsArticleSize" />
+			<Button
+				android:id="@+id/addToCalendar"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:layout_alignParentEnd="true"
+				android:layout_alignParentBottom="true"
+				android:paddingLeft="16dp"
+				android:paddingStart="16dp"
+				android:paddingRight="16dp"
+				android:paddingEnd="16dp"
+				android:paddingHorizontal="16dp"
+				android:text="@string/event_add_to_calendar"
+				android:theme="@style/AccentButton" />
+		</RelativeLayout>
 
-            <TableLayout
-                android:id="@+id/eventDetailsTableLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="16dp"
+			android:orientation="vertical"
+			android:paddingLeft="16dp"
+			android:paddingStart="16dp"
+			android:paddingRight="16dp"
+			android:paddingEnd="16dp"
+			android:paddingHorizontal="16dp">
 
+			<TextView
+				android:id="@+id/eventLocationLine1"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="@color/black"
+				android:textSize="@dimen/eventLocationSize" />
 
-            </TableLayout>
-        </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+			<TextView
+				android:id="@+id/eventLocationLine2"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:layout_marginTop="8dp"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="@color/black"
+				android:textSize="@dimen/newsTimeSize" />
+
+			<TextView
+				android:id="@+id/eventDetails"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="16dp"
+				android:textSize="@dimen/newsArticleSize" />
+
+			<TableLayout
+				android:id="@+id/eventDetailsTableLayout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

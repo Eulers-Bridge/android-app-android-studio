@@ -6,7 +6,6 @@
 	android:layout_height="match_parent"
 	android:background="@android:color/white"
 	android:gravity="top"
-	android:clickable="true"
 	android:orientation="vertical">
 
 	<LinearLayout
@@ -14,150 +13,102 @@
 		android:layout_height="wrap_content"
 		android:background="@android:color/white"
 		android:gravity="top"
-		android:clickable="true"
 		android:orientation="vertical">
 
-		<LinearLayout
+		<RelativeLayout
 			android:id="@+id/topBackgroundNews"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:gravity="bottom"
 			android:orientation="vertical"
-			android:paddingBottom="16dp">
-
-			<LinearLayout
-				android:layout_width="match_parent"
-				android:layout_height="0dp"
-				android:layout_weight="1"
-				android:gravity="bottom"
-				android:orientation="horizontal"
-				android:paddingLeft="16dp"
-				android:paddingStart="16dp"
-				android:paddingRight="16dp"
-				android:paddingEnd="16dp"
-				android:paddingHorizontal="16dp">
+			android:padding="16dp">
 
 			<TextView
 				android:id="@+id/newsArticleTitle"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_gravity="bottom"
-				android:text="Labor pulls ahead in Nielson poll"
+				android:layout_alignParentTop="true"
+				android:layout_marginTop="16dp"
 				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+				android:lineSpacingMultiplier="1.2"
 				android:textColor="@color/white" />
-			</LinearLayout>
 
-			<LinearLayout
-				android:layout_width="match_parent"
+			<ImageView
+				android:id="@+id/newsArticleAuthorImage"
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentStart="true"
+				android:layout_alignParentBottom="true"
+				android:layout_marginRight="16dp"
+				android:layout_marginEnd="16dp"
+				android:background="#ff3f3f3f"
+				android:visibility="gone" />
+
+			<TextView
+				android:id="@+id/photoTitle"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:orientation="vertical"
-				android:gravity="bottom"
-				android:paddingLeft="16dp"
-				android:paddingStart="16dp"
-				android:paddingHorizontal="16dp">
+				android:layout_above="@+id/newsArticleDate"
+				android:layout_toRightOf="@id/newsArticleAuthorImage"
+				android:layout_toEndOf="@id/newsArticleAuthorImage"
+				android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+				android:textColor="@color/white"
+				android:textSize="@dimen/newsArticleName" />
 
-				<RelativeLayout
-					android:id="@+id/RelativeLayout01"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:paddingTop="16dp">
+			<TextView
+				android:id="@id/newsArticleDate"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_toRightOf="@id/newsArticleAuthorImage"
+				android:layout_toEndOf="@id/newsArticleAuthorImage"
+				android:layout_marginTop="8dp"
+				android:layout_marginBottom="3dp"
+				android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+				android:textColor="@color/white" />
 
-					<LinearLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:orientation="horizontal"
-						android:layout_alignParentLeft="true"
-						android:layout_alignParentStart="true"
-						android:gravity="bottom">
+			<TextView
+				android:id="@+id/newsArticleLikes"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_toLeftOf="@+id/starView"
+				android:layout_toStartOf="@+id/starView"
+				android:layout_marginBottom="12dp"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="@color/white"
+				android:textSize="@dimen/newsPointsSize" />
 
-						 <ImageView
-							android:id="@+id/newsArticleAuthorImage"
-							android:layout_width="0dp"
-							android:layout_height="50dp"
-							android:layout_gravity="center_vertical"
-							android:layout_weight="1"
-							android:paddingRight="5dp"
-							 android:paddingEnd="5dp"
-							 android:paddingHorizontal="5dp"
-							 android:background="#ff3f3f3f"
-							 android:layout_marginRight="5dp"
-							 android:layout_marginEnd="5dp"
-							 android:layout_marginHorizontal="5dp"
-							 android:visibility="gone" />
+			<ImageView
+				android:id="@id/starView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_toLeftOf="@+id/flagView"
+				android:layout_toStartOf="@+id/flagView"
+				android:src="@drawable/stardefault"
+				android:contentDescription="@string/news_article_star_content_description" />
 
-						<LinearLayout
-							android:layout_width="wrap_content"
-							android:layout_height="wrap_content"
-							android:orientation="vertical"
-							android:gravity="bottom"
-							android:layout_gravity="center_vertical">
-
-								<TextView
-									android:id="@+id/photoTitle"
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:textAppearance="?android:attr/textAppearanceSmall"
-									android:textColor="@color/white"
-									android:textSize="@dimen/newsArticleName" />
-
-								<TextView
-									android:id="@+id/newsArticleDate"
-									android:layout_width="wrap_content"
-									android:layout_height="wrap_content"
-									android:layout_marginTop="8dp"
-									android:text="Yesterday, 9:00 AM"
-									android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-									android:textColor="@color/white" />
-						</LinearLayout>
-					</LinearLayout>
-
-					<LinearLayout
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:orientation="horizontal"
-						android:layout_gravity="center_vertical"
-						android:layout_alignParentRight="true"
-						android:layout_alignParentEnd="true">
-
-							 <TextView
-								 android:id="@+id/newsArticleLikes"
-								 android:layout_width="wrap_content"
-								 android:layout_height="wrap_content"
-								 android:layout_gravity="center_vertical"
-								 android:layout_weight="1"
-								 android:gravity="end"
-								 android:text="205"
-								 android:textAppearance="?android:attr/textAppearanceSmall"
-								 android:textColor="@color/white"
-								 android:textSize="@dimen/newsPointsSize" />
-
-							<ImageView
-								android:id="@+id/starView"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_weight="1"
-								android:src="@drawable/stardefault"
-								android:contentDescription="@string/news_article_star_content_description" />
-
-							<ImageView
-								android:id="@+id/flagView"
-								android:layout_width="wrap_content"
-								android:layout_height="wrap_content"
-								android:layout_weight="1"
-								android:src="@drawable/flagdefault"
-								android:contentDescription="@string/news_article_flag_content_description" />
-					</LinearLayout>
-				</RelativeLayout>
-			</LinearLayout>
-		</LinearLayout>
+			<ImageView
+				android:id="@id/flagView"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentBottom="true"
+				android:layout_alignParentRight="true"
+				android:layout_alignParentEnd="true"
+				android:src="@drawable/flagdefault"
+				android:contentDescription="@string/news_article_flag_content_description" />
+		</RelativeLayout>
 
 		<TextView
 			android:id="@+id/textNews"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
+			android:layout_height="wrap_content"
 			android:padding="@dimen/activity_horizontal_margin"
 			android:textAppearance="@style/TextAppearance.AppCompat.Body1"
 			android:lineSpacingMultiplier="1.2"/>
+
 	</LinearLayout>
 </ScrollView>

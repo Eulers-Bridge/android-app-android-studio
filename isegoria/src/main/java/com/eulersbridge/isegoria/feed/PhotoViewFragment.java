@@ -20,6 +20,7 @@ import com.eulersbridge.isegoria.utilities.TimeConverter;
 public class PhotoViewFragment extends Fragment {
 	private View rootView;
 
+	private ImageView photoView;
     private ImageView photoStar;
     private TextView photoLikes;
 
@@ -40,32 +41,31 @@ public class PhotoViewFragment extends Fragment {
 
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
 
-        addPhoto("", imageBitmap);
-
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getPhoto(this, photoPath);
         network.getPhotoLiked(this);
 
+        photoView = rootView.findViewById(R.id.photoView);
         photoStar = rootView.findViewById(R.id.photoFlag);
         photoLikes = rootView.findViewById(R.id.photoLikes);
 
+        addPhoto("", imageBitmap);
+
         final ImageView starView = rootView.findViewById(R.id.photoStar);
         starView.setOnClickListener(view -> {
-            if(!setLiked) {
-                setLiked = true;
+            setLiked = !setLiked;
+
+            if (setLiked) {
                 starView.setImageResource(R.drawable.star);
-                network.likePhoto(photoPath, PhotoViewFragment.this);
-                int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
-                likes = likes + 1;
+                network.likePhoto(photoPath);
+                int likes = Integer.parseInt(String.valueOf(photoLikes.getText())) + 1;
                 photoLikes.setText(String.valueOf(likes));
             }
             else {
-                setLiked = false;
                 starView.setImageResource(R.drawable.stardefault);
-                network.unlikePhoto(photoPath, PhotoViewFragment.this);
-                int likes = Integer.parseInt(String.valueOf(photoLikes.getText()));
-                likes = likes - 1;
+                network.unlikePhoto(photoPath);
+                int likes = Integer.parseInt(String.valueOf(photoLikes.getText())) - 1;
                 photoLikes.setText(String.valueOf(likes));
             }
         });
@@ -98,38 +98,36 @@ public class PhotoViewFragment extends Fragment {
                         final boolean inappropriateContent, int numOfLikes) {
         String dateStr = TimeConverter.convertTimestampToString(date);
 
-        TextView photoTileTextView = rootView.findViewById(R.id.photoTitle);
+        TextView photoTitleTextView = rootView.findViewById(R.id.photoTitle);
         TextView photoDateTextView = rootView.findViewById(R.id.photoDate);
         TextView photoLikesTextView = rootView.findViewById(R.id.photoLikes);
         ImageView flagged = rootView.findViewById(R.id.photoFlag);
 
-        if(!inappropriateContent) {
-            flagged.setImageResource(R.drawable.flag);
-        }
+        if (!inappropriateContent) flagged.setImageResource(R.drawable.flag);
 
-        photoTileTextView.setText(title);
+        photoTitleTextView.setText(title);
+        photoView.setContentDescription(title);
+
         photoDateTextView.setText(dateStr);
         photoLikesTextView.setText(String.valueOf(numOfLikes));
     }
 	
 	private void addPhoto(final String title, final Bitmap bitmap) {
-		try {
-			getActivity().runOnUiThread(() -> {
-                TextView photoTitle = rootView.findViewById(R.id.photoTitle);
-                photoTitle.setText(title);
-                ImageView photoImageView = rootView.findViewById(R.id.photoView);
-                try {
-                    photoImageView.setScaleType(ScaleType.CENTER_CROP);
-                    photoImageView.setImageBitmap(bitmap);
-                    photoImageView.getLayoutParams().width = displayMetrics.widthPixels;
-                    photoImageView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
-                    photoImageView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-		} catch(Exception ignored) {
-			
-		}
+        getActivity().runOnUiThread(() -> {
+            TextView photoTitle = rootView.findViewById(R.id.photoTitle);
+            photoTitle.setText(title);
+
+            try {
+                photoView.setScaleType(ScaleType.CENTER_CROP);
+                photoView.setImageBitmap(bitmap);
+                photoView.getLayoutParams().width = displayMetrics.widthPixels;
+                photoView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
+                photoView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
+                photoView.setContentDescription(title);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 	}
 }

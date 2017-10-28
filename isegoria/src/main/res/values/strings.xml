@@ -1,4 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="TAG">com.eulersbridge.isegoria</string>
     <string name="app_name">Isegoria</string>
 
     <string name="isegoria_logo_content_description">Isegoria Logo</string>
@@ -122,5 +123,7 @@
 
     <string name="poll_asked_by">Asked by %s</string>
     <string name="poll_vote_submit_button">Vote</string>
+    <string name="photo_detail_view_star">Star Photo</string>
+    <string name="photo_detail_view_flag">Report Photo</string>
 
 </resources>

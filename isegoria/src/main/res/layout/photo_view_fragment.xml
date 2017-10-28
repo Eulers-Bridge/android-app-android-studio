@@ -12,69 +12,66 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/photoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/photoView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/photoDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/photoView"
-        android:layout_centerHorizontal="true"
-        android:paddingTop="15dp"
-        android:paddingLeft="15dp"
-        android:paddingStart="15dp"
-        android:orientation="vertical">
-     
-	    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        android:layout_below="@id/photoTitle"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/white" />
 
-            <TextView
-                android:id="@+id/photoTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:textColor="@color/white"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:textSize="16sp" />
+    <TextView
+        android:id="@+id/photoLikes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_below="@id/photoView"
+        android:layout_toLeftOf="@+id/photoStar"
+        android:layout_toStartOf="@+id/photoStar"
+        android:layout_marginTop="24dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/white"
+        android:textSize="@dimen/newsPointsSize" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true">
+    <ImageView
+        android:contentDescription="@string/photo_detail_view_star"
+        android:id="@id/photoStar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/photoView"
+        android:layout_toLeftOf="@+id/photoFlag"
+        android:layout_toStartOf="@+id/photoFlag"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/stardefault" />
 
-                <TextView
-                    android:id="@+id/photoLikes"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/newsPointsSize" />
-
-                <ImageView
-                    android:id="@+id/photoStar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/stardefault" />
-
-                <ImageView
-                    android:id="@+id/photoFlag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/flagdefault" />
-            </LinearLayout>
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/photoDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textColor="@color/white" />
-    </LinearLayout>
+    <ImageView
+        android:contentDescription="@string/photo_detail_view_flag"
+        android:id="@id/photoFlag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/photoView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:src="@drawable/flagdefault" />
 </RelativeLayout>

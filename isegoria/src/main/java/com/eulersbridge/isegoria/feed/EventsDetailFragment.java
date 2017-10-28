@@ -12,6 +12,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,7 +33,6 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
@@ -41,11 +41,8 @@ import com.eulersbridge.isegoria.utilities.Utils;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
-    private View eventDivider1;
-    private View eventDivider2;
 	private float dpWidth;
     private Isegoria isegoria;
-    private Button addToCalendar;
 
     private TableLayout eventContactTableLayout;
     private Network network;
@@ -56,23 +53,19 @@ public class EventsDetailFragment extends Fragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
+
         eventContactTableLayout = rootView.findViewById(R.id.eventDetailsTableLayout);
-		this.isegoria = (Isegoria) getActivity().getApplication();
-		Bundle bundle = this.getArguments();
-		
-		addToCalendar = rootView.findViewById(R.id.addToCalendar);
+
+        Button addToCalendar = rootView.findViewById(R.id.addToCalendar);
         addToCalendar.setOnClickListener(view -> addToCalendar());
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        eventDivider1 = rootView.findViewById(R.id.eventDivider1);
-        eventDivider2 = rootView.findViewById(R.id.eventDivider2);
+        event = getArguments().getParcelable("event");
 
-        event = bundle.getParcelable("event");
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        isegoria = (Isegoria) getActivity().getApplication();
+        network = isegoria.getNetwork();
 
         if (event != null && event.getImageUrl() != null) {
             network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
@@ -94,59 +87,57 @@ public class EventsDetailFragment extends Fragment {
 	}
 	
 	private void populateContent(final Event event) {
-		try {
-			getActivity().runOnUiThread(() -> {
-                int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                        (float) 200, getResources().getDisplayMetrics());
+        getActivity().runOnUiThread(() -> {
+            int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) 200, getResources().getDisplayMetrics());
 
-                LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-                backgroundLinearLayout.getLayoutParams().height = imageHeight;
-                //Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
-                //Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
+            RelativeLayout backgroundLayout = rootView.findViewById(R.id.topBackgroundNews);
+            backgroundLayout.getLayoutParams().height = imageHeight;
+            //Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
+            //Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
 
-                if (eventImage != null) {
-                    Drawable d = new BitmapDrawable(getActivity().getResources(), eventImage);
-                    d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        backgroundLinearLayout.setBackground(d);
-                    } else {
-                        backgroundLinearLayout.setBackgroundDrawable(d);
-                    }
+            if (eventImage != null) {
+                Drawable d = new BitmapDrawable(getActivity().getResources(), eventImage);
+                d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    backgroundLayout.setBackground(d);
+                } else {
+                    backgroundLayout.setBackgroundDrawable(d);
                 }
+            }
 
-                TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
-                eventTitleField.setText(event.getName());
+            TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
+            eventTitleField.setText(event.getName());
 
-                TextView eventTime = rootView.findViewById(R.id.eventTime);
-                eventTime.setText(TimeConverter.convertTimestampToString(event.getDate()));
+            TextView eventTime = rootView.findViewById(R.id.eventTime);
+            eventTime.setText(TimeConverter.convertTimestampToString(event.getDate()));
 
-                TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
-                eventLocationLine1.setText(event.getLocation());
+            TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
+            eventLocationLine1.setText(event.getLocation());
 
-                TextView eventLocationLine2 = rootView.findViewById(R.id.eventLocationLine2);
-
-                TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
-                eventsTextField.setText(event.getDescription());
-
-                addToCalendar.setVisibility(ViewGroup.VISIBLE);
-                eventDivider1.setVisibility(ViewGroup.VISIBLE);
-                eventDivider2.setVisibility(ViewGroup.VISIBLE);
-                eventLocationLine2.setVisibility(ViewGroup.VISIBLE);
-            });
-		} catch(Exception ignored) {
-			
-		}
+            TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
+            eventsTextField.setText(event.getDescription());
+        });
 	}
 	
 	private void addToCalendar() {
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", event.getDate());
-        intent.putExtra("allDay", false);
-        intent.putExtra("endTime", event.getDate()+60*60*1000);
-        intent.putExtra("title", event.getName());
-        intent.putExtra("description", event.getDescription());
-        isegoria.getMainActivity().startActivity(intent);
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDate())
+
+                // Make event 1 hour long (add an hour in in milliseconds to event start)
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDate() + 60 * 60 * 1000)
+                .putExtra(CalendarContract.Events.ALL_DAY, false)
+
+                .putExtra(CalendarContract.Events.TITLE, event.getName())
+                .putExtra(CalendarContract.Events.DESCRIPTION, event.getDescription())
+                .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getLocation())
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            isegoria.getMainActivity().startActivity(intent);
+        }
 	}
 
     public void addCandidate(String email) {
@@ -171,7 +162,7 @@ public class EventsDetailFragment extends Fragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(ticketId, userId, "GRN", "#4FBE3E", firstName + " " + lastName, "", positionId);
+        addTableRow(ticketId, userId, "GRN", "#4FBE3E", String.format("%s %s", firstName, lastName), "", positionId);
     }
 
     private void addTableRow(int ticketId, final int userId, String partyAbr,
@@ -179,15 +170,15 @@ public class EventsDetailFragment extends Fragment {
                              String candidatePosition, int positionId) {
         TableRow tr;
 
-        LinearLayout layout = new LinearLayout(getActivity());
+        LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.HORIZONTAL);
 
-        tr = new TableRow(getActivity());
+        tr = new TableRow(getContext());
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         tr.setLayoutParams(rowParams);
         tr.setPadding(0, 10, 0, 10);
 
-        ImageView candidateProfileView = new ImageView(getActivity());
+        ImageView candidateProfileView = new ImageView(getContext());
         candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
         candidateProfileView.setLayoutParams(layoutParams);
@@ -195,7 +186,7 @@ public class EventsDetailFragment extends Fragment {
         network.getFirstPhoto(userId, candidateProfileView);
         candidateProfileView.setPadding(10, 0, 10, 0);
 
-        ImageView candidateProfileImage = new ImageView(getActivity());
+        ImageView candidateProfileImage = new ImageView(getContext());
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
@@ -212,7 +203,7 @@ public class EventsDetailFragment extends Fragment {
                     .commit();
         });
 
-        TextView textViewParty = new TextView(getActivity());
+        TextView textViewParty = new TextView(getContext());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewParty.setText(partyAbr);
@@ -229,7 +220,7 @@ public class EventsDetailFragment extends Fragment {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setStrokeWidth(5);
 
-        LinearLayout partyLayout = new LinearLayout(getActivity());
+        LinearLayout partyLayout = new LinearLayout(getContext());
         partyLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 80, 40);
@@ -238,14 +229,14 @@ public class EventsDetailFragment extends Fragment {
         //partyLayout.setBackgroundDrawable(rectShapeDrawable);
         partyLayout.addView(textViewParty);
 
-        TextView textViewCandidate = new TextView(getActivity());
+        TextView textViewCandidate = new TextView(getContext());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(10, 0, 10, 0);
         textViewCandidate.setGravity(Gravity.START);
 
-        TextView textViewPosition = new TextView(getActivity());
+        TextView textViewPosition = new TextView(getContext());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewPosition.setText(candidatePosition);
@@ -254,11 +245,11 @@ public class EventsDetailFragment extends Fragment {
 
         network.getPositionText(textViewPosition, positionId);
 
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
+        View dividerView = new View(getContext());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
 
-        RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
+        RelativeLayout relLayoutMaster = new RelativeLayout(getContext());
         TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
 
@@ -268,12 +259,12 @@ public class EventsDetailFragment extends Fragment {
         RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-        LinearLayout linLayout = new LinearLayout(getActivity());
+        LinearLayout linLayout = new LinearLayout(getContext());
         linLayout.setOrientation(LinearLayout.VERTICAL);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
-        LinearLayout linLayout2 = new LinearLayout(getActivity());
+        LinearLayout linLayout2 = new LinearLayout(getContext());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
         linLayout2.addView(candidateProfileImage);
         linLayout2.setGravity(Gravity.END);
@@ -290,6 +281,6 @@ public class EventsDetailFragment extends Fragment {
         tr.addView(relLayoutMaster);
 
         eventContactTableLayout.addView(tr);
-        eventContactTableLayout.addView(dividierView);
+        eventContactTableLayout.addView(dividerView);
     }
 }

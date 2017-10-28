@@ -10,13 +10,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -29,7 +28,6 @@ import com.eulersbridge.isegoria.utilities.Utils;
 
 public class NewsArticleFragment extends Fragment {
     private View rootView;
-    private View newsArticleDivider;
     private ImageView newsArticleAuthorImage;
     private int articleId;
 
@@ -75,88 +73,71 @@ public class NewsArticleFragment extends Fragment {
 
     @SuppressWarnings("deprecation")
     public void populateContent(final String title, final String content, final String likes, final long date, @Nullable final Bitmap picture, final String email, final boolean inappropriateContent) {
-        try {
-            getActivity().runOnUiThread(() -> {
-                DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        getActivity().runOnUiThread(() -> {
 
-                int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                        (float) 83.33333333, getResources().getDisplayMetrics());
-                int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                        (float) 23.33333333, getResources().getDisplayMetrics());
+            int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                    (float) 250, getResources().getDisplayMetrics());
 
-                int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                        (float) 250, getResources().getDisplayMetrics());
+            RelativeLayout backgroundLayout = rootView.findViewById(R.id.topBackgroundNews);
+            backgroundLayout.getLayoutParams().height = imageHeight;
 
-                LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-                backgroundLinearLayout.getLayoutParams().height = imageHeight;
-                if (picture != null) {
-                    Bitmap tintedPicture = Utils.tintBitmap(picture, Color.argb(128, 0, 0, 0));
-                    Drawable d = new BitmapDrawable(getActivity().getResources(), tintedPicture);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        backgroundLinearLayout.setBackground(d);
-                    } else {
-                        backgroundLinearLayout.setBackgroundDrawable(d);
-                    }
+            if (picture != null) {
+                Bitmap tintedPicture = Utils.tintBitmap(picture, Color.argb(128, 0, 0, 0));
+                Drawable d = new BitmapDrawable(getActivity().getResources(), tintedPicture);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    backgroundLayout.setBackground(d);
+                } else {
+                    backgroundLayout.setBackgroundDrawable(d);
                 }
+            }
 
-                TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
-                newsTitle.setText(title);
+            TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
+            newsTitle.setText(title);
 
-                final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
-                newsArticleLikesView.setText(likes);
+            final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
+            newsArticleLikesView.setText(likes);
 
-                TextView newsText = rootView.findViewById(R.id.textNews);
-                newsText.setText(content);
+            TextView newsText = rootView.findViewById(R.id.textNews);
+            newsText.setText(content);
 
-                TextView newsArticleDate = rootView.findViewById(R.id.newsArticleDate);
-                newsArticleDate.setText(TimeConverter.convertTimestampToString(date));
+            TextView newsArticleDate = rootView.findViewById(R.id.newsArticleDate);
+            newsArticleDate.setText(TimeConverter.convertTimestampToString(date));
 
-                final ImageView flagView = rootView.findViewById(R.id.flagView);
-                flagView.setOnClickListener(view -> flagView.setImageResource(R.drawable.flag));
+            final ImageView flagView = rootView.findViewById(R.id.flagView);
+            flagView.setOnClickListener(view -> flagView.setImageResource(R.drawable.flag));
 
-                if(inappropriateContent) {
-                    flagView.setImageResource(R.drawable.flagdefault);
+            if (inappropriateContent) flagView.setImageResource(R.drawable.flagdefault);
+
+            final ImageView starView = rootView.findViewById(R.id.starView);
+            starView.setOnClickListener(view -> {
+                setLiked = !setLiked;
+
+                if (setLiked) {
+                    starView.setImageResource(R.drawable.star);
+                    network.likeArticle(articleId);
+                    int newLikes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText())) + 1;
+                    newsArticleLikesView.setText(String.valueOf(newLikes));
+                } else {
+                    starView.setImageResource(R.drawable.stardefault);
+                    network.unlikeArticle(articleId);
+                    int newLikes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText())) - 1;
+                    newsArticleLikesView.setText(String.valueOf(newLikes));
                 }
-
-                final ImageView starView = rootView.findViewById(R.id.starView);
-                starView.setOnClickListener(view -> {
-                    if(!setLiked) {
-                        setLiked = true;
-                        starView.setImageResource(R.drawable.star);
-                        network.likeArticle(articleId, NewsArticleFragment.this);
-                        int likes1 = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
-                        likes1 = likes1 + 1;
-                        newsArticleLikesView.setText(String.valueOf(likes1));
-                    }
-                    else {
-                        setLiked = false;
-                        starView.setImageResource(R.drawable.stardefault);
-                        network.unlikeArticle(articleId, NewsArticleFragment.this);
-                        int likes1 = Integer.parseInt(String.valueOf(newsArticleLikesView.getText()));
-                        likes1 = likes1 - 1;
-                        newsArticleLikesView.setText(String.valueOf(likes1));
-                    }
-                });
-
-                //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
-                //network.getFirstPhotoImage(email, headShotImageView);
-
-                newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
             });
-        } catch(Exception ignored) {
 
-        }
+            //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
+            //network.getFirstPhotoImage(email, headShotImageView);
+
+            newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
+        });
     }
 
     public void populateUserContent(final String name, final String photoURL) {
-        try {
-            getActivity().runOnUiThread(() -> {
-                TextView newsArticleName = rootView.findViewById(R.id.photoTitle);
-                newsArticleName.setText(name);
-            });
-        } catch(Exception ignored) {
-
-        }
+        getActivity().runOnUiThread(() -> {
+            TextView newsArticleName = rootView.findViewById(R.id.photoTitle);
+            newsArticleName.setText(name);
+        });
 
         ImageView newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
         network.getPicture(photoURL, new Network.PictureDownloadListener() {

@@ -3,7 +3,10 @@ package com.eulersbridge.isegoria;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -39,6 +42,8 @@ import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.securepreferences.SecurePreferences;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -70,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		application = (Isegoria) getApplicationContext();
 		application.setMainActivity(this);
+
+		setupNotificationChannels();
 		
 		if (savedInstanceState != null)
 			mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
@@ -90,6 +97,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			switchContent(new LoginScreenFragment());
 		}
         //switchContent(new PersonalityQuestionsFragment());
+	}
+
+	private void setupNotificationChannels() {
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+			HashMap<CharSequence, Integer> channels = new HashMap<>();
+			channels.put("Friends", NotificationManager.IMPORTANCE_DEFAULT);
+			channels.put("Vote Reminder", NotificationManager.IMPORTANCE_DEFAULT);
+
+			NotificationManager notificationManager =
+					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			if (notificationManager != null) {
+				for (Map.Entry<CharSequence, Integer> entry : channels.entrySet()) {
+					CharSequence channelName = entry.getKey();
+					String channelId = channelName.toString().toLowerCase().replace(" ","_");
+					int importance = entry.getValue();
+
+					NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
+					notificationChannel.setShowBadge(true);
+					notificationManager.createNotificationChannel(notificationChannel);
+				}
+			}
+		}
 	}
 
 	private void setupToolbarAndNavigation() {

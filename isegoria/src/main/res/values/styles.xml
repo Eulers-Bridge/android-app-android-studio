@@ -32,7 +32,12 @@
     </style>
 
     <style name="PositiveButton" parent="Widget.AppCompat.Button.Borderless">
-        <item name="colorButtonNormal">#52BB42</item>
+        <item name="colorButtonNormal">@color/lightGreen</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="AccentButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="colorButtonNormal">@color/lightBlue</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
@@ -49,16 +54,16 @@
         <item name="android:textSize">25sp</item>
     </style>
 
-    <style name="LoginSignUpButton" parent="Widget.AppCompat.Button.Borderless">
+    <style name="WhiteTextColouredButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="LoginButton" parent="LoginSignUpButton">
-        <item name="colorButtonNormal">#52BB42</item>
+    <style name="LoginButton" parent="WhiteTextColouredButton">
+        <item name="colorButtonNormal">@color/lightGreen</item>
     </style>
 
-    <style name="SignUpButton" parent="LoginSignUpButton">
-        <item name="colorButtonNormal">#4E8DDC</item>
+    <style name="SignUpButton" parent="WhiteTextColouredButton">
+        <item name="colorButtonNormal">@color/lightBlue</item>
     </style>
 
     <style name="LoginSignUpSmallPrintText">

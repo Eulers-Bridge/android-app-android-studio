@@ -1873,71 +1873,27 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void likePhoto(int photoId, PhotoViewFragment photoViewFragment) {
+    private void toggleContentLike(boolean like, String contentType, int contentId) {
         User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/photo/" + String.valueOf(photoId)
-                + "/likedBy/"
-                + String.valueOf(loggedInUser.getEmail()) + "/";
-        HashMap<String, String> params = new HashMap<>();
+        String url = String.format("%s/%s/%s/%s/%s/",
+                SERVER_URL,
+                contentType,
+                String.valueOf(contentId),
+                like? "likedBy" : "unlikedBy",
+                String.valueOf(loggedInUser.getEmail()));
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        int requestMethod = like? Request.Method.PUT : Request.Method.DELETE;
+
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(requestMethod, url, null,
                 response -> {
                     try {
                         //If we land in here the vote was submitted successfully
-                        String test = "";
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }, error -> Log.d("Volley", error.toString()));
 
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        Log.d("VolleyRequest", req.toString());
-    }
-
-    public void unlikePhoto(int photoId, PhotoViewFragment photoViewFragment) {
-        User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/photo/" + String.valueOf(photoId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
-        HashMap<String, String> params = new HashMap<>();
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
-                response -> {
-                    try {
-                        //If we land in here the vote was submitted successfully
-                        String test = "";
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, error -> Log.d("Volley", error.toString()));
-
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        Log.d("VolleyRequest", req.toString());
-    }
-
-    public void likeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
-        HashMap<String, String> params = new HashMap<>();
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
-                response -> {
-                    try {
-                        //If we land in here the vote was submitted successfully
-                        String test = "";
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, error -> Log.d("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1946,27 +1902,20 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    public void unlikeArticle(int articleId, NewsArticleFragment newsArticleFragment) {
-        User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/newsArticle/" + String.valueOf(articleId) + "/likedBy/" + String.valueOf(loggedInUser.getEmail()) + "/";
-        HashMap<String, String> params = new HashMap<>();
+    public void likePhoto(int photoId) {
+	    toggleContentLike(true, "photo", photoId);
+    }
 
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.DELETE, url, new JSONObject(params),
-                response -> {
-                    try {
-                        //If we land in here the vote was submitted successfully
-                        String test = "";
+    public void unlikePhoto(int photoId) {
+        toggleContentLike(false, "photo", photoId);
+    }
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, error -> Log.d("Volley", error.toString()));
+    public void likeArticle(int articleId) {
+        toggleContentLike(true, "newsArticle", articleId);
+    }
 
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        Log.d("VolleyRequest", req.toString());
+    public void unlikeArticle(int articleId) {
+        toggleContentLike(false, "newsArticle", articleId);
     }
 
     public void getTasks(final ProfileFragment profileFragment) {
@@ -2085,17 +2034,7 @@ public class Network {
     }
 
 	public void likeNewsArticle(final NewsArticleFragment newsArticleFragment) {
-		Runnable r = () -> {
-            try {
-                String response = getRequest("/newsArticle/"+String.valueOf(newsArticleFragment.getArticleId()) + "/likedBy/" + getLoggedInUser().getEmail() + "/");
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-		Thread t = new Thread(r);
-		t.start();
+        toggleContentLike(true, "newsArticle", newsArticleFragment.getArticleId());
 	}
 
     /**

@@ -3,6 +3,8 @@ package com.eulersbridge.isegoria;
 import android.util.Log;
 
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
@@ -26,6 +28,7 @@ public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService
     private static AmazonSNSClient getSNSClient() {
         if (snsClient == null){
             snsClient = new AmazonSNSClient(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY));
+            snsClient.setRegion(Region.getRegion(Regions.AP_SOUTHEAST_2));
         }
         return snsClient;
     }
@@ -34,7 +37,7 @@ public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d("Isegoria", "Refreshed token: " + refreshedToken);
+        Log.d(getString(R.string.TAG), "Refreshed token: " + refreshedToken);
 
         CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest();
 

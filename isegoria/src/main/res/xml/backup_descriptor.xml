@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude shared preferences (with user email & password) as per Google suggestion:
+    "Consider asking the user to reauthenticate the first time they launch a restored app rather
+    than allowing for storage of such information in the backup" -->
+    <exclude domain="sharedpref" path="."/>
+
+    <exclude domain="external" path="."/>
+
+    <!-- Exclude any Android Studio/development Instant Run files -->
+    <exclude domain="file" path="instant-run"/>
+</full-backup-content>
