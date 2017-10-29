@@ -4,6 +4,24 @@
 
     <string name="isegoria_logo_content_description">Isegoria Logo</string>
 
+    <!-- Navigation drawer labels -->
+    <string name="navigation_feed">Feed</string>
+    <string name="navigation_election">Election</string>
+    <string name="navigation_poll">Poll</string>
+    <string name="navigation_vote">Vote</string>
+    <string name="navigation_friends">Friends</string>
+    <string name="navigation_profile">Profile</string>
+    <string name="navigation_settings">Settings</string>
+
+    <!-- Toolbar titles for each navigation item -->
+    <string name="section_title_feed">Feed</string>
+    <string name="section_title_election">Election</string>
+    <string name="section_title_poll">Poll</string>
+    <string name="section_title_vote">Vote</string>
+    <string name="section_title_friends">Friends</string>
+    <string name="section_title_profile">Profile</string>
+    <string name="section_title_settings">Settings</string>
+
     <!-- Login / Sign Up -->
     <string name="user_login_email_hint">Email</string>
     <string name="user_login_password_hint">Password</string>
@@ -19,6 +37,11 @@
     <string name="user_sign_up_first_password">New Password</string>
     <string name="user_sign_up_confirm_password">Confirm Password</string>
     <string name="user_sign_up_next_button">Next</string>
+
+    <!-- Email verification -->
+    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
+    <string name="email_verification_success_button">Verified, Please Log Me In</string>
+    <string name="email_verification_resend_button">Resend Verification Email</string>
 
     <!-- Personality Questions -->
     <string name="section_title_personality_questions">Personality Questions</string>
@@ -38,6 +61,10 @@
     <string name="personality_slider_agree_a_little">Agree a Little</string>
     <string name="personality_slider_agree_moderately">Agree Moderately</string>
     <string name="personality_slider_agree_strongly">Agree Strongly</string>
+
+    <!-- Election -->
+    <string name="election_overview_subheading">Overview</string>
+    <string name="election_overview_process_subheading">Process</string>
 
     <!-- Voting -->
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
@@ -61,32 +88,24 @@
     <string name="self_efficacy_slider_likely">Somewhat likely</string>
     <string name="self_efficacy_slider_completely">Completely</string>
 
-    <!-- Email verification -->
-    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
-    <string name="email_verification_success_button">Verified, Please Log Me In</string>
-    <string name="email_verification_resend_button">Resend Verification Email</string>
+    <!-- Polls -->
+    <string name="poll_asked_by">Asked by %s</string>
+    <string name="poll_vote_submit_button">Vote</string>
 
-    <!-- News -->
+    <!-- Feed/News -->
     <string name="news_article_star_content_description">Star news article</string>
     <string name="news_article_flag_content_description">Flag news article</string>
 
-    <!-- Navigation drawer labels -->
-    <string name="navigation_feed">Feed</string>
-    <string name="navigation_election">Election</string>
-    <string name="navigation_poll">Poll</string>
-    <string name="navigation_vote">Vote</string>
-    <string name="navigation_friends">Friends</string>
-    <string name="navigation_profile">Profile</string>
-    <string name="navigation_settings">Settings</string>
+    <!-- Feed/Photos -->
+    <string name="photo_detail_view_star">Star Photo</string>
+    <string name="photo_detail_view_flag">Report Photo</string>
 
-    <!-- Toolbar titles for each navigation item -->
-    <string name="section_title_feed">Feed</string>
-    <string name="section_title_election">Election</string>
-    <string name="section_title_poll">Poll</string>
-    <string name="section_title_vote">Vote</string>
-    <string name="section_title_friends">Friends</string>
-    <string name="section_title_profile">Profile</string>
-    <string name="section_title_settings">Settings</string>
+    <!-- Friends -->
+    <string name="friends_search_title">Search</string>
+    <string name="friends_subheading_search_results">Search Results</string>
+    <string name="friends_subheading_friend_requests_received">Friend Requests</string>
+    <string name="friends_subheading_friend_requests_sent">Pending</string>
+    <string name="friends_subheading_all_friends">Friends</string>
 
     <!-- User profile page -->
     <string name="profile_section_friends">FRIENDS</string>
@@ -116,14 +135,5 @@
     <string name="drawer_close" tools:keep="@string/drawer_close">Drawer Close</string>
 
     <string name="contact_profile_picture_content_description">Contact profile picture</string>
-    <string name="friends_search_title">Search</string>
-
-    <string name="election_overview_subheading">Overview</string>
-    <string name="election_overview_process_subheading">Process</string>
-
-    <string name="poll_asked_by">Asked by %s</string>
-    <string name="poll_vote_submit_button">Vote</string>
-    <string name="photo_detail_view_star">Star Photo</string>
-    <string name="photo_detail_view_flag">Report Photo</string>
 
 </resources>

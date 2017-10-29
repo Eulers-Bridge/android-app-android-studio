@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,12 +24,13 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 public class NewsArticleFragment extends Fragment {
     private View rootView;
-    private ImageView newsArticleAuthorImage;
+    private ImageView authorImageView;
     private int articleId;
 
     private boolean setLiked = false;
@@ -48,7 +50,7 @@ public class NewsArticleFragment extends Fragment {
         network = mainActivity.getIsegoriaApplication().getNetwork();
         network.getNewsArticleLiked(this);
 
-        newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
+        authorImageView = rootView.findViewById(R.id.newsArticleAuthorImage);
 
         return rootView;
     }
@@ -129,26 +131,28 @@ public class NewsArticleFragment extends Fragment {
             //ImageView headShotImageView = (ImageView) rootView.findViewById(R.id.newsArticleHeadView);
             //network.getFirstPhotoImage(email, headShotImageView);
 
-            newsArticleAuthorImage.setVisibility(ViewGroup.VISIBLE);
+            authorImageView.setVisibility(ViewGroup.VISIBLE);
         });
     }
 
-    public void populateUserContent(final String name, final String photoURL) {
+    public void populateUserContent(User user) {
         getActivity().runOnUiThread(() -> {
             TextView newsArticleName = rootView.findViewById(R.id.photoTitle);
-            newsArticleName.setText(name);
+            newsArticleName.setText(user.getFullName());
         });
 
-        ImageView newsArticleAuthorImage = rootView.findViewById(R.id.newsArticleAuthorImage);
-        network.getPicture(photoURL, new Network.PictureDownloadListener() {
-            @Override
-            public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                Bitmap tintedBitmap = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
-                newsArticleAuthorImage.setImageBitmap(tintedBitmap);
-            }
+        if (!TextUtils.isEmpty(user.getProfilePhotoURL())) {
+            network.getPicture(user.getProfilePhotoURL(), new Network.PictureDownloadListener() {
+                @Override
+                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
+                    Bitmap tintedBitmap = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
+                    authorImageView.setImageBitmap(tintedBitmap);
+                }
 
-            @Override
-            public void onDownloadFailed(String url, VolleyError error) {}
-        });
+                @Override
+                public void onDownloadFailed(String url, VolleyError error) {}
+            });
+
+        }
     }
 }

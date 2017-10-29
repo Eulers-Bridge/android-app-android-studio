@@ -2,8 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/scrollView2">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,139 +13,118 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/searchResultsLinearLayout"
-            android:visibility="gone">
+            android:id="@+id/searchResultsSection"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingHorizontal="16dp"
+                android:text="@string/friends_subheading_search_results"
+                android:textColor="#ff575757"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <TableLayout
+                android:id="@+id/searchResultsTable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dip"
-                android:background="#838a8a8a" />
-            <RelativeLayout
-                android:id="@+id/relativeLayoutSearchResults"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#64d3d3d3" >
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
 
-                <TextView
-                    android:id="@+id/taskLevelFieldSearchResults"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="Search Results"
-                    android:textColor="#ff575757"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp" />
-
-
-            </RelativeLayout>
         </LinearLayout>
-
-        <TableLayout
-            android:id="@+id/usersAllTable"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
-        </TableLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:id="@+id/pendingRequestsLinearLayout"
-            android:visibility="gone">
+            android:id="@+id/friendsReceivedSection"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingHorizontal="16dp"
+                android:text="@string/friends_subheading_friend_requests_received"
+                android:textColor="#ff575757"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+
+            <TableLayout
+                android:id="@+id/friendsReceivedTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dip"
-                android:background="#838a8a8a" />
-            <RelativeLayout
-                android:id="@+id/relativeLayoutPending"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#64d3d3d3" >
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
 
-                <TextView
-                    android:id="@+id/taskLevelFieldPending"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="Pending Friend Requests"
-                    android:textColor="#ff575757"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp" />
-
-
-            </RelativeLayout>
         </LinearLayout>
-
-        <TableLayout
-            android:id="@+id/friendsPendingTableLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-            <TableRow
-                android:id="@+id/tableRow2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
-        </TableLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:id="@+id/friendsSentSection"
+            android:layout_marginTop="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingHorizontal="16dp"
+                android:text="@string/friends_subheading_friend_requests_sent"
+                android:textColor="#ff575757"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <TableLayout
+                android:id="@+id/friendsSentTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="1dip"
-                android:background="#838a8a8a" />
-            <RelativeLayout
-                android:id="@+id/relativeLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#64d3d3d3" >
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
 
-                <TextView
-                    android:id="@+id/taskLevelField"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:text="Current Friends"
-                    android:textColor="#ff575757"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp" />
-
-
-            </RelativeLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/friendsAllSubheading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingHorizontal="16dp"
+            android:text="@string/friends_subheading_all_friends"
+            android:textColor="#ff575757"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="4dp" />
 
         <TableLayout
             android:id="@+id/friendsAllTableLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
-        </TableLayout>
-
+            android:layout_height="match_parent" />
     </LinearLayout>
 </ScrollView>

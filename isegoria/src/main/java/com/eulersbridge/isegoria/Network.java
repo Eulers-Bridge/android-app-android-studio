@@ -46,6 +46,7 @@ import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.login.UserSignupFragment;
 import com.eulersbridge.isegoria.models.CountryInfo;
 import com.eulersbridge.isegoria.models.Event;
+import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.PollOption;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.poll.PollFragment;
@@ -120,6 +121,9 @@ public class Network {
 
         Cache cache = new DiskBasedCache(application.getCacheDir(), 1024 * 1024); // 1MB cap
         BasicNetwork network = new BasicNetwork(new HurlStack());
+
+        //For detailed debug network logging, uncomment the following line:
+        //VolleyLog.DEBUG = true;
 
         mRequestQueue = new RequestQueue(cache, network);
         mRequestQueue.start();
@@ -331,8 +335,8 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
-        
+                }, error -> Log.e("Volley", error.toString()));
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -388,7 +392,7 @@ public class Network {
 	private void getUser(final NewsArticleFragment newsArticleFragment, final String userEmail) {
         User loggedInUser = getLoggedInUser();
 		if (userEmail.equals(loggedInUser.getEmail())) {
-            newsArticleFragment.populateUserContent(loggedInUser.getFullName(), loggedInUser.getProfilePhotoURL());
+            newsArticleFragment.populateUserContent(loggedInUser);
 
         } else {
             Runnable r = () -> {
@@ -403,21 +407,21 @@ public class Network {
                     String photoURL = null;
 
                     if (photos != null) {
-                        int index=0;
-                        for(int i=0; i<photos.length(); i++) {
+                        int photoIndex = 0;
+                        for (int i = 0; i < photos.length(); i++) {
                             JSONObject currentObject = photos.getJSONObject(i);
                             String currentSeq = currentObject.getString("sequence");
 
-                            if(currentSeq.equals("0")) {
-                                index = i;
+                            if (currentSeq.equals("0")) {
+                                photoIndex = i;
                                 break;
                             }
                         }
 
-                        photoURL = (userObject.getJSONArray("photos").getJSONObject(index).getString("url"));
+                        photoURL = (userObject.getJSONArray("photos").getJSONObject(photoIndex).getString("url"));
                     }
 
-                    newsArticleFragment.populateUserContent(user.getFullName(), photoURL);
+                    newsArticleFragment.populateUserContent(user);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -472,14 +476,13 @@ public class Network {
     }
 
     void getFriends(final FindAddContactFragment findAddContactFragment) {
-        User loggedInUser = getLoggedInUser();
         String url = String.format("%s/contacts", SERVER_URL);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
             try {
                 JSONArray jArray = response.getJSONArray("foundObjects");
 
-                for(int i = 0; i < jArray.length(); i++) {
+                for (int i = 0; i < jArray.length(); i++) {
                     try {
                         JSONObject userObject = jArray.getJSONObject(i);
 
@@ -493,37 +496,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-
-        url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId()) + "/contactRequests";
-        req = new AuthorisedJsonObjectRequest(url, response -> {
-            try {
-                JSONArray friends = response.getJSONArray("foundObjects");
-                for(int i=0; i<friends.length(); i++) {
-                    try {
-                        JSONObject resp = friends.getJSONObject(i);
-
-                        int userId = resp.getInt("userId");
-                        boolean acceptedBoolean = resp.getBoolean("accepted");
-                        String contactDetails = resp.getString("contactDetails");
-
-                        if(acceptedBoolean) {
-                            Network.this.findContactFriend(String.valueOf(userId), findAddContactFragment);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, error -> Log.d("Volley", error.toString()));
-
-        policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
@@ -546,33 +521,12 @@ public class Network {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
-        
+        }, error -> Log.e("Volley", error.toString()));
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
 	}
-
-    private void findContactPending(final int contactId, String query, final FindAddContactFragment findAddContactFragment) {
-
-        String url = SERVER_URL + "/user/" + String.valueOf(query) + "/";
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
-            try {
-                User user = new User(response);
-                user.setId(String.valueOf(contactId));
-
-                findAddContactFragment.addFriendRequestSent(user);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, error -> Log.d("Volley", error.toString()));
-
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
 
     public void getProfileStats(final ProfileFragment profileFragment) {
         User loggedInUser = getLoggedInUser();
@@ -597,9 +551,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -624,7 +578,7 @@ public class Network {
                 e.printStackTrace();
                 callback.onFetchFailure(e);
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -652,31 +606,8 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
-        
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
-    }
+        }, error -> Log.e("Volley", error.toString()));
 
-    private void findContactFriend(final String query, final FindAddContactFragment findAddContactFragment) {
-        String url = String.format("%s/user/%s/", SERVER_URL, String.valueOf(query));
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
-            try {
-                User user = new User(response);
-
-                int userId = Integer.parseInt(query);
-                user.setId(String.valueOf(userId));
-
-                findAddContactFragment.addFriend(user);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, error -> Log.d("Volley", error.toString()));
-
-        
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -693,9 +624,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -704,20 +635,18 @@ public class Network {
     }
 
     void acceptContact(String contactRequestId, final FindAddContactFragment findAddContactFragment) {
-        String url = String.format("%s/user/contactRequest/%s/accept",SERVER_URL,contactRequestId);
+        String url = String.format("%s/user/contactRequest/%s/accept", SERVER_URL, contactRequestId);
 
-        HashMap<String, Integer> params = new HashMap<>();
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, null,
                 response -> {
                     try {
                         findAddContactFragment.showAcceptMessage();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -728,18 +657,16 @@ public class Network {
     void denyContact(String requestId, final FindAddContactFragment findAddContactFragment) {
         String url = String.format("%s/user/contactRequest/%s/reject", SERVER_URL, String.valueOf(requestId));
 
-        HashMap<String, Integer> params = new HashMap<>();
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
+        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, null,
                 response -> {
                     try {
                         findAddContactFragment.showDenyMessage();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -747,74 +674,51 @@ public class Network {
         Log.d("VolleyRequest", req.toString());
     }
 
-    void getFriendRequestsSent(final FindAddContactFragment findAddContactFragment) {
+    private void getFriendRequests(final FindAddContactFragment findAddContactFragment, FriendRequest.Type friendRequestType) {
         User loggedInUser = getLoggedInUser();
+
         String url = String.format("%s/user/%s/contactRequests", SERVER_URL, String.valueOf(loggedInUser.getId()));
+
+        if (friendRequestType == FriendRequest.Type.RECEIVED) {
+            url += "/rec";
+        }
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
             try {
-                JSONArray jArray = response.optJSONArray("foundObjects");
+                JSONArray foundObjects = response.optJSONArray("foundObjects");
 
-                if (jArray != null) {
-                    for (int i=0; i<jArray.length(); i++) {
-                        JSONObject currentObject = jArray.getJSONObject(i);
+                if (foundObjects != null) {
+                    for (int i = 0; i < foundObjects.length(); i++) {
+                        JSONObject foundObject = foundObjects.getJSONObject(i);
 
-                        int nodeId = currentObject.getInt("nodeId");
-                        int userId = currentObject.getInt("userId");
-                        //boolean acceptedContact = response.getBoolean("accepted");
-                        // boolean rejectedContact = response.getBoolean("rejected");
-                        if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
-                            String contactDetails = currentObject.getString("contactDetails");
+                        FriendRequest friendRequest = new FriendRequest(foundObject, friendRequestType);
 
-                            Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
+                        if (!friendRequest.isAccepted() && !friendRequest.isRejected()) {
+                            findAddContactFragment.addFriendRequest(friendRequest);
                         }
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
-        
+        }, error -> Log.e("Volley", error.toString()));
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
     }
 
+    void getFriendRequestsSent(final FindAddContactFragment findAddContactFragment) {
+	    getFriendRequests(findAddContactFragment, FriendRequest.Type.SENT);
+    }
+
     void getFriendRequestsReceived(final FindAddContactFragment findAddContactFragment) {
-        User loggedInUser = getLoggedInUser();
-        String url = String.format("%s/user/%s/contactRequests/rec", SERVER_URL, String.valueOf(loggedInUser.getId()));
-
-        AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url, response -> {
-            try {
-                JSONArray jArray = response.optJSONArray("foundObjects");
-
-                if (jArray != null) {
-                    for(int i=0; i<jArray.length(); i++) {
-                        JSONObject currentObject = jArray.getJSONObject(i);
-
-                        int nodeId = currentObject.getInt("nodeId");
-                        int userId = currentObject.getInt("userId");
-                        //boolean acceptedContact = response.getBoolean("accepted");
-                        // boolean rejectedContact = response.getBoolean("rejected");
-                        if(currentObject.isNull("accepted") && currentObject.isNull("rejected")) {
-                            String contactDetails = currentObject.getString("contactDetails");
-                            Network.this.findContactPending(nodeId, String.valueOf(userId), findAddContactFragment);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, error -> Log.d("Volley", error.toString()));
-
-        RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-        req.setRetryPolicy(policy);
-        mRequestQueue.add(req);
+        getFriendRequests(findAddContactFragment, FriendRequest.Type.RECEIVED);
     }
 
     public void addVoteReminder(String location, long date) {
         User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getEmail()) + "/voteReminder";
+        String url = String.format("%s/user/%s/voteReminder", SERVER_URL, String.valueOf(loggedInUser.getEmail()));
 
         HashMap<String, String> params = new HashMap<>();
         params.put("userEmail", String.valueOf(loggedInUser.getEmail()));
@@ -828,9 +732,9 @@ public class Network {
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 response -> {
 
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -871,7 +775,7 @@ public class Network {
                     callback.onFetchFailure(error);
                 });
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -883,9 +787,9 @@ public class Network {
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(url,
                 jObject -> {
                     String test = ":)";
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -902,7 +806,7 @@ public class Network {
                     eventsDetailFragment.addCandidate(email);
                 });
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -922,9 +826,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -951,9 +855,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -980,9 +884,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1032,9 +936,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1082,9 +986,9 @@ public class Network {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1110,9 +1014,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1132,9 +1036,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1219,9 +1123,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1244,9 +1148,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1270,7 +1174,7 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1297,9 +1201,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1317,9 +1221,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1347,9 +1251,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1366,9 +1270,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1388,9 +1292,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1417,7 +1321,7 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1441,9 +1345,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1468,9 +1372,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1488,9 +1392,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1521,9 +1425,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1554,9 +1458,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1575,9 +1479,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1613,9 +1517,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1646,9 +1550,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1683,9 +1587,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1705,9 +1609,9 @@ public class Network {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1734,7 +1638,7 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1758,9 +1662,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1795,9 +1699,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1818,7 +1722,7 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1842,7 +1746,7 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1866,7 +1770,7 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -1892,7 +1796,7 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
@@ -1937,9 +1841,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1965,9 +1869,9 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -1996,7 +1900,7 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
+        }, error -> Log.e("Volley", error.toString()));
 
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
@@ -2026,8 +1930,8 @@ public class Network {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, error -> Log.d("Volley", error.toString()));
-        
+        }, error -> Log.e("Volley", error.toString()));
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2052,6 +1956,7 @@ public class Network {
         BufferedReader bufferedReader = null;
 
         try {
+            Log.d("Isegoria", "GET REQUEST WITH PARAMS: "+params);
             URL url = new URL(SERVER_URL + params);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             connection.setDoInput(true);
@@ -2120,25 +2025,25 @@ public class Network {
                     try {
                         JSONArray photos = response.getJSONArray("photos");
 
-                        int index=0;
-                        for(int i=0; i<photos.length(); i++) {
+                        int photoIndex = 0;
+                        for (int i = 0; i < photos.length(); i++) {
                             JSONObject currentObject = photos.getJSONObject(i);
                             String currentSeq = currentObject.getString("sequence");
 
-                            if(currentSeq.equals("0")) {
-                                index = i;
+                            if (currentSeq.equals("0")) {
+                                photoIndex = i;
                                 break;
                             }
                         }
 
-                        String url1 = (response.getJSONArray("photos").getJSONObject(index).getString("url"));
+                        String url1 = (response.getJSONArray("photos").getJSONObject(photoIndex).getString("url"));
                         getFirstPhotoImage(url1, imageView);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2157,9 +2062,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2171,10 +2076,10 @@ public class Network {
                     view.setImageBitmap(bitmap);
                     view.refreshDrawableState();
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                error -> Log.d("Volley", error.toString())) {
+                error -> Log.e("Volley", error.toString())) {
         };
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2204,9 +2109,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2223,9 +2128,9 @@ public class Network {
                         view.setBackgroundDrawable(d);
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                error -> Log.d("Volley", error.toString()));
+                error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2235,9 +2140,9 @@ public class Network {
         if (params == null) return;
 
         ImageRequest req = new ImageRequest(params, imageView::setImageBitmap
-                , 0, 0, ImageView.ScaleType.CENTER_INSIDE, null, volleyError -> Log.d("Volley", volleyError.toString()));
+                , 0, 0, ImageView.ScaleType.CENTER_INSIDE, null, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2249,9 +2154,9 @@ public class Network {
                     view.setImageBitmap(srcBmp);
                     fragment.setImageBitmap(srcBmp);
                 }, 0, 0, ImageView.ScaleType.CENTER_INSIDE, null,
-                error -> Log.d("Volley", error.toString()));
+                error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2328,7 +2233,7 @@ public class Network {
     }
 
     private void updateDisplayPicturePhoto(String pictureURL) {
-        String url = SERVER_URL + "/photo";
+        String url = String.format("%s/photo", SERVER_URL);
         long timestamp = System.currentTimeMillis() / 1000L;
 
         User loggedInUser = getLoggedInUser();
@@ -2349,9 +2254,9 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
-        
+
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         req.setRetryPolicy(policy);
         mRequestQueue.add(req);
@@ -2361,7 +2266,7 @@ public class Network {
 
     public void updateUserDetails() {
         User loggedInUser = getLoggedInUser();
-        String url = SERVER_URL + "/user/" + String.valueOf(loggedInUser.getId());
+        String url = String.format("%s/user/%s", SERVER_URL, String.valueOf(loggedInUser.getId()));
 
         HashMap<String, String> params = new HashMap<>();
         params.put("trackingOff", String.valueOf(loggedInUser.isTrackingOff()));
@@ -2374,7 +2279,7 @@ public class Network {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }, error -> Log.d("Volley", error.toString()));
+                }, error -> Log.e("Volley", error.toString()));
 
         
         RetryPolicy policy = new DefaultRetryPolicy(socketTimeout, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);

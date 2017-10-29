@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -86,7 +87,7 @@ public class PollVoteFragment extends Fragment {
 
             createProgressBar("#0000FF", option);
 
-            if (option.getPhotoUrl() != null) {
+            if (!TextUtils.isEmpty(option.getPhotoUrl())) {
                 // Add one to the index, as the first table row is the poll question itself
                 final int finalIndex = i + 1;
 
@@ -298,7 +299,7 @@ public class PollVoteFragment extends Fragment {
         linearLayout.setPadding(paddingMargin1, 0, paddingMargin2, 0);
         linearLayout.setGravity(Gravity.CENTER_VERTICAL);
 
-        if (option.getPhotoUrl() != null) {
+        if (!TextUtils.isEmpty(option.getPhotoUrl())) {
             ImageView optionImageView = new ImageView(getActivity());
             optionImageView.setId(pollOptionImageViewId);
             optionImageView.setScaleType(ScaleType.FIT_CENTER);

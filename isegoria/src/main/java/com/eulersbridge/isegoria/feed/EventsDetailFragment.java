@@ -16,6 +16,7 @@ import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -67,7 +68,7 @@ public class EventsDetailFragment extends Fragment {
         isegoria = (Isegoria) getActivity().getApplication();
         network = isegoria.getNetwork();
 
-        if (event != null && event.getImageUrl() != null) {
+        if (event != null && !TextUtils.isEmpty(event.getImageUrl())) {
             network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
                 @Override
                 public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
