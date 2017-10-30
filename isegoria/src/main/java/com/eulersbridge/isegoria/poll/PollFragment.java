@@ -41,6 +41,9 @@ public class PollFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.poll_vote_fragment, container, false);
 
+        // Ensure options menu from another fragment is not carried over
+        getActivity().invalidateOptionsMenu();
+
         ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_poll));
 
 		fragments = new Vector<>();

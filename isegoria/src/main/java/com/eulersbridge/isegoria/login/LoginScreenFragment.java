@@ -2,11 +2,13 @@ package com.eulersbridge.isegoria.login;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -31,6 +33,7 @@ public class LoginScreenFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.user_login_screen_fragment, container, false);
 
         final MainActivity mainActivity = (MainActivity) getActivity();
+        Utils.setStatusBarColour(mainActivity, Color.BLACK);
         mainActivity.setToolbarVisible(false);
 
         final LinearLayout loginContainer = rootView.findViewById(R.id.loginContainer);
@@ -86,4 +89,9 @@ public class LoginScreenFragment extends Fragment {
 		
 		return rootView;
 	}
+
+    public void setTabLayout(TabLayout tabLayout) {
+        tabLayout.setVisibility(View.GONE);
+    }
+
 }

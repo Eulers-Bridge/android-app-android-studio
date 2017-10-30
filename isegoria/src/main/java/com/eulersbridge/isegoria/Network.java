@@ -219,6 +219,7 @@ public class Network {
                     signup.put("accountVerified", "false");
                     signup.put("password", password);
                     signup.put("institutionId", String.valueOf(institution));
+                    signup.put("hasPersonality", false);
 
                     json = signup.toString();
 
@@ -1199,22 +1200,23 @@ public class Network {
         mRequestQueue.add(req);
     }
 
-    public void answerPersonality(float extroversion, float agreeableness, float conscientiousness,
+    public void addPersonalityForUser(float extroversion, float agreeableness, float conscientiousness,
                                   float emotionalStability, float openness) {
         User loggedInUser = getLoggedInUser();
-        String url = String.format("%s/user/%s/personality", SERVER_URL, String.valueOf(loggedInUser.getId()));
+        String url = String.format("%s/user/%s/personality", SERVER_URL, String.valueOf(loggedInUser.getEmail()));
 
         HashMap<String, Float> params = new HashMap<>();
-        params.put("extroversion", extroversion);
         params.put("agreeableness", agreeableness);
         params.put("conscientiousness", conscientiousness);
         params.put("emotionalStability", emotionalStability);
+        params.put("extroversion", extroversion);
         params.put("openess", openness);
 
         AuthorisedJsonObjectRequest req = new AuthorisedJsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
                 response -> {
                     try {
                         application.setFeedFragment();
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

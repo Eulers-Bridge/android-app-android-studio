@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.utilities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,11 +11,14 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+
+import com.eulersbridge.isegoria.R;
 
 import java.io.InputStream;
 
@@ -23,6 +27,31 @@ import java.io.InputStream;
  */
 
 public final class Utils {
+
+    //Change colour, use default title (app name)
+    public static void setMultitaskColour(Activity activity, @ColorInt int colour) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            setMultitaskDescription(activity, activity.getString(R.string.app_name), colour);
+        }
+    }
+
+    private static void setMultitaskDescription(Activity activity, String title, @ColorInt int colour) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            final Bitmap icon = BitmapFactory.decodeResource(activity.getResources(), R.drawable.app_icon);
+
+            activity.setTaskDescription(new ActivityManager.TaskDescription(title, icon, colour));
+
+            icon.recycle();
+        }
+    }
+
+    public static void setStatusBarColour(Activity activity, @ColorInt int colour) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            activity.getWindow().setStatusBarColor(colour);
+        }
+    }
 
     public static void hideKeyboard(Activity activity) {
         final View currentFocus = activity.getCurrentFocus();

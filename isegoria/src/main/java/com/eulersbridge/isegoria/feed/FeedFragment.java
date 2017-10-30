@@ -1,9 +1,11 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,12 +24,24 @@ public class FeedFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.feed_fragment, container, false);
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_feed));
+        MainActivity mainActivity = (MainActivity)getActivity();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int colour = ContextCompat.getColor(mainActivity, R.color.darkBlue);
+            mainActivity.getWindow().setStatusBarColor(colour);
+
+            Utils.setMultitaskColour(mainActivity, colour);
+        }
+
+        // Ensure options menu from another fragment is not carried over
+        mainActivity.invalidateOptionsMenu();
+
+        mainActivity.setToolbarTitle(getString(R.string.section_title_feed));
 
         setupViewPager(rootView);
         setupTabLayout();
 
-        Utils.hideKeyboard(getActivity());
+        Utils.hideKeyboard(mainActivity);
 
 		return rootView;
 	}

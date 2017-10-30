@@ -117,6 +117,7 @@
     <string name="profile_section_events">Events</string>
     <string name="profile_show_progress">Show Progress</string>
     <string name="user_profile_personality_test_button">Complete Personality Test</string>
+    <string name="profile_logout">Logout</string>
 
     <!-- Settings -->
     <string name="settings_profile_picture_content_description">Your profile picture</string>

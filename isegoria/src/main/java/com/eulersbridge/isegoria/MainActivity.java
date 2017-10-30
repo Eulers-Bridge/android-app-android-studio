@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			login(userEmail, userPassword);
 
 		} else {
-			switchContent(new LoginScreenFragment());
+			showLogin();
 		}
         //switchContent(new PersonalityQuestionsFragment());
 	}
@@ -182,6 +182,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	public TabLayout getTabLayout() {
 		return tabLayout;
+	}
+
+	public void showLogin() {
+		LoginScreenFragment loginScreenFragment = new LoginScreenFragment();
+		loginScreenFragment.setTabLayout(tabLayout);
+		switchContent(loginScreenFragment);
 	}
 
 	@Override

@@ -22,6 +22,9 @@ public class ElectionMasterFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.election_master_layout, container, false);
 
+		// Ensure options menu from another fragment is not carried over
+		getActivity().invalidateOptionsMenu();
+
 		((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_election));
 
 		overviewFragment = new ElectionOverviewFragment();

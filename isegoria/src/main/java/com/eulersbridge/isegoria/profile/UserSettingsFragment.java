@@ -46,6 +46,9 @@ public class UserSettingsFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
 
+        // Ensure options menu from another fragment is not carried over
+        getActivity().invalidateOptionsMenu();
+
         mainActivity = (MainActivity) getActivity();
 
         mainActivity.setToolbarTitle(getString(R.string.section_title_settings));

@@ -23,6 +23,9 @@ public class VoteViewPagerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
+        // Ensure options menu from another fragment is not carried over
+        getActivity().invalidateOptionsMenu();
+
         ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_vote));
 
         setupViewPager(rootView);

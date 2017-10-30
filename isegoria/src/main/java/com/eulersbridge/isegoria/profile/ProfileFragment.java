@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -41,6 +44,8 @@ public class ProfileFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
+		setHasOptionsMenu(true);
+
         final MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
@@ -73,19 +78,6 @@ public class ProfileFragment extends Fragment {
             }
         });*/
 
-        final TextView personalityTestButton = rootView.findViewById(R.id.personalityTestButton);
-        personalityTestButton.setOnClickListener(view -> {
-
-            PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-            personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
-
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .add(R.id.container, personalityQuestionsFragment)
-                    .commit();
-        });
-
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
         circularSeekBar3 = rootView.findViewById(R.id.circularSeekBar3);
@@ -99,6 +91,25 @@ public class ProfileFragment extends Fragment {
 
         final TextView name = rootView.findViewById(R.id.profileName);
         name.setText(user.getFullName());
+
+        final TextView personalityTestButton = rootView.findViewById(R.id.personalityTestButton);
+
+        if (user.hasPersonality()) {
+            personalityTestButton.setVisibility(View.GONE);
+
+        } else {
+            personalityTestButton.setOnClickListener(view -> {
+
+                PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
+                personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.container, personalityQuestionsFragment)
+                        .commit();
+            });
+        }
 
         updateCompletedBadgesCount(user.getCompletedBadgesCount());
         updateCompletedTasksCount(user.getCompletedTasksCount());
@@ -121,7 +132,25 @@ public class ProfileFragment extends Fragment {
 		return rootView;
 	}
 
-	private void updateCompletedBadgesCount(long count) {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	    if (item.getItemId() == R.id.profileLogout) {
+
+            ((Isegoria)getActivity().getApplication()).logOut();
+
+	        return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateCompletedBadgesCount(long count) {
         circularSeekBar2.setTopLine(String.valueOf(count));
         circularSeekBar2.setProgress((int)count);
 

@@ -44,8 +44,11 @@ public class PersonalityScreen2Fragment extends Fragment {
             float emotionalStability = (personalitySliderBar9.getScore() + (8-personalitySliderBar4.getScore()))/2;
             float opennessToExperiences = (personalitySliderBar5.getScore() + (10-personalitySliderBar6.getScore()))/2;
 
-            network.answerPersonality(extraversion, agreeableness, conscientiousness,
+            network.addPersonalityForUser(extraversion, agreeableness, conscientiousness,
                     emotionalStability, opennessToExperiences);
+
+            mainActivity.getSupportFragmentManager().popBackStack();
+            mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
         });
 
         return rootView;

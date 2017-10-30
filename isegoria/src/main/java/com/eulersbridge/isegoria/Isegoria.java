@@ -1,11 +1,6 @@
 package com.eulersbridge.isegoria;
 
-import android.app.ActivityManager;
 import android.app.Application;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
@@ -55,18 +50,6 @@ public class Isegoria extends Application {
 
             mainActivity.setNavigationDrawerEnabled(true);
             mainActivity.setToolbarVisible(true);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int color = ContextCompat.getColor(mainActivity, R.color.darkBlue);
-                mainActivity.getWindow().setStatusBarColor(color);
-
-                //Set color of multitasking bar (have to pass in app name and icon again however)
-
-                Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.app_icon);
-                mainActivity.setTaskDescription(
-                        new ActivityManager.TaskDescription(getString(R.string.app_name), icon, color));
-                icon.recycle();
-            }
 
             final FeedFragment feedFragment = new FeedFragment();
             feedFragment.setTabLayout(mainActivity.getTabLayout());
@@ -133,6 +116,18 @@ public class Isegoria extends Application {
 				.putString("userEmail", loggedInUser.getEmail())
 				.putString("userPassword", loggedInUser.getPassword())
 				.apply();
+	}
+
+	public void logOut() {
+		loggedInUser = null;
+
+		new SecurePreferences(getApplicationContext())
+				.edit()
+				.remove("userPassword")
+				.apply();
+
+
+		getMainActivity().showLogin();
 	}
 
 	public void setTrackingOff(boolean trackingOff) {
