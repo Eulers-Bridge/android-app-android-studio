@@ -24,8 +24,6 @@ import com.eulersbridge.isegoria.views.CircularSeekBar;
 public class ContactProfileFragment extends Fragment {
     private View rootView;
 
-    private Network network;
-
     private TextView friendsNumTextView;
     private TextView groupNumTextView;
     private TextView rewardsNumTextView;
@@ -35,18 +33,16 @@ public class ContactProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
+    private Network network;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.contact_profile_fragment, container, false);
+        rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-        //TODO: Hide tab layout
+        rootView.findViewById(R.id.personalityTestButton).setVisibility(View.GONE);
 
-        Bundle bundle = this.getArguments();
-        User user = bundle.getParcelable("profile");
-
-        friendsNumTextView = rootView.findViewById(R.id.contactFriendsNum);
-        groupNumTextView = rootView.findViewById(R.id.contactsGroupNum);
-        rewardsNumTextView = rootView.findViewById(R.id.contactRewardsNum);
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
@@ -55,17 +51,9 @@ public class ContactProfileFragment extends Fragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-
-        //TextView name = rootView.findViewById(R.id.profileName);
-        //network.getUserFullName(profileId, name, "");
-
-        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-        network.getUserDP(Integer.valueOf(user.getId()), photoImageView, backgroundLinearLayout);
-
-        network.getTasks(this);
-        network.getDashboardStats(this, Integer.valueOf(user.getId()));
+        friendsNumTextView = rootView.findViewById(R.id.friendsNum);
+        groupNumTextView = rootView.findViewById(R.id.groupNum);
+        rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
@@ -76,32 +64,81 @@ public class ContactProfileFragment extends Fragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
+        Bundle bundle = this.getArguments();
+        User user = bundle.getParcelable("profile");
+
+        final TextView name = rootView.findViewById(R.id.profileName);
+        name.setText(user.getFullName());
+
+        updateCompletedBadgesCount(user.getCompletedBadgesCount());
+        updateCompletedTasksCount(user.getCompletedTasksCount());
+        updateExperience(user.getLevel());
+
+        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
+        network.getUserDP(photoImageView, backgroundLinearLayout);
+
+        network.getTasks(this);
+        network.getProfileStats(user.getEmail(), new Network.ProfileStatsListener() {
+            @Override
+            public void onFetchSuccess(int contactsCount, int totalTasksCount) {
+                updateStats(contactsCount, totalTasksCount);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) { }
+        });
+
         return rootView;
     }
 
-    public void updateStats(int numOfContacts, int numOfCompBadges, int numOfCompTasks,
-                            int totalBadges, int totalTasks) {
+    private void updateCompletedBadgesCount(long count) {
+        circularSeekBar2.setTopLine(String.valueOf(count));
+        circularSeekBar2.setProgress((int)count);
+
+        if (circularSeekBar2.getMax() > 0) {
+            Thread t2 = new Thread(circularSeekBar2);
+            t2.start();
+        }
+    }
+
+    private void updateRemainingBadgesCount(long count) {
+        circularSeekBar2.setBottomLine("/" + String.valueOf(count));
+        circularSeekBar2.setMax((int)count);
+
+        if (circularSeekBar2.getProgress() > 0) {
+            Thread t2 = new Thread(circularSeekBar2);
+            t2.start();
+        }
+    }
+
+    private void updateCompletedTasksCount(long count) {
+        circularSeekBar3.setTopLine(String.valueOf(count));
+        circularSeekBar3.setProgress((int)count);
+        Thread t3 = new Thread(circularSeekBar3);
+        t3.start();
+    }
+
+    private void updateExperience(long experience) {
+        circularSeekBar1.setTopLine(String.valueOf(experience));
+        circularSeekBar1.setBottomLine("NEED " + (1000 - (experience % 1000)));
+        circularSeekBar1.setProgress((int)experience);
+        circularSeekBar1.setMax((int) ((experience / 1000) % 1000));
+        Thread t1 = new Thread(circularSeekBar1);
+        t1.start();
+    }
+
+    public void updateStats(int numOfContacts, int totalTasks) {
         friendsNumTextView.setText(String.valueOf(numOfContacts));
         groupNumTextView.setText(String.valueOf("0"));
         rewardsNumTextView.setText(String.valueOf("0"));
-        circularSeekBar2.setTopLine(String.valueOf(numOfCompBadges));
-        circularSeekBar2.setBottomLine("/" + String.valueOf(totalBadges));
-        circularSeekBar3.setTopLine(String.valueOf(numOfCompTasks));
+
         circularSeekBar3.setBottomLine("PER DAY");
+        circularSeekBar4.setTopLine(String.valueOf("0"));
+        circularSeekBar4.setBottomLine("ATTENDED");
 
-        circularSeekBar1.setProgress(30);
-        circularSeekBar2.setMax(totalBadges);
-        circularSeekBar2.setProgress(numOfCompBadges);
         circularSeekBar3.setMax(totalTasks);
-        circularSeekBar3.setProgress(numOfCompTasks);
-        circularSeekBar4.setProgress(30);
 
-        Thread t1 = new Thread(circularSeekBar1);
-        t1.start();
-        Thread t2 = new Thread(circularSeekBar2);
-        t2.start();
-        Thread t3 = new Thread(circularSeekBar3);
-        t3.start();
+        circularSeekBar4.setProgress(30);
         Thread t4 = new Thread(circularSeekBar4);
         t4.start();
     }

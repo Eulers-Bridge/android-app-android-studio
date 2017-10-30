@@ -151,8 +151,10 @@ public class FindAddContactFragment extends Fragment {
         }
     }
 
-    public void addFriend(User user) {
-        addTableRow(friendsAllTableLayout, user, null, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
+    public void setFriends(ArrayList<User> friends) {
+        for (User friend : friends) {
+            addTableRow(friendsAllTableLayout, friend, null, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
+        }
     }
 
     public void addFriendRequest(FriendRequest friendRequest) {

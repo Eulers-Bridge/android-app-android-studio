@@ -41,15 +41,15 @@ public class ProfileFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
+        final MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
 
         ImageView photoImageView = rootView.findViewById(R.id.profilePic);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
-
-        final MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         groupNumTextView = rootView.findViewById(R.id.groupNum);
@@ -98,7 +98,7 @@ public class ProfileFragment extends Fragment {
         User user = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
 
         final TextView name = rootView.findViewById(R.id.profileName);
-        name.setText(user.getFamilyName());
+        name.setText(user.getFullName());
 
         updateCompletedBadgesCount(user.getCompletedBadgesCount());
         updateCompletedTasksCount(user.getCompletedTasksCount());
@@ -108,7 +108,15 @@ public class ProfileFragment extends Fragment {
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
         network.getTasks(this);
-        network.getProfileStats(this);
+        network.getProfileStats(user.getEmail(), new Network.ProfileStatsListener() {
+            @Override
+            public void onFetchSuccess(int contactsCount, int totalTasksCount) {
+                updateStats(contactsCount, totalTasksCount);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) { }
+        });
 
 		return rootView;
 	}

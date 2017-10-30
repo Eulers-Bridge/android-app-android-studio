@@ -29,6 +29,8 @@ public class User implements Parcelable {
     private String nationality;
     private String yearOfBirth;
 
+    private long contactsCount;
+
     private long completedTasksCount;
     private long completedBadgesCount;
     private long experience;
@@ -55,6 +57,8 @@ public class User implements Parcelable {
             gender = jsonObject.getString("gender");
             nationality = jsonObject.getString("nationality");
             yearOfBirth = jsonObject.optString("yearOfBirth");
+
+            contactsCount = jsonObject.optLong("numOfContacts");
 
             completedTasksCount = jsonObject.getLong("numOfCompTasks");
             completedBadgesCount = jsonObject.getLong("numOfCompBadges");
@@ -89,6 +93,8 @@ public class User implements Parcelable {
         nationality = in.readString();
         yearOfBirth = in.readString();
 
+        contactsCount = in.readLong();
+
         completedTasksCount = in.readLong();
         completedBadgesCount = in.readLong();
         experience = in.readLong();
@@ -117,6 +123,8 @@ public class User implements Parcelable {
         parcel.writeString(gender);
         parcel.writeString(nationality);
         parcel.writeString(yearOfBirth);
+
+        parcel.writeLong(contactsCount);
 
         parcel.writeLong(completedTasksCount);
         parcel.writeLong(completedBadgesCount);
@@ -213,6 +221,14 @@ public class User implements Parcelable {
 
     public boolean isOptedOutOfDataCollection() {
         return optOutDataCollection;
+    }
+
+    public void setContactsCount(long contactsCount) {
+        this.contactsCount = contactsCount;
+    }
+
+    public long getContactsCount() {
+        return contactsCount;
     }
 
     public long getCompletedTasksCount() {
