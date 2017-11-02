@@ -394,7 +394,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	@Override
 	public void onSaveInstanceState(Bundle outState){
 		super.onSaveInstanceState(outState);
-		getSupportFragmentManager().putFragment(outState, "mContent", mContent);
+
+		if (mContent.isAdded()) {
+			getSupportFragmentManager().putFragment(outState, "mContent", mContent);
+		}
 	}
 	
 	public void switchContent(Fragment fragment) {

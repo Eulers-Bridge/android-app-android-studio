@@ -38,8 +38,6 @@ public class FindAddContactFragment extends Fragment {
     private TableLayout searchResultsTableLayout;
     private TableLayout friendsAllTableLayout;
 
-    private float dpWidth;
-
     private Network network;
 
     private MainActivity mainActivity;
@@ -56,14 +54,6 @@ public class FindAddContactFragment extends Fragment {
 
         searchResultsTableLayout = rootView.findViewById(R.id.searchResultsTable);
         friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
-
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        dpWidth = displayMetrics.widthPixels;
-
-        View dividerView = new View(getActivity());
-        dividerView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
-        dividerView.setBackgroundColor(Color.parseColor("#E0E0E0"));
-        searchResultsTableLayout.addView(dividerView);
 
         mainActivity = (MainActivity) getActivity();
         mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
@@ -333,7 +323,7 @@ public class FindAddContactFragment extends Fragment {
         layout.setLayoutParams(relativeParamsLeft);
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
-        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
+        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
 
         relLayoutMaster.addView(layout);
