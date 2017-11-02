@@ -12,10 +12,13 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item>
+
+        <item name="colorPrimary">@color/lightBlue</item>
+        <item name="colorPrimaryDark">@color/lightBlue</item>
+        <item name="colorAccent">@color/lightBlue</item>
     </style>
 
     <style name="ToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/lightBlue</item>
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
