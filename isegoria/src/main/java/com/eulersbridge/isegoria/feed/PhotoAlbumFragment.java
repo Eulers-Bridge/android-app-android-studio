@@ -21,6 +21,9 @@ import android.widget.TableRow;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Photo;
+
+import java.util.ArrayList;
 
 public class PhotoAlbumFragment extends Fragment {
     private TableLayout photosAlbumTableLayout;
@@ -32,7 +35,6 @@ public class PhotoAlbumFragment extends Fragment {
 	private int dividerPadding = 0;
 
 	private boolean insertedFirstRow = false;
-	private String photoAlbumName = "";
 
     private PhotoViewPagerFragment photoViewPagerFragment;
 
@@ -45,15 +47,11 @@ public class PhotoAlbumFragment extends Fragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
-		getActivity().setTitle(getString(R.string.app_name));
-		Bundle bundle = this.getArguments();
-		photoAlbumName = bundle.getString("Album");
+
+		int photoAlbumId = getArguments().getInt("albumId");
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		photosAlbumTableLayout = rootView.findViewById(R.id.photosAlbumTableLayout);
-
-        int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 6.666666667, getResources().getDisplayMetrics());
 
         squareSize = displayMetrics.widthPixels / 4 - (10/4);
         fitPerRow = 4;
@@ -65,16 +63,29 @@ public class PhotoAlbumFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPhotoAlbum(this, photoAlbumName);
+        network.getAlbumPhotos(photoAlbumId, new Network.PhotosListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Photo> photos) {
+                addPhotoThumbs(photos);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 
 		return rootView;
 	}
 
-	public void addPhotoThumb(final String bitmap, final int photoId) {
-		addTableRow(bitmap, photoId);
-	}
+	private void addPhotoThumbs(ArrayList<Photo> photos) {
+	    if (getActivity() != null) {
+	        getActivity().runOnUiThread(() -> {
+                for (Photo photo : photos)
+                    addTableRow(photo);
+            });
+        }
+    }
 
-	private void addTableRow(String bitmap, final int photoPath) {
+	private void addTableRow(Photo photo) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float) 6.666666667, getResources().getDisplayMetrics());
@@ -110,20 +121,20 @@ public class PhotoAlbumFragment extends Fragment {
             linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             linearLayout.setPadding(paddingMargin, 0, 0, 0);
 
-            PhotoViewFragment fragment2 = new PhotoViewFragment();
+            PhotoViewFragment detailFragment = new PhotoViewFragment();
             Bundle args = new Bundle();
-            args.putInt("PhotoId", photoPath);
-            fragment2.setArguments(args);
+            args.putParcelable("photo", photo);
+            detailFragment.setArguments(args);
 
-            final int index = photoViewPagerFragment.addFragment(fragment2);
-            network.getPictureVolley2(bitmap, view, squareSize, fragment2);
+            final int index = photoViewPagerFragment.addFragment(detailFragment);
+            network.getPictureVolley2(photo.getThumbnailUrl(), view, detailFragment);
 
             view.setOnClickListener(view1 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 PhotoViewFragment fragment21 = new PhotoViewFragment();
                 Bundle args1 = new Bundle();
-                args1.putString("PhotoName", String.valueOf(photoPath));
+                args1.putString("PhotoName", String.valueOf(photo.getId()));
                 fragment21.setArguments(args1);
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);

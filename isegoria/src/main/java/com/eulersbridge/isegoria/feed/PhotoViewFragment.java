@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.feed;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 
 public class PhotoViewFragment extends Fragment {
@@ -25,7 +27,8 @@ public class PhotoViewFragment extends Fragment {
     private TextView photoLikes;
 
 	private DisplayMetrics displayMetrics;
-	private int photoPath;
+
+    private int photoPath;
 
     private Network network;
     private Bitmap imageBitmap;
@@ -38,13 +41,9 @@ public class PhotoViewFragment extends Fragment {
 
 		Bundle bundle = this.getArguments();
 		photoPath = bundle.getInt("PhotoId");
+        Photo photo = bundle.getParcelable("photo");
 
 		displayMetrics = getActivity().getResources().getDisplayMetrics();
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPhoto(this, photoPath);
-        network.getPhotoLiked(this);
 
         photoView = rootView.findViewById(R.id.photoView);
         photoStar = rootView.findViewById(R.id.photoFlag);
@@ -70,12 +69,44 @@ public class PhotoViewFragment extends Fragment {
             }
         });
 
+        MainActivity mainActivity = (MainActivity) getActivity();
+        network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        if (photo == null) {
+            network.getPhoto(photoPath, new Network.PhotoListener() {
+                @Override
+                public void onFetchSuccess(Photo photo) {
+                    populatePhotoData(photo.getTitle(), photo.getDateTimestamp(), photo.hasInappropriateContent(), photo.getLikeCount());
+                }
+
+                @Override
+                public void onFetchFailure(long photoId, Exception e) {}
+            });
+
+            network.getPhotoLiked(photoPath, new Network.PhotoLikedListener() {
+                @Override
+                public void onFetchSuccess(long photoId, boolean liked) {
+                    if (liked) initiallyLiked();
+                }
+
+                @Override
+                public void onFetchFailure(Exception e) {}
+            });
+
+        } else {
+            populatePhotoData(photo.getTitle(), photo.getDateTimestamp(), photo.hasInappropriateContent(), photo.getLikeCount());
+        }
+
 		return rootView;
 	}
 
     public void initiallyLiked() {
-        final ImageView starView = rootView.findViewById(R.id.photoStar);
-        starView.setImageResource(R.drawable.star);
+	    if (getActivity() != null) {
+	        getActivity().runOnUiThread(() -> {
+                final ImageView starView = rootView.findViewById(R.id.photoStar);
+                starView.setImageResource(R.drawable.star);
+            });
+        }
     }
 
     public boolean isSetLiked() {
@@ -94,7 +125,8 @@ public class PhotoViewFragment extends Fragment {
         this.imageBitmap = bitmap;
     }
 
-    public void setData(String title, long date,
+    @UiThread
+    private void populatePhotoData(String title, long date,
                         final boolean inappropriateContent, int numOfLikes) {
         String dateStr = TimeConverter.convertTimestampToString(date);
 

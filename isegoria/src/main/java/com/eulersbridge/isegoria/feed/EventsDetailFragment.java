@@ -212,7 +212,16 @@ public class EventsDetailFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        network.getTicketLabel(textViewParty, ticketId);
+        network.getTicketLabel(ticketId, new Network.TicketLabelListener() {
+            @Override
+            public void onFetchSuccess(long ticketId, String colour, String code) {
+                textViewParty.setText(code);
+                textViewParty.setBackgroundColor(Color.parseColor(colour));
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) { }
+        });
 
         RectShape rect = new RectShape();
         ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
@@ -244,7 +253,15 @@ public class EventsDetailFragment extends Fragment {
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(textViewPosition, positionId);
+        network.getPositionText(positionId, new Network.PositionListener() {
+            @Override
+            public void onFetchSuccess(long positionId, String name) {
+                textViewPosition.setText(name);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 
         View dividerView = new View(getContext());
         dividerView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));

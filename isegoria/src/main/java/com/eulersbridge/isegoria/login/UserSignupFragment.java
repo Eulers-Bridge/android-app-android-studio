@@ -15,15 +15,13 @@ import android.widget.Spinner;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.CountryInfo;
-import com.eulersbridge.isegoria.models.InstitutionInfo;
+import com.eulersbridge.isegoria.models.Country;
+import com.eulersbridge.isegoria.models.Institution;
 
 import java.util.ArrayList;
 
 public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
-	private ArrayList<String> countries;
-	private ArrayList<CountryInfo> countryObjects;
-	private ArrayList<String> institutions;
+	private ArrayList<Country> countries;
 	private ArrayAdapter<String> spinnerArrayAdapter;
 	private ArrayAdapter<String> spinnerInstitutionArrayAdapter;
 
@@ -37,14 +35,21 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 
 		//TODO: Hide tabs
 
-		countries = new ArrayList<>();
-		countryObjects = new ArrayList<>();
+        countries = new ArrayList<>();
 
 		Isegoria isegoria = (Isegoria) getActivity().getApplication();
-		isegoria.setCountryObjects(countryObjects);
+		isegoria.setCountryObjects(countries);
         Network network = new Network(isegoria);
         isegoria.setNetwork(network);
-        network.getGeneralInfo(this);
+        network.getGeneralInfo(new Network.GeneralInfoListener() {
+            @Override
+            public void onFetchCountriesSuccess(ArrayList<Country> countries) {
+                setCountries(countries);
+            }
+
+            @Override
+            public void onFetchCountriesFailure(Exception e) {}
+        });
         
         Spinner spinner = rootView.findViewById(R.id.country);
         spinner.setOnItemSelectedListener(this);
@@ -78,20 +83,23 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerYearOfBirth.setAdapter(spinnerYearOfBirthArrayAdapter);
         
-        CountryInfo countryInfo = new CountryInfo("Select Country"); 
-        addCountry(countryInfo);
+        Country countryPlaceholder = new Country("Select Country");
+        spinnerArrayAdapter.add(countryPlaceholder.getName());
         spinnerInstitutionArrayAdapter.add("Select Institution");
 		
 		return rootView;
 	}
 	
-	public void addCountry(final CountryInfo countryInfo) {
+	private void setCountries(final ArrayList<Country> countries) {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {
-                spinnerArrayAdapter.add(countryInfo.getCountry());
-                countries.add(countryInfo.getCountry());
-                countryObjects.add(countryInfo);
+
+			    for (Country country : countries) {
+			        spinnerArrayAdapter.add(country.getName());
+                }
+
+                UserSignupFragment.this.countries = countries;
             });
 		}
 	}
@@ -100,16 +108,14 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
             int pos, long id) {
     	String selectedCountry = (String) parent.getSelectedItem();
     	spinnerInstitutionArrayAdapter.clear();
-    	
-    	for(int i=0; i<countryObjects.size(); i++) {
-    		CountryInfo countryInfo = countryObjects.get(i);
-    		if(selectedCountry.equals(countryInfo.getCountry())) {
-    			for(int j=0; j<countryInfo.getInstitutions().size(); j++) {
-    				InstitutionInfo currentInstitution = countryInfo.getInstitutions().get(j);
-    				spinnerInstitutionArrayAdapter.add(currentInstitution.getInstitution());
-    			}
-    		}
-    	}
+
+    	for (Country country : countries) {
+            if (selectedCountry.equals(country.getName())) {
+                for (Institution institution : country.getInstitutions()) {
+                    spinnerInstitutionArrayAdapter.add(institution.getName());
+                }
+            }
+        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

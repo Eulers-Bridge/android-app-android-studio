@@ -5,7 +5,7 @@ import android.app.Application;
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
-import com.eulersbridge.isegoria.models.CountryInfo;
+import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.User;
 import com.securepreferences.SecurePreferences;
 
@@ -22,7 +22,7 @@ public class Isegoria extends Application {
 	private String username = "";
 	private String password = "";
 
-	private ArrayList<CountryInfo> countryObjects;
+	private ArrayList<Country> countryObjects;
 	
 	public Isegoria() {
 		super();
@@ -36,11 +36,11 @@ public class Isegoria extends Application {
 		this.mainActivity = mainActivity;
 	}
 	
-	public ArrayList<CountryInfo> getCountryObjects() {
+	public ArrayList<Country> getCountryObjects() {
 		return countryObjects;
 	}
 
-	public void setCountryObjects(ArrayList<CountryInfo> countryObjects) {
+	public void setCountryObjects(ArrayList<Country> countryObjects) {
 		this.countryObjects = countryObjects;
 	}
 

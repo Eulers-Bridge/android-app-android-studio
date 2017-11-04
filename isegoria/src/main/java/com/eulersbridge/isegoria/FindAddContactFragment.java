@@ -3,11 +3,11 @@ package com.eulersbridge.isegoria;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -59,12 +59,43 @@ public class FindAddContactFragment extends Fragment {
         mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
 
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getFriends(this);
-        network.getFriendRequestsSent(this);
-        network.getFriendRequestsReceived(this);
+        network.getFriends(new Network.FriendsListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<User> friends) {
+                setFriends(friends);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
+        network.getFriendRequestsSent(friendRequestsCallback);
+        network.getFriendRequestsReceived(friendRequestsCallback);
 
         return rootView;
     }
+
+    final Network.FriendRequestsListener friendRequestsCallback = new Network.FriendRequestsListener() {
+        @Override
+        public void onFetchSuccess(ArrayList<FriendRequest> friendRequests) {
+            for (FriendRequest friendRequest : friendRequests) {
+                addFriendRequest(friendRequest);
+            }
+        }
+
+        @Override
+        public void onFetchFailure(Exception e) {}
+    };
+
+    final Network.SearchUsersListener searchCallback = new Network.SearchUsersListener() {
+        @Override
+        public void onFetchSuccess(ArrayList<User> users) {
+            clearSearchResults();
+            addUsers(users);
+        }
+
+        @Override
+        public void onFetchFailure(Exception e) {}
+    };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -98,7 +129,8 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
-                    network.findContacts(query, FindAddContactFragment.this);
+                    clearSearchResults();
+                    network.searchForUsers(query, searchCallback);
                     return true;
                 }
                 return false;
@@ -107,7 +139,8 @@ public class FindAddContactFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() > 2) {
-                    network.findContacts(newText, FindAddContactFragment.this);
+                    clearSearchResults();
+                    network.searchForUsers(newText, searchCallback);
 
                 } else {
                     clearSearchResults();
@@ -141,7 +174,7 @@ public class FindAddContactFragment extends Fragment {
         }
     }
 
-    public void setFriends(ArrayList<User> friends) {
+    private void setFriends(ArrayList<User> friends) {
         for (User friend : friends) {
             addTableRow(friendsAllTableLayout, friend, null, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
         }
@@ -165,6 +198,7 @@ public class FindAddContactFragment extends Fragment {
         sectionContainer.setVisibility(View.VISIBLE);
     }
 
+    @UiThread
     private void addTableRow(TableLayout tableLayout, final User user, final String contactRequestId, UserType type, FriendRequest.Type friendRequestType) {
         final TableRow tr;
 
@@ -226,7 +260,15 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.addToBackStack(null);
             fragmentTransaction2.replace(android.R.id.content, fragment2);
             fragmentTransaction2.commit();*/
-                network.addFriend(user.getEmail(), FindAddContactFragment.this);
+                network.addFriend(user.getEmail(), new Network.AddFriendListener() {
+                    @Override
+                    public void onSuccess(String email) {
+                        showAddedMessage();
+                    }
+
+                    @Override
+                    public void onFailure(String email, Exception e) {}
+                });
             });
 
             linLayout2.addView(candidateProfileImage);
@@ -275,7 +317,15 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
                 FindAddContactFragment.this.addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
-                network.acceptContact(String.valueOf(contactRequestId), FindAddContactFragment.this);
+                network.acceptContact(String.valueOf(contactRequestId), new Network.AcceptFriendRequestListener() {
+                    @Override
+                    public void onSuccess(String contactRequestId) {
+                        showAcceptMessage();
+                    }
+
+                    @Override
+                    public void onFailure(String contactRequestId, Exception e) {}
+                });
             });
 
             final ImageView denyImage = new ImageView(getActivity());
@@ -295,7 +345,15 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.replace(android.R.id.content, fragment2);
             fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
-                network.denyContact(String.valueOf(contactRequestId), FindAddContactFragment.this);
+                network.rejectContact(String.valueOf(contactRequestId), new Network.RejectFriendRequestListener() {
+                    @Override
+                    public void onSuccess(String contactRequestId) {
+                        showDenyMessage();
+                    }
+
+                    @Override
+                    public void onFailure(String contactRequestId, Exception e) {}
+                });
             });
 
             linLayout2.addView(denyImage);
@@ -335,14 +393,20 @@ public class FindAddContactFragment extends Fragment {
     }
 
     public void showAddedMessage() {
-        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
+        }
     }
 
     public void showAcceptMessage() {
-        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
+        }
     }
 
     public void showDenyMessage() {
-        Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show();
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
+        }
     }
 }

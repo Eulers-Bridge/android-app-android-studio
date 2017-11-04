@@ -29,7 +29,10 @@ import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import java.util.ArrayList;
 
 public class CandidatePositionFragment extends Fragment {
     private TableLayout positionsTableLayout;
@@ -43,7 +46,7 @@ public class CandidatePositionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
         Bundle bundle = this.getArguments();
-        int positionId = bundle.getInt("PositionId");
+        long positionId = bundle.getLong("PositionId");
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -52,17 +55,41 @@ public class CandidatePositionFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getCandidatesPosition(this, positionId);
+        network.getCandidatesPosition(positionId, new Network.CandidatesListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Candidate> candidates) {
+                addCandidates(candidates);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {
+
+            }
+        });
 		
 		return rootView;
 	}
 
-    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
-                             String firstName, String lastName) {
-        addTableRow(ticketId, positionId, userId, "", "", firstName + " " + lastName, "", userId);
+    private void addCandidates(ArrayList<Candidate> candidates) {
+        if (getActivity() != null && candidates.size() > 0) {
+            getActivity().runOnUiThread(() -> {
+
+                for (Candidate candidate : candidates) {
+                    addTableRow(
+                            candidate.getTicketId(),
+                            candidate.getPositionId(),
+                            candidate.getUserId(),
+                            "",
+                            "",
+                            String.format("%s %s", candidate.getGivenName(), candidate.getFamilyName()),
+                            "",
+                            candidate.getUserId());
+                }
+            });
+        }
     }
 	
-	private void addTableRow(int ticketId, int positionId, int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, final int userId) {
+	private void addTableRow(long ticketId, long positionId, long profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, long userId) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -95,7 +122,7 @@ public class CandidatePositionFragment extends Fragment {
             FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
             ContactProfileFragment fragment2 = new ContactProfileFragment();
             Bundle args = new Bundle();
-            args.putInt("ProfileId", userId);
+            args.putLong("ProfileId", userId);
             fragment2.setArguments(args);
             fragmentTransaction2.addToBackStack(null);
             fragmentTransaction2.replace(android.R.id.content, fragment2);
@@ -110,7 +137,16 @@ public class CandidatePositionFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        network.getTicketLabel(textViewParty, ticketId);
+        network.getTicketLabel(ticketId, new Network.TicketLabelListener() {
+            @Override
+            public void onFetchSuccess(long ticketId, String colour, String code) {
+                textViewParty.setText(code);
+                textViewParty.setBackgroundColor(Color.parseColor(colour));
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) { }
+        });
 
         int imageSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 27, getResources().getDisplayMetrics());
@@ -137,7 +173,15 @@ public class CandidatePositionFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(textViewPosition, positionId);
+        network.getPositionText(positionId, new Network.PositionListener() {
+            @Override
+            public void onFetchSuccess(long positionId, String name) {
+                textViewPosition.setText(name);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
         
         View dividierView = new View(getActivity());
         dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));

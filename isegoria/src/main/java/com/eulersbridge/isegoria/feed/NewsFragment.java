@@ -1,14 +1,13 @@
 package com.eulersbridge.isegoria.feed;
 
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -27,34 +26,31 @@ import com.android.volley.VolleyError;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import java.util.ArrayList;
 
 public class NewsFragment extends Fragment {
 	private TableLayout newsTableLayout;
 	
 	private float dpWidth;
 	
-	private int[] drawables = new int[14];
-	private int drawableInt = 0;
-	
-	private int lastArticleId; 
-	private int lastInstitutionId; 
-	private String lastTitle;
-	private String lastContent; 
-	private Bitmap lastPicture;
-    private String lastPictureURL;
-	private String lastLikes;
-	private long lastDate;
-	private String lastCreatorEmail; 
-	private String lastStudentYear; 
-	private String lastLink;
-	
 	private int doubleCell = 0;
-	private int articlesAdded = 0;
 
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerNews;
     private Network network;
+
+    private final Network.NewsArticlesListener listener = new Network.NewsArticlesListener() {
+		@Override
+		public void onFetchSuccess(ArrayList<NewsArticle> articles) {
+			setNewsArticles(articles);
+		}
+
+		@Override
+		public void onFetchFailure(Exception e) { }
+	};
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,16 +64,16 @@ public class NewsFragment extends Fragment {
             swipeContainerNews.setRefreshing(true);
 
             NewsFragment.this.clearTable();
-            network.getNewsArticles(NewsFragment.this);
+            network.getNewsArticles(listener);
 
-            ( new android.os.Handler()).postDelayed(() -> swipeContainerNews.setRefreshing(false), 7000);
+            (new android.os.Handler()).postDelayed(() -> swipeContainerNews.setRefreshing(false), 7000);
         });
 		
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
         
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getNewsArticles(this);
+        network.getNewsArticles(listener);
         
 		return rootView;
 	}
@@ -85,46 +81,33 @@ public class NewsFragment extends Fragment {
     private void clearTable() {
         newsTableLayout.removeAllViews();
     }
-	
-	public void addNewsArticle(final int articleId, final int institutionId, final String title, final String content, final String pictureURL, final String likes,
-			final long date, final String creatorEmail, final String studentYear, final String link) {
-		articlesAdded = articlesAdded + 1;
 
-		try {
-			getActivity().runOnUiThread(() -> {
-                try {
-                    if(doubleCell == 0) {
-                        doubleCell = 1;
-                        NewsFragment.this.addTableRow(articleId, -1, pictureURL, null, false, false, title, TimeConverter.convertTimestampToString(date), "", "");
-                     }
-                    else if(doubleCell == 1) {
-                        doubleCell = 2;
-                        lastArticleId = articleId;
-                        lastInstitutionId = institutionId;
-                        lastTitle = title;
-                        lastContent = content;
-                        lastPictureURL = pictureURL;
-                        lastLikes = likes;
-                        lastDate = date;
-                        lastCreatorEmail = creatorEmail;
-                        lastStudentYear = studentYear;
-                        lastLink = link;
-                    }
-                    else if(doubleCell == 2) {
-                        doubleCell = 0;
-                        NewsFragment.this.addTableRow(lastArticleId, articleId, lastPictureURL, pictureURL, true, false, lastTitle, TimeConverter.convertTimestampToString(lastDate), title, "");
-                    }
-                } catch(Exception ignored) {
+    private void setNewsArticles(final ArrayList<NewsArticle> articles) {
+		Activity activity = getActivity();
+		if (activity != null) {
+			activity.runOnUiThread(() -> {
 
-                }
-            });
-		} catch(Exception e) {
-			e.printStackTrace();
+				NewsArticle lastArticle = null;
+
+				for (NewsArticle article : articles) {
+					if (doubleCell == 0) {
+						doubleCell = 1;
+						addTableRow(article, null, article.getPhotoURL(), null, false);
+
+					} else if(doubleCell == 1) {
+						doubleCell = 2;
+						lastArticle = article;
+
+					} else if (doubleCell == 2) {
+						doubleCell = 0;
+						NewsFragment.this.addTableRow(lastArticle, article, lastArticle.getPhotoURL(), article.getPhotoURL(), true);
+					}
+				}
+			});
 		}
 	}
 	
-	private void addTableRow(final int articleId1, final int articleId2, String drawable1, String drawable2, boolean doubleCell, boolean lastCell, String articleTitle1, String articleTime1,
-							 String articleTitle2, String articleTime2) {
+	private void addTableRow(final NewsArticle article1, final @Nullable NewsArticle article2, String drawable1, String drawable2, boolean doubleCell) {
 		TableRow tableRow = new TableRow(getContext());
 		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
 		tableRow.setLayoutParams(rowParams);
@@ -147,10 +130,7 @@ public class NewsFragment extends Fragment {
 		if(doubleCell) {
 			RelativeLayout relativeLayout = new RelativeLayout(getContext());
 			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
-			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
-			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
+			((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 
 			if(drawable1 == null) {
 				colour = "#000000";
@@ -159,14 +139,14 @@ public class NewsFragment extends Fragment {
 	        TextView titleTextView = new TextView(getContext());
 			titleTextView.setTextColor(Color.parseColor(colour));
 			titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
-			titleTextView.setText(articleTitle1);
+			titleTextView.setText(article1.getTitle());
 			titleTextView.setPadding(paddingMargin5, 0, paddingMargin5, 0);
 			titleTextView.setGravity(Gravity.CENTER);
 	        
 	        TextView titleTextViewTime = new TextView(getContext());
 	        titleTextViewTime.setTextColor(Color.parseColor(colour));
 	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        titleTextViewTime.setText(articleTime1);
+	        titleTextViewTime.setText(TimeConverter.convertTimestampToString(article1.getDateTimestamp()));
 	        titleTextViewTime.setPadding(0, paddingMargin2, 0, 0);
 	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
@@ -193,15 +173,16 @@ public class NewsFragment extends Fragment {
 				public void onDownloadFailed(String url, VolleyError error) {}
 			});
 	        view.setOnClickListener(view13 -> {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    NewsArticleFragment fragment2 = new NewsArticleFragment();
-                    Bundle args = new Bundle();
-                    args.putInt("ArticleId", articleId1);
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
-                    fragmentTransaction2.commit();
+				NewsArticleFragment detailFragment = new NewsArticleFragment();
+				Bundle args = new Bundle();
+				args.putParcelable("article", article1);
+				detailFragment.setArguments(args);
+
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.addToBackStack(null)
+						.add(R.id.newsFrameLayout, detailFragment)
+						.commit();
             });
 	        
 	        relativeLayout.addView(view);
@@ -212,10 +193,7 @@ public class NewsFragment extends Fragment {
 	        
 			relativeLayout = new RelativeLayout(getContext());
 			relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
-			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, paddingMargin);
-			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, 0);
+			((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(0, paddingMargin, paddingMargin, paddingMargin);
 			
 			colour = "#F8F8F8";
 			if(drawable2 == null) {
@@ -225,14 +203,14 @@ public class NewsFragment extends Fragment {
 	        titleTextView = new TextView(getContext());
 	        titleTextView.setTextColor(Color.parseColor(colour));
 	        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
-	        titleTextView.setText(articleTitle2);
+	        titleTextView.setText(article2.getTitle());
 	        titleTextView.setPadding(paddingMargin5, 0, paddingMargin5, 0);
 	        titleTextView.setGravity(Gravity.CENTER);
 	        
 	        titleTextViewTime = new TextView(getContext());
 	        titleTextViewTime.setTextColor(Color.parseColor(colour));
 	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        titleTextViewTime.setText(articleTime2);
+	        titleTextViewTime.setText("");
 	        titleTextViewTime.setPadding(0, paddingMargin2, 0, 0);
 	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
@@ -259,15 +237,16 @@ public class NewsFragment extends Fragment {
 				public void onDownloadFailed(String url, VolleyError error) {}
 			});
 			view2.setOnClickListener(view12 -> {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    NewsArticleFragment fragment2 = new NewsArticleFragment();
-                    Bundle args = new Bundle();
-                    args.putInt("ArticleId", articleId2);
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
-                    fragmentTransaction2.commit();
+				NewsArticleFragment detailFragment = new NewsArticleFragment();
+				Bundle args = new Bundle();
+				args.putParcelable("article", article2);
+				detailFragment.setArguments(args);
+
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.addToBackStack(null)
+						.add(R.id.newsFrameLayout, detailFragment)
+						.commit();
             });
 	        
 	        relativeLayout.addView(view2);
@@ -285,10 +264,7 @@ public class NewsFragment extends Fragment {
 			RelativeLayout relativeLayout = new RelativeLayout(getContext());
 			relativeLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 			((TableRow.LayoutParams) relativeLayout.getLayoutParams()).span = 2;
-			if(lastCell)
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
-			else
-				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
+			((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			
 			ImageView imageView = new ImageView(getContext());
 //			imageView.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
@@ -306,27 +282,28 @@ public class NewsFragment extends Fragment {
 			});
 
 			imageView.setOnClickListener(view1 -> {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    NewsArticleFragment fragment2 = new NewsArticleFragment();
-                    Bundle args = new Bundle();
-                    args.putInt("ArticleId", articleId1);
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.newsFrameLayout, fragment2);
-                    fragmentTransaction2.commit();
+				NewsArticleFragment detailFragment = new NewsArticleFragment();
+				Bundle args = new Bundle();
+				args.putParcelable("article", article1);
+				detailFragment.setArguments(args);
+
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.addToBackStack(null)
+						.add(R.id.newsFrameLayout, detailFragment)
+						.commit();
             });
 	        
 	        TextView titleTextView = new TextView(getContext());
 	        titleTextView.setTextColor(Color.parseColor(colour));
 	        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
-	        titleTextView.setText(articleTitle1);
+	        titleTextView.setText(article1.getTitle());
 	        titleTextView.setGravity(Gravity.CENTER);
 	        
 	        TextView titleTextViewTime = new TextView(getContext());
 	        titleTextViewTime.setTextColor(Color.parseColor(colour));
 	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        titleTextViewTime.setText(articleTime1);
+	        titleTextViewTime.setText(TimeConverter.convertTimestampToString(article1.getDateTimestamp()));
 	        titleTextViewTime.setPadding(0, 100, 0, 0);
 	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        

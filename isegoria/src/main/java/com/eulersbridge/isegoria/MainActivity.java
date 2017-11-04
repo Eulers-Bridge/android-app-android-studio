@@ -31,8 +31,8 @@ import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.LoginScreenFragment;
 import com.eulersbridge.isegoria.login.UserConsentAgreementFragment;
 import com.eulersbridge.isegoria.login.UserSignupFragment;
-import com.eulersbridge.isegoria.models.CountryInfo;
-import com.eulersbridge.isegoria.models.InstitutionInfo;
+import com.eulersbridge.isegoria.models.Country;
+import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.profile.UserSettingsFragment;
@@ -364,15 +364,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		}
 		else {
 			String institutionID = "";
-			ArrayList<CountryInfo> countryObjects = application.getCountryObjects();
-			for(int i=0; i<countryObjects.size(); i++) {
-				CountryInfo currentCountryInfo = countryObjects.get(i);
-				
-				for(int j=0; j<currentCountryInfo.getInstitutions().size(); j++) {
-					InstitutionInfo currentInstituionInfo = currentCountryInfo.getInstitutions().get(j);
-					
-					if(currentInstituionInfo.getInstitution().equals(institution)) {
-						institutionID = currentInstituionInfo.getId();
+			ArrayList<Country> countryObjects = application.getCountryObjects();
+
+			for (Country country : countryObjects) {
+				for (Institution institution : country.getInstitutions()) {
+					if (institution.getName().equals(institution)) {
+						institutionID = institution.getId();
 					}
 				}
 			}
