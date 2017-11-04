@@ -23,7 +23,7 @@ public class FriendRequest {
     private User requester;
     private User requestReceiver;
 
-    private Type type;
+    private Type type = Type.UNKNOWN;
 
     public FriendRequest(JSONObject jsonObject, Type type) {
         try {
@@ -40,10 +40,6 @@ public class FriendRequest {
         }
 
         this.type = type;
-    }
-
-    public FriendRequest(JSONObject jsonObject) {
-        this(jsonObject, Type.UNKNOWN);
     }
 
     public long getId() {

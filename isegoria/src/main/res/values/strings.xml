@@ -7,7 +7,7 @@
     <!-- Navigation drawer labels -->
     <string name="navigation_feed">Feed</string>
     <string name="navigation_election">Election</string>
-    <string name="navigation_poll">Poll</string>
+    <string name="navigation_poll">Polls</string>
     <string name="navigation_vote">Vote</string>
     <string name="navigation_friends">Friends</string>
     <string name="navigation_profile">Profile</string>
@@ -16,7 +16,7 @@
     <!-- Toolbar titles for each navigation item -->
     <string name="section_title_feed">Feed</string>
     <string name="section_title_election">Election</string>
-    <string name="section_title_poll">Poll</string>
+    <string name="section_title_poll">Current Polls</string>
     <string name="section_title_vote">Vote</string>
     <string name="section_title_friends">Friends</string>
     <string name="section_title_profile">Profile</string>

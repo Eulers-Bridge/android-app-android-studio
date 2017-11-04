@@ -30,6 +30,7 @@ import com.android.volley.VolleyError;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.models.PollOption;
 import com.eulersbridge.isegoria.models.User;
 
@@ -42,9 +43,8 @@ public class PollVoteFragment extends Fragment {
 	
 	private boolean insertedFirstRow = false;
 
-    private int nodeId;
+    private long pollId;
     private User creator;
-	private String question;
     private ArrayList<PollOption> options = new ArrayList<>();
 
     private Network network;
@@ -72,15 +72,39 @@ public class PollVoteFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.poll_fragment, container, false);
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+
 		pollTableLayout = rootView.findViewById(R.id.pollTableLayout);
 
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         pixelWidth = displayMetrics.widthPixels;
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
 
+        Poll poll = getArguments().getParcelable("poll");
+
+        pollId = poll.getId();
+        creator = poll.getCreator();
+        String question = poll.getQuestion();
+        options = poll.getOptions();
+
         addTableRow(question, "");
+
+        if (poll.getCreator() == null && !TextUtils.isEmpty(poll.getCreatorEmail())) {
+            network.getUser(poll.getCreatorEmail(), new Network.UserInfoListener() {
+                @Override
+                public void onFetchSuccess(User user) {
+                    creator = user;
+                    fetchCreatorPhoto();
+                }
+
+                @Override
+                public void onFetchFailure(String userEmail, Exception e) {}
+            });
+
+        } else if (creator != null) {
+            fetchCreatorPhoto();
+        }
 
         for (int i = 0; i < options.size(); i++) {
             PollOption option = options.get(i);
@@ -109,13 +133,8 @@ public class PollVoteFragment extends Fragment {
 		return rootView;
 	}
 
-    public void setData(int nodeId, @Nullable User creator, String question, ArrayList<PollOption> options) {
-        this.nodeId = nodeId;
-        this.creator = creator;
-        this.question = question;
-        this.options = options;
-
-        if (creator != null) {
+    private void fetchCreatorPhoto() {
+	    if (creator != null && !TextUtils.isEmpty(creator.getProfilePhotoURL())) {
             network.getPicture(creator.getProfilePhotoURL(), new Network.PictureDownloadListener() {
                 @Override
                 public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
@@ -130,9 +149,17 @@ public class PollVoteFragment extends Fragment {
         }
     }
 
-    void postVote() {
-        network.answerPoll(nodeId, -1, this);
-    }
+    final Network.PollResultsListener pollResultsCallback = new Network.PollResultsListener() {
+        @Override
+        public void onFetchSuccess(ArrayList<Integer> results) {
+            for (int i = 0; i < results.size(); i++) {
+                setPollOptionResult(i, results.get(i));
+            }
+        }
+
+        @Override
+        public void onFetchFailure(Exception e) {}
+    };
 
     @UiThread
     private void updateCreatorPhoto() {
@@ -152,7 +179,8 @@ public class PollVoteFragment extends Fragment {
             }
         }
     }
-	
+
+    @UiThread
 	private void addTableRow(String label, String caption) {
 		TableRow tr = new TableRow(getActivity());
 
@@ -347,13 +375,12 @@ public class PollVoteFragment extends Fragment {
         tickBoxes.add(tickImageView);
 
         tickImageView.setOnClickListener(view -> {
-            for (int i=0; i < tickBoxes.size(); i++) {
-                tickBoxes.get(i).setImageResource(R.drawable.tickempty);
+            for (ImageView tickBox : tickBoxes) {
+                tickBox.setImageResource(R.drawable.tickempty);
             }
             ((ImageView) view).setImageResource(R.drawable.tickgreen);
 
-            PollVoteFragment self = PollVoteFragment.this;
-            self.network.answerPoll(nodeId, (int)option.getId(), self);
+            network.answerPoll(pollId, (int)option.getId(), pollResultsCallback);
         });
 		
         tr.addView(tickImageView);
@@ -362,12 +389,12 @@ public class PollVoteFragment extends Fragment {
 		pollTableLayout.addView(tr);
 	}
 
-    public void setPollResult(int index, int count) {
+    private void setPollOptionResult(int index, int count) {
         pollResults.get(index).setText(String.valueOf(count));
         progressBars.get(index).setProgress(count);
     }
 
-    public int getNodeId() {
-        return nodeId;
+    public long getNodeId() {
+        return pollId;
     }
 }

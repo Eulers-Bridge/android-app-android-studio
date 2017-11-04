@@ -15,14 +15,11 @@ import com.eulersbridge.isegoria.R;
 
 public class EmailVerificationFragment extends Fragment {
     private MainActivity mainActivity;
-    private EmailVerificationFragment emailVerificationFragment;
     private Network network;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.email_verification, container, false);
-
-        emailVerificationFragment = this;
 
         mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
@@ -35,7 +32,7 @@ public class EmailVerificationFragment extends Fragment {
         });
 
         final Button resendVerificationButton = rootView.findViewById(R.id.resendVerificationButton);
-        resendVerificationButton.setOnClickListener(view -> network.verifyEmail(emailVerificationFragment));
+        resendVerificationButton.setOnClickListener(view -> network.verifyEmail());
 
         return rootView;
     }

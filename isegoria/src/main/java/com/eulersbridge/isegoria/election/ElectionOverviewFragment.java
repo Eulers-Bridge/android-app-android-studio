@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Election;
 
 public class ElectionOverviewFragment extends Fragment {
 
@@ -19,7 +20,6 @@ public class ElectionOverviewFragment extends Fragment {
     private TextView electionTitle;
     private TextView electionProcess;
     private TextView electionDate;
-    private int electionId;
 
     @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -33,18 +33,29 @@ public class ElectionOverviewFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getLatestElection(this);
+        network.getLatestElection(new Network.ElectionListener() {
+            @Override
+            public void onFetchSuccess(Election election) {
+                populateElectionText(election);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 		
 		return rootView;
 	}
 
-    public void updateEntities(int electionId, String title, String introduction, String date,
-                               String process) {
-        this.electionId = electionId;
+    private void populateElectionText(Election election) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                electionTitle.setText(election.getTitle());
+                electionIntroduction.setText(election.getIntroduction());
+                //TODO: Format election date
+                electionDate.setText("");
+                electionProcess.setText(election.getProcess());
+            });
 
-        electionTitle.setText(title);
-        electionIntroduction.setText(introduction);
-        electionDate.setText(date);
-        electionProcess.setText(process);
+        }
     }
 }

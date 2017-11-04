@@ -24,6 +24,9 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Position;
+
+import java.util.ArrayList;
 
 public class CandidatePositionsFragment extends Fragment {
 	private TableLayout positionsTableLayout;
@@ -31,8 +34,8 @@ public class CandidatePositionsFragment extends Fragment {
 	
 	private float dpWidth;
 
-    private int lastElectionId;
-    private int lastPositionId;
+    private long lastElectionId;
+    private long lastPositionId;
     private String lastName;
     private String lastDesc;
 
@@ -56,31 +59,45 @@ public class CandidatePositionsFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPositions(this);
+        network.getPositions(new Network.PositionsListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Position> positions) {
+                addPositions(positions);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) { }
+        });
         
 		return rootView;
 	}
 
-    public void addPosition(int electionId, int positionId, String name,
-                            String desc, int noOfPositions) {
-        addedPositionsCount = addedPositionsCount + 1;
-        if(addRow) {
-            addTableRow(lastElectionId, electionId, lastPositionId, positionId, true, false, lastName, name);
-        }
+	private void addPositions(ArrayList<Position> positions) {
+	    if (getActivity() != null && positions.size() > 0) {
+	        getActivity().runOnUiThread(() -> {
 
-        this.lastElectionId = electionId;
-        this.lastPositionId = positionId;
-        this.lastName = name;
-        this.lastDesc = desc;
+	            for (Position position : positions) {
+                    addedPositionsCount = addedPositionsCount + 1;
+                    if(addRow) {
+                        addTableRow(lastElectionId, position.getElectionId(), lastPositionId, position.getId(), true, false, lastName, position.getName());
+                    }
 
-		addRow = !addRow;
+                    lastElectionId = position.getElectionId();
+                    lastPositionId = position.getId();
+                    lastName = position.getName();
+                    lastDesc = position.getDescription();
 
-        if(noOfPositions == addedPositionsCount) {
-            this.addTableRowOneSquare(electionId, positionId, name, desc);
+                    addRow = !addRow;
+
+                    if (positions.size() == addedPositionsCount) {
+                        this.addTableRowOneSquare(position.getElectionId(), position.getId(), position.getName(), position.getDescription());
+                    }
+                }
+            });
         }
     }
 	
-	private void addTableRow(int lastElectionId, int electionId, final int lastPositionId, final int positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
+	private void addTableRow(long lastElectionId, long electionId, long lastPositionId, long positionId, boolean doubleCell, boolean lastCell, String title1, String title2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -131,7 +148,7 @@ public class CandidatePositionsFragment extends Fragment {
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                 Bundle args = new Bundle();
-                args.putInt("PositionId", positionId);
+                args.putLong("PositionId", positionId);
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
@@ -173,7 +190,7 @@ public class CandidatePositionsFragment extends Fragment {
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                 Bundle args = new Bundle();
-                args.putInt("PositionId", positionId);
+                args.putLong("PositionId", positionId);
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
@@ -225,7 +242,7 @@ public class CandidatePositionsFragment extends Fragment {
 		}
 	}
 
-    private void addTableRowOneSquare(int electionId, final int positionId,
+    private void addTableRowOneSquare(long electionId, long positionId,
 									  String title1, String desc1) {
         TableRow tr;
 
@@ -273,7 +290,7 @@ public class CandidatePositionsFragment extends Fragment {
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 CandidatePositionFragment fragment2 = new CandidatePositionFragment();
                 Bundle args = new Bundle();
-                args.putInt("PositionId", positionId);
+                args.putLong("PositionId", positionId);
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
                 fragmentTransaction2.add(R.id.candidate_frame1, fragment2);

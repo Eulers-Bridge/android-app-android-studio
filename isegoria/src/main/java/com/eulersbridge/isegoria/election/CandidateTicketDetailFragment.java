@@ -36,7 +36,11 @@ import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Candidate;
+import com.eulersbridge.isegoria.models.CandidateTicket;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
 public class CandidateTicketDetailFragment extends Fragment {
@@ -52,16 +56,16 @@ public class CandidateTicketDetailFragment extends Fragment {
     private String partyLogo = "";
 
     private TextView partyDetailSupporters;
-    private CandidateTicketDetailFragment candidateTicketDetailFragment;
     private Network network;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        candidateTicketDetailFragment = this;
 		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
-		Bundle bundle = this.getArguments();
+
 		int backgroundDrawableResource = R.drawable.me;
-        final int ticketId = bundle.getInt("TicketId");
+
+        Bundle bundle = getArguments();
+        final long ticketId = bundle.getLong("TicketId");
         final String ticketName = bundle.getString("TicketName");
         final int noOfSupporters = bundle.getInt("NoOfSupporters");
         partyColour = bundle.getString("Colour");
@@ -86,7 +90,15 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getTicketDetail(ticketId, candidateTicketDetailFragment);
+        network.getTicketDetail(ticketId, new Network.TicketsListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<CandidateTicket> tickets) {
+                updateInformation(tickets);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 
         ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
         network.getFirstPhoto(ticketId, partyDetailLogo);
@@ -99,14 +111,14 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton.setOnClickListener(view -> {
             if(ticketSupportButton.getText().equals("Support")) {
-                network.supportTicket(ticketId, candidateTicketDetailFragment);
+                network.supportTicket(ticketId);
                 TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
                 ticketSupportButton.setText("Unsupport");
             }
             else if(ticketSupportButton.getText().equals("Unsupport")) {
-                network.unsupportTicket(ticketId, candidateTicketDetailFragment);
+                network.unsupportTicket(ticketId);
                 TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
@@ -121,21 +133,50 @@ public class CandidateTicketDetailFragment extends Fragment {
 		return rootView;
 	}
 
-    public void updateInformation(int ticketId, int electionId, String name, String code,
-                                  String information, String colour) {
-        this.code = code;
-        this.colour = colour;
+	private void updateInformation(ArrayList<CandidateTicket> tickets) {
+	    if (getActivity() != null && tickets.size() > 0) {
 
-        network.getTicketCandidates(this, ticketId);
-        rootView.invalidate();
+	        getActivity().runOnUiThread(() -> {
+                for (CandidateTicket ticket : tickets) {
+                    code = "";
+                    colour = ticket.getColour();
+
+                    network.getTicketCandidates(ticket.getId(), new Network.CandidatesListener() {
+                        @Override
+                        public void onFetchSuccess(ArrayList<Candidate> candidates) {
+                            addCandidates(candidates);
+                        }
+
+                        @Override
+                        public void onFetchFailure(Exception e) { }
+                    });
+
+                    rootView.invalidate();
+                }
+            });
+        }
     }
 
-    public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
-                             String firstName, String lastName) {
-        addTableRow(userId, code, colour, firstName + " " + lastName, "", userId, positionId);
+    private void addCandidates(ArrayList<Candidate> candidates) {
+	    if (getActivity() != null && candidates.size() > 0) {
+
+	        getActivity().runOnUiThread(() -> {
+
+                for (Candidate candidate : candidates) {
+                    addTableRow(
+                            (int)candidate.getUserId(),
+                            code,
+                            colour,
+                            String.format("%s %s", candidate.getGivenName(), candidate.getFamilyName()),
+                            "",
+                            candidate.getUserId(),
+                            candidate.getPositionId());
+                }
+            });
+        }
     }
 	
-	private void addTableRow(final int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, int userId, final int positionId) {
+	private void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, long userId, long positionId) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -220,11 +261,19 @@ public class CandidateTicketDetailFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(textViewPosition, positionId);
+        network.getPositionText(positionId, new Network.PositionListener() {
+            @Override
+            public void onFetchSuccess(long positionId, String name) {
+                textViewPosition.setText(name);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
         
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
         LayoutParams relLayoutMasterParam = new LayoutParams((int)dpWidth, LayoutParams.WRAP_CONTENT);
@@ -258,7 +307,7 @@ public class CandidateTicketDetailFragment extends Fragment {
         tr.addView(relLayoutMaster);
         
         candidateTicketDetialTableLayout.addView(tr);
-        candidateTicketDetialTableLayout.addView(dividierView);
+        candidateTicketDetialTableLayout.addView(dividerView);
 	}
 	
 	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,

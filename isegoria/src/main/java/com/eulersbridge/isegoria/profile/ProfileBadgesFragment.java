@@ -5,8 +5,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,6 +21,9 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Badge;
+
+import java.util.ArrayList;
 
 public class ProfileBadgesFragment extends Fragment {
     private TableLayout badgesTableLayout;
@@ -34,11 +35,9 @@ public class ProfileBadgesFragment extends Fragment {
     private int dividerPadding = 0;
 
     private boolean insertedFirstRow = false;
-    private String photoAlbumName = "";
 
     private Network network;
 
-    private String targetName = "";
     private int targetLevel = 0;
 
     public ProfileBadgesFragment() {
@@ -48,13 +47,14 @@ public class ProfileBadgesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_badges_layout, container, false);
-        getActivity().setTitle("Isegoria");
-        Bundle bundle = this.getArguments();
 
-        try {
+        String targetName = null;
+
+        Bundle bundle = getArguments();
+        if (bundle != null) {
             targetName = bundle.getString("name");
             targetLevel = bundle.getInt("level");
-        } catch (Exception ignored) {}
+        }
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         badgesTableLayout = rootView.findViewById(R.id.profileBadgesTableLayout);
@@ -68,22 +68,50 @@ public class ProfileBadgesFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getProfileBadgesComplete(this, targetName, targetLevel);
+        network.getProfileBadgesComplete(targetLevel, new Network.ProfileBadgesListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Badge> badges) {
+                addCompletedBadges(badges);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
+
+        network.getProfileBadgesRemaining(targetLevel, new Network.ProfileBadgesListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Badge> badges) {
+                addRemainingBadges(badges);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 
         return rootView;
     }
 
-    public void addBadgeRemaining(final int badgeId, final String name, final String description,
-                         final int maxLevel) {
-        addTableRow(name, description, badgeId, maxLevel, true);
+    private void addRemainingBadges(ArrayList<Badge> badges) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                for (Badge badge : badges) {
+                    addTableRow(badge.getName(), badge.getDescription(), badge.getId(), badge.getLevel(), true);
+                }
+            });
+        }
     }
 
-    public void addBadgeComplete(final int badgeId, final String name, final String description,
-                                  final int maxLevel) {
-        addTableRow(name, description, badgeId, maxLevel, false);
+    private void addCompletedBadges(ArrayList<Badge> badges) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                for (Badge badge : badges) {
+                    addTableRow(badge.getName(), badge.getDescription(), badge.getId(), badge.getLevel(), false);
+                }
+            });
+        }
     }
 
-    private void addTableRow(final String name, final String description, final int badgeId,
+    private void addTableRow(final String name, final String description, final long badgeId,
                              final int maxLevel, final boolean remaining) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -129,7 +157,7 @@ public class ProfileBadgesFragment extends Fragment {
             view.setLayoutParams(layoutParams);
             view.setScaleType(ScaleType.FIT_XY);
             //view.setBackgroundColor(Color.GRAY);
-            network.getFirstPhoto(badgeId, view);
+            network.getFirstPhoto((int)badgeId, view);
 
             viewLinearLayout.setPadding(0, 0, 0, paddingMargin);
             viewLinearLayout.addView(view);
@@ -167,18 +195,20 @@ public class ProfileBadgesFragment extends Fragment {
             linearLayout.addView(descTextView);
             linearLayout.addView(linearLayout2);
 
-            if(targetLevel < maxLevel) {
+            if (targetLevel < maxLevel) {
                 view.setOnClickListener(view1 -> {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    ProfileBadgesFragment fragment2 = new ProfileBadgesFragment();
+
+                    ProfileBadgesFragment badgesFragment = new ProfileBadgesFragment();
                     Bundle args = new Bundle();
                     args.putString("name", name);
                     args.putInt("level", targetLevel + 1);
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.profileFrameLayout, fragment2);
-                    fragmentTransaction2.commit();
+                    badgesFragment.setArguments(args);
+
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .add(R.id.profileFrameLayout, badgesFragment)
+                            .commit();
                 });
             }
 

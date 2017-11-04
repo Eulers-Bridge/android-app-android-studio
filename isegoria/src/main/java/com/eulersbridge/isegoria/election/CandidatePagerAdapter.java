@@ -21,17 +21,16 @@ class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
 	 
 	 @Override
 	    public CharSequence getPageTitle(int position) {
-		 	if(position == 0) {
-		 		return "By Type";
-		 	}
-		 	else if(position == 1) {
-		 		return "By Ticket";
-		 	}
-		 	else if(position == 2) {
-		 		return "List";
-		 	}
-		 	
-		 	return "";
+			switch(position) {
+				case 0:
+					return "By Type";
+				case 1:
+					return "By Ticket";
+				case 2:
+					return "List";
+				default:
+					return "";
+			}
 	    }
 	 
 	 @Override

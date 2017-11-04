@@ -16,7 +16,7 @@ public class TimeConverter {
 	}
 	
 	public static long convertTimestampTimezone(long timestamp) {
-		 Calendar c= Calendar.getInstance();
+		 Calendar c = Calendar.getInstance();
 	     TimeZone tz = c.getTimeZone();
 	     int offsetFromUtc = tz.getOffset(0)/1000;
 
