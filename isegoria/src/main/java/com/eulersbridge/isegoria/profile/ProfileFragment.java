@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,8 +24,11 @@ import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
+
+import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
 	private View rootView;
@@ -118,7 +122,16 @@ public class ProfileFragment extends Fragment {
         LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
         network.getUserDP(photoImageView, backgroundLinearLayout);
 
-        network.getTasks(this);
+        network.getTasks(new Network.TasksListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Task> tasks) {
+                addTasks(tasks);
+            }
+
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
+
         network.getProfileStats(user.getEmail(), new Network.ProfileStatsListener() {
             @Override
             public void onFetchSuccess(int contactsCount, int totalTasksCount) {
@@ -150,6 +163,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @UiThread
     private void updateCompletedBadgesCount(long count) {
         circularSeekBar2.setTopLine(String.valueOf(count));
         circularSeekBar2.setProgress((int)count);
@@ -160,6 +174,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @UiThread
     private void updateRemainingBadgesCount(long count) {
         circularSeekBar2.setBottomLine("/" + String.valueOf(count));
         circularSeekBar2.setMax((int)count);
@@ -170,6 +185,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    @UiThread
     private void updateCompletedTasksCount(long count) {
         circularSeekBar3.setTopLine(String.valueOf(count));
         circularSeekBar3.setProgress((int)count);
@@ -177,6 +193,7 @@ public class ProfileFragment extends Fragment {
         t3.start();
     }
 
+    @UiThread
     private void updateExperience(long experience) {
         circularSeekBar1.setTopLine(String.valueOf(experience));
         circularSeekBar1.setBottomLine("NEED " + (1000 - (experience % 1000)));
@@ -186,6 +203,7 @@ public class ProfileFragment extends Fragment {
         t1.start();
     }
 
+    @UiThread
     public void updateStats(int numOfContacts, int totalTasks) {
         friendsNumTextView.setText(String.valueOf(numOfContacts));
         groupNumTextView.setText(String.valueOf("0"));
@@ -202,6 +220,17 @@ public class ProfileFragment extends Fragment {
         t4.start();
     }
 
+    private void addTasks(ArrayList<Task> tasks) {
+	    if (getActivity() != null && tasks.size() > 0) {
+	        getActivity().runOnUiThread(() -> {
+	            for (Task task : tasks) {
+	                addTask(task.getId(), task.getAction(), task.getXpValue());
+                }
+            });
+        }
+    }
+
+    @UiThread
     public void addTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 

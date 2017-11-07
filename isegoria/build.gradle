@@ -21,8 +21,8 @@ android {
         applicationId "au.com.isegoria.app"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.0.5"
+        versionCode 7
+        versionName "1.0.6"
     }
     lintOptions {
         abortOnError false
@@ -54,7 +54,6 @@ dependencies {
     compile 'com.android.support:design:27.0.0'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
-    compile 'com.sothree.slidinguppanel:library:3.4.0'
     compile 'com.amazonaws:aws-android-sdk-s3:2.6.5'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.6.5'
     compile 'com.amazonaws:aws-android-sdk-sns:2.6.5'

@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
@@ -9,11 +10,11 @@ import org.json.JSONObject;
 
 public class User implements Parcelable {
 
-    private String password;
+    private @Nullable String password;
 
     private @Nullable String id;
 
-    private String email;
+    private @NonNull String email;
     private String givenName;
     private String familyName;
 
@@ -162,6 +163,7 @@ public class User implements Parcelable {
         return id;
     }
 
+    @NonNull
     public String getEmail() {
         return email;
     }
@@ -170,6 +172,7 @@ public class User implements Parcelable {
         this.password = password;
     }
 
+    @Nullable
     public String getPassword() {
         return password;
     }

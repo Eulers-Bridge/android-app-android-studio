@@ -27,6 +27,9 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.CandidateTicket;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
 public class CandidateTicketFragment extends Fragment {
@@ -34,7 +37,7 @@ public class CandidateTicketFragment extends Fragment {
 	
 	private float dpWidth;
 
-	private int lastTicketId;
+	private long lastTicketId;
     private String lastName;
     private String lastNoOfSupporters;
     private String lastColour;
@@ -55,38 +58,63 @@ public class CandidateTicketFragment extends Fragment {
 
         MainActivity mainActivity = (MainActivity) getActivity();
 		Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getTickets(this);
+        network.getTickets(new Network.TicketsListener() {
+			@Override
+			public void onFetchSuccess(ArrayList<CandidateTicket> tickets) {
+				addTickets(tickets);
+			}
+
+			@Override
+			public void onFetchFailure(Exception e) { }
+		});
         network.getUserSupportedTickets();
         
 		return rootView;
 	}
 
-    public void addTicket(int ticketId, String name, String information, String noOfSupporters,
-                          String colour, String logo, int numberOfParties) {
-        addedCounter = addedCounter + 1;
-        if(added) {
-            this.addTableRow(lastTicketId, ticketId, lastColour, colour, true, false, lastName, name,
-                    lastNoOfSupporters, noOfSupporters, lastLogo, logo);
-        }
+	private void addTickets(ArrayList<CandidateTicket> tickets) {
+		if (getActivity() != null && tickets.size() > 0) {
+			getActivity().runOnUiThread(() -> {
 
-        lastTicketId = ticketId;
-        lastName = name;
-        lastInformation = information;
-        lastNoOfSupporters = noOfSupporters;
-        lastColour = colour;
-        lastLogo = logo;
+				for (CandidateTicket ticket : tickets) {
 
-		added = !added;
+					addedCounter = addedCounter + 1;
+					if (added) {
+						this.addTableRow(
+								lastTicketId,
+								ticket.getId(),
+								lastColour, ticket.getColour(),
+								true,
+								false,
+								lastName,
+								ticket.getName(),
+								lastNoOfSupporters,
+								ticket.getSupportersCount(),
+								lastLogo,
+								ticket.getLogo());
+					}
 
-        if(numberOfParties == addedCounter && (numberOfParties % 2) != 0) {
-            this.addTableRowOneSquare(ticketId, colour, name, noOfSupporters, logo);
-        }
-    }
+					lastTicketId = ticket.getId();
+					lastName = ticket.getName();
+					lastInformation = ticket.getInformation();
+					lastNoOfSupporters = ticket.getSupportersCount();
+					lastColour = ticket.getColour();
+					lastLogo = ticket.getLogo();
+
+					added = !added;
+
+					if (tickets.size() == addedCounter && (tickets.size() % 2) != 0) {
+						this.addTableRowOneSquare(ticket.getId(), ticket.getColour(), ticket.getName(), ticket.getSupportersCount(), ticket.getLogo());
+					}
+				}
+			});
+		}
+	}
 	
-	private void addTableRow(final int lastTicketId, final int ticketId, final String colour1,
-							 final String colour2, boolean doubleCell, boolean lastCell,
-							 final String title1, final String title2, final String supporters1,
-							 final String supporters2, final String logo1, final String logo2) {
+	private void addTableRow(long lastTicketId, long ticketId, String colour1,
+							 String colour2, boolean doubleCell, boolean lastCell,
+							 String title1, String title2, String supporters1,
+							 String supporters2, String logo1, String logo2) {
 		TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -149,7 +177,7 @@ public class CandidateTicketFragment extends Fragment {
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
                     Bundle args = new Bundle();
-                    args.putInt("TicketId", lastTicketId);
+                    args.putLong("TicketId", lastTicketId);
                     args.putString("TicketName", title1);
                     args.putString("Colour", colour1);
                     args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
@@ -221,7 +249,7 @@ public class CandidateTicketFragment extends Fragment {
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                     CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
                     Bundle args = new Bundle();
-                    args.putInt("TicketId", ticketId);
+                    args.putLong("TicketId", ticketId);
                     args.putString("TicketName", title2);
                     args.putString("Colour", colour2);
                     args.putInt("NoOfSupporters", Integer.parseInt(supporters2));
@@ -276,8 +304,8 @@ public class CandidateTicketFragment extends Fragment {
 		}
 	}
 
-    private void addTableRowOneSquare(final int ticketId, final String colour1, final String title1,
-									  final String supporters1, final String logo1) {
+    private void addTableRowOneSquare(long ticketId, String colour1, String title1,
+									  String supporters1, String logo1) {
         TableRow tr;
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -337,7 +365,7 @@ public class CandidateTicketFragment extends Fragment {
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
                 CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
                 Bundle args = new Bundle();
-                args.putInt("TicketId", lastTicketId);
+                args.putLong("TicketId", lastTicketId);
                 args.putString("TicketName", title1);
                 args.putString("Colour", colour1);
                 args.putInt("NoOfSupporters", Integer.parseInt(supporters1));

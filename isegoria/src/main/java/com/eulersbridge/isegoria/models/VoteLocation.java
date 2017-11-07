@@ -1,43 +1,40 @@
 package com.eulersbridge.isegoria.models;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by Anthony on 24/03/2015.
  */
 public class VoteLocation {
-    private String ownerId;
-    private String votingLocationId;
+
+    private long ownerId;
+    private long votingLocationId;
     private String name;
     private String information;
 
-    public VoteLocation(String ownerId, String votingLocationId, String name, String information) {
-        this.ownerId = ownerId;
-        this.votingLocationId = votingLocationId;
-        this.name = name;
-        this.information = information;
+    public VoteLocation(JSONObject jsonObject) {
+        try {
+            this.ownerId = jsonObject.getLong("ownerId");
+            this.votingLocationId = jsonObject.getLong("votingLocationId");
+            this.name = jsonObject.getString("name");
+            this.information = jsonObject.getString("information");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    public String getOwnerId() {
+    public long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public String getVotingLocationId() {
+    public long getVotingLocationId() {
         return votingLocationId;
-    }
-
-    public void setVotingLocationId(String votingLocationId) {
-        this.votingLocationId = votingLocationId;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getInformation() {

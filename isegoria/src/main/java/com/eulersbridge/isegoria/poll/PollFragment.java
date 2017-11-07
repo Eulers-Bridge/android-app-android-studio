@@ -2,24 +2,20 @@ package com.eulersbridge.isegoria.poll;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.PollOption;
+import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.utilities.Utils;
-import com.eulersbridge.isegoria.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +28,6 @@ public class PollFragment extends Fragment {
     private SimpleFragmentPagerAdapter pagerAdapter;
 
 	private List<Fragment> fragments;
-
-    private com.sothree.slidinguppanel.SlidingUpPanelLayout slidingUpPanelLayout;
-
-    private boolean expanded = false;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,19 +42,20 @@ public class PollFragment extends Fragment {
 		
         MainActivity mainActivity = (MainActivity) getActivity();
         Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPollQuestions(this);
+        network.getPollOptions(new Network.PollsListener() {
+            @Override
+            public void onFetchSuccess(ArrayList<Poll> polls) {
+                for (Poll poll : polls) {
+                    addPoll(poll);
+                }
+            }
 
-        slidingUpPanelLayout = rootView.findViewById(R.id.sliding_layout);
-        slidingUpPanelLayout.setTouchEnabled(false);
-        slidingUpPanelLayout.setEnabled(false);
+            @Override
+            public void onFetchFailure(Exception e) {}
+        });
 
         setupViewPager(rootView);
         setupTabLayout();
-
-        rootView.findViewById(R.id.voteButton).setOnClickListener(view -> {
-            PollVoteFragment fragment = (PollVoteFragment)fragments.get(viewPager.getCurrentItem());
-            fragment.postVote();
-        });
 		
 		return rootView;
 	}
@@ -125,32 +118,22 @@ public class PollFragment extends Fragment {
         tabLayout.setVisibility(View.VISIBLE);
     }
 
-    public void collapseBar(MotionEvent ev) {
-        if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
-            collapseBarSlideDown();
-        }
-    }
-
-    private void collapseBarSlideDown() {
-        if (expanded) {
-            expanded = false;
-            slidingUpPanelLayout.setPanelHeight(100);
-
-            Utils.hideKeyboard(getActivity());
-        }
-    }
-
-    public void addQuestion(final int nodeId, @Nullable final User creator, final String question, final ArrayList<PollOption> options) {
+    public void addPoll(Poll poll) {
 		try {
 			getActivity().runOnUiThread(() -> {
                 PollVoteFragment pollVoteFragment = new PollVoteFragment();
-                pollVoteFragment.setData(nodeId, creator, question, options);
+
+                Bundle args = new Bundle();
+                args.putParcelable("poll", poll);
+
+                pollVoteFragment.setArguments(args);
 
                 fragments.add(pollVoteFragment);
                 updateTabs();
             });
 		} catch(Exception e) {
-            Log.d("Error", e.toString());
+            Log.d("Error adding poll", e.toString());
+            e.printStackTrace();
         }
 	}
 }

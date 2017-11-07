@@ -3,9 +3,8 @@ package com.eulersbridge.isegoria.feed;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +20,9 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.PhotoAlbum;
+
+import java.util.ArrayList;
 
 public class PhotosFragment extends Fragment {
 	private TableLayout photosTableLayout;
@@ -42,9 +44,12 @@ public class PhotosFragment extends Fragment {
         swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
         swipeContainerPhotos.setOnRefreshListener(() -> {
             swipeContainerPhotos.setRefreshing(true);
-            PhotosFragment.this.clearTable();
-            network.getPhotoAlbums(PhotosFragment.this);
-            ( new android.os.Handler()).postDelayed(() -> {
+
+            clearTable();
+
+            network.getPhotoAlbums(photoAlbumsCallback);
+
+            new android.os.Handler().postDelayed(() -> {
                 insertedFirstRow = false;
                 swipeContainerPhotos.setRefreshing(false);
             }, 7000);
@@ -52,19 +57,38 @@ public class PhotosFragment extends Fragment {
         
         MainActivity mainActivity = (MainActivity) getActivity();
         network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPhotoAlbums(this);
+        network.getPhotoAlbums(photoAlbumsCallback);
 
 		return rootView;
 	}
 
+	private final Network.PhotoAlbumsListener photoAlbumsCallback = new Network.PhotoAlbumsListener() {
+		@Override
+		public void onFetchSuccess(ArrayList<PhotoAlbum> albums) {
+			addPhotoAlbums(albums);
+		}
+
+		@Override
+		public void onFetchFailure(Exception e) {
+
+		}
+	};
+
     private void clearTable() {
         photosTableLayout.removeAllViews();
     }
-	
-	public void addPhotoAlbum(final int albumId, final String label, final String caption, String photoAlbumThumb) {
-		addTableRow(albumId, label, caption, photoAlbumThumb);
+
+	public void addPhotoAlbums(ArrayList<PhotoAlbum> albums) {
+    	if (getActivity() != null) {
+    		getActivity().runOnUiThread(() -> {
+                for (PhotoAlbum album : albums) {
+                    addTableRow(album.getId(), album.getName(), album.getDescription(), album.getThumbnailPhotoUrl());
+                }
+            });
+		}
 	}
 
+	@UiThread
 	private void addTableRow(final int albumId, String label, String caption, String bitmap) {
 		try {
 			TableRow tr = new TableRow(getActivity());
@@ -103,27 +127,29 @@ public class PhotosFragment extends Fragment {
 	        textViewArticle.setGravity(Gravity.START);
 
 	        textViewArticle.setOnClickListener(view12 -> {
-                    FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                    FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                    PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
-                    Bundle args = new Bundle();
-                    args.putString("Album", String.valueOf(albumId));
-                    fragment2.setArguments(args);
-                    fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
-                    fragmentTransaction2.commit();
+				PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
+				Bundle args = new Bundle();
+				args.putInt("albumId", albumId);
+				albumFragment.setArguments(args);
+
+				getActivity().getSupportFragmentManager()
+						.beginTransaction()
+						.addToBackStack(null)
+						.add(R.id.photosFrameLayout, albumFragment)
+						.commit();
             });
 	        
 	       view.setOnClickListener(view1 -> {
-                   FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                   FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                   PhotoAlbumFragment fragment2 = new PhotoAlbumFragment();
-                   Bundle args = new Bundle();
-                   args.putString("Album", String.valueOf(albumId));
-                   fragment2.setArguments(args);
-                   fragmentTransaction2.addToBackStack(null);
-                   fragmentTransaction2.add(R.id.photosFrameLayout, fragment2);
-                   fragmentTransaction2.commit();
+			   PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
+			   Bundle args = new Bundle();
+			   args.putInt("albumId", albumId);
+			   albumFragment.setArguments(args);
+
+			   getActivity().getSupportFragmentManager()
+					   .beginTransaction()
+					   .addToBackStack(null)
+					   .add(R.id.photosFrameLayout, albumFragment)
+					   .commit();
            });
 	        
 	        TextView textViewArticleTime = new TextView(getActivity());
