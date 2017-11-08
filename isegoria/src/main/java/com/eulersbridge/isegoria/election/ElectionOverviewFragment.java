@@ -9,10 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Election;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ElectionOverviewFragment extends Fragment {
 
@@ -31,16 +36,23 @@ public class ElectionOverviewFragment extends Fragment {
         electionDate = rootView.findViewById(R.id.electionDate);
         electionProcess = rootView.findViewById(R.id.electionProcess);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getLatestElection(new Network.ElectionListener() {
+        Isegoria isegoria = (Isegoria)getActivity().getApplication();
+
+        long institutionId = isegoria.getLoggedInUser().institutionId;
+
+        isegoria.getAPI().getElections(institutionId).enqueue(new Callback<List<Election>>() {
             @Override
-            public void onFetchSuccess(Election election) {
-                populateElectionText(election);
+            public void onResponse(Call<List<Election>> call, Response<List<Election>> response) {
+                List<Election> elections = response.body();
+                if (elections != null && elections.size() > 0) {
+                    populateElectionText(elections.get(0));
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<List<Election>> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 		
 		return rootView;
@@ -49,11 +61,11 @@ public class ElectionOverviewFragment extends Fragment {
     private void populateElectionText(Election election) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                electionTitle.setText(election.getTitle());
-                electionIntroduction.setText(election.getIntroduction());
+                electionTitle.setText(election.title);
+                electionIntroduction.setText(election.introduction);
                 //TODO: Format election date
                 electionDate.setText("");
-                electionProcess.setText(election.getProcess());
+                electionProcess.setText(election.process);
             });
 
         }

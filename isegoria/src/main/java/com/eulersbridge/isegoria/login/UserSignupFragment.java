@@ -13,42 +13,43 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.network.GeneralInfoResponse;
+import com.eulersbridge.isegoria.network.Network;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
-	private ArrayList<Country> countries;
+	private List<Country> countries;
 	private ArrayAdapter<String> spinnerArrayAdapter;
 	private ArrayAdapter<String> spinnerInstitutionArrayAdapter;
-
-	public UserSignupFragment() {
-		
-	}
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.user_signup_fragment, container, false);
 
-		//TODO: Hide tabs
-
         countries = new ArrayList<>();
 
 		Isegoria isegoria = (Isegoria) getActivity().getApplication();
 		isegoria.setCountryObjects(countries);
+
         Network network = new Network(isegoria);
         isegoria.setNetwork(network);
-        network.getGeneralInfo(new Network.GeneralInfoListener() {
-            @Override
-            public void onFetchCountriesSuccess(ArrayList<Country> countries) {
-                setCountries(countries);
-            }
 
+        isegoria.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
             @Override
-            public void onFetchCountriesFailure(Exception e) {}
+            protected void handleResponse(Response<GeneralInfoResponse> response) {
+                GeneralInfoResponse body = response.body();
+                if (body != null && body.countries.size() > 0) {
+                    setCountries(body.countries);
+                }
+            }
         });
         
         Spinner spinner = rootView.findViewById(R.id.country);
@@ -84,19 +85,19 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         spinnerYearOfBirth.setAdapter(spinnerYearOfBirthArrayAdapter);
         
         Country countryPlaceholder = new Country("Select Country");
-        spinnerArrayAdapter.add(countryPlaceholder.getName());
+        spinnerArrayAdapter.add(countryPlaceholder.name);
         spinnerInstitutionArrayAdapter.add("Select Institution");
 		
 		return rootView;
 	}
 	
-	private void setCountries(final ArrayList<Country> countries) {
+	private void setCountries(List<Country> countries) {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {
 
 			    for (Country country : countries) {
-			        spinnerArrayAdapter.add(country.getName());
+			        spinnerArrayAdapter.add(country.name);
                 }
 
                 UserSignupFragment.this.countries = countries;
@@ -110,9 +111,9 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
     	spinnerInstitutionArrayAdapter.clear();
 
     	for (Country country : countries) {
-            if (selectedCountry.equals(country.getName())) {
-                for (Institution institution : country.getInstitutions()) {
-                    spinnerInstitutionArrayAdapter.add(institution.getName());
+            if (selectedCountry.equals(country.name)) {
+                for (Institution institution : country.institutions) {
+                    spinnerInstitutionArrayAdapter.add(institution.name);
                 }
             }
         }

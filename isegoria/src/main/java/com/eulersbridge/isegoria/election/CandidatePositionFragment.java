@@ -26,20 +26,27 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.ContactProfileFragment;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Photo;
+import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.utilities.Utils;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CandidatePositionFragment extends Fragment {
     private TableLayout positionsTableLayout;
 	
 	private float dpWidth;
 
-    private Network network;
+	private Isegoria isegoria;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,37 +60,40 @@ public class CandidatePositionFragment extends Fragment {
         
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getCandidatesPosition(positionId, new Network.CandidatesListener() {
+        isegoria = (Isegoria)getActivity().getApplication();
+
+        isegoria.getAPI().getPositionCandidates(positionId).enqueue(new Callback<List<Candidate>>() {
             @Override
-            public void onFetchSuccess(ArrayList<Candidate> candidates) {
-                addCandidates(candidates);
+            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
+                List<Candidate> candidates = response.body();
+                if (candidates != null && candidates.size() > 0) {
+                    addCandidates(candidates);
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {
-
+            public void onFailure(Call<List<Candidate>> call, Throwable t) {
+                t.printStackTrace();
             }
         });
 		
 		return rootView;
 	}
 
-    private void addCandidates(ArrayList<Candidate> candidates) {
+    private void addCandidates(List<Candidate> candidates) {
         if (getActivity() != null && candidates.size() > 0) {
             getActivity().runOnUiThread(() -> {
 
                 for (Candidate candidate : candidates) {
                     addTableRow(
-                            candidate.getTicketId(),
-                            candidate.getPositionId(),
-                            candidate.getUserId(),
+                            candidate.ticketId,
+                            candidate.positionId,
+                            candidate.userId,
                             "",
                             "",
-                            String.format("%s %s", candidate.getGivenName(), candidate.getFamilyName()),
+                            candidate.getName(),
                             "",
-                            candidate.getUserId());
+                            candidate.userId);
                 }
             });
         }
@@ -110,7 +120,25 @@ public class CandidatePositionFragment extends Fragment {
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
-        network.getFirstPhoto(userId, candidateProfileView);
+
+		isegoria.getAPI().getPhoto(userId).enqueue(new Callback<Photo>() {
+            @Override
+            public void onResponse(Call<Photo> call, Response<Photo> response) {
+                if (response.isSuccessful()) {
+                    Photo photo = response.body();
+                    if (photo != null) {
+                        GlideApp.with(CandidatePositionFragment.this)
+                                .load(photo.thumbnailUrl)
+                                .into(candidateProfileView);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Photo> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
@@ -137,15 +165,22 @@ public class CandidatePositionFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        network.getTicketLabel(ticketId, new Network.TicketLabelListener() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
             @Override
-            public void onFetchSuccess(long ticketId, String colour, String code) {
-                textViewParty.setText(code);
-                textViewParty.setBackgroundColor(Color.parseColor(colour));
+            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
+                if (response.isSuccessful()) {
+                    Ticket ticket = response.body();
+                    if (ticket != null) {
+                        textViewParty.setText(ticket.code);
+                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) { }
+            public void onFailure(Call<Ticket> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 
         int imageSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -173,14 +208,21 @@ public class CandidatePositionFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(positionId, new Network.PositionListener() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
             @Override
-            public void onFetchSuccess(long positionId, String name) {
-                textViewPosition.setText(name);
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                if (response.isSuccessful()) {
+                    Position position = response.body();
+                    if (position != null) {
+                        textViewPosition.setText(position.name);
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<Position> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
         
         View dividierView = new View(getActivity());

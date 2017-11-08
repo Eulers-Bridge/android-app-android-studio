@@ -9,9 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.models.UserSelfEfficacy;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.SimpleCallback;
+
+import retrofit2.Response;
 
 /**
  * Created by Seb on 20/10/2017.
@@ -23,28 +27,35 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false);
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
+        MainActivity mainActivity = (MainActivity) getActivity();
 
         mainActivity.setToolbarTitle(getString(R.string.section_title_self_efficacy_questions));
 
-        final Network network = mainActivity.getIsegoriaApplication().getNetwork();
+        Isegoria isegoria = mainActivity.getIsegoriaApplication();
+        String userEmail = isegoria.getLoggedInUser().email;
 
-        final SelfEfficacySliderBar sliderBar1 = rootView.findViewById(R.id.selfEfficacySliderBar1);
-        final SelfEfficacySliderBar sliderBar2 = rootView.findViewById(R.id.selfEfficacySliderBar2);
-        final SelfEfficacySliderBar sliderBar3 = rootView.findViewById(R.id.selfEfficacySliderBar3);
-        final SelfEfficacySliderBar sliderBar4 = rootView.findViewById(R.id.selfEfficacySliderBar4);
+        SelfEfficacySliderBar sliderBar1 = rootView.findViewById(R.id.selfEfficacySliderBar1);
+        SelfEfficacySliderBar sliderBar2 = rootView.findViewById(R.id.selfEfficacySliderBar2);
+        SelfEfficacySliderBar sliderBar3 = rootView.findViewById(R.id.selfEfficacySliderBar3);
+        SelfEfficacySliderBar sliderBar4 = rootView.findViewById(R.id.selfEfficacySliderBar4);
 
         Button doneButton = rootView.findViewById(R.id.selfEfficacyDoneButton);
         doneButton.setOnClickListener(v -> {
-            network.answerEfficacy(
-                    sliderBar1.getScore() + 1,
-                    sliderBar2.getScore() + 1,
-                    sliderBar3.getScore() + 1,
-                    sliderBar4.getScore() + 1
+
+            UserSelfEfficacy answers = new UserSelfEfficacy(
+                    sliderBar1.getScore(),
+                    sliderBar2.getScore(),
+                    sliderBar3.getScore(),
+                    sliderBar4.getScore()
             );
 
-            mainActivity.getSupportFragmentManager().popBackStack();
-            mainActivity.setToolbarTitle(getString(R.string.section_title_vote));
+            isegoria.getAPI().addUserEfficacy(userEmail, answers).enqueue(new SimpleCallback<Void>() {
+                @Override
+                protected void handleResponse(Response response) {
+                    mainActivity.getSupportFragmentManager().popBackStack();
+                    mainActivity.setToolbarTitle(getString(R.string.section_title_vote));
+                }
+            });
         });
 
         return rootView;

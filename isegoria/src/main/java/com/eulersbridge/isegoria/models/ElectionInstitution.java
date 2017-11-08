@@ -1,53 +1,18 @@
 package com.eulersbridge.isegoria.models;
 
-import android.support.annotation.Nullable;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Seb on 04/11/2017.
  */
 
-public class ElectionInstitution {
+class ElectionInstitution {
 
-    private long id;
-    private String name;
-    private String campus;
-    private @Nullable String state;
-    private String country;
+    @SerializedName("institutionId")
+    public long id;
 
-    ElectionInstitution(JSONObject jsonObject) {
-        try {
-            id = jsonObject.getLong("institutionId");
-            name = jsonObject.getString("name");
-            campus = jsonObject.getString("campus");
-            state = jsonObject.getString("state");
-            country = jsonObject.getString("country");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCampus() {
-        return campus;
-    }
-
-    @Nullable
-    public String getState() {
-        return state;
-    }
-
-    public String getCountry() {
-        return country;
-    }
+    public String name;
+    public String campus;
+    public String state;
+    public String country;
 }

@@ -6,10 +6,9 @@
     android:gravity="top"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/topBackgroundSettings"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="220dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
@@ -17,31 +16,33 @@
         android:paddingRight="16dp"
         android:paddingTop="16dp" >
 
-        <ImageView
-			android:contentDescription="@string/settings_profile_picture_content_description"
-            android:id="@+id/profilePicSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:maxHeight="100dp"
-            android:maxWidth="100dp" />
+		<ImageView
+			android:id="@+id/settings_image_background"
+			android:background="@color/profileImageBackground"
+			android:layout_width="match_parent"
+			android:layout_height="220dp"
+			android:scaleType="centerInside" />
 
-	    <LinearLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:gravity="center"
-	        android:orientation="horizontal"
-	        android:paddingTop="8dp" >
-                    	               
-			<Button
-				android:id="@+id/changePhotoButton"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:text="@string/settings_change_photo"
-				android:textColor="@color/white" />
-        </LinearLayout>
-    </LinearLayout>
+		<ImageView
+			android:contentDescription="@string/settings_profile_picture_content_description"
+			android:id="@+id/settings_image_small"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerHorizontal="true"
+			android:adjustViewBounds="true"
+			android:maxHeight="100dp"
+			android:maxWidth="100dp" />
+
+		<Button
+			android:id="@+id/changePhotoButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerHorizontal="true"
+			android:layout_alignParentBottom="true"
+			android:layout_marginBottom="@dimen/activity_vertical_margin"
+			android:text="@string/settings_change_photo"
+			android:textColor="@color/white" />
+    </RelativeLayout>
 
 	<TextView
 		android:layout_width="match_parent"

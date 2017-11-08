@@ -15,22 +15,32 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.models.Photo;
+import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.UserSettings;
+import com.eulersbridge.isegoria.network.IgnoredCallback;
+import com.eulersbridge.isegoria.network.Network;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.io.File;
+
+import retrofit2.Response;
 
 public class UserSettingsFragment extends Fragment {
     private static final int PICK_IMAGE = 1;
@@ -50,34 +60,59 @@ public class UserSettingsFragment extends Fragment {
         getActivity().invalidateOptionsMenu();
 
         mainActivity = (MainActivity) getActivity();
-
         mainActivity.setToolbarTitle(getString(R.string.section_title_settings));
 
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getUserDPId();
+        Isegoria isegoria = (Isegoria)getActivity().getApplication();
 
-        photoImageView = rootView.findViewById(R.id.profilePicSettings);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(150, 150);
+        UserProfile loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
+
+        network = isegoria.getNetwork();
+
+        photoImageView = rootView.findViewById(R.id.settings_image_small);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
         final Switch doNotTrackSwitch = rootView.findViewById(R.id.doNotTrackSwitch);
         doNotTrackSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             network.setTrackingOff(isChecked);
-            network.updateUserDetails();
+
+            UserSettings userSettings = new UserSettings(isChecked, loggedInUser.isOptedOutOfDataCollection);
+
+            isegoria.getAPI().updateUserDetails(loggedInUser.email, userSettings).enqueue(new IgnoredCallback<>());
         });
         final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
         optOutDataCollectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             network.setOptedOutOfDataCollection(isChecked);
-            network.updateUserDetails();
+
+            UserSettings userSettings = new UserSettings(loggedInUser.trackingOff, isChecked);
+
+            isegoria.getAPI().updateUserDetails(loggedInUser.email, userSettings).enqueue(new IgnoredCallback<>());
         });
 
-        User loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
+        doNotTrackSwitch.setChecked(loggedInUser.isOptedOutOfDataCollection);
+        optOutDataCollectionSwitch.setChecked(loggedInUser.trackingOff);
 
-        doNotTrackSwitch.setChecked(loggedInUser.isOptedOutOfDataCollection());
-        optOutDataCollectionSwitch.setChecked(loggedInUser.isTrackingOff());
+        if (!TextUtils.isEmpty(loggedInUser.profilePhotoURL)) {
+            GlideApp.with(this)
+                    .load(loggedInUser.profilePhotoURL)
+                    .into(photoImageView);
+        }
 
-        backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundSettings);
-        network.getUserDP(photoImageView, backgroundLinearLayout);
+        ImageView backgroundImageView = rootView.findViewById(R.id.settings_image_background);
+
+        isegoria.getAPI().getPhotos(loggedInUser.email).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.photos != null && body.photos.size() > 0) {
+                    Photo photo = body.photos.get(0);
+
+                    GlideApp.with(UserSettingsFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .into(backgroundImageView);
+                }
+            }
+        });
 
         final TextView aboutThisAppButton = rootView.findViewById(R.id.aboutThisAppButton);
         aboutThisAppButton.setOnClickListener(view -> {

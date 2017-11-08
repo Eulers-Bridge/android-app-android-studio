@@ -21,7 +21,7 @@ public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService
     private static final String ACCESS_KEY_ID = "AKIAJNFUHYIZGWPMIZWA";
     private static final String SECRET_KEY = "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";
 
-    private static final String SNSPlatformApplicationArn = "arn:aws:sns:ap-southeast-2:715927704730:app/GCM/android_dev";
+    public static final String SNSPlatformApplicationArn = "arn:aws:sns:ap-southeast-2:715927704730:app/GCM/android_dev";
 
     private static AmazonSNSClient snsClient = null;
 

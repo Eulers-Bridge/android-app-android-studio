@@ -41,8 +41,8 @@ import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.securepreferences.SecurePreferences;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		
 		application.login();
 		
-		dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+		//dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 	}
 	
 	public void hideDialog() {
@@ -363,18 +363,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			
 		}
 		else {
-			String institutionID = "";
-			ArrayList<Country> countryObjects = application.getCountryObjects();
+			long institutionId = -1;
+			List<Country> countryObjects = application.getCountryObjects();
 
 			for (Country country : countryObjects) {
-				for (Institution institution : country.getInstitutions()) {
-					if (institution.getName().equals(institution)) {
-						institutionID = institution.getId();
+				for (Institution institution : country.institutions) {
+					if (institution.name.equals(institution)) {
+						institutionId = institution.id;
 					}
 				}
 			}
 			
-			application.getNetwork().signup(firstName, lastName, gender, country, yearOfBirth, email, password, confirmPassword, institutionID);
+			application.getNetwork().signUp(firstName, lastName, gender, country, yearOfBirth, email, password, confirmPassword, institutionId);
 		}
 		
 		switchContent(new LoginScreenFragment());

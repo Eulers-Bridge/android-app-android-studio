@@ -33,14 +33,23 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.ContactProfileFragment;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Photo;
+import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.models.Ticket;
+import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
-import com.eulersbridge.isegoria.models.CandidateTicket;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @SuppressWarnings("deprecation")
 public class CandidateTicketDetailFragment extends Fragment {
@@ -50,13 +59,13 @@ public class CandidateTicketDetailFragment extends Fragment {
 	
 	private float dpWidth;
 
-    private String code;
-    private String colour;
+	private long ticketId;
+    private String code =  "";
+    private String colour = "#000000";
     private String partyColour = "";
     private String partyLogo = "";
 
-    private TextView partyDetailSupporters;
-    private Network network;
+    private Isegoria isegoria;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,14 +74,14 @@ public class CandidateTicketDetailFragment extends Fragment {
 		int backgroundDrawableResource = R.drawable.me;
 
         Bundle bundle = getArguments();
-        final long ticketId = bundle.getLong("TicketId");
+        ticketId = bundle.getLong("TicketId");
         final String ticketName = bundle.getString("TicketName");
         final int noOfSupporters = bundle.getInt("NoOfSupporters");
         partyColour = bundle.getString("Colour");
         partyLogo = bundle.getString("Logo");
 
 		candidateTicketDetialTableLayout = rootView.findViewById(R.id.candidateTicketDetailTable);
-        partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
+        TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -88,38 +97,79 @@ public class CandidateTicketDetailFragment extends Fragment {
             backgroundLinearLayout.setBackgroundDrawable(d);
         }
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getTicketDetail(ticketId, new Network.TicketsListener() {
+        isegoria = (Isegoria)getActivity().getApplication();
+        isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new Callback<List<Candidate>>() {
             @Override
-            public void onFetchSuccess(ArrayList<CandidateTicket> tickets) {
-                updateInformation(tickets);
+            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
+                if (response.isSuccessful()) {
+                    List<Candidate> candidates = response.body();
+                    if (candidates != null) {
+                        addCandidates(candidates);
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<List<Candidate>> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 
         ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
-        network.getFirstPhoto(ticketId, partyDetailLogo);
+
+        isegoria.getAPI().getPhotos(ticketId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse photosResponse = response.body();
+                if (photosResponse != null && photosResponse.photos != null && photosResponse.photos.size() > 0) {
+                    Photo photo = photosResponse.photos.get(0);
+
+                    GlideApp.with(CandidateTicketDetailFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .into(partyDetailLogo);
+                }
+            }
+        });
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        if(network.getUserTickets().contains(ticketId)) {
-            ticketSupportButton.setText("Unsupport");
-        }
+        isegoria.getAPI().getUserSupportedTickets(isegoria.getLoggedInUser().email).enqueue(new Callback<List<Ticket>>() {
+            @Override
+            public void onResponse(Call<List<Ticket>> call, Response<List<Ticket>> response) {
+                if (response.isSuccessful()) {
+                    List<Ticket> tickets = response.body();
+                    if (tickets != null && tickets.size() > 0) {
+                        for (Ticket ticket : tickets) {
+                            if (ticket.id == ticketId) {
+                                getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Ticket>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
 
         ticketSupportButton.setOnClickListener(view -> {
+
+            String userEmail = isegoria.getLoggedInUser().email;
+
             if(ticketSupportButton.getText().equals("Support")) {
-                network.supportTicket(ticketId);
-                TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
+
+                isegoria.getAPI().supportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
+
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
                 ticketSupportButton.setText("Unsupport");
             }
             else if(ticketSupportButton.getText().equals("Unsupport")) {
-                network.unsupportTicket(ticketId);
-                TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
+
+                isegoria.getAPI().unsupportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
+
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
                 ticketSupportButton.setText("Support");
@@ -133,44 +183,20 @@ public class CandidateTicketDetailFragment extends Fragment {
 		return rootView;
 	}
 
-	private void updateInformation(ArrayList<CandidateTicket> tickets) {
-	    if (getActivity() != null && tickets.size() > 0) {
-
-	        getActivity().runOnUiThread(() -> {
-                for (CandidateTicket ticket : tickets) {
-                    code = "";
-                    colour = ticket.getColour();
-
-                    network.getTicketCandidates(ticket.getId(), new Network.CandidatesListener() {
-                        @Override
-                        public void onFetchSuccess(ArrayList<Candidate> candidates) {
-                            addCandidates(candidates);
-                        }
-
-                        @Override
-                        public void onFetchFailure(Exception e) { }
-                    });
-
-                    rootView.invalidate();
-                }
-            });
-        }
-    }
-
-    private void addCandidates(ArrayList<Candidate> candidates) {
+    private void addCandidates(@NonNull List<Candidate> candidates) {
 	    if (getActivity() != null && candidates.size() > 0) {
 
 	        getActivity().runOnUiThread(() -> {
 
                 for (Candidate candidate : candidates) {
                     addTableRow(
-                            (int)candidate.getUserId(),
+                            (int)candidate.userId,
                             code,
                             colour,
-                            String.format("%s %s", candidate.getGivenName(), candidate.getFamilyName()),
+                            candidate.getName(),
                             "",
-                            candidate.getUserId(),
-                            candidate.getPositionId());
+                            candidate.userId,
+                            candidate.positionId);
                 }
             });
         }
@@ -198,7 +224,19 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-        network.getFirstPhoto(userId, candidateProfileView);
+		isegoria.getAPI().getPhotos(userId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.photos != null && body.photos.size() > 0) {
+                    Photo photo = body.photos.get(0);
+
+                    GlideApp.with(CandidateTicketDetailFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .into(candidateProfileView);
+                }
+            }
+        });
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 
@@ -261,14 +299,21 @@ public class CandidateTicketDetailFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(positionId, new Network.PositionListener() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
             @Override
-            public void onFetchSuccess(long positionId, String name) {
-                textViewPosition.setText(name);
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                if (response.isSuccessful()) {
+                    Position position = response.body();
+                    if (position != null) {
+                        textViewPosition.setText(position.name);
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<Position> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
         
         View dividerView = new View(getActivity());

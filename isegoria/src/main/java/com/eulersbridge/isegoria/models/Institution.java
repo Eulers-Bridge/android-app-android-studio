@@ -1,27 +1,18 @@
 package com.eulersbridge.isegoria.models;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 public class Institution {
-	private String id;
-	private String name;
 
-	Institution(JSONObject jsonObject) {
-		try {
-			this.id = jsonObject.getString("institutionId");
-			this.name = jsonObject.getString("institutionName");
+	@SerializedName("institutionId")
+	public long id;
 
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public String getId() {
-		return id;
-	}
+	public long newsFeedId;
 
-	public String getName() {
-		return name;
-	}
+	@SerializedName(value="institutionName", alternate = {"name"})
+	public String name;
+
+	public String state;
+	public String campus;
+	public String country;
 }

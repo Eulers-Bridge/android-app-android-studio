@@ -1,175 +1,131 @@
 package com.eulersbridge.isegoria.feed;
 
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.network.IgnoredCallback;
+import com.eulersbridge.isegoria.network.LikedResponse;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.utilities.TimeConverter;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.utilities.TintTransformation;
+
+import org.parceler.Parcels;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NewsArticleFragment extends Fragment {
     private View rootView;
-    private RelativeLayout backgroundLayout;
-    private ImageView authorImageView;
 
     private NewsArticle article;
+    private Isegoria isegoria;
 
     private boolean setLiked = false;
-    private Network network;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.news_article_fragment, container, false);
 
-        backgroundLayout = rootView.findViewById(R.id.topBackgroundNews);
-        authorImageView = rootView.findViewById(R.id.newsArticleAuthorImage);
+        ImageView articleImageView = rootView.findViewById(R.id.article_image);
+        ImageView authorImageView = rootView.findViewById(R.id.article_image_author);
 
-        article = getArguments().getParcelable("article");
+        article = Parcels.unwrap(getArguments().getParcelable("article"));
         populateTextContent(article);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getNewsArticleLiked(article.getId(), new Network.NewsArticleLikedListener() {
+        isegoria = (Isegoria)getActivity().getApplication();
+
+        isegoria.getAPI().getNewsArticleLiked(article.id, isegoria.getLoggedInUser().email).enqueue(new Callback<LikedResponse>() {
             @Override
-            public void onFetchSuccess(long articleId, boolean likedByUser) {
-                if (likedByUser) initiallyLiked();
+            public void onResponse(Call<LikedResponse> call, Response<LikedResponse> response) {
+                LikedResponse likedResponse = response.body();
+
+                if (likedResponse != null && likedResponse.liked) initiallyLiked();
             }
 
             @Override
-            public void onFetchFailure(long articleId, Exception e) {}
-        });
-
-        network.getPicture(article.getPhotoURL(), new Network.PictureDownloadListener() {
-            @Override
-            public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                populateArticlePhoto(bitmap);
+            public void onFailure(Call<LikedResponse> call, Throwable t) {
+                t.printStackTrace();
             }
-
-            @Override
-            public void onDownloadFailed(String url, VolleyError error) {}
         });
 
-        final String creatorPhotoURL = article.getCreator().getProfilePhotoURL();
+        GlideApp.with(this)
+                .load(article.photos.get(0).thumbnailUrl)
+                .transform(new TintTransformation())
+                .into(articleImageView);
+
+        String creatorPhotoURL = article.creator.profilePhotoURL;
 
         if (!TextUtils.isEmpty(creatorPhotoURL)) {
-            network.getPicture(creatorPhotoURL, new Network.PictureDownloadListener() {
-                @Override
-                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                    populateCreatorPhoto(bitmap);
-                }
-
-                @Override
-                public void onDownloadFailed(String url, VolleyError error) {}
-            });
-
+            GlideApp.with(this)
+                    .load(creatorPhotoURL)
+                    .transform(new TintTransformation())
+                    .into(authorImageView);
         }
 
         return rootView;
     }
 
-    public void initiallyLiked() {
-        final ImageView starView = rootView.findViewById(R.id.starView);
+    private void initiallyLiked() {
+        final ImageView starView = rootView.findViewById(R.id.article_star);
         starView.setImageResource(R.drawable.star);
         setLiked = true;
     }
 
-    public boolean isSetLiked() {
-        return setLiked;
-    }
-
-    public long getArticleId() {
-        return article.getId();
-    }
-
     @UiThread
-    void populateArticlePhoto(@Nullable Bitmap bitmap) {
-        if (bitmap != null) {
-            getActivity().runOnUiThread(() -> {
-                Bitmap tintedPicture = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
-                Drawable d = new BitmapDrawable(getActivity().getResources(), tintedPicture);
+    private void populateTextContent(final NewsArticle article) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    backgroundLayout.setBackground(d);
-                } else {
-                    backgroundLayout.setBackgroundDrawable(d);
-                }
-            });
-        }
-    }
+        TextView newsTitle = rootView.findViewById(R.id.article_title);
+        newsTitle.setText(article.title);
 
-    @UiThread
-    void populateCreatorPhoto(@Nullable Bitmap bitmap) {
-        if (bitmap != null) {
-            getActivity().runOnUiThread(() -> {
-                Bitmap tintedBitmap = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
-                authorImageView.setImageBitmap(tintedBitmap);
-            });
-        }
-    }
+        final TextView likesTextView = rootView.findViewById(R.id.article_likes);
+        likesTextView.setText(String.valueOf(article.likeCount));
 
+        TextView contentTextView = rootView.findViewById(R.id.article_content);
+        contentTextView.setText(article.content);
 
-    @UiThread
-    void populateTextContent(final NewsArticle article) {
-        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 250, getResources().getDisplayMetrics());
+        TextView authorNameTextView = rootView.findViewById(R.id.article_author);
+        authorNameTextView.setText(article.creator.getFullName());
 
-        backgroundLayout.getLayoutParams().height = imageHeight;
+        TextView dateTextView = rootView.findViewById(R.id.article_date);
+        dateTextView.setText(TimeConverter.convertTimestampToString(article.dateTimestamp));
 
-        TextView newsTitle = rootView.findViewById(R.id.newsArticleTitle);
-        newsTitle.setText(article.getTitle());
-
-        final TextView newsArticleLikesView = rootView.findViewById(R.id.newsArticleLikes);
-        newsArticleLikesView.setText(String.valueOf(article.getLikeCount()));
-
-        TextView newsText = rootView.findViewById(R.id.textNews);
-        newsText.setText(article.getContent());
-
-        TextView newsArticleName = rootView.findViewById(R.id.photoTitle);
-        newsArticleName.setText(article.getCreator().getFullName());
-
-        TextView newsArticleDate = rootView.findViewById(R.id.newsArticleDate);
-        newsArticleDate.setText(TimeConverter.convertTimestampToString(article.getDateTimestamp()));
-
-        final ImageView flagView = rootView.findViewById(R.id.flagView);
+        final ImageView flagView = rootView.findViewById(R.id.article_flag);
         flagView.setOnClickListener(view -> flagView.setImageResource(R.drawable.flag));
 
-        if (article.hasInappropriateContent()) flagView.setImageResource(R.drawable.flagdefault);
+        if (article.hasInappropriateContent) flagView.setImageResource(R.drawable.flagdefault);
 
-        final ImageView starView = rootView.findViewById(R.id.starView);
+        final ImageView starView = rootView.findViewById(R.id.article_star);
         starView.setOnClickListener(view -> {
             setLiked = !setLiked;
 
             if (setLiked) {
+                isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(new IgnoredCallback<>());
+
                 starView.setImageResource(R.drawable.star);
-                network.likeArticle(article.getId());
-                int newLikes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText())) + 1;
-                newsArticleLikesView.setText(String.valueOf(newLikes));
+
+                int newLikes = Integer.parseInt(String.valueOf(likesTextView.getText())) + 1;
+                likesTextView.setText(String.valueOf(newLikes));
+
             } else {
+                isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(new IgnoredCallback<>());
+
                 starView.setImageResource(R.drawable.stardefault);
-                network.unlikeArticle(article.getId());
-                int newLikes = Integer.parseInt(String.valueOf(newsArticleLikesView.getText())) - 1;
-                newsArticleLikesView.setText(String.valueOf(newLikes));
+
+                int newLikes = Integer.parseInt(String.valueOf(likesTextView.getText())) - 1;
+                likesTextView.setText(String.valueOf(newLikes));
             }
         });
 

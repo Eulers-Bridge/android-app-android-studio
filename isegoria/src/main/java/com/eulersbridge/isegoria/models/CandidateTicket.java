@@ -1,10 +1,8 @@
 package com.eulersbridge.isegoria.models;
 
 import android.text.TextUtils;
-import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Seb on 04/11/2017.
@@ -12,64 +10,36 @@ import org.json.JSONObject;
 
 public class CandidateTicket {
 
-    private long id;
+    @SerializedName("ticketId")
+    public long id;
 
     private String name;
-    private String supportersCount;
-    private String information;
-    private String logo;
+    private String givenName;
+    private String familyName;
+
+    @SerializedName("numberOfSupporters")
+    public String supportersCount;
+
+    public String information;
+    public String logo;
+
     private String colour;
 
-    public CandidateTicket(JSONObject jsonObject) {
-        try {
-            id = jsonObject.getLong("ticketId");
+    public String getName() {
+        if (!TextUtils.isEmpty(name)) {
+            return name;
 
-            name = jsonObject.optString("name");
-
-            if (TextUtils.isEmpty(name)) {
-                String givenName = jsonObject.getString("givenName");
-                String familyName = jsonObject.getString("familyName");
-
-                name = String.format("%s %s", givenName, familyName);
-            }
-
-            supportersCount = jsonObject.getString("numberOfSupporters");
-            information = jsonObject.getString("information");
-            logo = jsonObject.getString("logo");
-
-            if (jsonObject.isNull("colour")) {
-                colour = "#000000";
-            } else {
-                colour = jsonObject.getString("colour");
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } else {
+            return String.format("%s %s", givenName, familyName);
         }
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSupportersCount() {
-        return supportersCount;
-    }
-
-    public String getInformation() {
-        return information;
-    }
-
-    public String getLogo() {
-        return logo;
-    }
-
     public String getColour() {
-        return colour;
+        if (!TextUtils.isEmpty(colour)) {
+            return colour;
+
+        } else {
+            return "#000000";
+        }
     }
 }
