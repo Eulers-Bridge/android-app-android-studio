@@ -8,33 +8,35 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.models.UserPersonality;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.SimpleCallback;
+
+import retrofit2.Response;
 
 /**
  * Created by Anthony on 01/04/2015.
 */
 public class PersonalityScreen2Fragment extends Fragment {
-    private Network network;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.personality_screen2_fragment, container, false);
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        MainActivity mainActivity = (MainActivity) getActivity();
 
-        final PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);
-        final PersonalitySliderBar personalitySliderBar2 = rootView.findViewById(R.id.personalitySliderBar2);
-        final PersonalitySliderBar personalitySliderBar3 = rootView.findViewById(R.id.personalitySliderBar3);
-        final PersonalitySliderBar personalitySliderBar4 = rootView.findViewById(R.id.personalitySliderBar4);
-        final PersonalitySliderBar personalitySliderBar5 = rootView.findViewById(R.id.personalitySliderBar5);
-        final PersonalitySliderBar personalitySliderBar6 = rootView.findViewById(R.id.personalitySliderBar6);
-        final PersonalitySliderBar personalitySliderBar7 = rootView.findViewById(R.id.personalitySliderBar7);
-        final PersonalitySliderBar personalitySliderBar8 = rootView.findViewById(R.id.personalitySliderBar8);
-        final PersonalitySliderBar personalitySliderBar9 = rootView.findViewById(R.id.personalitySliderBar9);
-        final PersonalitySliderBar personalitySliderBar10 = rootView.findViewById(R.id.personalitySliderBar10);
+        PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);
+        PersonalitySliderBar personalitySliderBar2 = rootView.findViewById(R.id.personalitySliderBar2);
+        PersonalitySliderBar personalitySliderBar3 = rootView.findViewById(R.id.personalitySliderBar3);
+        PersonalitySliderBar personalitySliderBar4 = rootView.findViewById(R.id.personalitySliderBar4);
+        PersonalitySliderBar personalitySliderBar5 = rootView.findViewById(R.id.personalitySliderBar5);
+        PersonalitySliderBar personalitySliderBar6 = rootView.findViewById(R.id.personalitySliderBar6);
+        PersonalitySliderBar personalitySliderBar7 = rootView.findViewById(R.id.personalitySliderBar7);
+        PersonalitySliderBar personalitySliderBar8 = rootView.findViewById(R.id.personalitySliderBar8);
+        PersonalitySliderBar personalitySliderBar9 = rootView.findViewById(R.id.personalitySliderBar9);
+        PersonalitySliderBar personalitySliderBar10 = rootView.findViewById(R.id.personalitySliderBar10);
 
         Button donePersonalityQuestions = rootView.findViewById(R.id.donePersonalityQuestions);
         donePersonalityQuestions.setOnClickListener(v -> {
@@ -44,11 +46,22 @@ public class PersonalityScreen2Fragment extends Fragment {
             float emotionalStability = (personalitySliderBar9.getScore() + (8-personalitySliderBar4.getScore()))/2;
             float opennessToExperiences = (personalitySliderBar5.getScore() + (10-personalitySliderBar6.getScore()))/2;
 
-            network.addPersonalityForUser(extraversion, agreeableness, conscientiousness,
-                    emotionalStability, opennessToExperiences);
+            UserPersonality personality = new UserPersonality(agreeableness, conscientiousness,
+                    emotionalStability, extraversion, opennessToExperiences);
 
-            mainActivity.getSupportFragmentManager().popBackStack();
-            mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
+            Isegoria isegoria = mainActivity.getIsegoriaApplication();
+
+            String userEmail = isegoria.getLoggedInUser().email;
+
+            isegoria.getAPI()
+                    .addUserPersonality(userEmail, personality)
+                    .enqueue(new SimpleCallback<Void>() {
+                        @Override
+                        protected void handleResponse(Response response) {
+                            mainActivity.getSupportFragmentManager().popBackStack();
+                            mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
+                        }
+                    });
         });
 
         return rootView;

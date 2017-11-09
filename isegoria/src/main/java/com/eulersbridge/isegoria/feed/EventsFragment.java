@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria.feed;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,59 +20,75 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventsFragment extends Fragment {
 	private TableLayout newsTableLayout;
-    private EventsFragment eventsFragment;
 
 	private EventsDetailFragment detailFragment;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerEvents;
-    private Network network;
-
-	private final Network.FetchEventsListener eventsListener = new Network.FetchEventsListener() {
-		@Override
-		public void onFetchSuccess(final ArrayList<Event> events) {
-			getActivity().runOnUiThread(() -> {
-                for (Event event : events) {
-                    addTableRow(event);
-                }
-            });
-		}
-
-		@Override
-		public void onFetchFailure(VolleyError error) {}
-	};
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.events_fragment, container, false);
+
+		Isegoria isegoria = (Isegoria)getActivity().getApplication();
+
 		newsTableLayout = rootView.findViewById(R.id.eventsTableLayout);
-        eventsFragment = this;
 
 		swipeContainerEvents = rootView.findViewById(R.id.swipeContainerEvents);
         swipeContainerEvents.setOnRefreshListener(() -> {
-            eventsFragment.clearTable();
+            clearTable();
 
-            network.getEvents(eventsListener);
+            getEvents(isegoria);
 
             swipeContainerEvents.setRefreshing(true);
             new Handler().postDelayed(() -> swipeContainerEvents.setRefreshing(false), 7000);
         });
-	
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getEvents(eventsListener);
+
+		getEvents(isegoria);
 
 		return rootView;
+	}
+
+	private final Callback<List<Event>> callback = new Callback<List<Event>>() {
+		@Override
+		public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+			List<Event> events = response.body();
+			addEvents(events);
+		}
+
+		@Override
+		public void onFailure(Call<List<Event>> call, Throwable t) {
+			t.printStackTrace();
+		}
+	};
+
+	private void getEvents(Isegoria isegoria) {
+		isegoria.getAPI().getEvents(isegoria.getLoggedInUser().institutionId).enqueue(callback);
+	}
+
+	private void addEvents(List<Event> events) {
+		if (getActivity() != null && events != null && events.size() > 0) {
+			getActivity().runOnUiThread(() -> {
+				for (Event event : events) {
+					addTableRow(event);
+				}
+			});
+		}
 	}
 
     private void clearTable() {
@@ -98,7 +113,7 @@ public class EventsFragment extends Fragment {
 
 
 		
-		if(event.getImageUrl() == null) {
+		if (event.photos.size() == 0 || event.photos.get(0).thumbnailUrl == null) {
 			colour = "#000000";
 		}
 		
@@ -115,26 +130,22 @@ public class EventsFragment extends Fragment {
 		view.setColorFilter(Color.argb(paddingMargin2, paddingMargin3, paddingMargin3, paddingMargin3));
 		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
 		view.setScaleType(ScaleType.CENTER_CROP);
-		network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
-			@Override
-			public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-				Bitmap tintedBitmap = Utils.tintBitmap(bitmap, Color.argb(128, 0, 0, 0));
-				view.setImageBitmap(tintedBitmap);
-			}
 
-			@Override
-			public void onDownloadFailed(String url, VolleyError error) {}
-		});
+        GlideApp.with(this)
+                .load(event.photos.get(0).thumbnailUrl)
+                .transform(new TintTransformation())
+                .into(view);
 		
 		view.setOnClickListener(view1 -> {
             detailFragment = new EventsDetailFragment();
             Bundle args = new Bundle();
-            args.putParcelable("event", event);
+            args.putParcelable("event", Parcels.wrap(event));
             detailFragment.setArguments(args);
 
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.eventsFrameLayout, detailFragment)
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .addToBackStack(null)
                     .commit();
         });
@@ -142,10 +153,10 @@ public class EventsFragment extends Fragment {
 	    TextView textViewArticle = new TextView(getActivity());
 	    textViewArticle.setTextColor(Color.parseColor(colour));
 	    textViewArticle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20.0f);
-	    textViewArticle.setText(event.getName());
+	    textViewArticle.setText(event.name);
 	    textViewArticle.setGravity(Gravity.CENTER);
 
-		String eventTimeStr = TimeConverter.convertTimestampToString(event.getDate());
+		String eventTimeStr = Utils.convertTimestampToString(getContext(), event.date);
 	        
 	    TextView textViewArticleTime = new TextView(getActivity());
 	    textViewArticleTime.setTextColor(Color.parseColor(colour));

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,16 +20,25 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.models.Badge;
+import com.eulersbridge.isegoria.models.Contact;
+import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.Photo;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
-import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 	private View rootView;
@@ -42,7 +52,7 @@ public class ProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
-    private Network network;
+    private Isegoria isegoria;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,28 +60,31 @@ public class ProfileFragment extends Fragment {
 
 		setHasOptionsMenu(true);
 
+        isegoria = (Isegoria) getActivity().getApplication();
+
         final MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
 
-        ImageView photoImageView = rootView.findViewById(R.id.profilePic);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
+        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        network.getRemainingBadgeCount(new Network.RemainingBadgeCountListener() {
-            @Override
-            public void onFetchSuccess(final long remainingBadgeCount) {
-                getActivity().runOnUiThread(() -> updateRemainingBadgesCount(remainingBadgeCount));
-            }
+        Long userId = isegoria.getLoggedInUser().getId();
 
+        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
-            public void onFetchFailure(Exception e) { }
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> remainingBadges = response.body();
+                if (remainingBadges != null) {
+                    updateRemainingBadgesCount(remainingBadges.size());
+                }
+            }
         });
 
         /*final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
@@ -91,14 +104,14 @@ public class ProfileFragment extends Fragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
-        User user = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
+        User user = isegoria.getLoggedInUser();
 
-        final TextView name = rootView.findViewById(R.id.profileName);
+        final TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
 
-        final TextView personalityTestButton = rootView.findViewById(R.id.personalityTestButton);
+        final TextView personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
 
-        if (user.hasPersonality()) {
+        if (user.hasPersonality) {
             personalityTestButton.setVisibility(View.GONE);
 
         } else {
@@ -115,31 +128,60 @@ public class ProfileFragment extends Fragment {
             });
         }
 
-        updateCompletedBadgesCount(user.getCompletedBadgesCount());
-        updateCompletedTasksCount(user.getCompletedTasksCount());
-        updateExperience(user.getLevel());
+        updateCompletedBadgesCount(user.completedBadgesCount);
+        updateCompletedTasksCount(user.completedTasksCount);
+        updateExperience(user.level);
 
-        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-        network.getUserDP(photoImageView, backgroundLinearLayout);
+        TextView institutionTextView = rootView.findViewById(R.id.profile_institution);
 
-        network.getTasks(new Network.TasksListener() {
+        isegoria.getAPI().getInstitution(user.institutionId).enqueue(new SimpleCallback<Institution>() {
             @Override
-            public void onFetchSuccess(ArrayList<Task> tasks) {
-                addTasks(tasks);
+            protected void handleResponse(Response<Institution> response) {
+                Institution institution = response.body();
+                if (institution != null){
+                    institutionTextView.setText(institution.name);
+                }
             }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
         });
 
-        network.getProfileStats(user.getEmail(), new Network.ProfileStatsListener() {
-            @Override
-            public void onFetchSuccess(int contactsCount, int totalTasksCount) {
-                updateStats(contactsCount, totalTasksCount);
-            }
+        if (!TextUtils.isEmpty(user.profilePhotoURL)) {
+            GlideApp.with(this)
+                    .load(user.profilePhotoURL)
+                    .into(photoImageView);
+        }
 
+        ImageView backgroundImageView = rootView.findViewById(R.id.profile_image_background);
+
+        isegoria.getAPI().getPhotos(user.email).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
-            public void onFetchFailure(Exception e) { }
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.totalPhotos > 0) {
+                    Photo photo = body.photos.get(0);
+
+                    GlideApp.with(ProfileFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .into(backgroundImageView);
+                }
+            }
+        });
+
+        isegoria.getAPI().getTasks().enqueue(new SimpleCallback<List<Task>>() {
+            @Override
+            protected void handleResponse(Response<List<Task>> response) {
+                List<Task> tasks = response.body();
+                if (tasks != null) addTasks(tasks);
+            }
+        });
+
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
+            @Override
+            protected void handleResponse(Response<Contact> response) {
+                Contact user = response.body();
+                if (user != null) {
+                    updateStats(user.contactsCount, user.totalTasksCount);
+                }
+            }
         });
 
 		return rootView;
@@ -204,7 +246,7 @@ public class ProfileFragment extends Fragment {
     }
 
     @UiThread
-    public void updateStats(int numOfContacts, int totalTasks) {
+    private void updateStats(long numOfContacts, long totalTasks) {
         friendsNumTextView.setText(String.valueOf(numOfContacts));
         groupNumTextView.setText(String.valueOf("0"));
         rewardsNumTextView.setText(String.valueOf("0"));
@@ -213,25 +255,25 @@ public class ProfileFragment extends Fragment {
         circularSeekBar4.setTopLine(String.valueOf("0"));
         circularSeekBar4.setBottomLine("ATTENDED");
 
-        circularSeekBar3.setMax(totalTasks);
+        circularSeekBar3.setMax((int)totalTasks);
 
         circularSeekBar4.setProgress(30);
         Thread t4 = new Thread(circularSeekBar4);
         t4.start();
     }
 
-    private void addTasks(ArrayList<Task> tasks) {
-	    if (getActivity() != null && tasks.size() > 0) {
+    private void addTasks(@NonNull List<Task> tasks) {
+	    if (getActivity() != null) {
 	        getActivity().runOnUiThread(() -> {
 	            for (Task task : tasks) {
-	                addTask(task.getId(), task.getAction(), task.getXpValue());
+	                addTask(task.id, task.action, task.xpValue);
                 }
             });
         }
     }
 
     @UiThread
-    public void addTask(long taskId, String action, long xpValue) {
+    private void addTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -263,7 +305,17 @@ public class ProfileFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, iconImage);
+        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.totalPhotos > 0 && isAdded()) {
+                    GlideApp.with(ProfileFragment.this)
+                            .load(body.photos.get(0).thumbnailUrl)
+                            .into(iconImage);
+                }
+            }
+        });
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
@@ -294,5 +346,22 @@ public class ProfileFragment extends Fragment {
         divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
         divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
         tasksLinearLayout.addView(divider);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        // Work around a child fragment manager bug: https://stackoverflow.com/a/15656428/447697
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

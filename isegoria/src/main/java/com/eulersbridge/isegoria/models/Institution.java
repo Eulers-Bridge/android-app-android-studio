@@ -1,27 +1,20 @@
 package com.eulersbridge.isegoria.models;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.squareup.moshi.Json;
 
 public class Institution {
-	private String id;
-	private String name;
 
-	Institution(JSONObject jsonObject) {
-		try {
-			this.id = jsonObject.getString("institutionId");
-			this.name = jsonObject.getString("institutionName");
+	@Json(name = "institutionId")
+	public long id;
 
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public String getId() {
-		return id;
-	}
+	public long newsFeedId;
 
-	public String getName() {
-		return name;
-	}
+	//@Json(name = value="institutionName", alternate = {"name"})
+	//TODO: Custom field
+	@Json(name = "institutionName")
+	public String name;
+
+	public String state;
+	public String campus;
+	public String country;
 }

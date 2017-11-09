@@ -14,10 +14,6 @@ import com.eulersbridge.isegoria.views.SliderBarPoint;
 
 import java.util.ArrayList;
 
-/**
- * Created by Seb on 20/10/2017.
- */
-
 public class BaseSliderBar extends View {
 
     private int parentWidth;

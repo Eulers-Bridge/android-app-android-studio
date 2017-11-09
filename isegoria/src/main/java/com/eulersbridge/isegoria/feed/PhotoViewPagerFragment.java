@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,19 +29,23 @@ public class PhotoViewPagerFragment extends Fragment {
 
         FragmentManager fm = getActivity().getSupportFragmentManager();
 
-        ViewPager mPager = rootView.findViewById(R.id.photoViewPagerFragment);
+        ViewPager pager = rootView.findViewById(R.id.photoViewPagerFragment);
 
-        PhotoPagerAdapter mPagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
-        mPager.setAdapter(mPagerAdapter);
+        int marginDp = 8;
+        float marginPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp, getContext().getResources().getDisplayMetrics());
+        pager.setPageMargin((int)marginPixels);
 
-        mPager.setCurrentItem(this.position);
+        PhotoPagerAdapter pagerAdapter = new PhotoPagerAdapter(fm, fragmentList);
+        pager.setAdapter(pagerAdapter);
+
+        pager.setCurrentItem(position);
 
         return rootView;
     }
 
     public int addFragment(Fragment fragment) {
         fragmentList.add(fragment);
-        return fragmentList.size()-1;
+        return fragmentList.size() - 1;
     }
 
     public void setPosition(int pos) {

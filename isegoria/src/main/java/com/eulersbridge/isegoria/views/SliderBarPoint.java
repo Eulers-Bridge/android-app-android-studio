@@ -1,8 +1,5 @@
 package com.eulersbridge.isegoria.views;
 
-/**
- * Created by Anthony on 02/04/2015.
- */
 public class SliderBarPoint {
     private final int x;
     private final int y;

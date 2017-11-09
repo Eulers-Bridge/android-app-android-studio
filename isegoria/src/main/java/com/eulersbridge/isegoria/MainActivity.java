@@ -33,6 +33,8 @@ import com.eulersbridge.isegoria.login.UserConsentAgreementFragment;
 import com.eulersbridge.isegoria.login.UserSignupFragment;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.network.GeneralInfoResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.profile.UserSettingsFragment;
@@ -41,9 +43,10 @@ import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.securepreferences.SecurePreferences;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -274,12 +277,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 	}
 	
 	public void login(String email, String password) {
-		application.setUsername(email);
-		application.setPassword(password);
+		application.login(email, password);
 		
-		application.login();
-		
-		dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+		//dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 	}
 	
 	public void hideDialog() {
@@ -363,18 +363,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			
 		}
 		else {
-			String institutionID = "";
-			ArrayList<Country> countryObjects = application.getCountryObjects();
+			application.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
+				@Override
+				protected void handleResponse(Response<GeneralInfoResponse> response) {
+					GeneralInfoResponse body = response.body();
+					if (body != null && body.countries.size() > 0) {
 
-			for (Country country : countryObjects) {
-				for (Institution institution : country.getInstitutions()) {
-					if (institution.getName().equals(institution)) {
-						institutionID = institution.getId();
+						long institutionId = -1;
+
+						for (Country country : body.countries) {
+							for (Institution institution : country.institutions) {
+								if (institution.name.equals(institution)) {
+									institutionId = institution.id;
+								}
+							}
+						}
+
+						application.getNetworkService().signUp(firstName, lastName, gender, country, yearOfBirth, email, password, institutionId);
 					}
 				}
-			}
-			
-			application.getNetwork().signup(firstName, lastName, gender, country, yearOfBirth, email, password, confirmPassword, institutionID);
+			});
 		}
 		
 		switchContent(new LoginScreenFragment());

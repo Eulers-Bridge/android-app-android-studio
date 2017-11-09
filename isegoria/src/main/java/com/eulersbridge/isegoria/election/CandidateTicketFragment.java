@@ -24,15 +24,23 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Election;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.CandidateTicket;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @SuppressWarnings("deprecation")
 public class CandidateTicketFragment extends Fragment {
+
+	private Isegoria isegoria;
+
 	private TableLayout positionsTableLayout;
 	
 	private float dpWidth;
@@ -56,23 +64,48 @@ public class CandidateTicketFragment extends Fragment {
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-		Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getTickets(new Network.TicketsListener() {
-			@Override
-			public void onFetchSuccess(ArrayList<CandidateTicket> tickets) {
-				addTickets(tickets);
-			}
+		isegoria = (Isegoria)getActivity().getApplication();
 
-			@Override
-			public void onFetchFailure(Exception e) { }
-		});
-        network.getUserSupportedTickets();
+        User loggedInUser = isegoria.getLoggedInUser();
+
+		isegoria.getAPI().getElections(loggedInUser.institutionId).enqueue(electionsCallback);
         
 		return rootView;
 	}
 
-	private void addTickets(ArrayList<CandidateTicket> tickets) {
+	private final Callback<List<Election>> electionsCallback = new Callback<List<Election>>() {
+		@Override
+		public void onResponse(Call<List<Election>> call, Response<List<Election>> response) {
+			List<Election> elections = response.body();
+			if (elections != null && elections.size() > 0) {
+				Election election = elections.get(0);
+
+				isegoria.getAPI().getTickets(election.id).enqueue(ticketsCallback);
+			}
+		}
+
+		@Override
+		public void onFailure(Call<List<Election>> call, Throwable t) {
+			t.printStackTrace();
+		}
+	};
+
+	private final Callback<List<CandidateTicket>> ticketsCallback = new Callback<List<CandidateTicket>>() {
+		@Override
+		public void onResponse(Call<List<CandidateTicket>> call, Response<List<CandidateTicket>> response) {
+			List<CandidateTicket> tickets = response.body();
+			if (tickets != null) {
+				addTickets(tickets);
+			}
+		}
+
+		@Override
+		public void onFailure(Call<List<CandidateTicket>> call, Throwable t) {
+			t.printStackTrace();
+		}
+	};
+
+	private void addTickets(List<CandidateTicket> tickets) {
 		if (getActivity() != null && tickets.size() > 0) {
 			getActivity().runOnUiThread(() -> {
 
@@ -82,29 +115,29 @@ public class CandidateTicketFragment extends Fragment {
 					if (added) {
 						this.addTableRow(
 								lastTicketId,
-								ticket.getId(),
+								ticket.id,
 								lastColour, ticket.getColour(),
 								true,
 								false,
 								lastName,
 								ticket.getName(),
 								lastNoOfSupporters,
-								ticket.getSupportersCount(),
+								ticket.supportersCount,
 								lastLogo,
-								ticket.getLogo());
+								ticket.logo);
 					}
 
-					lastTicketId = ticket.getId();
+					lastTicketId = ticket.id;
 					lastName = ticket.getName();
-					lastInformation = ticket.getInformation();
-					lastNoOfSupporters = ticket.getSupportersCount();
+					lastInformation = ticket.information;
+					lastNoOfSupporters = ticket.supportersCount;
 					lastColour = ticket.getColour();
-					lastLogo = ticket.getLogo();
+					lastLogo = ticket.logo;
 
 					added = !added;
 
 					if (tickets.size() == addedCounter && (tickets.size() % 2) != 0) {
-						this.addTableRowOneSquare(ticket.getId(), ticket.getColour(), ticket.getName(), ticket.getSupportersCount(), ticket.getLogo());
+						this.addTableRowOneSquare(ticket.id, ticket.getColour(), ticket.getName(), ticket.supportersCount, ticket.logo);
 					}
 				}
 			});

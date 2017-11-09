@@ -11,15 +11,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Poll;
+import com.eulersbridge.isegoria.network.PollsResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
 import java.util.List;
 import java.util.Vector;
+
+import retrofit2.Response;
 
 public class PollFragment extends Fragment {
 
@@ -39,19 +44,19 @@ public class PollFragment extends Fragment {
         ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_poll));
 
 		fragments = new Vector<>();
-		
-        MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPollOptions(new Network.PollsListener() {
+
+		Isegoria isegoria = (Isegoria)getActivity().getApplication();
+		long institutionId = isegoria.getLoggedInUser().institutionId;
+		isegoria.getAPI().getPolls(institutionId).enqueue(new SimpleCallback<PollsResponse>() {
             @Override
-            public void onFetchSuccess(ArrayList<Poll> polls) {
-                for (Poll poll : polls) {
-                    addPoll(poll);
+            protected void handleResponse(Response<PollsResponse> response) {
+                PollsResponse body = response.body();
+                if (body != null && body.totalPolls > 0) {
+                    for (Poll poll : body.polls) {
+                        addPoll(poll);
+                    }
                 }
             }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
         });
 
         setupViewPager(rootView);
@@ -118,13 +123,13 @@ public class PollFragment extends Fragment {
         tabLayout.setVisibility(View.VISIBLE);
     }
 
-    public void addPoll(Poll poll) {
+    private void addPoll(Poll poll) {
 		try {
 			getActivity().runOnUiThread(() -> {
                 PollVoteFragment pollVoteFragment = new PollVoteFragment();
 
                 Bundle args = new Bundle();
-                args.putParcelable("poll", poll);
+                args.putParcelable("poll", Parcels.wrap(poll));
 
                 pollVoteFragment.setArguments(args);
 

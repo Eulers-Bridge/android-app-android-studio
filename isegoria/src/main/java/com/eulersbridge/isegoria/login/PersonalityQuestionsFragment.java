@@ -15,9 +15,6 @@ import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-/**
- * Created by Anthony on 01/04/2015.
- */
 public class PersonalityQuestionsFragment extends Fragment {
     private TabLayout tabLayout;
     private NonSwipeableViewPager viewPager;
