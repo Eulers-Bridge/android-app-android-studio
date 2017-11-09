@@ -1,18 +1,23 @@
 package com.eulersbridge.isegoria;
 
 import android.app.Application;
+import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
-import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.network.NewsFeedResponse;
 import com.securepreferences.SecurePreferences;
+
+import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -32,19 +37,46 @@ public class Isegoria extends Application {
 		this.mainActivity = mainActivity;
 	}
 
-	public void setFeedFragment() {
-		mainActivity.runOnUiThread(() -> {
-            mainActivity.hideDialog();
+	private void setupAppShortcuts() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
 
-            mainActivity.setNavigationEnabled(true);
-            mainActivity.setToolbarVisible(true);
+            if (shortcutManager != null) {
 
-            final FeedFragment feedFragment = new FeedFragment();
-            feedFragment.setTabLayout(mainActivity.getTabLayout());
+                ShortcutInfo election = new ShortcutInfo.Builder(this, Constant.SHORTCUT_ACTION_ELECTION)
+                        .setShortLabel(getString(R.string.section_title_election))
+                        .setLongLabel("View the latest election")
+                        .setIcon(Icon.createWithResource(this, R.drawable.electionblue))
+                        .setRank(1)
+                        .setIntent(new Intent(this, MainActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        .setAction(Constant.SHORTCUT_ACTION_ELECTION)
+                        )
+                        .build();
 
-            mainActivity.switchContent(feedFragment);
-        });
-	}
+                ShortcutInfo friends = new ShortcutInfo.Builder(this, Constant.SHORTCUT_ACTION_FRIENDS)
+                        .setShortLabel(getString(R.string.section_title_friends))
+                        .setLongLabel("Add a friend")
+                        .setIcon(Icon.createWithResource(this, R.drawable.friends))
+                        .setRank(2)
+                        .setIntent(new Intent(this, MainActivity.class)
+                                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                        .setAction(Constant.SHORTCUT_ACTION_FRIENDS)
+                        )
+                        .build();
+
+                shortcutManager.setDynamicShortcuts(Arrays.asList(election, friends));
+            }
+        }
+    }
+
+    public void onLoginSuccess() {
+        mainActivity.onLoginSuccess(loggedInUser);
+    }
+
+    public void onLoginFailure() {
+        mainActivity.onLoginFailure();
+    }
 
     public void setVerification() {
         mainActivity.runOnUiThread(() -> {
@@ -53,27 +85,12 @@ public class Isegoria extends Application {
         });
     }
 
-    public void setPersonality() {
-        mainActivity.runOnUiThread(() -> {
-            mainActivity.hideDialog();
-
-            PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-            personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
-            mainActivity.switchContent(personalityQuestionsFragment);
-        });
-    }
-
-	public void signupSucceeded() {
-		mainActivity.showSignupSucceeded();
+	public void onSignUpSuccess() {
+		mainActivity.onSignUpSuccess();
 	}
 	
-	public void signupFailed() {
-		mainActivity.showSignupFailed();
-	}
-	
-	public void loginFailed() {
-		mainActivity.hideDialog();
-		mainActivity.showLoginFailed();
+	public void onSignUpFailure() {
+		mainActivity.onSignUpFailure();
 	}
 	
 	public @NonNull NetworkService getNetworkService() {
@@ -141,6 +158,12 @@ public class Isegoria extends Application {
 		// Remove any notifications that are still visible
         NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
         manager.cancelAll();
+
+        // Remove all app long-press shortcuts
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
+            ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
+            if (shortcutManager != null) shortcutManager.removeAllDynamicShortcuts();
+        }
 
 		getMainActivity().showLogin();
 	}

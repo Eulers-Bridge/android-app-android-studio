@@ -2,12 +2,14 @@ package com.eulersbridge.isegoria.feed;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -181,18 +183,21 @@ public class NewsFragment extends Fragment {
 					.transforms(new CenterCrop(), new TintTransformation())
 					.into(view);
 
-	        view.setOnClickListener(view13 -> {
-				NewsArticleFragment detailFragment = new NewsArticleFragment();
-				Bundle args = new Bundle();
-				args.putParcelable("article", Parcels.wrap(article1));
-				detailFragment.setArguments(args);
+	        view.setOnClickListener(innerView -> {
+                int[] location = new int[] {0,0};
+                innerView.getLocationOnScreen(location);
 
-				getActivity().getSupportFragmentManager()
-						.beginTransaction()
-						.add(R.id.newsFrameLayout, detailFragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack(null)
-						.commit();
+                Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
+
+                Bundle extras = new Bundle();
+                extras.putParcelable("article", Parcels.wrap(article1));
+                activityIntent.putExtras(extras);
+
+                //Animate with a scale-up transition between the activities
+                Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(tableRow, location[0],
+                        location[1], innerView.getWidth(), innerView.getHeight()).toBundle();
+
+                ActivityCompat.startActivity(getContext(), activityIntent, options);
             });
 	        
 	        relativeLayout.addView(view);
@@ -240,18 +245,22 @@ public class NewsFragment extends Fragment {
 					.transforms(new CenterCrop(), new TintTransformation())
 					.into(view2);
 
-			view2.setOnClickListener(view12 -> {
-				NewsArticleFragment detailFragment = new NewsArticleFragment();
-				Bundle args = new Bundle();
-				args.putParcelable("article", Parcels.wrap(article2));
-				detailFragment.setArguments(args);
+			view2.setOnClickListener(innerView -> {
+                int[] location = new int[] {0,0};
+                innerView.getLocationOnScreen(location);
 
-				getActivity().getSupportFragmentManager()
-						.beginTransaction()
-                        .add(R.id.newsFrameLayout, detailFragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack(null)
-						.commit();
+                Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
+
+                Bundle extras = new Bundle();
+                extras.putParcelable("article", Parcels.wrap(article2));
+
+                activityIntent.putExtras(extras);
+
+                //Animate with a scale-up transition between the activities
+                Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(tableRow, location[0], location[1],
+                        innerView.getWidth(),innerView.getHeight()).toBundle();
+
+                ActivityCompat.startActivity(getContext(), activityIntent, options);
             });
 	        
 	        relativeLayout.addView(view2);
@@ -279,18 +288,21 @@ public class NewsFragment extends Fragment {
 					.transforms(new CenterCrop(), new TintTransformation())
 					.into(imageView);
 
-			imageView.setOnClickListener(view1 -> {
-				NewsArticleFragment detailFragment = new NewsArticleFragment();
-				Bundle args = new Bundle();
-				args.putParcelable("article", Parcels.wrap(article1));
-				detailFragment.setArguments(args);
+			imageView.setOnClickListener(innerView -> {
+                int[] location = new int[] {0,0};
+                innerView.getLocationOnScreen(location);
 
-				getActivity().getSupportFragmentManager()
-						.beginTransaction()
-                        .add(R.id.newsFrameLayout, detailFragment)
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                        .addToBackStack(null)
-						.commit();
+                Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
+
+                Bundle extras = new Bundle();
+                extras.putParcelable("article", Parcels.wrap(article1));
+                activityIntent.putExtras(extras);
+
+                //Animate with a scale-up transition between the activities
+                Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(tableRow, location[0],
+                        location[1], innerView.getWidth(), innerView.getHeight()).toBundle();
+
+                ActivityCompat.startActivity(getContext(), activityIntent, options);
             });
 	        
 	        TextView titleTextView = new TextView(getContext());

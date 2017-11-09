@@ -18,6 +18,10 @@
         <item name="colorAccent">@color/lightBlue</item>
     </style>
 
+    <style name="DetailTheme" parent="AppTheme">
+
+    </style>
+
     <style name="ToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>

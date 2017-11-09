@@ -31,6 +31,7 @@ public class FeedFragment extends Fragment {
             mainActivity.getWindow().setStatusBarColor(colour);
 
             Utils.setMultitaskColour(mainActivity, colour);
+            Utils.setStatusBarColour(mainActivity, colour);
         }
 
         // Ensure options menu from another fragment is not carried over

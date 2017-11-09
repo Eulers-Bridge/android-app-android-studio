@@ -21,6 +21,7 @@ android {
         applicationId "au.com.isegoria.app"
         minSdkVersion 14
         targetSdkVersion 27
+        vectorDrawables.useSupportLibrary = true
         versionCode 7
         versionName "1.0.6"
     }
@@ -53,11 +54,11 @@ dependencies {
     compile 'com.github.bumptech.glide:okhttp3-integration:4.3.0'
 
     compile 'com.android.support:support-fragment:27.0.0'
-    // v4 fragment library depends on all other v4 libraries for now.
     // core-ui in order to access `ViewPager` (does not affect APK size)
     compile 'com.android.support:support-core-ui:27.0.0'
     compile 'com.android.support:appcompat-v7:27.0.0'
     compile 'com.android.support:design:27.0.0'
+    compile 'com.android.support:support-vector-drawable:27.0.0'
 
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'

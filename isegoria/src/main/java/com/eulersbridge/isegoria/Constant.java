@@ -12,4 +12,6 @@ public class Constant {
     public static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/";
     //public static final String PICTURES_URL "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
 
+    static final String SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION";
+    static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
 }

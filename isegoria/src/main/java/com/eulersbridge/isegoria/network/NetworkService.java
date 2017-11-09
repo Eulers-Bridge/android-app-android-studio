@@ -148,11 +148,7 @@ public class NetworkService {
                         if (user.accountVerified) {
                             userAccountVerified = true;
 
-                            if (user.hasPersonality) {
-                                application.setFeedFragment();
-                            } else {
-                                application.setPersonality();
-                            }
+                            application.onLoginSuccess();
                         }
                     }
                 }
@@ -163,7 +159,7 @@ public class NetworkService {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 t.printStackTrace();
-                application.getMainActivity().runOnUiThread(application::loginFailed);
+                application.getMainActivity().runOnUiThread(application::onLoginFailure);
             }
         });
     }
@@ -211,9 +207,9 @@ public class NetworkService {
 
         } finally {
             if (success) {
-                application.getMainActivity().runOnUiThread(application::signupSucceeded);
+                application.getMainActivity().runOnUiThread(application::onSignUpSuccess);
             } else {
-                application.getMainActivity().runOnUiThread(application::signupFailed);
+                application.getMainActivity().runOnUiThread(application::onSignUpFailure);
             }
         }
     }

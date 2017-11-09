@@ -40,10 +40,15 @@ public final class Utils {
         }
     }
 
+    public static void setMultitaskTitle(Activity activity, String title) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setMultitaskDescription(activity, title, activity.getResources().getColor(R.color.darkBlue));
+        }
+    }
+
     //Change colour, use default title (app name)
     public static void setMultitaskColour(Activity activity, @ColorInt int colour) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
             setMultitaskDescription(activity, activity.getString(R.string.app_name), colour);
         }
     }
@@ -148,18 +153,6 @@ public final class Utils {
         canvas.drawBitmap(source, null, targetRect, null);
 
         return dest;
-    }
-
-    public static Bitmap tintBitmap(Bitmap bitmap, @ColorInt int color) {
-        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-        Paint paint = new Paint();
-        paint.setColorFilter(new PorterDuffColorFilter(Color.argb(127, 0,0,0), PorterDuff.Mode.SRC_ATOP));
-
-        Canvas canvas = new Canvas(resultBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-
-        return resultBitmap;
     }
 
     public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -52,7 +53,7 @@ public class ProfileViewPagerFragment extends Fragment {
         switch (item.getItemId()) {
 
             case R.id.profile_settings:
-                mainActivity.showSettings();
+                startActivity(new Intent(getContext(), SettingsActivity.class));
                 return true;
 
             case R.id.profile_logout:

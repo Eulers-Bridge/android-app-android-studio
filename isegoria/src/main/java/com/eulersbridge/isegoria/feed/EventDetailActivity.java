@@ -6,17 +6,15 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,12 +26,11 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Event;
-
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -43,35 +40,44 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EventsDetailFragment extends Fragment {
-	private View rootView;
-	private float dpWidth;
+public class EventDetailActivity extends AppCompatActivity {
+
+    private float dpWidth;
     private Isegoria isegoria;
 
     private TableLayout eventContactTableLayout;
 
     private Event event;
-	
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
 
-        eventContactTableLayout = rootView.findViewById(R.id.event_details_table_layout);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        Button addToCalendar = rootView.findViewById(R.id.event_button_add_to_calendar);
+        setContentView(R.layout.event_detail_activity);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+
+        findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
+
+        eventContactTableLayout = findViewById(R.id.event_details_table_layout);
+
+        Button addToCalendar = findViewById(R.id.event_button_add_to_calendar);
         addToCalendar.setOnClickListener(view -> addToCalendar());
 
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        event = Parcels.unwrap(getArguments().getParcelable("event"));
+        event = Parcels.unwrap(getIntent().getExtras().getParcelable("event"));
 
-        isegoria = (Isegoria) getActivity().getApplication();
+        isegoria = (Isegoria)getApplication();
 
         if (event != null) {
             populateContent(event);
 
-            ImageView eventImageView = rootView.findViewById(R.id.event_image);
+            ImageView eventImageView = findViewById(R.id.event_image);
 
             if (!TextUtils.isEmpty(event.photos.get(0).thumbnailUrl)) {
                 GlideApp.with(this)
@@ -80,27 +86,25 @@ public class EventsDetailFragment extends Fragment {
                         .into(eventImageView);
             }
         }
-		
-		return rootView;
-	}
-	
-	private void populateContent(final Event event) {
-        getActivity().runOnUiThread(() -> {
-            TextView eventTitleField = rootView.findViewById(R.id.event_title);
+    }
+
+    private void populateContent(final Event event) {
+        runOnUiThread(() -> {
+            TextView eventTitleField = findViewById(R.id.event_title);
             eventTitleField.setText(event.name);
 
-            TextView eventTime = rootView.findViewById(R.id.event_time);
-            eventTime.setText(Utils.convertTimestampToString(getContext(), event.date));
+            TextView eventTime = findViewById(R.id.event_time);
+            eventTime.setText(Utils.convertTimestampToString(this, event.date));
 
-            TextView eventLocationLine1 = rootView.findViewById(R.id.event_location_1);
+            TextView eventLocationLine1 = findViewById(R.id.event_location_1);
             eventLocationLine1.setText(event.location);
 
-            TextView eventsTextField = rootView.findViewById(R.id.event_details);
+            TextView eventsTextField = findViewById(R.id.event_details);
             eventsTextField.setText(event.description);
         });
-	}
-	
-	private void addToCalendar() {
+    }
+
+    private void addToCalendar() {
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
                 .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.date)
@@ -114,23 +118,23 @@ public class EventsDetailFragment extends Fragment {
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+        if (intent.resolveActivity(getPackageManager()) != null) {
             isegoria.getMainActivity().startActivity(intent);
         }
-	}
+    }
 
     public void addCandidate(String email) {
         TableRow tr;
 
-        tr = new TableRow(getActivity());
+        tr = new TableRow(this);
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         tr.setLayoutParams(rowParams);
         tr.setPadding(10, 10, 0, 10);
 
-        LinearLayout layout = new LinearLayout(getActivity());
+        LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
 
-        TextView contactTextView = new TextView(getActivity());
+        TextView contactTextView = new TextView(this);
         contactTextView.setTypeface(null, Typeface.BOLD);
         contactTextView.setText("Organizer: " + email);
         layout.addView(contactTextView);
@@ -149,15 +153,15 @@ public class EventsDetailFragment extends Fragment {
                              String candidatePosition, int positionId) {
         TableRow tr;
 
-        LinearLayout layout = new LinearLayout(getContext());
+        LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
 
-        tr = new TableRow(getContext());
+        tr = new TableRow(this);
         TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         tr.setLayoutParams(rowParams);
         tr.setPadding(0, 10, 0, 10);
 
-        ImageView candidateProfileView = new ImageView(getContext());
+        ImageView candidateProfileView = new ImageView(this);
         candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
         candidateProfileView.setLayoutParams(layoutParams);
@@ -168,7 +172,7 @@ public class EventsDetailFragment extends Fragment {
             GlideApp.with(this).load(user.profilePhotoURL).into(candidateProfileView);
         }
 
-        ImageView candidateProfileImage = new ImageView(getContext());
+        ImageView candidateProfileImage = new ImageView(this);
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
@@ -179,13 +183,13 @@ public class EventsDetailFragment extends Fragment {
             Bundle args = new Bundle();
             args.putInt("ProfileId", userId);
 
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .addToBackStack(null)
                     .replace(R.id.container, profileFragment)
                     .commit();
         });
 
-        TextView textViewParty = new TextView(getContext());
+        TextView textViewParty = new TextView(this);
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewParty.setText(partyAbr);
@@ -216,7 +220,7 @@ public class EventsDetailFragment extends Fragment {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setStrokeWidth(5);
 
-        LinearLayout partyLayout = new LinearLayout(getContext());
+        LinearLayout partyLayout = new LinearLayout(this);
         partyLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 80, 40);
@@ -225,14 +229,14 @@ public class EventsDetailFragment extends Fragment {
         //partyLayout.setBackgroundDrawable(rectShapeDrawable);
         partyLayout.addView(textViewParty);
 
-        TextView textViewCandidate = new TextView(getContext());
+        TextView textViewCandidate = new TextView(this);
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         textViewCandidate.setText(candidateName);
         textViewCandidate.setPadding(10, 0, 10, 0);
         textViewCandidate.setGravity(Gravity.START);
 
-        TextView textViewPosition = new TextView(getContext());
+        TextView textViewPosition = new TextView(this);
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
         textViewPosition.setText(candidatePosition);
@@ -254,11 +258,11 @@ public class EventsDetailFragment extends Fragment {
             }
         });
 
-        View dividerView = new View(getContext());
+        View dividerView = new View(this);
         dividerView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
         dividerView.setBackgroundColor(Color.parseColor("#676475"));
 
-        RelativeLayout relLayoutMaster = new RelativeLayout(getContext());
+        RelativeLayout relLayoutMaster = new RelativeLayout(this);
         TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
 
@@ -268,12 +272,12 @@ public class EventsDetailFragment extends Fragment {
         RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
         relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-        LinearLayout linLayout = new LinearLayout(getContext());
+        LinearLayout linLayout = new LinearLayout(this);
         linLayout.setOrientation(LinearLayout.VERTICAL);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
 
-        LinearLayout linLayout2 = new LinearLayout(getContext());
+        LinearLayout linLayout2 = new LinearLayout(this);
         linLayout2.setOrientation(LinearLayout.VERTICAL);
         linLayout2.addView(candidateProfileImage);
         linLayout2.setGravity(Gravity.END);

@@ -26,8 +26,7 @@ public class PersonalityScreen1Fragment extends Fragment {
         takePersonalityButton.setOnClickListener(view -> mPager.setCurrentItem(1));
 
         Button skipPersonalityQuestions = rootView.findViewById(R.id.skipPersonality);
-        skipPersonalityQuestions.setOnClickListener(v -> mainActivity.getIsegoriaApplication().setFeedFragment());
-
+        skipPersonalityQuestions.setOnClickListener(v -> mainActivity.getIsegoriaApplication().onLoginSuccess());
 
         return rootView;
     }

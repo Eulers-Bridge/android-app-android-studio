@@ -1,12 +1,14 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,7 +40,6 @@ import retrofit2.Response;
 public class EventsFragment extends Fragment {
 	private TableLayout newsTableLayout;
 
-	private EventsDetailFragment detailFragment;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerEvents;
 
 	@Override
@@ -136,18 +137,22 @@ public class EventsFragment extends Fragment {
                 .transform(new TintTransformation())
                 .into(view);
 		
-		view.setOnClickListener(view1 -> {
-            detailFragment = new EventsDetailFragment();
-            Bundle args = new Bundle();
-            args.putParcelable("event", Parcels.wrap(event));
-            detailFragment.setArguments(args);
+		view.setOnClickListener(innerView -> {
 
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.eventsFrameLayout, detailFragment)
-					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit();
+            int[] location = new int[] {0,0};
+            innerView.getLocationOnScreen(location);
+
+            Intent activityIntent = new Intent(getActivity(), EventDetailActivity.class);
+
+            Bundle extras = new Bundle();
+            extras.putParcelable("event", Parcels.wrap(event));
+            activityIntent.putExtras(extras);
+
+            //Animate with a scale-up transition between the activities
+            Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(innerView, location[0],
+                    location[1], innerView.getWidth(), innerView.getHeight()).toBundle();
+
+            ActivityCompat.startActivity(getContext(), activityIntent, options);
         });
 	        
 	    TextView textViewArticle = new TextView(getActivity());

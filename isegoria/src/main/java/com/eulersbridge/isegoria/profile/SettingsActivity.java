@@ -11,15 +11,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -28,13 +24,12 @@ import android.widget.TextView;
 
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.models.UserSettings;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.NetworkService;
-import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
@@ -43,37 +38,41 @@ import java.io.File;
 
 import retrofit2.Response;
 
-public class UserSettingsFragment extends Fragment {
+public class SettingsActivity extends AppCompatActivity {
+
     private static final int PICK_IMAGE = 1;
     private final static int REQ_CODE_PICK_IMAGE = 1;
 
     private ImageView photoImageView;
     private LinearLayout backgroundLinearLayout;
 
-    private MainActivity mainActivity;
     private NetworkService network;
 
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.user_settings_fragment, container, false);
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        // Ensure options menu from another fragment is not carried over
-        getActivity().invalidateOptionsMenu();
+        setContentView(R.layout.user_settings_fragment);
 
-        mainActivity = (MainActivity) getActivity();
-        mainActivity.setToolbarTitle(getString(R.string.section_title_settings));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
 
-        Isegoria isegoria = (Isegoria)getActivity().getApplication();
+        Utils.setMultitaskTitle(this, getString(R.string.settings_title));
 
-        User loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
+        findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
 
+        Isegoria isegoria = (Isegoria)getApplication();
         network = isegoria.getNetworkService();
 
-        photoImageView = rootView.findViewById(R.id.settings_image_small);
+        photoImageView = findViewById(R.id.settings_image_small);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(150, 150);
         photoImageView.setLayoutParams(layoutParams);
 
-        final Switch doNotTrackSwitch = rootView.findViewById(R.id.doNotTrackSwitch);
+        User loggedInUser = isegoria.getLoggedInUser();
+
+        final Switch doNotTrackSwitch = findViewById(R.id.doNotTrackSwitch);
         doNotTrackSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isegoria.setTrackingOff(isChecked);
 
@@ -82,7 +81,7 @@ public class UserSettingsFragment extends Fragment {
             isegoria.getAPI().updateUserDetails(loggedInUser.email, userSettings).enqueue(new IgnoredCallback<>());
         });
 
-        final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
+        final Switch optOutDataCollectionSwitch = findViewById(R.id.optOutDataCollectionSwitch);
         optOutDataCollectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isegoria.setOptedOutOfDataCollection(isChecked);
 
@@ -100,7 +99,7 @@ public class UserSettingsFragment extends Fragment {
                     .into(photoImageView);
         }
 
-        ImageView backgroundImageView = rootView.findViewById(R.id.settings_image_background);
+        ImageView backgroundImageView = findViewById(R.id.settings_image_background);
 
         isegoria.getAPI().getPhotos(loggedInUser.email).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
@@ -109,26 +108,22 @@ public class UserSettingsFragment extends Fragment {
                 if (body != null && body.totalPhotos > 0) {
                     Photo photo = body.photos.get(0);
 
-                    GlideApp.with(UserSettingsFragment.this)
+                    GlideApp.with(SettingsActivity.this)
                             .load(photo.thumbnailUrl)
                             .into(backgroundImageView);
                 }
             }
         });
 
-        final TextView aboutThisAppButton = rootView.findViewById(R.id.aboutThisAppButton);
-        aboutThisAppButton.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        final TextView aboutThisAppButton = findViewById(R.id.aboutThisAppButton);
+        aboutThisAppButton.setOnClickListener(view -> getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.container, new AboutScreenFragment())
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit());
 
-            fragmentManager
-                    .beginTransaction()
-                    .add(R.id.container, new AboutScreenFragment())
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit();
-        });
-
-        final TextView changePhotoButton = rootView.findViewById(R.id.changePhotoButton);
+        final TextView changePhotoButton = findViewById(R.id.changePhotoButton);
         changePhotoButton.setOnClickListener(view -> {
             Intent intent = new Intent();
             intent.setType("image/*");
@@ -136,19 +131,13 @@ public class UserSettingsFragment extends Fragment {
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
         });
 
-       // network.s3Auth();
-
-		return rootView;
-	}
-
-    public void setTabLayout(TabLayout tabLayout) {
-        tabLayout.setVisibility(View.GONE);
+        // network.s3Auth();
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void onActivityResult(int requestCode, int resultCode,
-                                    Intent imageReturnedIntent) {
+                                 Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
         switch(requestCode) {
@@ -157,7 +146,7 @@ public class UserSettingsFragment extends Fragment {
                     Uri selectedImage = imageReturnedIntent.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                    Cursor cursor = getActivity().getContentResolver().query(
+                    Cursor cursor = getContentResolver().query(
                             selectedImage, filePathColumn, null, null, null);
                     cursor.moveToFirst();
 
@@ -171,8 +160,7 @@ public class UserSettingsFragment extends Fragment {
                     Bitmap bitmap = BitmapFactory.decodeFile(file.getPath(), options);
                     photoImageView.setImageBitmap(bitmap);
 
-                    Drawable d = new BitmapDrawable(mainActivity.getResources(),
-                            Utils.fastBlur(bitmap, 25));
+                    Drawable d = new BitmapDrawable(getResources(), Utils.fastBlur(bitmap, 25));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         backgroundLinearLayout.setBackground(d);
                     } else {
