@@ -11,13 +11,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -38,9 +35,9 @@ import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.profile.UserSettingsFragment;
+import com.eulersbridge.isegoria.utilities.BottomNavigationViewHelper;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
 import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
-import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.securepreferences.SecurePreferences;
 
 import java.util.HashMap;
@@ -48,15 +45,15 @@ import java.util.Map;
 
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
 	private Fragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
 
+    private BottomNavigationView navigationView;
+
 	private TextView toolbarTitleTextView;
-	private DrawerLayout drawerLayout;
-	private ActionBarDrawerToggle drawerToggle;
 	private TabLayout tabLayout;
 	private @IdRes int currentNavigationId;
 	
@@ -88,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 		setupToolbarAndNavigation();
 
-		setNavigationDrawerEnabled(false);
+		setNavigationEnabled(false);
 
 		String userEmail = new SecurePreferences(this).getString("userEmail", null);
 		String userPassword = new SecurePreferences(this).getString("userPassword", null);
@@ -136,21 +133,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		toolbarTitleTextView = toolbar.findViewById(R.id.toolbar_title);
 		toolbarTitleTextView.setTypeface(titleFont);
 
-		drawerLayout = findViewById(R.id.drawer_layout);
-
-		NavigationView navigationView = findViewById(R.id.navigation);
+		navigationView = findViewById(R.id.navigation);
 		if (navigationView != null) {
-			navigationView.setNavigationItemSelectedListener(this);
-		}
+		    navigationView.setOnNavigationItemSelectedListener(this);
 
-		//Set icon to open/close drawer and provide identifiers for open/close states (not important)
-		drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
-		drawerLayout.addDrawerListener(drawerToggle);
-		drawerToggle.syncState();
-		drawerToggle.setToolbarNavigationClickListener(view -> {
-            onBackPressed();
-            setShowNavigationBackButton(false);
-        });
+            BottomNavigationViewHelper.disableShiftMode(navigationView);
+		}
 
 		tabLayout = findViewById(R.id.tabLayout);
 	}
@@ -178,14 +166,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 		getSupportActionBar().setDisplayShowHomeEnabled(show);
 	}
 
-	void setNavigationDrawerEnabled(boolean enabled) {
-		drawerLayout.setDrawerLockMode(enabled? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		drawerToggle.setDrawerIndicatorEnabled(enabled);
+	void setNavigationEnabled(boolean enabled) {
+        navigationView.setEnabled(enabled);
 	}
 
 	public TabLayout getTabLayout() {
 		return tabLayout;
 	}
+
+	public void showSettings() {
+        UserSettingsFragment userSettingsFragment = new UserSettingsFragment();
+        userSettingsFragment.setTabLayout(tabLayout);
+
+        addContent(userSettingsFragment);
+    }
+
+    public void showFriends() {
+        FindAddContactFragment friendsFragment = new FindAddContactFragment();
+        friendsFragment.setTabLayout(tabLayout);
+
+        addContent(friendsFragment);
+    }
 
 	public void showLogin() {
 		LoginScreenFragment loginScreenFragment = new LoginScreenFragment();
@@ -200,8 +201,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-		if (drawerLayout.isDrawerOpen(GravityCompat.START))
-			drawerLayout.closeDrawer(GravityCompat.START);
 
 		if (item.isCheckable()) item.setChecked(true);
 
@@ -230,19 +229,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 					switchContent(pollFragment);
 					break;
 
-				case R.id.navigation_vote:
+				/*case R.id.navigation_vote:
 					VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
 					voteFragment.setTabLayout(tabLayout);
 
 					switchContent(voteFragment);
-					break;
-
-				case R.id.navigation_friends:
-					FindAddContactFragment friendsFragment = new FindAddContactFragment();
-					friendsFragment.setTabLayout(tabLayout);
-
-					switchContent(friendsFragment);
-					break;
+					break;*/
 
 				case R.id.navigation_profile:
 
@@ -250,13 +242,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 					profileFragment.setTabLayout(tabLayout);
 
 					switchContent(profileFragment);
-					break;
-
-				case R.id.navigation_settings:
-					final UserSettingsFragment userSettingsFragment = new UserSettingsFragment();
-					userSettingsFragment.setTabLayout(tabLayout);
-
-					switchContent(userSettingsFragment);
 					break;
 			}
 
@@ -404,6 +389,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 			getSupportFragmentManager().putFragment(outState, "mContent", mContent);
 		}
 	}
+
+    private void addContent(Fragment fragment) {
+        mContent = fragment;
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+    }
 	
 	public void switchContent(Fragment fragment) {
 		switchContent(fragment, true);

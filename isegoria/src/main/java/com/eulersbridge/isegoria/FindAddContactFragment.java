@@ -61,6 +61,8 @@ public class FindAddContactFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
 
+        getActivity().invalidateOptionsMenu();
+
         setHasOptionsMenu(true);
 
         searchResultsTableLayout = rootView.findViewById(R.id.searchResultsTable);
@@ -108,6 +110,14 @@ public class FindAddContactFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
+        mainActivity.getTabLayout().setVisibility(View.VISIBLE);
     }
 
     private final SimpleCallback<List<User>> searchCallback = new SimpleCallback<List<User>>() {

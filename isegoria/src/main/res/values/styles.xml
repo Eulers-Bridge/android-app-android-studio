@@ -24,8 +24,7 @@
 
     <!-- Style the tab bar (e.g. on Feed fragment), and give child tabs a text appearance -->
     <style name="AppTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabBackground">@color/barBackground</item>
-        <item name="tabIndicatorColor">@color/lightBlue</item>
+        <item name="tabIndicatorColor">@color/white</item>
         <item name="tabSelectedTextColor">@color/white</item>
         <item name="tabTextAppearance">@style/TabTextAppearance</item>
     </style>

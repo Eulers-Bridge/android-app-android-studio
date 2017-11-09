@@ -36,7 +36,7 @@ public class Isegoria extends Application {
 		mainActivity.runOnUiThread(() -> {
             mainActivity.hideDialog();
 
-            mainActivity.setNavigationDrawerEnabled(true);
+            mainActivity.setNavigationEnabled(true);
             mainActivity.setToolbarVisible(true);
 
             final FeedFragment feedFragment = new FeedFragment();

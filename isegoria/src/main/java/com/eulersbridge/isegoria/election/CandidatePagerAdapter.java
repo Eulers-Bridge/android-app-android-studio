@@ -23,11 +23,11 @@ class CandidatePagerAdapter extends FragmentStatePagerAdapter  {
 	    public CharSequence getPageTitle(int position) {
 			switch(position) {
 				case 0:
-					return "By Type";
+					return "Position";
 				case 1:
-					return "By Ticket";
+					return "Ticket";
 				case 2:
-					return "List";
+					return "All";
 				default:
 					return "";
 			}

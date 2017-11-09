@@ -53,7 +53,7 @@ public class PollVoteFragment extends Fragment {
 
     private long pollId;
     private Contact creator;
-    private ArrayList<PollOption> options = new ArrayList<>();
+    private List<PollOption> options = new ArrayList<>();
 
     private Isegoria isegoria;
 

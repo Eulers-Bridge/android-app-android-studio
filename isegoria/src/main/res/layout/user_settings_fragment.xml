@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:id="@+id/settingsFrame"
     android:gravity="top"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+	android:background="@color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.models;
 
+import android.support.annotation.Nullable;
+
 import com.squareup.moshi.Json;
 @org.parceler.Parcel
 public class PollOption {
@@ -12,7 +14,8 @@ public class PollOption {
     public Photo photo;
 
     @Json(name = "numOfVoters")
-    public long votersCount;
+    @Nullable
+    public Long votersCount;
 
     @Json(name = "voted")
     public boolean hasVoted;

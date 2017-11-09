@@ -6,6 +6,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -20,16 +23,45 @@ public class ProfileViewPagerFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private MainActivity mainActivity;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_profile));
+        setHasOptionsMenu(true);
+
+        mainActivity = (MainActivity)getActivity();
+
+        mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
 
         setupViewPager(rootView);
         setupTabLayout();
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.profile_settings:
+                mainActivity.showSettings();
+                return true;
+
+            case R.id.profile_logout:
+                mainActivity.getIsegoriaApplication().logOut();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setupViewPager(View rootView) {
@@ -49,7 +81,7 @@ public class ProfileViewPagerFragment extends Fragment {
                 public CharSequence getPageTitle(int position) {
                     switch (position) {
                         case 0:
-                            return "Profile";
+                            return "Overview";
                         case 1:
                             return "Progress";
                         case 2:

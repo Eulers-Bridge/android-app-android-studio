@@ -81,6 +81,7 @@ public class UserSettingsFragment extends Fragment {
 
             isegoria.getAPI().updateUserDetails(loggedInUser.email, userSettings).enqueue(new IgnoredCallback<>());
         });
+
         final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
         optOutDataCollectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isegoria.setOptedOutOfDataCollection(isChecked);

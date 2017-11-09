@@ -4,7 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/profileLogout"
+        android:id="@+id/profile_settings"
+        android:title="@string/profile_settings"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/profile_logout"
         android:title="@string/profile_logout"
         app:showAsAction="never"/>
 

@@ -5,6 +5,6 @@
     <item android:color="@color/darkBlue" android:state_checked="true" />
 
     <!-- Default text colour -->
-    <item android:color="@color/barBackground" />
+    <item android:color="@color/lightGrey" />
 
 </selector>

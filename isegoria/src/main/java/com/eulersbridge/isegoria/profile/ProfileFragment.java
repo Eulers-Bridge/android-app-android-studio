@@ -10,9 +10,6 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -58,11 +55,9 @@ public class ProfileFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-		setHasOptionsMenu(true);
-
         isegoria = (Isegoria) getActivity().getApplication();
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
+        MainActivity mainActivity = (MainActivity) getActivity();
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
@@ -71,7 +66,15 @@ public class ProfileFragment extends Fragment {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
+
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
+
+        View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
+
+        friendsNumTextView.setOnClickListener(friendsClickListener);
+        rootView.findViewById(R.id.friendsTitle).setOnClickListener(friendsClickListener);
+
+
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
@@ -186,24 +189,6 @@ public class ProfileFragment extends Fragment {
 
 		return rootView;
 	}
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.profile, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-	    if (item.getItemId() == R.id.profileLogout) {
-
-            ((Isegoria)getActivity().getApplication()).logOut();
-
-	        return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
 
     @UiThread
     private void updateCompletedBadgesCount(long count) {
