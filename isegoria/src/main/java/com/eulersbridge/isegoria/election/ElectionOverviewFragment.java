@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Election;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ElectionOverviewFragment extends Fragment {
                 electionTitle.setText(election.title);
                 electionIntroduction.setText(election.introduction);
                 //TODO: Format election date
-                electionDate.setText("");
+                electionDate.setText(Utils.convertTimestampToString(getContext(), election.startTimestamp));
                 electionProcess.setText(election.process);
             });
 

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -14,19 +15,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 import com.eulersbridge.isegoria.utilities.TintTransformation;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
@@ -159,7 +161,7 @@ public class NewsFragment extends Fragment {
 	        TextView titleTextViewTime = new TextView(getContext());
 	        titleTextViewTime.setTextColor(Color.parseColor(colour));
 	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        titleTextViewTime.setText(TimeConverter.convertTimestampToString(article1.dateTimestamp));
+	        titleTextViewTime.setText(Utils.convertTimestampToString(getContext(), article1.dateTimestamp));
 	        titleTextViewTime.setPadding(0, paddingMargin2, 0, 0);
 	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        
@@ -172,13 +174,11 @@ public class NewsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 			
 			final ImageView view = new ImageView(getContext());
-			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view.setScaleType(ScaleType.CENTER_CROP);
 
 			GlideApp.with(this)
 					.load(drawable1)
-					.transform(new TintTransformation())
+					.transforms(new CenterCrop(), new TintTransformation())
 					.into(view);
 
 	        view.setOnClickListener(view13 -> {
@@ -189,8 +189,9 @@ public class NewsFragment extends Fragment {
 
 				getActivity().getSupportFragmentManager()
 						.beginTransaction()
-						.addToBackStack(null)
 						.add(R.id.newsFrameLayout, detailFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
 						.commit();
             });
 	        
@@ -232,13 +233,11 @@ public class NewsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, titleTextView.getId());
 			
 			ImageView view2 = new ImageView(getContext());
-			view2.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view2.setScaleType(ScaleType.CENTER_CROP);
 
 			GlideApp.with(this)
 					.load(drawable2)
-					.transform(new TintTransformation())
+					.transforms(new CenterCrop(), new TintTransformation())
 					.into(view2);
 
 			view2.setOnClickListener(view12 -> {
@@ -249,8 +248,9 @@ public class NewsFragment extends Fragment {
 
 				getActivity().getSupportFragmentManager()
 						.beginTransaction()
-						.addToBackStack(null)
-						.add(R.id.newsFrameLayout, detailFragment)
+                        .add(R.id.newsFrameLayout, detailFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
 						.commit();
             });
 	        
@@ -272,13 +272,11 @@ public class NewsFragment extends Fragment {
 			((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, paddingMargin);
 			
 			ImageView imageView = new ImageView(getContext());
-//			imageView.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			imageView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
-			imageView.setScaleType(ScaleType.CENTER_CROP);
 
 			GlideApp.with(this)
 					.load(drawable1)
-					.transform(new TintTransformation())
+					.transforms(new CenterCrop(), new TintTransformation())
 					.into(imageView);
 
 			imageView.setOnClickListener(view1 -> {
@@ -289,8 +287,9 @@ public class NewsFragment extends Fragment {
 
 				getActivity().getSupportFragmentManager()
 						.beginTransaction()
-						.addToBackStack(null)
-						.add(R.id.newsFrameLayout, detailFragment)
+                        .add(R.id.newsFrameLayout, detailFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
 						.commit();
             });
 	        
@@ -303,7 +302,7 @@ public class NewsFragment extends Fragment {
 	        TextView titleTextViewTime = new TextView(getContext());
 	        titleTextViewTime.setTextColor(Color.parseColor(colour));
 	        titleTextViewTime.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
-	        titleTextViewTime.setText(TimeConverter.convertTimestampToString(article1.dateTimestamp));
+	        titleTextViewTime.setText(Utils.convertTimestampToString(getContext(), article1.dateTimestamp));
 	        titleTextViewTime.setPadding(0, 100, 0, 0);
 	        titleTextViewTime.setGravity(Gravity.CENTER);
 	        

@@ -34,6 +34,10 @@ public class PhotosFragment extends Fragment {
 	private boolean insertedFirstRow = false;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerPhotos;
 
+    private Isegoria isegoria;
+
+    private boolean fetchedPhotos = false;
+
 	public PhotosFragment() {
 		insertedFirstRow = false;
 	}
@@ -44,9 +48,9 @@ public class PhotosFragment extends Fragment {
 
 		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
 
-		Isegoria isegoria = (Isegoria)getActivity().getApplication();
+		isegoria = (Isegoria)getActivity().getApplication();
 
-		refreshPhotoAlbums(isegoria);
+		refreshPhotoAlbums();
 
         swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
         swipeContainerPhotos.setOnRefreshListener(() -> {
@@ -54,7 +58,7 @@ public class PhotosFragment extends Fragment {
 
             clearTable();
 
-			refreshPhotoAlbums(isegoria);
+			refreshPhotoAlbums();
 
             new android.os.Handler().postDelayed(() -> {
                 insertedFirstRow = false;
@@ -65,8 +69,21 @@ public class PhotosFragment extends Fragment {
 		return rootView;
 	}
 
-	private void refreshPhotoAlbums(Isegoria isegoria) {
-		isegoria.getAPI().getPhotoAlbums(isegoria.getLoggedInUser().getNewsFeedId()).enqueue(callback);
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (getView() != null && isegoria != null && !fetchedPhotos) {
+            refreshPhotoAlbums();
+        }
+    }
+
+    private void refreshPhotoAlbums() {
+	    long newsFeedId = isegoria.getLoggedInUser().getNewsFeedId();
+	    if (newsFeedId > 0) {
+	        fetchedPhotos = true;
+            isegoria.getAPI().getPhotoAlbums(isegoria.getLoggedInUser().getNewsFeedId()).enqueue(callback);
+        }
 	}
 
 	private final Callback<List<PhotoAlbum>> callback = new Callback<List<PhotoAlbum>>() {

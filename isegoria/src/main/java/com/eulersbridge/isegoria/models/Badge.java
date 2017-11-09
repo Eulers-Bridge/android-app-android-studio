@@ -1,14 +1,10 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 03/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class Badge {
 
-    @SerializedName("badgeId")
+    @Json(name = "badgeId")
     public long id;
 
     public String name;

@@ -1,65 +1,35 @@
 package com.eulersbridge.isegoria;
 
 import android.app.Application;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
 
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
-import com.eulersbridge.isegoria.models.Country;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
-import com.eulersbridge.isegoria.network.AuthenticationInterceptor;
-import com.eulersbridge.isegoria.network.Network;
-import com.eulersbridge.isegoria.network.UnwrapConverterFactory;
-import com.google.gson.JsonObject;
+import com.eulersbridge.isegoria.network.NetworkService;
+import com.eulersbridge.isegoria.network.NewsFeedResponse;
 import com.securepreferences.SecurePreferences;
 
-import java.io.IOException;
-import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Isegoria extends Application {
 
 	private MainActivity mainActivity;
-	private Network network;
+	private NetworkService network;
 
-	private OkHttpClient httpClient;
-    private final GsonConverterFactory gsonConverterFactory;
-	private API apiService;
+	private User loggedInUser;
 
-	private UserProfile loggedInUser;
-
-	private String username = "";
-	private String password = "";
-
-	private List<Country> countryObjects;
-	
-	public Isegoria() {
-		super();
-
-        gsonConverterFactory = GsonConverterFactory.create();
-	}
-	
-	public MainActivity getMainActivity() {
+    public MainActivity getMainActivity() {
 		return mainActivity;
 	}
 	
 	public void setMainActivity(MainActivity mainActivity) {
 		this.mainActivity = mainActivity;
-	}
-	
-	public List<Country> getCountryObjects() {
-		return countryObjects;
-	}
-
-	public void setCountryObjects(List<Country> countryObjects) {
-		this.countryObjects = countryObjects;
 	}
 
 	public void setFeedFragment() {
@@ -106,62 +76,71 @@ public class Isegoria extends Application {
 		mainActivity.showLoginFailed();
 	}
 	
-	public void setNetwork(Network network) {
-		this.network = network;
-	}
-	
-	public Network getNetwork() {
+	public @NonNull NetworkService getNetworkService() {
+        if (network == null) {
+            network = new NetworkService(this, null, null);
+        }
+
 		return network;
 	}
 
-	public UserProfile getLoggedInUser() {
+	public API getAPI() {
+	    return network.getAPI();
+    }
+
+	public User getLoggedInUser() {
 		return loggedInUser;
 	}
 
-	public void setLoggedInUser(UserProfile user) {
+	public void setLoggedInUser(User user, String password) {
 		loggedInUser = user;
 
 		new SecurePreferences(getApplicationContext())
 				.edit()
 				.putString("userEmail", loggedInUser.email)
-				.putString("userPassword", loggedInUser.getPassword())
+				.putString("userPassword", password)
 				.apply();
 
-		if (getAPI() != null) {
+        Runnable runnable = () -> {
+            try {
+                Call<NewsFeedResponse> call = network.getAPI().getInstitutionNewsFeed(loggedInUser.institutionId);
+                Response<NewsFeedResponse> response = call.execute();
 
-		    Runnable runnable = () -> {
-                try {
-                    Call<JsonObject> call = getAPI().getInstitutionNewsFeed(loggedInUser.institutionId);
-                    Response<JsonObject> response = call.execute();
+                if (response.isSuccessful()) {
+                    NewsFeedResponse body = response.body();
 
-                    if (response.isSuccessful()) {
-                        JsonObject body = response.body();
-
-                        if (body != null) {
-                            long newsFeedId = body.get("nodeId").getAsLong();
-
-                            loggedInUser.setNewsFeedId(newsFeedId);
-                        }
+                    if (body != null) {
+                        loggedInUser.setNewsFeedId(body.newsFeedId);
                     }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            };
 
-            Thread thread = new Thread(runnable);
-		    thread.start();
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
 	}
+
+	public void login(@Nullable String email, @Nullable String password) {
+        getNetworkService().login(email, password);
+    }
 
 	public void logOut() {
 		loggedInUser = null;
+
+        network.setEmail(null);
+        network.setPassword(null);
 
 		new SecurePreferences(getApplicationContext())
 				.edit()
 				.remove("userPassword")
 				.apply();
 
+		// Remove any notifications that are still visible
+        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.cancelAll();
 
 		getMainActivity().showLogin();
 	}
@@ -172,53 +151,5 @@ public class Isegoria extends Application {
 
 	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
 		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	public void login() {
-	    createHttpClient();
-        createAPI();
-
-		network = new Network(this, username, password);
-		network.login();
-	}
-
-	private void createHttpClient() {
-        OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
-                .addInterceptor(new AuthenticationInterceptor(username, password));
-
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-
-            //For more detailed debug logging, uncomment the following line:
-            //logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            httpClientBuilder.addInterceptor(logging);
-        }
-
-        httpClient = httpClientBuilder.build();
-    }
-
-	private void createAPI() {
-		Retrofit retrofit = new Retrofit.Builder()
-				.client(httpClient)
-				.baseUrl("http://54.79.70.241:8080/dbInterface/api/")
-				.addConverterFactory(new UnwrapConverterFactory(gsonConverterFactory))
-				.addConverterFactory(gsonConverterFactory)
-				.build();
-
-		apiService = retrofit.create(API.class);
-	}
-
-	public API getAPI() {
-		return apiService;
 	}
 }

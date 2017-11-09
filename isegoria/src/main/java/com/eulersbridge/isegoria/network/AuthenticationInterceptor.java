@@ -9,10 +9,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Created by Seb on 04/11/2017.
+ * For all methods that are not annotated with a "No Authentication" header,
+ * add basic username/password credentials "Authorization" header.
  */
-
-public class AuthenticationInterceptor implements Interceptor {
+class AuthenticationInterceptor implements Interceptor {
 
     private final String username;
     private final String password;

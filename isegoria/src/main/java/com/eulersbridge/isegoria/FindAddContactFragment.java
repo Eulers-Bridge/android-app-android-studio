@@ -26,8 +26,10 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.FriendRequest;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.GenericUser;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -69,19 +71,19 @@ public class FindAddContactFragment extends Fragment {
 
         isegoria = (Isegoria)getActivity().getApplication();
 
-        isegoria.getAPI().getFriends().enqueue(new SimpleCallback<List<UserProfile>>() {
+        isegoria.getAPI().getFriends().enqueue(new SimpleCallback<List<Contact>>() {
             @Override
-            protected void handleResponse(Response<List<UserProfile>> response) {
-                List<UserProfile> friends = response.body();
+            protected void handleResponse(Response<List<Contact>> response) {
+                List<Contact> friends = response.body();
                 if (friends != null) {
                     setFriends(friends);
                 }
             }
         });
 
-        String userEmail = isegoria.getLoggedInUser().email;
+        long userId = isegoria.getLoggedInUser().getId();
 
-        isegoria.getAPI().getFriendRequestsSent(userEmail).enqueue(new SimpleCallback<List<FriendRequest>>() {
+        isegoria.getAPI().getFriendRequestsSent(userId).enqueue(new SimpleCallback<List<FriendRequest>>() {
             @Override
             protected void handleResponse(Response<List<FriendRequest>> response) {
                 List<FriendRequest> friendRequestsSent = response.body();
@@ -93,7 +95,7 @@ public class FindAddContactFragment extends Fragment {
             }
         });
 
-        isegoria.getAPI().getFriendRequestsReceived(userEmail).enqueue(new SimpleCallback<List<FriendRequest>>() {
+        isegoria.getAPI().getFriendRequestsReceived(userId).enqueue(new SimpleCallback<List<FriendRequest>>() {
             @Override
             protected void handleResponse(Response<List<FriendRequest>> response) {
                 List<FriendRequest> friendRequestsReceived = response.body();
@@ -108,10 +110,10 @@ public class FindAddContactFragment extends Fragment {
         return rootView;
     }
 
-    private final SimpleCallback<List<UserProfile>> searchCallback = new SimpleCallback<List<UserProfile>>() {
+    private final SimpleCallback<List<User>> searchCallback = new SimpleCallback<List<User>>() {
         @Override
-        protected void handleResponse(Response<List<UserProfile>> response) {
-            List<UserProfile> users = response.body();
+        protected void handleResponse(Response<List<User>> response) {
+            List<User> users = response.body();
             if (users != null) {
                 clearSearchResults();
                 addUsers(users);
@@ -186,18 +188,18 @@ public class FindAddContactFragment extends Fragment {
         rootView.findViewById(R.id.searchResultsSection).setVisibility(View.GONE);
     }
 
-    private void addUsers(List<UserProfile> users) {
+    private void addUsers(List<User> users) {
         clearSearchResults();
 
-        for (UserProfile user : users) {
+        for (User user : users) {
             addTableRow(searchResultsTableLayout, user, -1, UserType.SEARCH, FriendRequestType.UNKNOWN);
 
             rootView.findViewById(R.id.searchResultsSection).setVisibility(View.VISIBLE);
         }
     }
 
-    private void setFriends(List<UserProfile> friends) {
-        for (UserProfile friend : friends) {
+    private void setFriends(List<Contact> friends) {
+        for (Contact friend : friends) {
             addTableRow(friendsAllTableLayout, friend, -1, UserType.FRIEND, FriendRequestType.UNKNOWN);
         }
     }
@@ -215,7 +217,7 @@ public class FindAddContactFragment extends Fragment {
             tableLayout = rootView.findViewById(R.id.friendsSentTableLayout);
         }
 
-        UserProfile friendRequestUser = (type == FriendRequestType.SENT)?
+        User friendRequestUser = (type == FriendRequestType.SENT)?
                 friendRequest.requestReceiver : friendRequest.requester;
 
         addTableRow(tableLayout, friendRequestUser, friendRequest.id, UserType.FRIEND_REQUEST, type);
@@ -224,7 +226,7 @@ public class FindAddContactFragment extends Fragment {
     }
 
     @UiThread
-    private void addTableRow(TableLayout tableLayout, final UserProfile user, long contactRequestId, UserType type, FriendRequestType friendRequestType) {
+    private void addTableRow(TableLayout tableLayout, final GenericUser user, long contactRequestId, UserType type, FriendRequestType friendRequestType) {
         final TableRow tr;
 
         final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -244,7 +246,6 @@ public class FindAddContactFragment extends Fragment {
         candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
         candidateProfileView.setLayoutParams(layoutParams);
-        candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
         //network.getFirstPhoto(0, userId, candidateProfileView);
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 
@@ -274,7 +275,6 @@ public class FindAddContactFragment extends Fragment {
         if (type == UserType.SEARCH) {
             final ImageView candidateProfileImage = new ImageView(getActivity());
             candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
             candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
             candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
             candidateProfileImage.setOnClickListener(view -> {
@@ -370,7 +370,7 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
 
-                isegoria.getAPI().acceptFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
+                isegoria.getAPI().rejectFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
                     @Override
                     protected void handleResponse(Response<Void> response) {
                         showDenyMessage();

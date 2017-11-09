@@ -1,21 +1,22 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import android.support.annotation.Nullable;
 
-/**
- * Created by Seb on 29/10/2017.
- */
+import com.squareup.moshi.Json;
 
 public class FriendRequest {
 
     public long id;
 
-    public boolean accepted;
-    public boolean rejected;
+    @Nullable
+    public Boolean accepted;
 
-    @SerializedName("requesterProfile")
-    public UserProfile requester;
+    @Nullable
+    public Boolean rejected;
 
-    @SerializedName("requestReceiverProfile")
-    public UserProfile requestReceiver;
+    @Json(name = "requesterProfile")
+    public User requester;
+
+    @Json(name = "requestReceiverProfile")
+    public User requestReceiver;
 }

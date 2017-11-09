@@ -1,36 +1,33 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 import org.parceler.Transient;
 
 import java.util.ArrayList;
 
-/**
- * Created by Seb on 04/11/2017.
- */
 
 @org.parceler.Parcel
 public class Poll {
 
-    @SerializedName("nodeId")
+    @Json(name = "nodeId")
     public long id;
 
     public String creatorEmail;
 
     @Transient
-    private UserProfile creator;
+    private Contact creator;
 
     public String question;
 
-    @SerializedName("pollOptions")
+    @Json(name = "pollOptions")
     public ArrayList<PollOption> options;
 
-    public void setCreator(UserProfile creator) {
+    public void setCreator(Contact creator) {
         this.creator = creator;
     }
 
-    public UserProfile getCreator() {
+    public Contact getCreator() {
         return creator;
     }
 

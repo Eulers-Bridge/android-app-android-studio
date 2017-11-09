@@ -1,12 +1,11 @@
 package com.eulersbridge.isegoria.network;
 
-import java.lang.annotation.ElementType;
+import com.squareup.moshi.JsonQualifier;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
-
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@interface Paginated {
+@JsonQualifier
+public @interface Timestamp {
 }

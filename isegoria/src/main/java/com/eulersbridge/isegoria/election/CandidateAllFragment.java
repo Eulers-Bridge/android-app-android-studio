@@ -217,7 +217,7 @@ public class CandidateAllFragment extends Fragment {
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
 
-                if (body != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     GlideApp.with(CandidateAllFragment.this)
                             .load(body.photos.get(0).thumbnailUrl)
                             .into(candidateProfileView);

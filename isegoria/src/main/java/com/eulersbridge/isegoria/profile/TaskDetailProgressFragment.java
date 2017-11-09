@@ -26,6 +26,7 @@ import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class TaskDetailProgressFragment extends Fragment {
 
     private Isegoria isegoria;
 
-    private List<ImageView> imageViews = new ArrayList<>();
+    private final List<ImageView> imageViews = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,7 +45,18 @@ public class TaskDetailProgressFragment extends Fragment {
 
         isegoria = (Isegoria) getActivity().getApplication();
 
-        long userId = isegoria.getLoggedInUser().id;
+        ProgressBar pb = rootView.findViewById(R.id.progressBar);
+        pb.setProgress(50);
+        pb.setMax(1000);
+        pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
+
+        fetchData();
+
+        return rootView;
+    }
+
+    private void fetchData() {
+        long userId = isegoria.getLoggedInUser().getId();
 
         isegoria.getAPI().getRemainingTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
             @Override
@@ -58,18 +70,9 @@ public class TaskDetailProgressFragment extends Fragment {
             @Override
             protected void handleResponse(Response<List<Task>> response) {
                 List<Task> tasks = response.body();
-                if (tasks != null) {
-                    addCompletedTasks(tasks);
-                }
+                if (tasks != null) addCompletedTasks(tasks);
             }
         });
-
-        ProgressBar pb = rootView.findViewById(R.id.progressBar);
-        pb.setProgress(50);
-        pb.setMax(1000);
-        pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
-
-        return rootView;
     }
 
     @Override
@@ -78,6 +81,18 @@ public class TaskDetailProgressFragment extends Fragment {
 
         for (ImageView imageView : imageViews) {
             GlideApp.with(TaskDetailProgressFragment.this).clear(imageView);
+        }
+
+        // Work around a child fragment manager bug: https://stackoverflow.com/a/15656428/447697
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -156,7 +171,7 @@ public class TaskDetailProgressFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0 && isAdded()) {
                     imageViews.add(iconImage);
 
                     GlideApp.with(TaskDetailProgressFragment.this)
@@ -243,7 +258,7 @@ public class TaskDetailProgressFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     imageViews.add(iconImage);
 
                     GlideApp.with(TaskDetailProgressFragment.this)

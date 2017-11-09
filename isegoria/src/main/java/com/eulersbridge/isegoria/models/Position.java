@@ -1,18 +1,17 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import android.support.annotation.Nullable;
 
-/**
- * Created by Seb on 04/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class Position {
 
-    @SerializedName("positionId")
+    @Json(name = "positionId")
     public long id;
 
-    @SerializedName("electionId")
-    public long electionId;
+    @Json(name = "electionId")
+    @Nullable
+    public Long electionId;
 
     public String name;
     public String description;

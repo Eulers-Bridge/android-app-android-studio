@@ -17,10 +17,6 @@ import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import retrofit2.Response;
 
-/**
- * Created by Seb on 20/10/2017.
- */
-
 public class SelfEfficacyQuestionsFragment extends Fragment {
 
     @Override

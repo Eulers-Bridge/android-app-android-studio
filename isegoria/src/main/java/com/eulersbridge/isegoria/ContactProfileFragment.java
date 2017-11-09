@@ -17,8 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.models.Badge;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Task;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
@@ -29,9 +30,6 @@ import java.util.List;
 
 import retrofit2.Response;
 
-/**
- * Created by Anthony on 30/03/2015.
- */
 public class ContactProfileFragment extends Fragment {
     private View rootView;
 
@@ -65,7 +63,7 @@ public class ContactProfileFragment extends Fragment {
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        long userId = isegoria.getLoggedInUser().id;
+        long userId = isegoria.getLoggedInUser().getId();
 
         isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
@@ -87,7 +85,7 @@ public class ContactProfileFragment extends Fragment {
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
         Bundle bundle = this.getArguments();
-        UserProfile user = Parcels.unwrap(bundle.getParcelable("profile"));
+        User user = Parcels.unwrap(bundle.getParcelable("profile"));
 
         final TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
@@ -108,10 +106,10 @@ public class ContactProfileFragment extends Fragment {
             }
         });
 
-        isegoria.getAPI().getUser(user.email).enqueue(new SimpleCallback<UserProfile>() {
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
             @Override
-            protected void handleResponse(Response<UserProfile> response) {
-                UserProfile user = response.body();
+            protected void handleResponse(Response<Contact> response) {
+                Contact user = response.body();
                 if (user != null) {
                     updateStats(user.contactsCount, user.totalTasksCount);
                 }
@@ -225,9 +223,10 @@ public class ContactProfileFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     GlideApp.with(ContactProfileFragment.this)
                             .load(body.photos.get(0).thumbnailUrl)
+                            .centerCrop()
                             .into(iconImage);
                 }
             }

@@ -24,9 +24,10 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.models.Badge;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.Photo;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
@@ -34,6 +35,7 @@ import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import retrofit2.Response;
@@ -73,7 +75,7 @@ public class ProfileFragment extends Fragment {
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        long userId = isegoria.getLoggedInUser().id;
+        Long userId = isegoria.getLoggedInUser().getId();
 
         isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
@@ -102,7 +104,7 @@ public class ProfileFragment extends Fragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
-        UserProfile user = isegoria.getLoggedInUser();
+        User user = isegoria.getLoggedInUser();
 
         final TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
@@ -154,7 +156,7 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     Photo photo = body.photos.get(0);
 
                     GlideApp.with(ProfileFragment.this)
@@ -172,10 +174,10 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        isegoria.getAPI().getUser(user.email).enqueue(new SimpleCallback<UserProfile>() {
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
             @Override
-            protected void handleResponse(Response<UserProfile> response) {
-                UserProfile user = response.body();
+            protected void handleResponse(Response<Contact> response) {
+                Contact user = response.body();
                 if (user != null) {
                     updateStats(user.contactsCount, user.totalTasksCount);
                 }
@@ -307,7 +309,7 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0 && isAdded()) {
                     GlideApp.with(ProfileFragment.this)
                             .load(body.photos.get(0).thumbnailUrl)
                             .into(iconImage);
@@ -344,5 +346,22 @@ public class ProfileFragment extends Fragment {
         divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
         divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
         tasksLinearLayout.addView(divider);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        // Work around a child fragment manager bug: https://stackoverflow.com/a/15656428/447697
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,14 +1,10 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 07/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class PollResult {
 
-    @SerializedName("answer")
+    @Json(name = "answer")
     public long id;
 
     public long count;

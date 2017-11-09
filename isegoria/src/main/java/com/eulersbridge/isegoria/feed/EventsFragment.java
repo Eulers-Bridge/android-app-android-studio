@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,8 +24,8 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
@@ -144,6 +145,7 @@ public class EventsFragment extends Fragment {
             getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.eventsFrameLayout, detailFragment)
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                     .addToBackStack(null)
                     .commit();
         });
@@ -154,7 +156,7 @@ public class EventsFragment extends Fragment {
 	    textViewArticle.setText(event.name);
 	    textViewArticle.setGravity(Gravity.CENTER);
 
-		String eventTimeStr = TimeConverter.convertTimestampToString(event.date);
+		String eventTimeStr = Utils.convertTimestampToString(getContext(), event.date);
 	        
 	    TextView textViewArticleTime = new TextView(getActivity());
 	    textViewArticleTime.setTextColor(Color.parseColor(colour));

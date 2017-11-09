@@ -4,9 +4,8 @@ import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 
 /**
- * Created by Seb on 04/11/2017.
+ * Stub class for Glide annotation processor to generate API for application
  */
-
 @GlideModule
 public class IsegoriaGlideModule extends AppGlideModule {
 

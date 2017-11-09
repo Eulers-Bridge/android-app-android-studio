@@ -1,15 +1,12 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
-/**
- * Created by Anthony on 24/03/2015.
- */
 public class VoteLocation {
 
     public long ownerId;
 
-    @SerializedName("votingLocationId")
+    @Json(name = "votingLocationId")
     public long id;
 
     public String name;

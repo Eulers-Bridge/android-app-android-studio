@@ -14,12 +14,13 @@ import android.widget.TextView;
 
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.LikedResponse;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+import com.eulersbridge.isegoria.utilities.Utils;
+
 
 import org.parceler.Parcels;
 
@@ -50,7 +51,7 @@ public class PhotoViewFragment extends Fragment {
         Photo photo = Parcels.unwrap(bundle.getParcelable("photo"));
 
         Isegoria isegoria = (Isegoria)getActivity().getApplication();
-        UserProfile loggedInUser = isegoria.getLoggedInUser();
+        User loggedInUser = isegoria.getLoggedInUser();
 
         displayMetrics = getActivity().getResources().getDisplayMetrics();
 
@@ -132,9 +133,9 @@ public class PhotoViewFragment extends Fragment {
     }
 
     @UiThread
-    private void populatePhotoData(String title, long date,
-                        final boolean inappropriateContent, int numOfLikes) {
-        String dateStr = TimeConverter.convertTimestampToString(date);
+    private void populatePhotoData(String title, long date, boolean inappropriateContent,
+                                   int numOfLikes) {
+        String dateStr = Utils.convertTimestampToString(getContext(), date);
 
         TextView photoTitleTextView = rootView.findViewById(R.id.photoTitle);
         TextView photoDateTextView = rootView.findViewById(R.id.photoDate);
@@ -152,7 +153,6 @@ public class PhotoViewFragment extends Fragment {
 	
 	private void setupPhotoView() {
         getActivity().runOnUiThread(() -> {
-
             try {
                 photoView.setScaleType(ScaleType.CENTER_CROP);
                 photoView.getLayoutParams().width = displayMetrics.widthPixels;

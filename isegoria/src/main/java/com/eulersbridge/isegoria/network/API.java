@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.network;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.models.CandidateTicket;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.models.FriendRequest;
@@ -12,14 +13,13 @@ import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.models.PhotoAlbum;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Task;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.models.UserPersonality;
-import com.eulersbridge.isegoria.models.UserProfile;
 import com.eulersbridge.isegoria.models.UserSelfEfficacy;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.models.UserSettings;
 import com.eulersbridge.isegoria.models.VoteLocation;
 import com.eulersbridge.isegoria.models.VoteReminder;
-import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -31,10 +31,6 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-
-/**
- * Created by Seb on 04/11/2017.
- */
 
 public interface API {
 
@@ -53,12 +49,12 @@ public interface API {
     Call<Void> updateUserDetails(@Path("userEmail") String userEmail, @Body UserSettings user);
 
     @Paginated
-    @GET("user/{userEmail}/contactRequests")
-    Call<List<FriendRequest>> getFriendRequestsSent(@Path("userEmail") String userEmail);
+    @GET("user/{userId}/contactRequests")
+    Call<List<FriendRequest>> getFriendRequestsSent(@Path("userId") long userId);
 
     @Paginated
-    @GET("user/{userEmail}/contactRequests/rec")
-    Call<List<FriendRequest>> getFriendRequestsReceived(@Path("userEmail") String userEmail);
+    @GET("user/{userId}/contactRequests/rec")
+    Call<List<FriendRequest>> getFriendRequestsReceived(@Path("userId") long userId);
 
     @PUT("user/{userEmail}/PPSEQuestions")
     Call<Void> addUserEfficacy(@Path("userEmail") String userEmail, @Body UserSelfEfficacy ppseQuestions);
@@ -78,11 +74,11 @@ public interface API {
 
 
     @GET("contact/{userEmail}/")
-    Call<UserProfile> getUser(@Path("userEmail") String userEmail);
+    Call<Contact> getContact(@Path("userEmail") String userEmail);
 
     @Paginated
     @GET("contacts")
-    Call<List<UserProfile>> getFriends();
+    Call<List<Contact>> getFriends();
 
     @POST("user/{userEmail}/contactRequest/{targetUserEmail}")
     Call<Void> addFriend(@Path("userEmail") String userEmail, @Path("targetUserEmail") String targetUserEmail);
@@ -95,7 +91,7 @@ public interface API {
 
 
     @GET("searchUserProfile/{query}/")
-    Call<List<UserProfile>> searchForUsers(@Path("query") String query);
+    Call<List<User>> searchForUsers(@Path("query") String query);
 
 
     @Paginated
@@ -124,7 +120,7 @@ public interface API {
     Call<Institution> getInstitution(@Path("institutionId") long institutionId);
 
     @GET("institution/{institutionId}/newsFeed")
-    Call<JsonObject> getInstitutionNewsFeed(@Path("institutionId") long institutionId);
+    Call<NewsFeedResponse> getInstitutionNewsFeed(@Path("institutionId") long institutionId);
 
 
     @Paginated

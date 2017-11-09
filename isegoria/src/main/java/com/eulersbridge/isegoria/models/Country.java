@@ -1,15 +1,15 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 import java.util.List;
 
 public class Country {
 
-	@SerializedName("countryId")
+	@Json(name = "countryId")
 	public long id;
 
-	@SerializedName("countryName")
+	@Json(name = "countryName")
 	public String name;
 	public List<Institution> institutions;
 

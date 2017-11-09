@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +13,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.LikedResponse;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 import com.eulersbridge.isegoria.utilities.TintTransformation;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
@@ -30,7 +33,6 @@ import retrofit2.Response;
 public class NewsArticleFragment extends Fragment {
     private View rootView;
 
-    private NewsArticle article;
     private Isegoria isegoria;
 
     private boolean setLiked = false;
@@ -40,10 +42,14 @@ public class NewsArticleFragment extends Fragment {
         rootView = inflater.inflate(R.layout.news_article_fragment, container, false);
 
         ImageView articleImageView = rootView.findViewById(R.id.article_image);
+
         ImageView authorImageView = rootView.findViewById(R.id.article_image_author);
 
-        article = Parcels.unwrap(getArguments().getParcelable("article"));
+        NewsArticle article = Parcels.unwrap(getArguments().getParcelable("article"));
         populateTextContent(article);
+
+        ViewCompat.setTransitionName(articleImageView, "Image" + article.title);
+        ViewCompat.setTransitionName(rootView.findViewById(R.id.article_title), "Title"+article.title);
 
         isegoria = (Isegoria)getActivity().getApplication();
 
@@ -63,7 +69,7 @@ public class NewsArticleFragment extends Fragment {
 
         GlideApp.with(this)
                 .load(article.photos.get(0).thumbnailUrl)
-                .transform(new TintTransformation())
+                .transforms(new CenterCrop(), new TintTransformation())
                 .into(articleImageView);
 
         String creatorPhotoURL = article.creator.profilePhotoURL;
@@ -71,7 +77,6 @@ public class NewsArticleFragment extends Fragment {
         if (!TextUtils.isEmpty(creatorPhotoURL)) {
             GlideApp.with(this)
                     .load(creatorPhotoURL)
-                    .transform(new TintTransformation())
                     .into(authorImageView);
         }
 
@@ -100,7 +105,7 @@ public class NewsArticleFragment extends Fragment {
         authorNameTextView.setText(article.creator.getFullName());
 
         TextView dateTextView = rootView.findViewById(R.id.article_date);
-        dateTextView.setText(TimeConverter.convertTimestampToString(article.dateTimestamp));
+        dateTextView.setText(Utils.convertTimestampToString(getContext(), article.dateTimestamp));
 
         final ImageView flagView = rootView.findViewById(R.id.article_flag);
         flagView.setOnClickListener(view -> flagView.setImageResource(R.drawable.flag));

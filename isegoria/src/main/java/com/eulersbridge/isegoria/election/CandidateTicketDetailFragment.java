@@ -53,8 +53,7 @@ import retrofit2.Response;
 
 @SuppressWarnings("deprecation")
 public class CandidateTicketDetailFragment extends Fragment {
-	private View rootView;
-	private TableLayout candidateTicketDetialTableLayout;
+    private TableLayout candidateTicketDetialTableLayout;
     private Button ticketSupportButton;
 	
 	private float dpWidth;
@@ -69,7 +68,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false);
 
 		int backgroundDrawableResource = R.drawable.me;
 
@@ -121,7 +120,7 @@ public class CandidateTicketDetailFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse photosResponse = response.body();
-                if (photosResponse != null && photosResponse.photos != null && photosResponse.photos.size() > 0) {
+                if (photosResponse != null && photosResponse.totalPhotos > 0) {
                     Photo photo = photosResponse.photos.get(0);
 
                     GlideApp.with(CandidateTicketDetailFragment.this)
@@ -228,7 +227,7 @@ public class CandidateTicketDetailFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     Photo photo = body.photos.get(0);
 
                     GlideApp.with(CandidateTicketDetailFragment.this)

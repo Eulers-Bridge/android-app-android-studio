@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,10 +30,10 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.models.Photo;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.models.UserSettings;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
-import com.eulersbridge.isegoria.network.Network;
+import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
@@ -50,7 +51,7 @@ public class UserSettingsFragment extends Fragment {
     private LinearLayout backgroundLinearLayout;
 
     private MainActivity mainActivity;
-    private Network network;
+    private NetworkService network;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,9 +65,9 @@ public class UserSettingsFragment extends Fragment {
 
         Isegoria isegoria = (Isegoria)getActivity().getApplication();
 
-        UserProfile loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
+        User loggedInUser = ((Isegoria)getActivity().getApplication()).getLoggedInUser();
 
-        network = isegoria.getNetwork();
+        network = isegoria.getNetworkService();
 
         photoImageView = rootView.findViewById(R.id.settings_image_small);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(150, 150);
@@ -74,7 +75,7 @@ public class UserSettingsFragment extends Fragment {
 
         final Switch doNotTrackSwitch = rootView.findViewById(R.id.doNotTrackSwitch);
         doNotTrackSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            network.setTrackingOff(isChecked);
+            isegoria.setTrackingOff(isChecked);
 
             UserSettings userSettings = new UserSettings(isChecked, loggedInUser.isOptedOutOfDataCollection);
 
@@ -82,7 +83,7 @@ public class UserSettingsFragment extends Fragment {
         });
         final Switch optOutDataCollectionSwitch = rootView.findViewById(R.id.optOutDataCollectionSwitch);
         optOutDataCollectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            network.setOptedOutOfDataCollection(isChecked);
+            isegoria.setOptedOutOfDataCollection(isChecked);
 
             UserSettings userSettings = new UserSettings(loggedInUser.trackingOff, isChecked);
 
@@ -104,7 +105,7 @@ public class UserSettingsFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
-                if (body != null && body.photos != null && body.photos.size() > 0) {
+                if (body != null && body.totalPhotos > 0) {
                     Photo photo = body.photos.get(0);
 
                     GlideApp.with(UserSettingsFragment.this)
@@ -120,8 +121,9 @@ public class UserSettingsFragment extends Fragment {
 
             fragmentManager
                     .beginTransaction()
-                    .addToBackStack(null)
                     .add(R.id.container, new AboutScreenFragment())
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .addToBackStack(null)
                     .commit();
         });
 
@@ -150,7 +152,7 @@ public class UserSettingsFragment extends Fragment {
 
         switch(requestCode) {
             case REQ_CODE_PICK_IMAGE:
-                if(resultCode == Activity.RESULT_OK){
+                if (resultCode == Activity.RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
 

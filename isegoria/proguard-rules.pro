@@ -27,6 +27,13 @@
 }
 
 # for DexGuard only
--keepresourcexmlelements manifest/application/meta-data@value=GlideModule
+#-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
+
+-dontwarn retrofit2.Platform$Java8
+
+-keepclasseswithmembers class * {
+    @com.squareup.moshi.* <methods>;
+}
+-keep @com.squareup.moshi.JsonQualifier interface *

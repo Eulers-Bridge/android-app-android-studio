@@ -5,10 +5,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by Seb on 07/11/2017.
- */
-
-/**
  * Retrofit's `enqueue` requires a non-null callback to execute a given call.
  * This callback subclass does not act on response, but simply logs errors.
  */

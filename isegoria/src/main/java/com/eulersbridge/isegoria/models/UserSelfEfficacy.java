@@ -1,15 +1,11 @@
 package com.eulersbridge.isegoria.models;
 
-/**
- * Created by Seb on 07/11/2017.
- */
-
 public class UserSelfEfficacy {
 
-    float q1;
-    float q2;
-    float q3;
-    float q4;
+    public float q1;
+    public float q2;
+    public float q3;
+    public float q4;
 
     public UserSelfEfficacy(float q1, float q2, float q3, float q4) {
         this.q1 = q1;

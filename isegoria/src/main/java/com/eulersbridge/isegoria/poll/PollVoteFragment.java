@@ -29,8 +29,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.PollResult;
-import com.eulersbridge.isegoria.models.UserProfile;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.models.PollOption;
@@ -52,7 +52,7 @@ public class PollVoteFragment extends Fragment {
 	private boolean insertedFirstRow = false;
 
     private long pollId;
-    private UserProfile creator;
+    private Contact creator;
     private ArrayList<PollOption> options = new ArrayList<>();
 
     private Isegoria isegoria;
@@ -97,12 +97,12 @@ public class PollVoteFragment extends Fragment {
         addTableRow(question, "");
 
         if (poll.getCreator() == null && !TextUtils.isEmpty(poll.creatorEmail)) {
-            isegoria.getAPI().getUser(poll.creatorEmail).enqueue(new SimpleCallback<UserProfile>() {
+            isegoria.getAPI().getContact(poll.creatorEmail).enqueue(new SimpleCallback<Contact>() {
                 @Override
-                protected void handleResponse(Response<UserProfile> response) {
-                    UserProfile userProfile = response.body();
-                    if (userProfile != null) {
-                        creator = userProfile;
+                protected void handleResponse(Response<Contact> response) {
+                    Contact user = response.body();
+                    if (user != null) {
+                        creator = user;
                         fetchCreatorPhoto();
                     }
                 }

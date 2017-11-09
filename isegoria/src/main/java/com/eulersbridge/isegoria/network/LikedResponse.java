@@ -1,14 +1,10 @@
 package com.eulersbridge.isegoria.network;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 05/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class LikedResponse {
 
-    @SerializedName("success")
+    @Json(name = "success")
     public boolean liked;
 
 }

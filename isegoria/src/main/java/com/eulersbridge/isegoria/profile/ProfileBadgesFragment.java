@@ -72,7 +72,7 @@ public class ProfileBadgesFragment extends Fragment {
 
         isegoria = (Isegoria) getActivity().getApplication();
 
-        long userId = isegoria.getLoggedInUser().id;
+        long userId = isegoria.getLoggedInUser().getId();
 
         isegoria.getAPI().getCompletedBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
@@ -170,7 +170,7 @@ public class ProfileBadgesFragment extends Fragment {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();
-                    if (body != null && body.photos != null && body.photos.size() > 0) {
+                    if (body != null && body.totalPhotos > 0) {
                         GlideApp.with(ProfileBadgesFragment.this)
                                 .load(body.photos.get(0).thumbnailUrl)
                                 .into(view);

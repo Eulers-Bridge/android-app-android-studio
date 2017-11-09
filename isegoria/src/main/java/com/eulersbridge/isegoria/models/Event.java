@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.eulersbridge.isegoria.network.Timestamp;
+import com.squareup.moshi.Json;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ public class Event {
     public String organizer;
     public String organizerEmail;
 
-    @SerializedName("created")
+    @Json(name = "created")
+    @Timestamp
     public long date;
 
     public List<Photo> photos;

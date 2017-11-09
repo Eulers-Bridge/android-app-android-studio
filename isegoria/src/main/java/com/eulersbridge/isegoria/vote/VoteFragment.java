@@ -36,7 +36,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private View voteDivider1;
     private View voteDivider2;
     private TextView voteText;
-    public DatePicker datePicker;
+    private DatePicker datePicker;
     private TimePicker timePicker;
 
     private ViewPager mPager;
@@ -135,7 +135,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         return spinnerLocation;
     }
 
-    public void showAll() {
+    private void showAll() {
         datePicker.setVisibility(ViewGroup.VISIBLE);
         timePicker.setVisibility(ViewGroup.VISIBLE);
         voteDivider1.setVisibility(ViewGroup.VISIBLE);

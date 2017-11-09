@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.notifications;
 
 import android.app.Notification;
 import android.os.Build;
@@ -6,12 +6,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 
+import com.eulersbridge.isegoria.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-/**
- * Created by Seb on 27/10/2017.
- */
 
 public class NotificationService extends FirebaseMessagingService {
 

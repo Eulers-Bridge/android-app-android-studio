@@ -4,10 +4,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 /**
- * Created by Seb on 07/11/2017.
- */
-
-/**
  * A simple Retrofit callback for a call `enqueue` that logs errors (via IgnoredCallback superclass)
  * and prompts response handling only on successful response.
  */

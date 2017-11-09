@@ -14,13 +14,13 @@ import android.widget.Spinner;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.network.GeneralInfoResponse;
-import com.eulersbridge.isegoria.network.Network;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Response;
@@ -37,10 +37,6 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         countries = new ArrayList<>();
 
 		Isegoria isegoria = (Isegoria) getActivity().getApplication();
-		isegoria.setCountryObjects(countries);
-
-        Network network = new Network(isegoria);
-        isegoria.setNetwork(network);
 
         isegoria.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
             @Override
@@ -64,29 +60,29 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         spinnerInstitution.setAdapter(spinnerInstitutionArrayAdapter);
         
         Spinner spinnerGender = rootView.findViewById(R.id.gender);
-		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
-        spinnerGenderArrayAdapter.add("Male");
-        spinnerGenderArrayAdapter.add("Female");
+		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{ "Male", "Female" });
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(spinnerGenderArrayAdapter);
         
         Spinner spinnerYearOfBirth = rootView.findViewById(R.id.yearOfBirth);
 		ArrayAdapter<String> spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+
+		int year = Calendar.getInstance().get(Calendar.YEAR);
+
         int cnt = 0;
-        for(int i=1900; i<=2014; i++) {
+        for(int i = (year - 100); i <= 2014; i++) {
         	spinnerYearOfBirthArrayAdapter.add(String.valueOf(i));
 
-            if(i == 1990) {
-                spinnerYearOfBirth.setSelection(cnt);
-            }
-            cnt = cnt + 1;
+            if (i == 1990) spinnerYearOfBirth.setSelection(cnt);
+
+            cnt++;
         }
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerYearOfBirth.setAdapter(spinnerYearOfBirthArrayAdapter);
         
-        Country countryPlaceholder = new Country("Select Country");
+        Country countryPlaceholder = new Country(getString(R.string.user_sign_up_choose_country_hint));
         spinnerArrayAdapter.add(countryPlaceholder.name);
-        spinnerInstitutionArrayAdapter.add("Select Institution");
+        spinnerInstitutionArrayAdapter.add(getString(R.string.user_sign_up_choose_institution_hint));
 		
 		return rootView;
 	}

@@ -1,29 +1,27 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 03/11/2017.
- */
+import com.eulersbridge.isegoria.network.Timestamp;
+import com.squareup.moshi.Json;
 
 @org.parceler.Parcel
 public class Photo {
 
-    @SerializedName("nodeId")
+    @Json(name = "nodeId")
     public int id;
 
     public String title;
     public String description;
 
-    @SerializedName("url")
+    @Json(name = "url")
     public String thumbnailUrl;
 
-    @SerializedName("date")
+    @Json(name = "date")
+    @Timestamp
     public long dateTimestamp;
 
-    @SerializedName("numOfLikes")
+    @Json(name = "numOfLikes")
     public int likeCount = 0;
 
-    @SerializedName("inappropriateContent")
+    @Json(name = "inappropriateContent")
     public boolean hasInappropriateContent;
 }

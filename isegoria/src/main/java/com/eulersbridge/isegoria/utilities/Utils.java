@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.utilities;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.ColorInt;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,12 +23,22 @@ import android.view.inputmethod.InputMethodManager;
 import com.eulersbridge.isegoria.R;
 
 import java.io.InputStream;
-
-/**
- * Created by Seb on 18/10/2017.
- */
+import java.util.Date;
 
 public final class Utils {
+
+    public static String convertTimestampToString(Context context, long timestamp) {
+        Date date = new Date(timestamp);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Use built-in Android ICU4J API subset ("reduce your APK footprint")
+            return android.icu.text.DateFormat.getDateTimeInstance(android.icu.text.DateFormat.LONG, android.icu.text.DateFormat.SHORT).format(date);
+
+        } else {
+            int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NO_MIDNIGHT | DateUtils.FORMAT_NO_NOON;
+            return DateUtils.formatDateTime(context, date.getTime(), flags);
+        }
+    }
 
     //Change colour, use default title (app name)
     public static void setMultitaskColour(Activity activity, @ColorInt int colour) {

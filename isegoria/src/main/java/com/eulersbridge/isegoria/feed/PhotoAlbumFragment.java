@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -146,8 +147,9 @@ public class PhotoAlbumFragment extends Fragment {
 
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .addToBackStack(null)
                         .add(R.id.photosFrameLayout, photoViewPagerFragment)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                        .addToBackStack(null)
                         .commit();
 
                 /*FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();

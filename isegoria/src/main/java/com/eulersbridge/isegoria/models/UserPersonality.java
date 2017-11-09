@@ -1,15 +1,11 @@
 package com.eulersbridge.isegoria.models;
 
-/**
- * Created by Seb on 07/11/2017.
- */
-
 public class UserPersonality {
 
-    float agreeableness;
-    float conscientiousness;
-    float emotionalStability;
-    float extroversion;
+    public float agreeableness;
+    public float conscientiousness;
+    public float emotionalStability;
+    public float extroversion;
 
     // Openness to experiences
     float openess;

@@ -2,22 +2,18 @@ package com.eulersbridge.isegoria.models;
 
 import android.text.TextUtils;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 04/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class CandidateTicket {
 
-    @SerializedName("ticketId")
+    @Json(name = "ticketId")
     public long id;
 
     private String name;
     private String givenName;
     private String familyName;
 
-    @SerializedName("numberOfSupporters")
+    @Json(name = "numberOfSupporters")
     public String supportersCount;
 
     public String information;

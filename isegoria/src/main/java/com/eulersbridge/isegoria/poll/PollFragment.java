@@ -51,7 +51,7 @@ public class PollFragment extends Fragment {
             @Override
             protected void handleResponse(Response<PollsResponse> response) {
                 PollsResponse body = response.body();
-                if (body != null && body.polls != null) {
+                if (body != null && body.totalPolls > 0) {
                     for (Poll poll : body.polls) {
                         addPoll(poll);
                     }

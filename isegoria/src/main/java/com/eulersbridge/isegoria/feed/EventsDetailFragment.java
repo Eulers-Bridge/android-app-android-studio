@@ -30,10 +30,10 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
-import com.eulersbridge.isegoria.models.UserProfile;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -90,7 +90,7 @@ public class EventsDetailFragment extends Fragment {
             eventTitleField.setText(event.name);
 
             TextView eventTime = rootView.findViewById(R.id.event_time);
-            eventTime.setText(TimeConverter.convertTimestampToString(event.date));
+            eventTime.setText(Utils.convertTimestampToString(getContext(), event.date));
 
             TextView eventLocationLine1 = rootView.findViewById(R.id.event_location_1);
             eventLocationLine1.setText(event.location);
@@ -144,7 +144,7 @@ public class EventsDetailFragment extends Fragment {
         addTableRow(ticketId, null, userId, "GRN", "#4FBE3E", String.format("%s %s", firstName, lastName), "", positionId);
     }
 
-    private void addTableRow(int ticketId, UserProfile user, final int userId, String partyAbr,
+    private void addTableRow(int ticketId, User user, final int userId, String partyAbr,
                              String colour, String candidateName,
                              String candidatePosition, int positionId) {
         TableRow tr;

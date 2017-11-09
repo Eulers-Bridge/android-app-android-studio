@@ -5,12 +5,7 @@ import java.io.IOException;
 import okhttp3.ResponseBody;
         import retrofit2.Converter;
 
-/**
- * Created by Seb on 04/11/2017.
- */
-
-class ResponseWrapperBodyConverter<T>
-        implements Converter<ResponseBody, T> {
+class ResponseWrapperBodyConverter<T> implements Converter<ResponseBody, T> {
     private final Converter<ResponseBody, GenericPaginatedResponse<T>> converter;
 
     ResponseWrapperBodyConverter(Converter<ResponseBody,
@@ -22,7 +17,10 @@ class ResponseWrapperBodyConverter<T>
     public T convert(ResponseBody value) throws IOException {
         GenericPaginatedResponse<T> response = converter.convert(value);
 
-        return response.foundObjects;
-
+        if (response.totalElements > 0) {
+            return response.foundObjects;
+        } else {
+            return null;
+        }
     }
 }

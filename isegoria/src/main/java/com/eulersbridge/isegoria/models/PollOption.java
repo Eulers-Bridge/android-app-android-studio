@@ -1,24 +1,19 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 23/10/2017.
- */
-
+import com.squareup.moshi.Json;
 @org.parceler.Parcel
 public class PollOption {
 
     public long id;
 
-    @SerializedName("txt")
+    @Json(name = "txt")
     public String text;
 
     public Photo photo;
 
-    @SerializedName("numOfVoters")
+    @Json(name = "numOfVoters")
     public long votersCount;
 
-    @SerializedName("voted")
+    @Json(name = "voted")
     public boolean hasVoted;
 }

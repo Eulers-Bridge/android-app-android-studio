@@ -13,11 +13,9 @@ import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 
 import java.security.MessageDigest;
 
-/**
- * Created by Seb on 04/11/2017.
- */
-
 public class TintTransformation extends BitmapTransformation {
+    private static final String ID = "au.com.isegoria.app.TintTransformation";
+    private static final byte[] ID_BYTES = ID.getBytes(CHARSET);
 
     @Override
     protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap toTransform, int outWidth, int outHeight) {
@@ -34,7 +32,17 @@ public class TintTransformation extends BitmapTransformation {
     }
 
     @Override
+    public boolean equals(Object o) {
+        return o instanceof TintTransformation;
+    }
+
+    @Override
+    public int hashCode() {
+        return ID.hashCode();
+    }
+
+    @Override
     public void updateDiskCacheKey(MessageDigest messageDigest) {
-        messageDigest.update("au.com.isegoria.app.TintTransformation".getBytes());
+        messageDigest.update(ID_BYTES);
     }
 }

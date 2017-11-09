@@ -1,32 +1,33 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 04/11/2017.
- */
+import com.eulersbridge.isegoria.network.Timestamp;
+import com.squareup.moshi.Json;
 
 public class Election {
 
-    @SerializedName("electionId")
+    @Json(name = "electionId")
     public long id;
 
-    @SerializedName("start")
+    @Json(name = "start")
+    @Timestamp
     public long startTimestamp;
 
-    @SerializedName("end")
+    @Json(name = "end")
+    @Timestamp
     public long endTimestamp;
 
-    @SerializedName("startVoting")
+    @Json(name = "startVoting")
+    @Timestamp
     public long startVotingTimestamp;
 
-    @SerializedName("endVoting")
+    @Json(name = "endVoting")
+    @Timestamp
     public long endVotingTimestamp;
 
     public String title;
     public String introduction;
     public String process;
 
-    @SerializedName("institutionDomain")
+    @Json(name = "institutionDomain")
     private ElectionInstitution electionInstitution;
 }

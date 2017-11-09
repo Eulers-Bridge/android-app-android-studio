@@ -1,15 +1,17 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Institution {
 
-	@SerializedName("institutionId")
+	@Json(name = "institutionId")
 	public long id;
 
 	public long newsFeedId;
 
-	@SerializedName(value="institutionName", alternate = {"name"})
+	//@Json(name = value="institutionName", alternate = {"name"})
+	//TODO: Custom field
+	@Json(name = "institutionName")
 	public String name;
 
 	public String state;

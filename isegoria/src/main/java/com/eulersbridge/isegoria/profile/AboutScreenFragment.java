@@ -9,9 +9,6 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.R;
 
-/**
- * Created by Anthony on 06/04/2015.
- */
 public class AboutScreenFragment extends Fragment {
 
     @Override

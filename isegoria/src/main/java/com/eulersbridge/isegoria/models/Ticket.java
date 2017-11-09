@@ -2,15 +2,11 @@ package com.eulersbridge.isegoria.models;
 
 import android.text.TextUtils;
 
-import com.google.gson.annotations.SerializedName;
-
-/**
- * Created by Seb on 05/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class Ticket {
 
-    @SerializedName("ticketId")
+    @Json(name = "ticketId")
     public long id;
 
     public long electionId;
@@ -22,7 +18,7 @@ public class Ticket {
     public String code;
     public String logo;
 
-    @SerializedName("numberOfSupporters")
+    @Json(name = "numberOfSupporters")
     public long supporterCount;
 
     public String getColour() {

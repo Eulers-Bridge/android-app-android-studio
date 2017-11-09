@@ -1,33 +1,36 @@
 package com.eulersbridge.isegoria.models;
 
-import com.google.gson.annotations.SerializedName;
+import android.support.annotation.Nullable;
+
+import com.eulersbridge.isegoria.network.Timestamp;
+import com.squareup.moshi.Json;
 
 import java.util.List;
-
-/**
- * Created by Seb on 02/11/2017.
- */
 
 @org.parceler.Parcel
 public class NewsArticle {
 
-    @SerializedName("articleId")
+    @Json(name = "articleId")
     public long id;
 
-    public long institutionId;
+    @Nullable
+    public Long institutionId;
+
     public String title;
     public String content;
 
     public List<Photo> photos;
 
+    @Json(name = "date")
+    @Timestamp
     public long dateTimestamp;
 
-    @SerializedName("likes")
+    @Json(name = "likes")
     public int likeCount = 0;
 
-    @SerializedName("creatorProfile")
-    public UserProfile creator;
+    @Json(name = "creatorProfile")
+    public Contact creator;
 
-    @SerializedName("inappropriateContent")
+    @Json(name = "inappropriateContent")
     public boolean hasInappropriateContent;
 }

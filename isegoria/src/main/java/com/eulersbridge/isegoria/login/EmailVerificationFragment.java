@@ -27,8 +27,7 @@ public class EmailVerificationFragment extends Fragment {
 
         final Button verifiedButton = rootView.findViewById(R.id.verifiedButton);
         verifiedButton.setOnClickListener(view -> {
-            isegoria.getNetwork().login();
-            isegoria.login();
+            isegoria.login(null, null);
             mainActivity.dialog = ProgressDialog.show(mainActivity, "", "Loading. Please wait...", true);
         });
 

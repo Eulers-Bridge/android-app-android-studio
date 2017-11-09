@@ -28,6 +28,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TintTransformation;
 
 import java.util.List;
 
@@ -136,12 +137,6 @@ public class CandidatePositionsFragment extends Fragment {
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 3.2, getResources().getDisplayMetrics());
-        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 90, getResources().getDisplayMetrics());
-        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 23.333, getResources().getDisplayMetrics());
-        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 83.33, getResources().getDisplayMetrics());
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 170, getResources().getDisplayMetrics());
 		
@@ -173,7 +168,6 @@ public class CandidatePositionsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
 
@@ -182,9 +176,10 @@ public class CandidatePositionsFragment extends Fragment {
 				protected void handleResponse(Response<PhotosResponse> response) {
 					PhotosResponse body = response.body();
 
-					if (body != null && body.photos != null && body.photos.size() > 0) {
+					if (body != null && body.totalPhotos > 0) {
 						GlideApp.with(CandidatePositionsFragment.this)
 								.load(body.photos.get(0).thumbnailUrl)
+                                .transforms(new TintTransformation())
 								.into(view);
 					}
 				}
@@ -228,7 +223,6 @@ public class CandidatePositionsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view2 = new ImageView(getActivity());
-            view2.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
 
@@ -237,10 +231,11 @@ public class CandidatePositionsFragment extends Fragment {
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();
 
-                    if (body != null && body.photos != null && body.photos.size() > 0) {
+                    if (body != null && body.totalPhotos > 0) {
                         GlideApp.with(CandidatePositionsFragment.this)
                                 .load(body.photos.get(0).thumbnailUrl)
-                                .into(view);
+                                .transforms(new TintTransformation())
+                                .into(view2);
                     }
                 }
             });
@@ -276,9 +271,7 @@ public class CandidatePositionsFragment extends Fragment {
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
-			view.setScaleType(ScaleType.CENTER_CROP);
 	        
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
@@ -341,18 +334,17 @@ public class CandidatePositionsFragment extends Fragment {
             params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 
             ImageView view = new ImageView(getActivity());
-            view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            view.setScaleType(ScaleType.CENTER_CROP);
 
 			isegoria.getAPI().getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();
 
-                    if (body != null && body.photos != null && body.photos.size() > 0) {
+                    if (body != null && body.totalPhotos > 0) {
                         GlideApp.with(CandidatePositionsFragment.this)
                                 .load(body.photos.get(0).thumbnailUrl)
+                                .transforms(new TintTransformation())
                                 .into(view);
                     }
                 }
