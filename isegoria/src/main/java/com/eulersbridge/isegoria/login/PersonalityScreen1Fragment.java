@@ -12,9 +12,6 @@ import android.widget.Button;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 
-/**
- * Created by Anthony on 01/04/2015.
- */
 public class PersonalityScreen1Fragment extends Fragment {
 
     private ViewPager mPager;

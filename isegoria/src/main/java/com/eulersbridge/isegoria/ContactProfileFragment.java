@@ -16,15 +16,20 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.models.Badge;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
 
-/**
- * Created by Anthony on 30/03/2015.
- */
+import java.util.List;
+
+import retrofit2.Response;
+
 public class ContactProfileFragment extends Fragment {
     private View rootView;
 
@@ -37,27 +42,38 @@ public class ContactProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
-    private Network network;
+    private Isegoria isegoria;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-        rootView.findViewById(R.id.personalityTestButton).setVisibility(View.GONE);
+        rootView.findViewById(R.id.profile_personality_test_button).setVisibility(View.GONE);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        isegoria = (Isegoria) getActivity().getApplication();
 
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 100.00, getResources().getDisplayMetrics());
 
-        ImageView photoImageView = rootView.findViewById(R.id.profilePic);
+        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
+
+        long userId = isegoria.getLoggedInUser().getId();
+
+        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
+            @Override
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> remainingBadges = response.body();
+                if (remainingBadges != null) {
+                    updateRemainingBadgesCount(remainingBadges.size());
+                }
+            }
+        });
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
@@ -69,36 +85,35 @@ public class ContactProfileFragment extends Fragment {
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
         Bundle bundle = this.getArguments();
-        User user = bundle.getParcelable("profile");
+        User user = Parcels.unwrap(bundle.getParcelable("profile"));
 
-        final TextView name = rootView.findViewById(R.id.profileName);
+        final TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
 
-        updateCompletedBadgesCount(user.getCompletedBadgesCount());
-        updateCompletedTasksCount(user.getCompletedTasksCount());
-        updateExperience(user.getLevel());
+        updateCompletedBadgesCount(user.completedBadgesCount);
+        updateCompletedTasksCount(user.completedTasksCount);
+        updateExperience(user.level);
 
-        LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundNews);
-        network.getUserDP(photoImageView, backgroundLinearLayout);
+        // TODO: getUserDP; photoImageView for avatar, background on backgroundLinearLayout
 
-        network.getTasks(new Network.TasksListener() {
+        isegoria.getAPI().getTasks().enqueue(new SimpleCallback<List<Task>>() {
             @Override
-            public void onFetchSuccess(ArrayList<Task> tasks) {
-                addTasks(tasks);
+            protected void handleResponse(Response<List<Task>> response) {
+                List<Task> tasks = response.body();
+                if (tasks != null) {
+                    addTasks(tasks);
+                }
             }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
         });
 
-        network.getProfileStats(user.getEmail(), new Network.ProfileStatsListener() {
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
             @Override
-            public void onFetchSuccess(int contactsCount, int totalTasksCount) {
-                updateStats(contactsCount, totalTasksCount);
+            protected void handleResponse(Response<Contact> response) {
+                Contact user = response.body();
+                if (user != null) {
+                    updateStats(user.contactsCount, user.totalTasksCount);
+                }
             }
-
-            @Override
-            public void onFetchFailure(Exception e) { }
         });
 
         return rootView;
@@ -145,7 +160,7 @@ public class ContactProfileFragment extends Fragment {
     }
 
     @UiThread
-    public void updateStats(int numOfContacts, int totalTasks) {
+    private void updateStats(long numOfContacts, long totalTasks) {
         friendsNumTextView.setText(String.valueOf(numOfContacts));
         groupNumTextView.setText(String.valueOf("0"));
         rewardsNumTextView.setText(String.valueOf("0"));
@@ -154,25 +169,25 @@ public class ContactProfileFragment extends Fragment {
         circularSeekBar4.setTopLine(String.valueOf("0"));
         circularSeekBar4.setBottomLine("ATTENDED");
 
-        circularSeekBar3.setMax(totalTasks);
+        circularSeekBar3.setMax((int)totalTasks);
 
         circularSeekBar4.setProgress(30);
         Thread t4 = new Thread(circularSeekBar4);
         t4.start();
     }
 
-    private void addTasks(ArrayList<Task> tasks) {
-        if (getActivity() != null && tasks.size() > 0) {
+    private void addTasks(@NonNull List<Task> tasks) {
+        if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 for (Task task : tasks) {
-                    addTask(task.getId(), task.getAction(), task.getXpValue());
+                    addTask(task.id, task.action, task.xpValue);
                 }
             });
         }
     }
 
     @UiThread
-    public void addTask(long taskId, String action, long xpValue) {
+    private void addTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
 
         int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -204,7 +219,18 @@ public class ContactProfileFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, iconImage);
+        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.totalPhotos > 0) {
+                    GlideApp.with(ContactProfileFragment.this)
+                            .load(body.photos.get(0).thumbnailUrl)
+                            .centerCrop()
+                            .into(iconImage);
+                }
+            }
+        });
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);

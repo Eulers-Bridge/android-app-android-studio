@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.eulersbridge.isegoria.Constant;
+
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -118,7 +120,7 @@ public class Signature extends View {
                 break;
 
             default:
-                debug("Ignored touch event: " + event.toString());
+                Log.v(Constant.TAG, "Ignored touch event: " + event.toString());
                 return false;
         }
 
@@ -131,9 +133,6 @@ public class Signature extends View {
         lastTouchY = eventY;
 
         return true;
-    }
-
-    private void debug(String string){
     }
 
     private void expandDirtyRect(float historicalX, float historicalY)

@@ -1,20 +1,14 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -31,14 +25,23 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
 import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.models.Ticket;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Event;
-import com.eulersbridge.isegoria.utilities.TimeConverter;
+
+import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import org.parceler.Parcels;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EventsDetailFragment extends Fragment {
 	private View rootView;
@@ -46,42 +49,36 @@ public class EventsDetailFragment extends Fragment {
     private Isegoria isegoria;
 
     private TableLayout eventContactTableLayout;
-    private Network network;
 
     private Event event;
-    private Bitmap eventImage;
 	
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.events_detail_fragment, container, false);
 
-        eventContactTableLayout = rootView.findViewById(R.id.eventDetailsTableLayout);
+        eventContactTableLayout = rootView.findViewById(R.id.event_details_table_layout);
 
-        Button addToCalendar = rootView.findViewById(R.id.addToCalendar);
+        Button addToCalendar = rootView.findViewById(R.id.event_button_add_to_calendar);
         addToCalendar.setOnClickListener(view -> addToCalendar());
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        event = getArguments().getParcelable("event");
+        event = Parcels.unwrap(getArguments().getParcelable("event"));
 
         isegoria = (Isegoria) getActivity().getApplication();
-        network = isegoria.getNetwork();
 
-        if (event != null && !TextUtils.isEmpty(event.getImageUrl())) {
-            network.getPicture(event.getImageUrl(), new Network.PictureDownloadListener() {
-                @Override
-                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                    eventImage = bitmap;
-                    populateContent(event);
-                }
+        if (event != null) {
+            populateContent(event);
 
-                @Override
-                public void onDownloadFailed(String url, VolleyError error) {
-                    eventImage = null;
-                    populateContent(event);
-                }
-            });
+            ImageView eventImageView = rootView.findViewById(R.id.event_image);
+
+            if (!TextUtils.isEmpty(event.photos.get(0).thumbnailUrl)) {
+                GlideApp.with(this)
+                        .load(event.photos.get(0).thumbnailUrl)
+                        .transform(new TintTransformation())
+                        .into(eventImageView);
+            }
         }
 		
 		return rootView;
@@ -89,51 +86,32 @@ public class EventsDetailFragment extends Fragment {
 	
 	private void populateContent(final Event event) {
         getActivity().runOnUiThread(() -> {
-            int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                    (float) 200, getResources().getDisplayMetrics());
+            TextView eventTitleField = rootView.findViewById(R.id.event_title);
+            eventTitleField.setText(event.name);
 
-            RelativeLayout backgroundLayout = rootView.findViewById(R.id.topBackgroundNews);
-            backgroundLayout.getLayoutParams().height = imageHeight;
-            //Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), backgroundDrawableResource);
-            //Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int)dpHeight/2, false);
+            TextView eventTime = rootView.findViewById(R.id.event_time);
+            eventTime.setText(Utils.convertTimestampToString(getContext(), event.date));
 
-            if (eventImage != null) {
-                Drawable d = new BitmapDrawable(getActivity().getResources(), eventImage);
-                d.setColorFilter(Color.argb(125, 35, 35, 35), Mode.DARKEN);
+            TextView eventLocationLine1 = rootView.findViewById(R.id.event_location_1);
+            eventLocationLine1.setText(event.location);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    backgroundLayout.setBackground(d);
-                } else {
-                    backgroundLayout.setBackgroundDrawable(d);
-                }
-            }
-
-            TextView eventTitleField = rootView.findViewById(R.id.eventTitle);
-            eventTitleField.setText(event.getName());
-
-            TextView eventTime = rootView.findViewById(R.id.eventTime);
-            eventTime.setText(TimeConverter.convertTimestampToString(event.getDate()));
-
-            TextView eventLocationLine1 = rootView.findViewById(R.id.eventLocationLine1);
-            eventLocationLine1.setText(event.getLocation());
-
-            TextView eventsTextField = rootView.findViewById(R.id.eventDetails);
-            eventsTextField.setText(event.getDescription());
+            TextView eventsTextField = rootView.findViewById(R.id.event_details);
+            eventsTextField.setText(event.description);
         });
 	}
 	
 	private void addToCalendar() {
         Intent intent = new Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getDate())
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.date)
 
                 // Make event 1 hour long (add an hour in in milliseconds to event start)
-                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getDate() + 60 * 60 * 1000)
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.date + 60 * 60 * 1000)
                 .putExtra(CalendarContract.Events.ALL_DAY, false)
 
-                .putExtra(CalendarContract.Events.TITLE, event.getName())
-                .putExtra(CalendarContract.Events.DESCRIPTION, event.getDescription())
-                .putExtra(CalendarContract.Events.EVENT_LOCATION, event.getLocation())
+                .putExtra(CalendarContract.Events.TITLE, event.name)
+                .putExtra(CalendarContract.Events.DESCRIPTION, event.description)
+                .putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (intent.resolveActivity(getContext().getPackageManager()) != null) {
@@ -163,10 +141,10 @@ public class EventsDetailFragment extends Fragment {
 
     public void addCandidate(int userId, int ticketId, int positionId, int candidateId,
                              String firstName, String lastName) {
-        addTableRow(ticketId, userId, "GRN", "#4FBE3E", String.format("%s %s", firstName, lastName), "", positionId);
+        addTableRow(ticketId, null, userId, "GRN", "#4FBE3E", String.format("%s %s", firstName, lastName), "", positionId);
     }
 
-    private void addTableRow(int ticketId, final int userId, String partyAbr,
+    private void addTableRow(int ticketId, User user, final int userId, String partyAbr,
                              String colour, String candidateName,
                              String candidatePosition, int positionId) {
         TableRow tr;
@@ -184,8 +162,11 @@ public class EventsDetailFragment extends Fragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
         candidateProfileView.setLayoutParams(layoutParams);
         candidateProfileView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        network.getFirstPhoto(userId, candidateProfileView);
         candidateProfileView.setPadding(10, 0, 10, 0);
+
+        if (!TextUtils.isEmpty(user.profilePhotoURL)){
+            GlideApp.with(this).load(user.profilePhotoURL).into(candidateProfileView);
+        }
 
         ImageView candidateProfileImage = new ImageView(getContext());
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
@@ -212,15 +193,20 @@ public class EventsDetailFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        network.getTicketLabel(ticketId, new Network.TicketLabelListener() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
             @Override
-            public void onFetchSuccess(long ticketId, String colour, String code) {
-                textViewParty.setText(code);
-                textViewParty.setBackgroundColor(Color.parseColor(colour));
+            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
+                Ticket ticket = response.body();
+                if (ticket != null) {
+                    textViewParty.setText(ticket.code);
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) { }
+            public void onFailure(Call<Ticket> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 
         RectShape rect = new RectShape();
@@ -253,14 +239,19 @@ public class EventsDetailFragment extends Fragment {
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(positionId, new Network.PositionListener() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
             @Override
-            public void onFetchSuccess(long positionId, String name) {
-                textViewPosition.setText(name);
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<Position> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 
         View dividerView = new View(getContext());

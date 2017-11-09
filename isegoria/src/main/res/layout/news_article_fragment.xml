@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:id="@+id/scrollView1"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="@android:color/white"
@@ -16,94 +15,110 @@
 		android:orientation="vertical">
 
 		<RelativeLayout
-			android:id="@+id/topBackgroundNews"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
 			android:gravity="bottom"
-			android:orientation="vertical"
-			android:padding="16dp">
+			android:orientation="vertical">
+
+			<ImageView
+				android:id="@+id/article_image"
+				android:layout_width="match_parent"
+				android:layout_height="250dp"
+				android:scaleType="centerInside"/>
 
 			<TextView
-				android:id="@+id/newsArticleTitle"
+				android:id="@+id/article_title"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentTop="true"
-				android:layout_marginTop="16dp"
+				android:layout_marginTop="32dp"
 				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
 				android:lineSpacingMultiplier="1.2"
-				android:textColor="@color/white" />
+				android:textColor="@color/white"
+				android:layout_marginLeft="@dimen/activity_horizontal_margin"
+				android:layout_marginStart="@dimen/activity_horizontal_margin"/>
 
 			<ImageView
-				android:id="@+id/newsArticleAuthorImage"
+				android:id="@+id/article_image_author"
 				android:layout_width="48dp"
 				android:layout_height="48dp"
 				android:layout_alignParentLeft="true"
 				android:layout_alignParentStart="true"
 				android:layout_alignParentBottom="true"
-				android:layout_marginRight="16dp"
-				android:layout_marginEnd="16dp"
+				android:layout_marginLeft="@dimen/activity_horizontal_margin"
+				android:layout_marginStart="@dimen/activity_horizontal_margin"
+				android:layout_marginRight="@dimen/activity_horizontal_margin"
+				android:layout_marginEnd="@dimen/activity_horizontal_margin"
+				android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+				android:layout_marginBottom="@dimen/activity_vertical_margin"
 				android:background="#ff3f3f3f"
 				android:visibility="gone" />
 
 			<TextView
-				android:id="@+id/photoTitle"
+				android:id="@+id/article_author"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_above="@+id/newsArticleDate"
-				android:layout_toRightOf="@id/newsArticleAuthorImage"
-				android:layout_toEndOf="@id/newsArticleAuthorImage"
+				android:layout_above="@+id/article_date"
+				android:layout_toRightOf="@id/article_image_author"
+				android:layout_toEndOf="@id/article_image_author"
 				android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
 				android:textColor="@color/white"
 				android:textSize="@dimen/newsArticleName" />
 
 			<TextView
-				android:id="@id/newsArticleDate"
+				android:id="@id/article_date"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
-				android:layout_toRightOf="@id/newsArticleAuthorImage"
-				android:layout_toEndOf="@id/newsArticleAuthorImage"
+				android:layout_toRightOf="@id/article_image_author"
+				android:layout_toEndOf="@id/article_image_author"
 				android:layout_marginTop="8dp"
-				android:layout_marginBottom="3dp"
+				android:paddingBottom="19dp"
+				android:layout_marginLeft="@dimen/activity_horizontal_margin"
+				android:layout_marginStart="@dimen/activity_horizontal_margin"
 				android:textAppearance="@style/TextAppearance.AppCompat.Caption"
 				android:textColor="@color/white" />
 
 			<TextView
-				android:id="@+id/newsArticleLikes"
+				android:id="@+id/article_likes"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
-				android:layout_toLeftOf="@+id/starView"
-				android:layout_toStartOf="@+id/starView"
-				android:layout_marginBottom="12dp"
+				android:layout_toLeftOf="@+id/article_star"
+				android:layout_toStartOf="@+id/article_star"
+				android:paddingBottom="28dp"
 				android:textAppearance="?android:attr/textAppearanceSmall"
 				android:textColor="@color/white"
 				android:textSize="@dimen/newsPointsSize" />
 
 			<ImageView
-				android:id="@id/starView"
+				android:id="@id/article_star"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
-				android:layout_toLeftOf="@+id/flagView"
-				android:layout_toStartOf="@+id/flagView"
+				android:layout_toLeftOf="@+id/article_flag"
+				android:layout_toStartOf="@+id/article_flag"
+				android:paddingBottom="@dimen/activity_vertical_margin"
 				android:src="@drawable/stardefault"
 				android:contentDescription="@string/news_article_star_content_description" />
 
 			<ImageView
-				android:id="@id/flagView"
+				android:id="@id/article_flag"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentBottom="true"
 				android:layout_alignParentRight="true"
 				android:layout_alignParentEnd="true"
+				android:paddingBottom="@dimen/activity_vertical_margin"
+				android:layout_marginRight="@dimen/activity_horizontal_margin"
+				android:layout_marginEnd="@dimen/activity_horizontal_margin"
 				android:src="@drawable/flagdefault"
 				android:contentDescription="@string/news_article_flag_content_description" />
 		</RelativeLayout>
 
 		<TextView
-			android:id="@+id/textNews"
+			android:id="@+id/article_content"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:padding="@dimen/activity_horizontal_margin"

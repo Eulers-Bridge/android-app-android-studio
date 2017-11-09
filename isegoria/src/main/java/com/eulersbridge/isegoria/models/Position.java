@@ -1,43 +1,18 @@
 package com.eulersbridge.isegoria.models;
 
-import org.json.JSONObject;
+import android.support.annotation.Nullable;
 
-/**
- * Created by Seb on 04/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class Position {
 
-    private long id;
-    private long electionId;
-    private String name;
-    private String description;
+    @Json(name = "positionId")
+    public long id;
 
-    public Position(JSONObject jsonObject) {
-        try {
-            id = jsonObject.getLong("positionId");
-            electionId = jsonObject.optLong("electionId", 0);
-            name = jsonObject.getString("name");
-            description = jsonObject.getString("description");
+    @Json(name = "electionId")
+    @Nullable
+    public Long electionId;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public long getElectionId() {
-        return electionId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    public String name;
+    public String description;
 }

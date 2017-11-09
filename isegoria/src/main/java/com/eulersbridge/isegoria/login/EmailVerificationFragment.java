@@ -9,30 +9,34 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.R;
 
 public class EmailVerificationFragment extends Fragment {
     private MainActivity mainActivity;
-    private Network network;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.email_verification, container, false);
 
         mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+
+        Isegoria isegoria = mainActivity.getIsegoriaApplication();
 
         final Button verifiedButton = rootView.findViewById(R.id.verifiedButton);
         verifiedButton.setOnClickListener(view -> {
-            network.login();
-            mainActivity.getIsegoriaApplication().login();
+            isegoria.login(null, null);
             mainActivity.dialog = ProgressDialog.show(mainActivity, "", "Loading. Please wait...", true);
         });
 
         final Button resendVerificationButton = rootView.findViewById(R.id.resendVerificationButton);
-        resendVerificationButton.setOnClickListener(view -> network.verifyEmail());
+        resendVerificationButton.setOnClickListener(view -> {
+            String userEmail = isegoria.getLoggedInUser().email;
+
+            isegoria.getAPI().sendVerificationEmail(userEmail).enqueue(new IgnoredCallback<>());
+        });
 
         return rootView;
     }

@@ -26,11 +26,18 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.FriendRequest;
+import com.eulersbridge.isegoria.models.GenericUser;
 import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
-import java.util.ArrayList;
+import org.parceler.Parcels;
+
+import java.util.List;
+
+import retrofit2.Response;
 
 public class FindAddContactFragment extends Fragment {
     private View rootView;
@@ -38,9 +45,13 @@ public class FindAddContactFragment extends Fragment {
     private TableLayout searchResultsTableLayout;
     private TableLayout friendsAllTableLayout;
 
-    private Network network;
+    private Isegoria isegoria;
 
     private MainActivity mainActivity;
+
+    public enum FriendRequestType {
+        RECEIVED, SENT, UNKNOWN
+    }
 
     public enum UserType {
         SEARCH, FRIEND, FRIEND_REQUEST
@@ -58,43 +69,56 @@ public class FindAddContactFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
         mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
 
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getFriends(new Network.FriendsListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<User> friends) {
-                setFriends(friends);
-            }
+        isegoria = (Isegoria)getActivity().getApplication();
 
+        isegoria.getAPI().getFriends().enqueue(new SimpleCallback<List<Contact>>() {
             @Override
-            public void onFetchFailure(Exception e) {}
+            protected void handleResponse(Response<List<Contact>> response) {
+                List<Contact> friends = response.body();
+                if (friends != null) {
+                    setFriends(friends);
+                }
+            }
         });
-        network.getFriendRequestsSent(friendRequestsCallback);
-        network.getFriendRequestsReceived(friendRequestsCallback);
+
+        long userId = isegoria.getLoggedInUser().getId();
+
+        isegoria.getAPI().getFriendRequestsSent(userId).enqueue(new SimpleCallback<List<FriendRequest>>() {
+            @Override
+            protected void handleResponse(Response<List<FriendRequest>> response) {
+                List<FriendRequest> friendRequestsSent = response.body();
+                if (friendRequestsSent != null) {
+                    for (FriendRequest friendRequest : friendRequestsSent) {
+                        addFriendRequest(friendRequest, FriendRequestType.SENT);
+                    }
+                }
+            }
+        });
+
+        isegoria.getAPI().getFriendRequestsReceived(userId).enqueue(new SimpleCallback<List<FriendRequest>>() {
+            @Override
+            protected void handleResponse(Response<List<FriendRequest>> response) {
+                List<FriendRequest> friendRequestsReceived = response.body();
+                if (friendRequestsReceived != null) {
+                    for (FriendRequest friendRequest : friendRequestsReceived) {
+                        addFriendRequest(friendRequest, FriendRequestType.RECEIVED);
+                    }
+                }
+            }
+        });
 
         return rootView;
     }
 
-    final Network.FriendRequestsListener friendRequestsCallback = new Network.FriendRequestsListener() {
+    private final SimpleCallback<List<User>> searchCallback = new SimpleCallback<List<User>>() {
         @Override
-        public void onFetchSuccess(ArrayList<FriendRequest> friendRequests) {
-            for (FriendRequest friendRequest : friendRequests) {
-                addFriendRequest(friendRequest);
+        protected void handleResponse(Response<List<User>> response) {
+            List<User> users = response.body();
+            if (users != null) {
+                clearSearchResults();
+                addUsers(users);
             }
         }
-
-        @Override
-        public void onFetchFailure(Exception e) {}
-    };
-
-    final Network.SearchUsersListener searchCallback = new Network.SearchUsersListener() {
-        @Override
-        public void onFetchSuccess(ArrayList<User> users) {
-            clearSearchResults();
-            addUsers(users);
-        }
-
-        @Override
-        public void onFetchFailure(Exception e) {}
     };
 
     @Override
@@ -130,7 +154,7 @@ public class FindAddContactFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
                     clearSearchResults();
-                    network.searchForUsers(query, searchCallback);
+                    isegoria.getAPI().searchForUsers(query).enqueue(searchCallback);
                     return true;
                 }
                 return false;
@@ -140,7 +164,7 @@ public class FindAddContactFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() > 2) {
                     clearSearchResults();
-                    network.searchForUsers(newText, searchCallback);
+                    isegoria.getAPI().searchForUsers(newText).enqueue(searchCallback);
 
                 } else {
                     clearSearchResults();
@@ -156,7 +180,7 @@ public class FindAddContactFragment extends Fragment {
         tabLayout.setVisibility(View.GONE);
     }
 
-    public void clearSearchResults() {
+    private void clearSearchResults() {
         searchResultsTableLayout.removeAllViews();
     }
 
@@ -164,27 +188,27 @@ public class FindAddContactFragment extends Fragment {
         rootView.findViewById(R.id.searchResultsSection).setVisibility(View.GONE);
     }
 
-    public void addUsers(ArrayList<User> users) {
+    private void addUsers(List<User> users) {
         clearSearchResults();
 
         for (User user : users) {
-            addTableRow(searchResultsTableLayout, user, null, UserType.SEARCH, FriendRequest.Type.UNKNOWN);
+            addTableRow(searchResultsTableLayout, user, -1, UserType.SEARCH, FriendRequestType.UNKNOWN);
 
             rootView.findViewById(R.id.searchResultsSection).setVisibility(View.VISIBLE);
         }
     }
 
-    private void setFriends(ArrayList<User> friends) {
-        for (User friend : friends) {
-            addTableRow(friendsAllTableLayout, friend, null, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
+    private void setFriends(List<Contact> friends) {
+        for (Contact friend : friends) {
+            addTableRow(friendsAllTableLayout, friend, -1, UserType.FRIEND, FriendRequestType.UNKNOWN);
         }
     }
 
-    public void addFriendRequest(FriendRequest friendRequest) {
+    private void addFriendRequest(FriendRequest friendRequest, FriendRequestType type) {
         View sectionContainer;
         TableLayout tableLayout;
 
-        if (friendRequest.getType() == FriendRequest.Type.RECEIVED) {
+        if (type == FriendRequestType.RECEIVED) {
             sectionContainer = rootView.findViewById(R.id.friendsReceivedSection);
             tableLayout = rootView.findViewById(R.id.friendsReceivedTableLayout);
 
@@ -193,13 +217,16 @@ public class FindAddContactFragment extends Fragment {
             tableLayout = rootView.findViewById(R.id.friendsSentTableLayout);
         }
 
-        addTableRow(tableLayout, friendRequest.getUser(), String.valueOf(friendRequest.getId()), UserType.FRIEND_REQUEST, friendRequest.getType());
+        User friendRequestUser = (type == FriendRequestType.SENT)?
+                friendRequest.requestReceiver : friendRequest.requester;
+
+        addTableRow(tableLayout, friendRequestUser, friendRequest.id, UserType.FRIEND_REQUEST, type);
 
         sectionContainer.setVisibility(View.VISIBLE);
     }
 
     @UiThread
-    private void addTableRow(TableLayout tableLayout, final User user, final String contactRequestId, UserType type, FriendRequest.Type friendRequestType) {
+    private void addTableRow(TableLayout tableLayout, final GenericUser user, long contactRequestId, UserType type, FriendRequestType friendRequestType) {
         final TableRow tr;
 
         final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -219,10 +246,12 @@ public class FindAddContactFragment extends Fragment {
         candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
         candidateProfileView.setLayoutParams(layoutParams);
-        candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
         //network.getFirstPhoto(0, userId, candidateProfileView);
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
-        network.getPictureVolley(user.getProfilePhotoURL(), candidateProfileView);
+
+        GlideApp.with(this)
+                .load(user.profilePhotoURL)
+                .into(candidateProfileView);
 
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
@@ -246,7 +275,6 @@ public class FindAddContactFragment extends Fragment {
         if (type == UserType.SEARCH) {
             final ImageView candidateProfileImage = new ImageView(getActivity());
             candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
             candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
             candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
             candidateProfileImage.setOnClickListener(view -> {
@@ -260,15 +288,13 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.addToBackStack(null);
             fragmentTransaction2.replace(android.R.id.content, fragment2);
             fragmentTransaction2.commit();*/
-                network.addFriend(user.getEmail(), new Network.AddFriendListener() {
-                    @Override
-                    public void onSuccess(String email) {
-                        showAddedMessage();
-                    }
-
-                    @Override
-                    public void onFailure(String email, Exception e) {}
-                });
+                isegoria.getAPI().addFriend(isegoria.getLoggedInUser().email, user.email)
+                        .enqueue(new SimpleCallback<Void>() {
+                            @Override
+                            protected void handleResponse(Response<Void> response) {
+                                showAddedMessage();
+                            }
+                        });
             });
 
             linLayout2.addView(candidateProfileImage);
@@ -286,7 +312,7 @@ public class FindAddContactFragment extends Fragment {
                 ContactProfileFragment profileFragment = new ContactProfileFragment();
 
                 Bundle args = new Bundle();
-                args.putParcelable("profile", user);
+                args.putParcelable("profile", Parcels.wrap(user));
                 profileFragment.setArguments(args);
 
                 getFragmentManager().beginTransaction()
@@ -298,7 +324,7 @@ public class FindAddContactFragment extends Fragment {
             linLayout2.addView(viewProfileImage);
         }
 
-        if (friendRequestType == FriendRequest.Type.RECEIVED) {
+        if (friendRequestType == FriendRequestType.RECEIVED) {
             final ImageView acceptImage = new ImageView(getActivity());
             acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
             acceptImage.setScaleType(ScaleType.CENTER_CROP);
@@ -316,15 +342,13 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.replace(android.R.id.content, fragment2);
             fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
-                FindAddContactFragment.this.addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequest.Type.UNKNOWN);
-                network.acceptContact(String.valueOf(contactRequestId), new Network.AcceptFriendRequestListener() {
+                addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequestType.UNKNOWN);
+
+                isegoria.getAPI().acceptFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
                     @Override
-                    public void onSuccess(String contactRequestId) {
+                    protected void handleResponse(Response<Void> response) {
                         showAcceptMessage();
                     }
-
-                    @Override
-                    public void onFailure(String contactRequestId, Exception e) {}
                 });
             });
 
@@ -345,14 +369,12 @@ public class FindAddContactFragment extends Fragment {
             fragmentTransaction2.replace(android.R.id.content, fragment2);
             fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
-                network.rejectContact(String.valueOf(contactRequestId), new Network.RejectFriendRequestListener() {
+
+                isegoria.getAPI().rejectFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
                     @Override
-                    public void onSuccess(String contactRequestId) {
+                    protected void handleResponse(Response<Void> response) {
                         showDenyMessage();
                     }
-
-                    @Override
-                    public void onFailure(String contactRequestId, Exception e) {}
                 });
             });
 
@@ -392,19 +414,19 @@ public class FindAddContactFragment extends Fragment {
         tableLayout.addView(tr);
     }
 
-    public void showAddedMessage() {
+    private void showAddedMessage() {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
         }
     }
 
-    public void showAcceptMessage() {
+    private void showAcceptMessage() {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
         }
     }
 
-    public void showDenyMessage() {
+    private void showDenyMessage() {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
         }

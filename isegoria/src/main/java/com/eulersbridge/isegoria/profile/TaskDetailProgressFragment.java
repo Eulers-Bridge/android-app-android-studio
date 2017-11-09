@@ -19,52 +19,81 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class TaskDetailProgressFragment extends Fragment {
     private View rootView;
 
-    private Network network;
+    private Isegoria isegoria;
+
+    private final List<ImageView> imageViews = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.task_detail_fragment, container, false);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-
-        network.getRemainingTasks(new Network.TasksTotalXPListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<Task> remainingTasks, long totalXp) {
-                addRemainingTasks(remainingTasks);
-            }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
-        });
-
-        network.getCompletedTasks(new Network.TasksTotalXPListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<Task> completedTasks, long totalXp) {
-                addCompletedTasks(completedTasks);
-                setLevel(totalXp);
-            }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
-        });
+        isegoria = (Isegoria) getActivity().getApplication();
 
         ProgressBar pb = rootView.findViewById(R.id.progressBar);
         pb.setProgress(50);
         pb.setMax(1000);
         pb.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
+        fetchData();
+
         return rootView;
+    }
+
+    private void fetchData() {
+        long userId = isegoria.getLoggedInUser().getId();
+
+        isegoria.getAPI().getRemainingTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
+            @Override
+            protected void handleResponse(Response<List<Task>> response) {
+                List<Task> tasks = response.body();
+                if (tasks != null) addRemainingTasks(tasks);
+            }
+        });
+
+        isegoria.getAPI().getCompletedTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
+            @Override
+            protected void handleResponse(Response<List<Task>> response) {
+                List<Task> tasks = response.body();
+                if (tasks != null) addCompletedTasks(tasks);
+            }
+        });
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        for (ImageView imageView : imageViews) {
+            GlideApp.with(TaskDetailProgressFragment.this).clear(imageView);
+        }
+
+        // Work around a child fragment manager bug: https://stackoverflow.com/a/15656428/447697
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @UiThread
@@ -89,18 +118,24 @@ public class TaskDetailProgressFragment extends Fragment {
         }
     }
 
-    private void addCompletedTasks(ArrayList<Task> completedTasks) {
+    private void addCompletedTasks(@NonNull List<Task> completedTasks) {
         if (getActivity() != null && completedTasks.size() > 0) {
             getActivity().runOnUiThread(() -> {
+                long totalXp = 0;
+
                 for (Task task : completedTasks) {
-                    addCompletedTask(task.getId(), task.getAction(), task.getXpValue());
+                    addCompletedTask(task.id, task.action, task.xpValue);
+
+                    totalXp += task.xpValue;
                 }
+
+                setLevel(totalXp);
             });
         }
     }
 
     @UiThread
-    public void addCompletedTask(long taskId, String action, long xpValue) {
+    private void addCompletedTask(long taskId, String action, long xpValue) {
         LinearLayout tasksLinearLayout = rootView.findViewById(R.id.completedTasksLayout);
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -132,7 +167,19 @@ public class TaskDetailProgressFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, iconImage);
+        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.totalPhotos > 0 && isAdded()) {
+                    imageViews.add(iconImage);
+
+                    GlideApp.with(TaskDetailProgressFragment.this)
+                            .load(body.photos.get(0).thumbnailUrl)
+                            .into(iconImage);
+                }
+            }
+        });
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);
@@ -165,11 +212,11 @@ public class TaskDetailProgressFragment extends Fragment {
         tasksLinearLayout.addView(divider);
     }
 
-    private void addRemainingTasks(ArrayList<Task> remainingTasks) {
+    private void addRemainingTasks(@NonNull List<Task> remainingTasks) {
         if (getActivity() != null && remainingTasks.size() > 0) {
             getActivity().runOnUiThread(() -> {
                 for (Task task : remainingTasks) {
-                    addCompletedTask(task.getId(), task.getAction(), task.getXpValue());
+                    addCompletedTask(task.id, task.action, task.xpValue);
                 }
             });
         }
@@ -207,7 +254,19 @@ public class TaskDetailProgressFragment extends Fragment {
         iconImage.setPadding(paddingMargin2, 0, 0, 0);
         //iconImage.setBackgroundColor(Color.BLACK);
 
-        network.getFirstPhoto((int) taskId, iconImage);
+        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+                if (body != null && body.totalPhotos > 0) {
+                    imageViews.add(iconImage);
+
+                    GlideApp.with(TaskDetailProgressFragment.this)
+                            .load(body.photos.get(0).thumbnailUrl)
+                            .into(iconImage);
+                }
+            }
+        });
 
         TextView taskLabel = new TextView(getActivity());
         taskLabel.setGravity(Gravity.CENTER_VERTICAL);

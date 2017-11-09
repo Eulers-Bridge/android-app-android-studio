@@ -21,16 +21,24 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TintTransformation;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CandidatePositionsFragment extends Fragment {
 	private TableLayout positionsTableLayout;
-    private Network network;
+    private Isegoria isegoria;
 	
 	private float dpWidth;
 
@@ -57,40 +65,67 @@ public class CandidatePositionsFragment extends Fragment {
         addTableRow(R.drawable.photo6, R.drawable.photo7, true, false, "Welfare Officer", "Creative Arts Officer");
         addTableRow(R.drawable.photo8, R.drawable.photo9, true, false, "Faculty Liaison", "");*/
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPositions(new Network.PositionsListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<Position> positions) {
-                addPositions(positions);
-            }
+        isegoria = (Isegoria)getActivity().getApplication();
 
-            @Override
-            public void onFetchFailure(Exception e) { }
-        });
+		long institutionId = isegoria.getLoggedInUser().institutionId;
+
+        isegoria.getAPI().getElections(institutionId).enqueue(electionsCallback);
         
 		return rootView;
 	}
 
-	private void addPositions(ArrayList<Position> positions) {
+	private final Callback<List<Election>> electionsCallback = new Callback<List<Election>>() {
+		@Override
+		public void onResponse(Call<List<Election>> call, Response<List<Election>> response) {
+			List<Election> elections = response.body();
+			if (elections != null && elections.size() > 0) {
+				Election election = elections.get(0);
+
+				isegoria.getAPI().getElectionPositions(election.id).enqueue(positionsCallback);
+			}
+		}
+
+		@Override
+		public void onFailure(Call<List<Election>> call, Throwable t) {
+			t.printStackTrace();
+		}
+	};
+
+	private final Callback<List<Position>> positionsCallback = new Callback<List<Position>>() {
+		@Override
+		public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
+			List<Position> positions = response.body();
+			if (positions != null) {
+				addPositions(positions);
+			}
+		}
+
+		@Override
+		public void onFailure(Call<List<Position>> call, Throwable t) {
+			t.printStackTrace();
+		}
+	};
+
+	private void addPositions(List<Position> positions) {
 	    if (getActivity() != null && positions.size() > 0) {
 	        getActivity().runOnUiThread(() -> {
 
 	            for (Position position : positions) {
+
                     addedPositionsCount = addedPositionsCount + 1;
                     if(addRow) {
-                        addTableRow(lastElectionId, position.getElectionId(), lastPositionId, position.getId(), true, false, lastName, position.getName());
+                        addTableRow(lastElectionId, position.electionId, lastPositionId, position.id, true, false, lastName, position.name);
                     }
 
-                    lastElectionId = position.getElectionId();
-                    lastPositionId = position.getId();
-                    lastName = position.getName();
-                    lastDesc = position.getDescription();
+                    lastElectionId = position.electionId;
+                    lastPositionId = position.id;
+                    lastName = position.name;
+                    lastDesc = position.description;
 
                     addRow = !addRow;
 
                     if (positions.size() == addedPositionsCount) {
-                        this.addTableRowOneSquare(position.getElectionId(), position.getId(), position.getName(), position.getDescription());
+                        this.addTableRowOneSquare(position.electionId, position.id, position.name, position.description);
                     }
                 }
             });
@@ -102,12 +137,6 @@ public class CandidatePositionsFragment extends Fragment {
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 3.2, getResources().getDisplayMetrics());
-        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 90, getResources().getDisplayMetrics());
-        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 23.333, getResources().getDisplayMetrics());
-        int paddingMargin4 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 83.33, getResources().getDisplayMetrics());
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 170, getResources().getDisplayMetrics());
 		
@@ -139,10 +168,23 @@ public class CandidatePositionsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(this.lastPositionId, view);
+
+			isegoria.getAPI().getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
+				@Override
+				protected void handleResponse(Response<PhotosResponse> response) {
+					PhotosResponse body = response.body();
+
+					if (body != null && body.totalPhotos > 0) {
+						GlideApp.with(CandidatePositionsFragment.this)
+								.load(body.photos.get(0).thumbnailUrl)
+                                .transforms(new TintTransformation())
+								.into(view);
+					}
+				}
+			});
+
 	        view.setOnClickListener(view12 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -181,10 +223,23 @@ public class CandidatePositionsFragment extends Fragment {
 	        params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 			
 			ImageView view2 = new ImageView(getActivity());
-            view2.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(positionId, view2);
+
+            isegoria.getAPI().getPhotos(positionId).enqueue(new SimpleCallback<PhotosResponse>() {
+                @Override
+                protected void handleResponse(Response<PhotosResponse> response) {
+                    PhotosResponse body = response.body();
+
+                    if (body != null && body.totalPhotos > 0) {
+                        GlideApp.with(CandidatePositionsFragment.this)
+                                .load(body.photos.get(0).thumbnailUrl)
+                                .transforms(new TintTransformation())
+                                .into(view2);
+                    }
+                }
+            });
+
             view2.setOnClickListener(view1 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -216,9 +271,7 @@ public class CandidatePositionsFragment extends Fragment {
 				((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 			
 			ImageView view = new ImageView(getActivity());
-			view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, imageHeight));
-			view.setScaleType(ScaleType.CENTER_CROP);
 	        
 	        TextView textViewTitle = new TextView(getActivity());
 	        textViewTitle.setTextColor(Color.parseColor("#F8F8F8"));
@@ -281,10 +334,22 @@ public class CandidatePositionsFragment extends Fragment {
             params2.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 
             ImageView view = new ImageView(getActivity());
-            view.setColorFilter(Color.argb(paddingMargin4, paddingMargin3, paddingMargin3, paddingMargin3));
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-            view.setScaleType(ScaleType.CENTER_CROP);
-            network.getFirstPhoto(this.lastPositionId, view);
+
+			isegoria.getAPI().getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
+                @Override
+                protected void handleResponse(Response<PhotosResponse> response) {
+                    PhotosResponse body = response.body();
+
+                    if (body != null && body.totalPhotos > 0) {
+                        GlideApp.with(CandidatePositionsFragment.this)
+                                .load(body.photos.get(0).thumbnailUrl)
+                                .transforms(new TintTransformation())
+                                .into(view);
+                    }
+                }
+			});
+
             view.setOnClickListener(view1 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();

@@ -18,12 +18,16 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Badge;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class ProfileBadgesFragment extends Fragment {
     private TableLayout badgesTableLayout;
@@ -36,7 +40,7 @@ public class ProfileBadgesFragment extends Fragment {
 
     private boolean insertedFirstRow = false;
 
-    private Network network;
+    private Isegoria isegoria;
 
     private int targetLevel = 0;
 
@@ -66,46 +70,50 @@ public class ProfileBadgesFragment extends Fragment {
         tr = new TableRow(getActivity());
         badgesTableLayout.addView(tr);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getProfileBadgesComplete(targetLevel, new Network.ProfileBadgesListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<Badge> badges) {
-                addCompletedBadges(badges);
-            }
+        isegoria = (Isegoria) getActivity().getApplication();
 
+        long userId = isegoria.getLoggedInUser().getId();
+
+        isegoria.getAPI().getCompletedBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
-            public void onFetchFailure(Exception e) {}
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> completedBadges = response.body();
+                if (completedBadges != null) {
+                    addCompletedBadges(completedBadges);
+                }
+            }
         });
 
-        network.getProfileBadgesRemaining(targetLevel, new Network.ProfileBadgesListener() {
+        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
-            public void onFetchSuccess(ArrayList<Badge> badges) {
-                addRemainingBadges(badges);
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> remainingBadges = response.body();
+                if (remainingBadges != null) {
+                    addRemainingBadges(remainingBadges);
+                }
             }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
         });
 
         return rootView;
     }
 
-    private void addRemainingBadges(ArrayList<Badge> badges) {
+    private void addRemainingBadges(List<Badge> badges) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 for (Badge badge : badges) {
-                    addTableRow(badge.getName(), badge.getDescription(), badge.getId(), badge.getLevel(), true);
+                    addTableRow(badge.name, badge.description, badge.id, badge.level, true);
                 }
             });
         }
     }
 
-    private void addCompletedBadges(ArrayList<Badge> badges) {
+    private void addCompletedBadges(List<Badge> badges) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 for (Badge badge : badges) {
-                    addTableRow(badge.getName(), badge.getDescription(), badge.getId(), badge.getLevel(), false);
+                    if (badge.level == targetLevel) {
+                        addTableRow(badge.name, badge.description, badge.id, badge.level, false);
+                    }
                 }
             });
         }
@@ -157,7 +165,18 @@ public class ProfileBadgesFragment extends Fragment {
             view.setLayoutParams(layoutParams);
             view.setScaleType(ScaleType.FIT_XY);
             //view.setBackgroundColor(Color.GRAY);
-            network.getFirstPhoto((int)badgeId, view);
+
+            isegoria.getAPI().getPhotos(badgeId).enqueue(new SimpleCallback<PhotosResponse>() {
+                @Override
+                protected void handleResponse(Response<PhotosResponse> response) {
+                    PhotosResponse body = response.body();
+                    if (body != null && body.totalPhotos > 0) {
+                        GlideApp.with(ProfileBadgesFragment.this)
+                                .load(body.photos.get(0).thumbnailUrl)
+                                .into(view);
+                    }
+                }
+            });
 
             viewLinearLayout.setPadding(0, 0, 0, paddingMargin);
             viewLinearLayout.addView(view);

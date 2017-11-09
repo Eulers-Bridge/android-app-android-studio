@@ -1,12 +1,11 @@
 package com.eulersbridge.isegoria.poll;
 
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -26,17 +25,26 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.android.volley.VolleyError;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Contact;
+import com.eulersbridge.isegoria.models.PollResult;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.models.PollOption;
-import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.PollResultsResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
+
+import org.parceler.Parcels;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import retrofit2.Response;
 
 public class PollVoteFragment extends Fragment {
     private TableLayout pollTableLayout;
@@ -44,15 +52,14 @@ public class PollVoteFragment extends Fragment {
 	private boolean insertedFirstRow = false;
 
     private long pollId;
-    private User creator;
+    private Contact creator;
     private ArrayList<PollOption> options = new ArrayList<>();
 
-    private Network network;
+    private Isegoria isegoria;
 
     private final int pollOptionImageViewId;
 
     private ImageView creatorImageView;
-    private Bitmap creatorPhoto;
 
     private final ArrayList<ImageView> tickBoxes = new ArrayList<>();
     private final ArrayList<TextView> pollResults = new ArrayList<>();
@@ -78,28 +85,27 @@ public class PollVoteFragment extends Fragment {
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
         pixelWidth = displayMetrics.widthPixels;
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
+        isegoria = (Isegoria)getActivity().getApplication();
 
-        Poll poll = getArguments().getParcelable("poll");
+        Poll poll = Parcels.unwrap(getArguments().getParcelable("poll"));
 
-        pollId = poll.getId();
+        pollId = poll.id;
         creator = poll.getCreator();
-        String question = poll.getQuestion();
-        options = poll.getOptions();
+        String question = poll.question;
+        options = poll.options;
 
         addTableRow(question, "");
 
-        if (poll.getCreator() == null && !TextUtils.isEmpty(poll.getCreatorEmail())) {
-            network.getUser(poll.getCreatorEmail(), new Network.UserInfoListener() {
+        if (poll.getCreator() == null && !TextUtils.isEmpty(poll.creatorEmail)) {
+            isegoria.getAPI().getContact(poll.creatorEmail).enqueue(new SimpleCallback<Contact>() {
                 @Override
-                public void onFetchSuccess(User user) {
-                    creator = user;
-                    fetchCreatorPhoto();
+                protected void handleResponse(Response<Contact> response) {
+                    Contact user = response.body();
+                    if (user != null) {
+                        creator = user;
+                        fetchCreatorPhoto();
+                    }
                 }
-
-                @Override
-                public void onFetchFailure(String userEmail, Exception e) {}
             });
 
         } else if (creator != null) {
@@ -111,22 +117,20 @@ public class PollVoteFragment extends Fragment {
 
             createProgressBar("#0000FF", option);
 
-            if (!TextUtils.isEmpty(option.getPhotoUrl())) {
+            if (option.photo != null && !TextUtils.isEmpty(option.photo.thumbnailUrl)) {
                 // Add one to the index, as the first table row is the poll question itself
-                final int finalIndex = i + 1;
+                int index = i + 1;
 
-                network.getPicture(option.getPhotoUrl(), new Network.PictureDownloadListener() {
-                    @Override
-                    public void onDownloadFinished(String url, @Nullable final Bitmap bitmap) {
-
-                        if (bitmap != null && getActivity() != null) {
-                            getActivity().runOnUiThread(() -> updateTableRowImage(finalIndex, bitmap));
-                        }
-                    }
-
-                    @Override
-                    public void onDownloadFailed(String url, VolleyError error) { }
-                });
+                GlideApp.with(this)
+                        .load(option.photo.thumbnailUrl)
+                        .into(new SimpleTarget<Drawable>() {
+                            @Override
+                            public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                                if (resource != null) {
+                                    updateTableRowImage(index, resource);
+                                }
+                            }
+                        });
             }
         }
 
@@ -134,49 +138,47 @@ public class PollVoteFragment extends Fragment {
 	}
 
     private void fetchCreatorPhoto() {
-	    if (creator != null && !TextUtils.isEmpty(creator.getProfilePhotoURL())) {
-            network.getPicture(creator.getProfilePhotoURL(), new Network.PictureDownloadListener() {
-                @Override
-                public void onDownloadFinished(String url, @Nullable Bitmap bitmap) {
-                    creatorPhoto = bitmap;
+	    if (creator != null && !TextUtils.isEmpty(creator.profilePhotoURL)) {
+	        GlideApp.with(this)
+                    .load(creator.profilePhotoURL)
+                    .into(creatorImageView);
+        }
+    }
 
-                    getActivity().runOnUiThread(() -> updateCreatorPhoto());
+	private final SimpleCallback<Void> pollVoteCallback =  new SimpleCallback<Void>() {
+        @Override
+        protected void handleResponse(Response response) {
+            // After voting successfully, fetch poll results and update with this data
+            isegoria.getAPI().getPollResults(pollId).enqueue(new SimpleCallback<PollResultsResponse>() {
+                @Override
+                protected void handleResponse(Response<PollResultsResponse> response) {
+                    PollResultsResponse body = response.body();
+                    if (body != null && body.results != null) {
+
+                        List<PollResult> results = body.results;
+
+                        for (int i = 0; i < results.size(); i++) {
+                            setPollOptionResult(i, results.get(i).count);
+                        }
+                    }
                 }
-
-                @Override
-                public void onDownloadFailed(String url, VolleyError error) { }
             });
         }
-    }
-
-    final Network.PollResultsListener pollResultsCallback = new Network.PollResultsListener() {
-        @Override
-        public void onFetchSuccess(ArrayList<Integer> results) {
-            for (int i = 0; i < results.size(); i++) {
-                setPollOptionResult(i, results.get(i));
-            }
-        }
-
-        @Override
-        public void onFetchFailure(Exception e) {}
     };
 
-    @UiThread
-    private void updateCreatorPhoto() {
-        creatorImageView.setImageBitmap(creatorPhoto);
-        creatorImageView.refreshDrawableState();
-    }
+    private void updateTableRowImage(int index, @NonNull Drawable drawable) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                View row = pollTableLayout.getChildAt(index);
 
-    @UiThread
-    private void updateTableRowImage(int index, Bitmap bitmap) {
-        View row = pollTableLayout.getChildAt(index);
+                if (row != null) {
+                    ImageView imageView = row.findViewById(pollOptionImageViewId);
 
-        if (row != null) {
-            ImageView imageView = row.findViewById(pollOptionImageViewId);
-
-            if (imageView != null) {
-                imageView.setImageBitmap(bitmap);
-            }
+                    if (imageView != null) {
+                        imageView.setImageDrawable(drawable);
+                    }
+                }
+            });
         }
     }
 
@@ -327,7 +329,7 @@ public class PollVoteFragment extends Fragment {
         linearLayout.setPadding(paddingMargin1, 0, paddingMargin2, 0);
         linearLayout.setGravity(Gravity.CENTER_VERTICAL);
 
-        if (!TextUtils.isEmpty(option.getPhotoUrl())) {
+        if (option.photo != null && !TextUtils.isEmpty(option.photo.thumbnailUrl)) {
             ImageView optionImageView = new ImageView(getActivity());
             optionImageView.setId(pollOptionImageViewId);
             optionImageView.setScaleType(ScaleType.FIT_CENTER);
@@ -343,15 +345,15 @@ public class PollVoteFragment extends Fragment {
         textViewParty.setSingleLine(false);
         textViewParty.setTextColor(Color.BLACK);
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
-        textViewParty.setText(option.getText());
+        textViewParty.setText(option.text);
         textViewParty.setGravity(Gravity.END);
         
         TextView textViewVotes = new TextView(getActivity());
         textViewVotes.setTextColor(Color.parseColor("#000000"));
         textViewVotes.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16.0f);
         DecimalFormat formatter = new DecimalFormat("#,###");
-        textViewVotes.setText(formatter.format(option.getVotersCount()));
-        if(!option.hasVoted()) {
+        textViewVotes.setText(formatter.format(option.votersCount));
+        if(!option.hasVoted) {
             textViewVotes.setText("");
         }
         textViewVotes.setPadding(0, 0, 0, 0);
@@ -370,7 +372,7 @@ public class PollVoteFragment extends Fragment {
 		ImageView tickImageView = new ImageView(getActivity());
         tickImageView.setLayoutParams(new TableRow.LayoutParams(tickImageSize, tickImageSize));
         tickImageView.setScaleType(ScaleType.CENTER_INSIDE);
-        tickImageView.setImageResource(option.hasVoted()? R.drawable.tickgreen : R.drawable.tickempty);
+        tickImageView.setImageResource(option.hasVoted? R.drawable.tickgreen : R.drawable.tickempty);
 
         tickBoxes.add(tickImageView);
 
@@ -380,7 +382,7 @@ public class PollVoteFragment extends Fragment {
             }
             ((ImageView) view).setImageResource(R.drawable.tickgreen);
 
-            network.answerPoll(pollId, (int)option.getId(), pollResultsCallback);
+            isegoria.getAPI().answerPoll(pollId, option.id).enqueue(pollVoteCallback);
         });
 		
         tr.addView(tickImageView);
@@ -389,12 +391,8 @@ public class PollVoteFragment extends Fragment {
 		pollTableLayout.addView(tr);
 	}
 
-    private void setPollOptionResult(int index, int count) {
+    private void setPollOptionResult(int index, long count) {
         pollResults.get(index).setText(String.valueOf(count));
-        progressBars.get(index).setProgress(count);
-    }
-
-    public long getNodeId() {
-        return pollId;
+        progressBars.get(index).setProgress((int)count);
     }
 }

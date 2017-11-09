@@ -1,38 +1,12 @@
 package com.eulersbridge.isegoria.models;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-/**
- * Created by Seb on 04/11/2017.
- */
+import com.squareup.moshi.Json;
 
 public class Task {
 
-    private long id;
-    private String action;
-    private long xpValue;
+    @Json(name = "taskId")
+    public long id;
 
-    public Task(JSONObject jsonObject) {
-        try {
-            id = jsonObject.getLong("taskId");
-            action = jsonObject.getString("action");
-            xpValue = jsonObject.getLong("xpValue");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public long getXpValue() {
-        return xpValue;
-    }
+    public String action;
+    public long xpValue;
 }

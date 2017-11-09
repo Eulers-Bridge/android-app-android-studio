@@ -17,20 +17,27 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.PhotoAlbum;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PhotosFragment extends Fragment {
 	private TableLayout photosTableLayout;
 
 	private boolean insertedFirstRow = false;
     private android.support.v4.widget.SwipeRefreshLayout swipeContainerPhotos;
-    private Network network;
-	
+
+    private Isegoria isegoria;
+
+    private boolean fetchedPhotos = false;
+
 	public PhotosFragment() {
 		insertedFirstRow = false;
 	}
@@ -41,36 +48,54 @@ public class PhotosFragment extends Fragment {
 
 		photosTableLayout = rootView.findViewById(R.id.photosTableLayout);
 
+		isegoria = (Isegoria)getActivity().getApplication();
+
+		refreshPhotoAlbums();
+
         swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
         swipeContainerPhotos.setOnRefreshListener(() -> {
             swipeContainerPhotos.setRefreshing(true);
 
             clearTable();
 
-            network.getPhotoAlbums(photoAlbumsCallback);
+			refreshPhotoAlbums();
 
             new android.os.Handler().postDelayed(() -> {
                 insertedFirstRow = false;
                 swipeContainerPhotos.setRefreshing(false);
             }, 7000);
         });
-        
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getPhotoAlbums(photoAlbumsCallback);
 
 		return rootView;
 	}
 
-	private final Network.PhotoAlbumsListener photoAlbumsCallback = new Network.PhotoAlbumsListener() {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (getView() != null && isegoria != null && !fetchedPhotos) {
+            refreshPhotoAlbums();
+        }
+    }
+
+    private void refreshPhotoAlbums() {
+	    long newsFeedId = isegoria.getLoggedInUser().getNewsFeedId();
+	    if (newsFeedId > 0) {
+	        fetchedPhotos = true;
+            isegoria.getAPI().getPhotoAlbums(isegoria.getLoggedInUser().getNewsFeedId()).enqueue(callback);
+        }
+	}
+
+	private final Callback<List<PhotoAlbum>> callback = new Callback<List<PhotoAlbum>>() {
 		@Override
-		public void onFetchSuccess(ArrayList<PhotoAlbum> albums) {
+		public void onResponse(Call<List<PhotoAlbum>> call, Response<List<PhotoAlbum>> response) {
+			List<PhotoAlbum> albums = response.body();
 			addPhotoAlbums(albums);
 		}
 
 		@Override
-		public void onFetchFailure(Exception e) {
-
+		public void onFailure(Call<List<PhotoAlbum>> call, Throwable t) {
+			t.printStackTrace();
 		}
 	};
 
@@ -78,11 +103,11 @@ public class PhotosFragment extends Fragment {
         photosTableLayout.removeAllViews();
     }
 
-	public void addPhotoAlbums(ArrayList<PhotoAlbum> albums) {
-    	if (getActivity() != null) {
+	private void addPhotoAlbums(List<PhotoAlbum> albums) {
+    	if (getActivity() != null && albums != null && albums.size() > 0) {
     		getActivity().runOnUiThread(() -> {
                 for (PhotoAlbum album : albums) {
-                    addTableRow(album.getId(), album.getName(), album.getDescription(), album.getThumbnailPhotoUrl());
+                    addTableRow(album.id, album.name, album.description, album.thumbnailPhotoUrl);
                 }
             });
 		}
@@ -118,7 +143,9 @@ public class PhotosFragment extends Fragment {
 			linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			linearLayout.setPadding(paddingMargin, 0, 0, 0);
 
-            network.getPictureVolley(bitmap, view);
+			GlideApp.with(this)
+					.load(bitmap)
+					.into(view);
 	        
 	        final TextView textViewArticle = new TextView(getActivity());
 	        textViewArticle.setTextColor(Color.parseColor("#000000"));

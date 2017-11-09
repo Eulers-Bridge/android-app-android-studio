@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.notifications;
 
 import android.util.Log;
 
@@ -8,20 +8,15 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
+import com.eulersbridge.isegoria.Constant;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.securepreferences.SecurePreferences;
 
-/**
- * Created by Seb on 24/10/2017.
- */
-
-public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService {
+public class FirebaseIDService extends FirebaseInstanceIdService {
 
     private static final String ACCESS_KEY_ID = "AKIAJNFUHYIZGWPMIZWA";
     private static final String SECRET_KEY = "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";
-
-    private static final String SNSPlatformApplicationArn = "arn:aws:sns:ap-southeast-2:715927704730:app/GCM/android_dev";
 
     private static AmazonSNSClient snsClient = null;
 
@@ -37,12 +32,12 @@ public class IsegoriaFirebaseInstanceIDService extends FirebaseInstanceIdService
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(getString(R.string.TAG), "Refreshed token: " + refreshedToken);
+        Log.d(Constant.TAG, "Refreshed token: " + refreshedToken);
 
         CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest();
 
         request.setToken(refreshedToken);
-        request.setPlatformApplicationArn(SNSPlatformApplicationArn);
+        request.setPlatformApplicationArn(Constant.SNSPlatformApplicationArn);
 
         CreatePlatformEndpointResult result = getSNSClient().createPlatformEndpoint(request);
         if (result != null) {

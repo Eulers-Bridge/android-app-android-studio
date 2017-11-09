@@ -11,50 +11,76 @@
 		android:orientation="vertical">
 
 		<RelativeLayout
-			android:id="@+id/topBackgroundNews"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:background="@color/white"
-			android:orientation="vertical"
-			android:padding="16dp">
+			android:gravity="bottom"
+			android:orientation="vertical">
+
+			<ImageView
+				android:id="@+id/event_image"
+				android:layout_width="match_parent"
+				android:layout_height="200dp"
+				android:scaleType="centerInside"/>
 
 			<TextView
-				android:id="@+id/eventTitle"
+				android:id="@+id/event_title"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_alignParentTop="true"
-				android:layout_marginTop="16dp"
+				android:layout_marginTop="32dp"
+				android:layout_marginLeft="@dimen/activity_horizontal_margin"
+				android:layout_marginStart="@dimen/activity_horizontal_margin"
 				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
 				android:lineSpacingMultiplier="1.2"
 				android:textColor="@color/white" />
 
-			<TextView
-				android:id="@+id/eventTime"
-				android:layout_width="wrap_content"
+			<RelativeLayout
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+                android:gravity="bottom"
 				android:layout_alignParentLeft="true"
 				android:layout_alignParentStart="true"
-				android:layout_alignParentBottom="true"
-				android:layout_marginTop="40dp"
-				android:layout_marginBottom="14dp"
-				android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-				android:textColor="@color/white"
-				android:textSize="@dimen/newsTimeSize" />
-
-			<Button
-				android:id="@+id/addToCalendar"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
 				android:layout_alignParentRight="true"
 				android:layout_alignParentEnd="true"
 				android:layout_alignParentBottom="true"
-				android:paddingLeft="16dp"
-				android:paddingStart="16dp"
-				android:paddingRight="16dp"
-				android:paddingEnd="16dp"
-				android:paddingHorizontal="16dp"
-				android:text="@string/event_add_to_calendar"
-				android:theme="@style/AccentButton" />
+				android:layout_marginTop="40dp"
+				android:paddingBottom="@dimen/activity_vertical_margin"
+				android:paddingLeft="@dimen/activity_horizontal_margin"
+				android:paddingStart="@dimen/activity_horizontal_margin"
+				android:paddingRight="@dimen/activity_horizontal_margin"
+				android:paddingEnd="@dimen/activity_horizontal_margin"
+				android:paddingHorizontal="16dp">
+
+				<TextView
+					android:id="@+id/event_time"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+					android:layout_marginTop="40dp"
+					android:paddingBottom="14dp"
+					android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+					android:textColor="@color/white"
+					android:textSize="@dimen/newsTimeSize" />
+
+				<Button
+					android:id="@+id/event_button_add_to_calendar"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+					android:paddingLeft="16dp"
+					android:paddingStart="16dp"
+					android:paddingRight="16dp"
+					android:paddingEnd="16dp"
+					android:paddingHorizontal="16dp"
+					android:text="@string/event_add_to_calendar"
+					android:theme="@style/AccentButton" />
+
+			</RelativeLayout>
 		</RelativeLayout>
 
 		<LinearLayout
@@ -69,7 +95,7 @@
 			android:paddingHorizontal="16dp">
 
 			<TextView
-				android:id="@+id/eventLocationLine1"
+				android:id="@+id/event_location_1"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
@@ -78,7 +104,7 @@
 				android:textSize="@dimen/eventLocationSize" />
 
 			<TextView
-				android:id="@+id/eventLocationLine2"
+				android:id="@+id/event_location_2"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
@@ -88,14 +114,14 @@
 				android:textSize="@dimen/newsTimeSize" />
 
 			<TextView
-				android:id="@+id/eventDetails"
+				android:id="@+id/event_details"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginTop="16dp"
 				android:textSize="@dimen/newsArticleSize" />
 
 			<TableLayout
-				android:id="@+id/eventDetailsTableLayout"
+				android:id="@+id/event_details_table_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content" />
 		</LinearLayout>

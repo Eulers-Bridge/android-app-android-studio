@@ -1,16 +1,14 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.notifications;
 
 import android.app.Notification;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 
+import com.eulersbridge.isegoria.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-/**
- * Created by Seb on 27/10/2017.
- */
 
 public class NotificationService extends FirebaseMessagingService {
 
@@ -29,15 +27,24 @@ public class NotificationService extends FirebaseMessagingService {
             // Data payload instead of notification object
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
+
+            if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) {
+                title = remoteMessage.getData().get("default");
+            }
         }
+
+        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) return;
 
         //TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,
                 "friends")
                 .setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(R.drawable.app_icon);
+                .setSmallIcon(R.mipmap.notification_icon);
+
+        if (!TextUtils.isEmpty(text)) {
+            notificationBuilder.setContentText(text);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_SOCIAL);

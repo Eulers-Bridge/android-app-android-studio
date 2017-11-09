@@ -1,47 +1,35 @@
 package com.eulersbridge.isegoria;
 
 import android.app.Application;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
 
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
-import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.API;
+import com.eulersbridge.isegoria.network.NetworkService;
+import com.eulersbridge.isegoria.network.NewsFeedResponse;
 import com.securepreferences.SecurePreferences;
 
-import java.util.ArrayList;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class Isegoria extends Application {
 
 	private MainActivity mainActivity;
-	private Network network;
+	private NetworkService network;
 
-	private boolean isLoggedIn = false;
 	private User loggedInUser;
 
-	private String username = "";
-	private String password = "";
-
-	private ArrayList<Country> countryObjects;
-	
-	public Isegoria() {
-		super();
-	}
-	
-	public MainActivity getMainActivity() {
+    public MainActivity getMainActivity() {
 		return mainActivity;
 	}
 	
 	public void setMainActivity(MainActivity mainActivity) {
 		this.mainActivity = mainActivity;
-	}
-	
-	public ArrayList<Country> getCountryObjects() {
-		return countryObjects;
-	}
-
-	public void setCountryObjects(ArrayList<Country> countryObjects) {
-		this.countryObjects = countryObjects;
 	}
 
 	public void setFeedFragment() {
@@ -88,44 +76,71 @@ public class Isegoria extends Application {
 		mainActivity.showLoginFailed();
 	}
 	
-	public void setNetwork(Network network) {
-		this.network = network;
-	}
-	
-	public Network getNetwork() {
+	public @NonNull NetworkService getNetworkService() {
+        if (network == null) {
+            network = new NetworkService(this, null, null);
+        }
+
 		return network;
 	}
 
-	public boolean isLoggedIn() {
-		return isLoggedIn;
-	}
-
-	public void setLoggedIn(boolean loggedIn) {
-		isLoggedIn = loggedIn;
-	}
+	public API getAPI() {
+	    return network.getAPI();
+    }
 
 	public User getLoggedInUser() {
 		return loggedInUser;
 	}
 
-	public void setLoggedInUser(User user) {
+	public void setLoggedInUser(User user, String password) {
 		loggedInUser = user;
 
 		new SecurePreferences(getApplicationContext())
 				.edit()
-				.putString("userEmail", loggedInUser.getEmail())
-				.putString("userPassword", loggedInUser.getPassword())
+				.putString("userEmail", loggedInUser.email)
+				.putString("userPassword", password)
 				.apply();
+
+        Runnable runnable = () -> {
+            try {
+                Call<NewsFeedResponse> call = network.getAPI().getInstitutionNewsFeed(loggedInUser.institutionId);
+                Response<NewsFeedResponse> response = call.execute();
+
+                if (response.isSuccessful()) {
+                    NewsFeedResponse body = response.body();
+
+                    if (body != null) {
+                        loggedInUser.setNewsFeedId(body.newsFeedId);
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
 	}
+
+	public void login(@Nullable String email, @Nullable String password) {
+        getNetworkService().login(email, password);
+    }
 
 	public void logOut() {
 		loggedInUser = null;
+
+        network.setEmail(null);
+        network.setPassword(null);
 
 		new SecurePreferences(getApplicationContext())
 				.edit()
 				.remove("userPassword")
 				.apply();
 
+		// Remove any notifications that are still visible
+        NotificationManagerCompat manager = NotificationManagerCompat.from(getApplicationContext());
+        manager.cancelAll();
 
 		getMainActivity().showLogin();
 	}
@@ -136,18 +151,5 @@ public class Isegoria extends Application {
 
 	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
 		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	
-	public void login() {
-		network = new Network(this, username, password);
-		network.login();
 	}
 }

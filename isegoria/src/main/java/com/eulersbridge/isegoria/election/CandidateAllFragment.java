@@ -30,26 +30,35 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.ContactProfileFragment;
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Election;
+import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
+import com.eulersbridge.isegoria.network.PhotosResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CandidateAllFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateAllTableLayout;
-    private SearchView searchViewCandidatesAll;
-    private final ArrayList<String> firstnames = new ArrayList<>();
-    private final ArrayList<String> lastnames = new ArrayList<>();
+    private final ArrayList<String> firstNames = new ArrayList<>();
+    private final ArrayList<String> lastnNmes = new ArrayList<>();
     private final ArrayList<TableRow> rows = new ArrayList<>();
 	
 	private float dpWidth;
 
     private CandidateAllFragment candidateAllFragment;
-    private Network network;
+    private Isegoria isegoria;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,82 +70,90 @@ public class CandidateAllFragment extends Fragment {
 
 		dpWidth = displayMetrics.widthPixels;
 
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
-        candidateAllTableLayout.addView(dividierView);
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
+        candidateAllTableLayout.addView(dividerView);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-        network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getCandidates(new Network.CandidatesListener() {
-            @Override
-            public void onFetchSuccess(ArrayList<Candidate> candidates) {
-                addCandidates(candidates);
-            }
+        isegoria = (Isegoria)getActivity().getApplication();
 
-            @Override
-            public void onFetchFailure(Exception e) {}
-        });
+        long institutionId = isegoria.getLoggedInUser().institutionId;
 
-        searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
+        isegoria.getAPI().getElections(institutionId).enqueue(electionsCallback);
+
+        SearchView searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
         searchViewCandidatesAll.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextChange(String query) {
-                addAllRows();
-                if(query.length() != 0) {
-                    int cnt = 0;
-                    for(int i=0; i<rows.size(); i++) {
-                        View view = rows.get(i);
-                        if (view instanceof TableRow) {
-                            try {
-                                TableRow row = (TableRow) view;
-                                String firstname = firstnames.get(i);
-                                String lastname = lastnames.get(i);
-
-                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
-                                    candidateAllTableLayout.removeView(row);
-                                }
-                                cnt = cnt + 1;
-                            } catch(Exception ignored) {}
-                        }
-                    }
-                    candidateAllFragment.rootView.invalidate();
-
-                    return true;
-                }
-                return false;
+                return handleSearchQueryTextChange(query);
             }
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                addAllRows();
-                if(query.length() != 0) {
-                    int cnt = 0;
-                    for(int i=0; i<rows.size(); i++) {
-                        View view = rows.get(i);
-                        if (view instanceof TableRow) {
-                            try {
-                                TableRow row = (TableRow) view;
-                                String firstname = firstnames.get(i);
-                                String lastname = lastnames.get(i);
-
-                                if(!firstname.toLowerCase().contains(query.toLowerCase()) && !lastname.toLowerCase().contains(query.toLowerCase())) {
-                                    candidateAllTableLayout.removeView(row);
-                                }
-                                cnt = cnt + 1;
-                            } catch(Exception ignored) {}
-                        }
-                    }
-                    candidateAllFragment.rootView.invalidate();
-
-                    return true;
-                }
-                return false;
+                return handleSearchQueryTextChange(query);
             }
         });
         
 		return rootView;
 	}
+
+	private boolean handleSearchQueryTextChange(String query) {
+        addAllRows();
+
+        if (query.length() != 0) {
+            for (int i = 0; i < rows.size(); i++) {
+                View view = rows.get(i);
+                if (view instanceof TableRow) {
+                    try {
+                        TableRow row = (TableRow) view;
+                        String firstName = firstNames.get(i);
+                        String lastName = lastnNmes.get(i);
+
+                        if(!firstName.toLowerCase().contains(query.toLowerCase()) && !lastName.toLowerCase().contains(query.toLowerCase())) {
+                            candidateAllTableLayout.removeView(row);
+                        }
+
+                    } catch(Exception ignored) {}
+                }
+            }
+            candidateAllFragment.rootView.invalidate();
+
+            return true;
+        }
+        return false;
+    }
+
+    private final Callback<List<Election>> electionsCallback = new Callback<List<Election>>() {
+        @Override
+        public void onResponse(Call<List<Election>> call, Response<List<Election>> response) {
+            List<Election> elections = response.body();
+            if (elections != null && elections.size() > 0) {
+                Election election = elections.get(0);
+
+                isegoria.getAPI().getElectionCandidates(election.id).enqueue(candidatesCallback);
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Election>> call, Throwable t) {
+            t.printStackTrace();
+        }
+    };
+
+    private final Callback<List<Candidate>> candidatesCallback = new Callback<List<Candidate>>() {
+        @Override
+        public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
+            List<Candidate> candidates = response.body();
+            if (candidates != null) {
+                addCandidates(candidates);
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Candidate>> call, Throwable t) {
+            t.printStackTrace();
+        }
+    };
 
     private void addAllRows() {
         try {
@@ -149,21 +166,21 @@ public class CandidateAllFragment extends Fragment {
         }
     }
 
-    private void addCandidates(ArrayList<Candidate> candidates) {
+    private void addCandidates(List<Candidate> candidates) {
 	    if (getActivity() != null && candidates.size() > 0) {
 	        getActivity().runOnUiThread(() -> {
 
 	            for (Candidate candidate : candidates) {
                     addTableRow(
-                            candidate.getTicketId(),
-                            candidate.getUserId(),
+                            candidate.ticketId,
+                            candidate.userId,
                             "GRN",
                             "#4FBE3E",
-                            String.format("%s %s", candidate.getGivenName(), candidate.getFamilyName()),
+                            String.format("%s %s", candidate.givenName, candidate.familyName),
                             "",
-                            candidate.getPositionId(),
-                            candidate.getGivenName(),
-                            candidate.getFamilyName());
+                            candidate.positionId,
+                            candidate.givenName,
+                            candidate.familyName);
                 }
             });
         }
@@ -194,7 +211,20 @@ public class CandidateAllFragment extends Fragment {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
         candidateProfileView.setLayoutParams(layoutParams);
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-        network.getFirstPhoto(userId, candidateProfileView);
+
+        isegoria.getAPI().getPhotos(userId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
+
+                if (body != null && body.totalPhotos > 0) {
+                    GlideApp.with(CandidateAllFragment.this)
+                            .load(body.photos.get(0).thumbnailUrl)
+                            .into(candidateProfileView);
+                }
+            }
+        });
+
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 		
 		ImageView candidateProfileImage = new ImageView(getActivity());
@@ -222,15 +252,24 @@ public class CandidateAllFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        network.getTicketLabel(ticketId, new Network.TicketLabelListener() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
             @Override
-            public void onFetchSuccess(long ticketId, String colour, String code) {
-                textViewParty.setText(code);
-                textViewParty.setBackgroundColor(Color.parseColor(colour));
+            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
+                if (response.isSuccessful()) {
+
+                    Ticket ticket = response.body();
+
+                    if (ticket != null) {
+                        textViewParty.setText(ticket.code);
+                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) { }
+            public void onFailure(Call<Ticket> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
 		
         RectShape rect = new RectShape();
@@ -266,14 +305,21 @@ public class CandidateAllFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        network.getPositionText(positionId, new Network.PositionListener() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
             @Override
-            public void onFetchSuccess(long positionId, String name) {
-                textViewPosition.setText(name);
+            public void onResponse(Call<Position> call, Response<Position> response) {
+                if (response.isSuccessful()) {
+                    Position position = response.body();
+                    if (position != null) {
+                        textViewPosition.setText(position.name);
+                    }
+                }
             }
 
             @Override
-            public void onFetchFailure(Exception e) {}
+            public void onFailure(Call<Position> call, Throwable t) {
+                t.printStackTrace();
+            }
         });
         
         View dividierView = new View(getActivity());
@@ -313,8 +359,8 @@ public class CandidateAllFragment extends Fragment {
         
 		candidateAllTableLayout.addView(tr);
 		candidateAllTableLayout.addView(dividierView);
-        firstnames.add(firstName);
-        lastnames.add(lastName);
+        firstNames.add(firstName);
+        lastnNmes.add(lastName);
         rows.add(tr);
 	}
 	

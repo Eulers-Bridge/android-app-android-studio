@@ -13,9 +13,6 @@ import com.eulersbridge.isegoria.views.SliderBarPoint;
 
 import java.util.ArrayList;
 
-/**
- * Created by Anthony on 01/04/2015.
- */
 public class PersonalitySliderBar extends BaseSliderBar {
     private Paint disagreePaint;
     private Paint centrePaint;

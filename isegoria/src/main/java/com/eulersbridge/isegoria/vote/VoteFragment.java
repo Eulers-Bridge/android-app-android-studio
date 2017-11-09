@@ -16,13 +16,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.Network;
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.VoteLocation;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private ArrayAdapter<String> voteLocationArrayAdapter;
@@ -33,7 +36,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private View voteDivider1;
     private View voteDivider2;
     private TextView voteText;
-    public DatePicker datePicker;
+    private DatePicker datePicker;
     private TimePicker timePicker;
 
     private ViewPager mPager;
@@ -58,36 +61,41 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
 
         Button voteOkButton = rootView.findViewById(R.id.voteOkButton);
         voteOkButton.setOnClickListener(view -> mPager.setCurrentItem(1));
-        
-        MainActivity mainActivity = (MainActivity) getActivity();
-        Network network = mainActivity.getIsegoriaApplication().getNetwork();
-        network.getVoteLocations(new Network.VoteLocationsListener() {
+
+        Isegoria isegoria = (Isegoria) getActivity().getApplication();
+
+        long institutionId = isegoria.getLoggedInUser().institutionId;
+
+        isegoria.getAPI().getVoteLocations(institutionId).enqueue(new SimpleCallback<List<VoteLocation>>() {
             @Override
-            public void onFetchSuccess(ArrayList<VoteLocation> voteLocations) {
-                for (VoteLocation voteLocation : voteLocations) {
-                    voteLocationArray.add(voteLocation);
-                    voteLocationArrayAdapter.add(voteLocation.getName());
+            protected void handleResponse(Response<List<VoteLocation>> response) {
+                List<VoteLocation> locations = response.body();
+                if (locations != null) {
+                    for (VoteLocation voteLocation : locations) {
+                        voteLocationArray.add(voteLocation);
+                        voteLocationArrayAdapter.add(voteLocation.name);
+                    }
+
+                    showAll();
                 }
-
-                showAll();
             }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
-        });
-        network.getLatestElection(new Network.ElectionListener() {
-            @Override
-            public void onFetchSuccess(Election election) {
-                updateDatePicker(election);
-            }
-
-            @Override
-            public void onFetchFailure(Exception e) {}
         });
 
-        if (network.isReminderSet()) {
+        isegoria.getAPI().getElections(institutionId).enqueue(new SimpleCallback<List<Election>>() {
+            @Override
+            protected void handleResponse(Response<List<Election>> response) {
+                List<Election> elections = response.body();
+                if (elections != null && elections.size() > 0) {
+                    Election election = elections.get(0);
+                    updateDatePicker(election);
+                }
+            }
+        });
+
+        // TODO: Fix
+        /*if (isegoria.getNetwork().isReminderSet()) {
             mPager.setCurrentItem(2);
-        }
+        }*/
 
 		return rootView;
 	}
@@ -95,8 +103,8 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
 	private void updateDatePicker(Election election) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                datePicker.setMinDate(election.getStartVotingTimestamp());
-                datePicker.setMaxDate(election.getEndVotingTimestamp());
+                datePicker.setMinDate(election.startVotingTimestamp);
+                datePicker.setMaxDate(election.endVotingTimestamp);
             });
         }
     }
@@ -127,7 +135,7 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
         return spinnerLocation;
     }
 
-    public void showAll() {
+    private void showAll() {
         datePicker.setVisibility(ViewGroup.VISIBLE);
         timePicker.setVisibility(ViewGroup.VISIBLE);
         voteDivider1.setVisibility(ViewGroup.VISIBLE);

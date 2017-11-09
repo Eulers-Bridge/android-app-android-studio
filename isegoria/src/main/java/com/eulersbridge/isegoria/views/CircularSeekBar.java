@@ -370,7 +370,6 @@ public class CircularSeekBar extends View implements Runnable {
 	 */
 	private OnCircularSeekBarChangeListener mOnCircularSeekBarChangeListener;
 
-    private CircularSeekBar circularSeekBar;
     private String topLine = "";
     private String bottomLine = "";
 
@@ -582,7 +581,6 @@ public class CircularSeekBar extends View implements Runnable {
 	 * Initialize the {@code Path} objects with the appropriate values.
 	 */
 	private void initPaths() {
-        circularSeekBar = this;
 		mCirclePath = new Path();
 		mCirclePath.addArc(mCircleRectF, mStartAngle, mTotalCircleDegrees);
 

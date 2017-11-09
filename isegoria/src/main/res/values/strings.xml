@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="TAG">com.eulersbridge.isegoria</string>
     <string name="app_name">Isegoria</string>
 
     <string name="isegoria_logo_content_description">Isegoria Logo</string>
@@ -37,6 +36,8 @@
     <string name="user_sign_up_first_password">New Password</string>
     <string name="user_sign_up_confirm_password">Confirm Password</string>
     <string name="user_sign_up_next_button">Next</string>
+    <string name="user_sign_up_choose_country_hint">Select Country</string>
+    <string name="user_sign_up_choose_institution_hint">Select Institution</string>
 
     <!-- Email verification -->
     <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
