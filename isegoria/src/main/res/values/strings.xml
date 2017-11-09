@@ -65,6 +65,9 @@
     <string name="election_overview_subheading">Overview</string>
     <string name="election_overview_process_subheading">Process</string>
 
+    <string name="election_efficacy_survey_message">Welcome to your election centre.\nLearn about your political efficacy by completing this survey.</string>
+    <string name="election_efficacy_survey_start_button">Start Survey</string>
+
     <!-- Voting -->
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
     <string name="vote_sign_pledge_next_button">Next</string>
@@ -136,9 +139,6 @@
     <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
 
     <!-- Misc -->
-    <string name="drawer_open" tools:keep="@string/drawer_open">Drawer Open</string>
-    <string name="drawer_close" tools:keep="@string/drawer_close">Drawer Close</string>
-
     <string name="contact_profile_picture_content_description">Contact profile picture</string>
 
     <string name="event_detail_activity_back_button_content_description">Back to Events</string>

@@ -17,7 +17,6 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.VoteReminder;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
-import com.eulersbridge.isegoria.election.SelfEfficacyQuestionsFragment;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.R;
@@ -84,17 +83,6 @@ public class VoteFragmentPledge extends Fragment {
             VoteReminder reminder = new VoteReminder(userEmail, electionId, location, date);
 
             isegoria.getAPI().addVoteReminder(userEmail, reminder).enqueue(new IgnoredCallback<>());
-        });
-
-        Button selfEfficacyStartButton = rootView.findViewById(R.id.selfEfficacyStartButton);
-        selfEfficacyStartButton.setOnClickListener(view -> {
-            SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
-
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .add(R.id.container, selfEfficacyQuestionsFragment)
-                    .commit();
         });
 
         return rootView;

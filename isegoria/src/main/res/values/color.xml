@@ -23,4 +23,6 @@
 
     <color name="self_efficacy_slider_2">#647EC7</color>
     <color name="self_efficacy_slider_3">#B4629A</color>
+
+    <color name="election_efficacy_overlay">#E6FFFFFF</color> <!-- 90% opacity white -->
 </resources>

@@ -13,6 +13,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.views.SliderBarPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BaseSliderBar extends View {
 
@@ -25,7 +26,7 @@ public class BaseSliderBar extends View {
     private final int circleStrokeWidth = 4;
     protected final int horizontalPadding = (circleRadius + (6 * circleStrokeWidth))/2;
 
-    private final ArrayList<SliderBarPoint> points = new ArrayList<>();
+    private final List<SliderBarPoint> points = new ArrayList<>();
 
     private int dragX = -1;
     private SliderBarPoint currentPoint;
@@ -56,7 +57,7 @@ public class BaseSliderBar extends View {
         points.add(point);
     }
 
-    protected ArrayList<SliderBarPoint> getPoints() {
+    protected List<SliderBarPoint> getPoints() {
         return points;
     }
 

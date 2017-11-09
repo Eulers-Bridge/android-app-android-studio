@@ -4,6 +4,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/election_frame">
+    android:background="@color/white">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/election_frame" />
+
+    <LinearLayout
+        android:id="@+id/election_efficacy_overlay"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/election_efficacy_overlay"
+        android:visibility="gone"
+        android:padding="32dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textSize="18sp"
+            android:lineSpacingMultiplier="1.2"
+            android:text="@string/election_efficacy_survey_message"/>
+
+        <Button
+            android:id="@+id/election_efficacy_overlay_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:minHeight="48dip"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingHorizontal="@dimen/activity_horizontal_margin"
+            android:text="@string/election_efficacy_survey_start_button"
+            android:theme="@style/PositiveButton"/>
+    </LinearLayout>
 
 </FrameLayout>

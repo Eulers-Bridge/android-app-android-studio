@@ -65,16 +65,6 @@
             android:text="@string/vote_sign_pledge_next_button"
             android:textColor="#52BB42"
             android:layout_gravity="center" />
-
-        <Button
-            android:id="@+id/selfEfficacyStartButton"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/green_button"
-            android:text="@string/vote_sign_pledge_self_efficacy_button"
-            android:textColor="#52BB42"
-            android:layout_gravity="center" />
     </LinearLayout>
 
 </LinearLayout>
