@@ -11,8 +11,9 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 
-public class ElectionMasterFragment extends Fragment {
+public class ElectionMasterFragment extends Fragment implements TitledFragment {
 
 	private ElectionOverviewFragment overviewFragment;
 	private CandidateFragment candidateFragment;
@@ -30,7 +31,6 @@ public class ElectionMasterFragment extends Fragment {
 		// Ensure options menu from another fragment is not carried over
 		mainActivity.invalidateOptionsMenu();
 
-		mainActivity.setToolbarTitle(getString(R.string.section_title_election));
         setupTabLayout();
 
 		overviewFragment = new ElectionOverviewFragment();
@@ -39,6 +39,11 @@ public class ElectionMasterFragment extends Fragment {
         showFirstTab();
 
 		return rootView;
+	}
+
+	@Override
+	public String getTitle() {
+		return getString(R.string.section_title_election);
 	}
 
 	public void setTabLayout(TabLayout tabLayout) {

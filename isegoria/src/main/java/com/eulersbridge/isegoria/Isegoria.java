@@ -95,7 +95,7 @@ public class Isegoria extends Application {
 	
 	public @NonNull NetworkService getNetworkService() {
         if (network == null) {
-            network = new NetworkService(this, null, null);
+            network = new NetworkService(this);
         }
 
 		return network;
@@ -117,6 +117,8 @@ public class Isegoria extends Application {
 				.putString("userEmail", loggedInUser.email)
 				.putString("userPassword", password)
 				.apply();
+
+        setupAppShortcuts();
 
         Runnable runnable = () -> {
             try {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -8,130 +10,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#64d3d3d3"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp">
+        android:padding="@dimen/activity_horizontal_margin">
 
         <ProgressBar
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" />
+            android:id="@+id/profile_tasks_progress_bar" />
 
         <TextView
-            android:id="@+id/taskLevelField"
+            android:id="@+id/profile_tasks_progress_level_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text=""
-            android:textColor="#ff575757"
+            android:layout_marginTop="4dp"
+            android:textColor="#575757"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingBottom="2dp" />
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/taskLevelDesc"
+            android:id="@+id/profile_tasks_progress_description_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text=""
-            android:textColor="#ff575757"
+            android:layout_marginTop="8dp"
+            android:textColor="#575757"
             android:textSize="12sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ScrollView
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/taskProgressLayout"
-        android:fillViewport="false">
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:text="@string/profile_tasks_progress_section_title_completed"
+        android:textColor="#575757"
+        android:textSize="15sp"
+        android:textStyle="bold" />
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/profile_tasks_progress_completed_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dip"
-                    android:background="#838a8a8a" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="@string/profile_tasks_progress_section_title_remaining"
+        android:textColor="#575757"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
 
-                <RelativeLayout
-                    android:id="@+id/relativeLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#64d3d3d3" >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Completed"
-                        android:textColor="#ff575757"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp" />
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/completedTasksLayout"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dip"
-                    android:background="#838a8a8a" />
-                <RelativeLayout
-                    android:id="@+id/relativeLayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#64d3d3d3" >
-
-                    <TextView
-                        android:id="@+id/mytextview2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:text="Remaining"
-                        android:textColor="#ff575757"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:paddingTop="2dp"
-                        android:paddingBottom="2dp" />
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/remainingTasksLayout"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/profile_tasks_progress_remaining_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"/>
 </LinearLayout>

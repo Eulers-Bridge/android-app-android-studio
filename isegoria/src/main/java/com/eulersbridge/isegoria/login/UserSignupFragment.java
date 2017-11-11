@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Country;
@@ -25,7 +26,7 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
+public class UserSignupFragment extends Fragment implements OnItemSelectedListener, TitledFragment {
 	private List<Country> countries;
 	private ArrayAdapter<String> spinnerArrayAdapter;
 	private ArrayAdapter<String> spinnerInstitutionArrayAdapter;
@@ -86,8 +87,13 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 		
 		return rootView;
 	}
-	
-	private void setCountries(List<Country> countries) {
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
+
+    private void setCountries(List<Country> countries) {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {

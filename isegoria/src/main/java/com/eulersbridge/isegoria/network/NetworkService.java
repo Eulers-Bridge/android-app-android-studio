@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.network;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -44,10 +43,8 @@ public class NetworkService {
 
     private boolean needsSetup;
 
-    public NetworkService(Isegoria application, @Nullable String email, @Nullable String password) {
+    public NetworkService(Isegoria application) {
         this.application = application;
-        this.email = email;
-        this.password = password;
 
         Moshi moshi = new Moshi.Builder()
                 .add(new LenientLongAdapter())

@@ -101,8 +101,7 @@
 		android:theme="@style/SignUpButton" />
 
 	<TextView
-		android:id="@+id/loginSmallTextView"
-		android:layout_width="wrap_content"
+        android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_gravity="center"
 		android:layout_marginTop="32dp"

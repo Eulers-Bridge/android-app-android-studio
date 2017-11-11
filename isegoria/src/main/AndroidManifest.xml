@@ -76,6 +76,16 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <activity
+            android:name=".profile.AboutActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AboutTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".profile.SettingsActivity" />
+        </activity>
+
         <service
             android:name=".notifications.FirebaseIDService"
             android:exported="false">

@@ -2,40 +2,28 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/scrollView4"
-    android:background="#ffffffff">
+    android:layout_height="wrap_content">
+
     <TableLayout
         android:id="@+id/candidatePositionTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="0,1"
-         >
+        android:stretchColumns="0,1">
 
         <TableRow
-            android:id="@+id/tableRow1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-
-        </TableRow>
+            android:layout_height="wrap_content"  />
 
         <TableRow
-            android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
+            android:layout_height="wrap_content"  />
 
         <TableRow
-            android:id="@+id/tableRow3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
+            android:layout_height="wrap_content"  />
 
         <TableRow
-            android:id="@+id/tableRow4"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-        </TableRow>
+            android:layout_height="wrap_content"  />
     </TableLayout>
 </ScrollView>

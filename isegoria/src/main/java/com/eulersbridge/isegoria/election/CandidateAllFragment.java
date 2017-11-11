@@ -252,23 +252,15 @@ public class CandidateAllFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
-            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
-                if (response.isSuccessful()) {
+            protected void handleResponse(Response<Ticket> response) {
+                Ticket ticket = response.body();
 
-                    Ticket ticket = response.body();
-
-                    if (ticket != null) {
-                        textViewParty.setText(ticket.code);
-                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
-                    }
+                if (ticket != null) {
+                    textViewParty.setText(ticket.code);
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Ticket> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 		
@@ -305,20 +297,13 @@ public class CandidateAllFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
+            protected void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
             }
         });
         

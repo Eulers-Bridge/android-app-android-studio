@@ -1,35 +1,44 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
-import java.util.List;
+import com.eulersbridge.isegoria.models.Photo;
 
-class PhotoPagerAdapter extends FragmentPagerAdapter {
-    private final List<Fragment> fragments;
+import org.parceler.Parcels;
 
-    PhotoPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+class PhotoPagerAdapter extends FragmentStatePagerAdapter {
+
+    private final PhotoAdapter photoAdapter;
+
+    PhotoPagerAdapter(FragmentManager fm, PhotoAdapter photoAdapter) {
         super(fm);
-        this.fragments = fragments;
-    }
-
-    public void addFragment(Fragment fragment) {
-        fragments.add(fragment);
+        this.photoAdapter = photoAdapter;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return this.fragments.get(position);
+
+        Photo photo = photoAdapter.getItem(position);
+        PhotoViewFragment viewFragment = new PhotoViewFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable("photo", Parcels.wrap(photo));
+        viewFragment.setArguments(args);
+
+        return viewFragment;
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
-        return "Profile" + String.valueOf(position+1);
+    public void restoreState(Parcelable state, ClassLoader loader) {
+        // Intentionally empty to avoid restoring fragment state
     }
 
     @Override
     public int getCount() {
-        return this.fragments.size();
+        return photoAdapter.getItemCount();
     }
 }

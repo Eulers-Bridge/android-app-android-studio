@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.network.PollsResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
@@ -26,7 +26,7 @@ import java.util.Vector;
 
 import retrofit2.Response;
 
-public class PollFragment extends Fragment {
+public class PollFragment extends Fragment implements TitledFragment {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -40,8 +40,6 @@ public class PollFragment extends Fragment {
 
         // Ensure options menu from another fragment is not carried over
         getActivity().invalidateOptionsMenu();
-
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_poll));
 
 		fragments = new Vector<>();
 
@@ -64,6 +62,11 @@ public class PollFragment extends Fragment {
 		
 		return rootView;
 	}
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.section_title_poll);
+    }
 
     private void setupViewPager(View rootView) {
         if (rootView == null) rootView = getView();

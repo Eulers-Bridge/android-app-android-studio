@@ -22,10 +22,11 @@ import android.graphics.Typeface;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 import com.securepreferences.SecurePreferences;
 
-public class LoginScreenFragment extends Fragment {
+public class LoginScreenFragment extends Fragment implements TitledFragment {
 
     @SuppressWarnings("deprecation")
 	@Override
@@ -89,6 +90,11 @@ public class LoginScreenFragment extends Fragment {
 		
 		return rootView;
 	}
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
 
     public void setTabLayout(TabLayout tabLayout) {
         tabLayout.setVisibility(View.GONE);

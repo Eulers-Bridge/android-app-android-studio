@@ -1,17 +1,22 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.User;
@@ -31,35 +36,29 @@ import retrofit2.Response;
 public class PhotoViewFragment extends Fragment {
 	private View rootView;
 
-	private ImageView photoView;
+	private SubsamplingScaleImageView photoView;
     private ImageView photoStar;
     private TextView photoLikes;
 
-	private DisplayMetrics displayMetrics;
+    private boolean setLiked = false;
 
     private long photoId;
-
-    private boolean setLiked = false;
 	
-	@Override
+	@SuppressLint("ClickableViewAccessibility")
+    @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.photo_view_fragment, container, false);
 
-		Bundle bundle = this.getArguments();
-		photoId = bundle.getInt("PhotoId");
-        Photo photo = Parcels.unwrap(bundle.getParcelable("photo"));
+		Photo photo = Parcels.unwrap(getArguments().getParcelable("photo"));
+        photoId = photo.id;
 
         Isegoria isegoria = (Isegoria)getActivity().getApplication();
         User loggedInUser = isegoria.getLoggedInUser();
 
-        displayMetrics = getActivity().getResources().getDisplayMetrics();
-
         photoView = rootView.findViewById(R.id.photoView);
         photoStar = rootView.findViewById(R.id.photoFlag);
         photoLikes = rootView.findViewById(R.id.photoLikes);
-
-        setupPhotoView();
 
         final ImageView starView = rootView.findViewById(R.id.photoStar);
         starView.setOnClickListener(view -> {
@@ -83,42 +82,35 @@ public class PhotoViewFragment extends Fragment {
             }
         });
 
-        if (photo == null) {
-            isegoria.getAPI().getPhoto(photoId).enqueue(new Callback<Photo>() {
-                @Override
-                public void onResponse(Call<Photo> call, Response<Photo> response) {
-                    Photo photo = response.body();
-                    if (photo != null) {
-                        populatePhotoData(photo.title, photo.dateTimestamp, photo.hasInappropriateContent, photo.likeCount);
+        populatePhotoData(photo.title, photo.dateTimestamp, photo.hasInappropriateContent, photo.likeCount);
+
+        GlideApp.with(this)
+                .asBitmap()
+                .load(photo.thumbnailUrl)
+                .override(Target.SIZE_ORIGINAL)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        photoView.setImage(ImageSource.bitmap(resource));
                     }
-                }
+                });
 
-                @Override
-                public void onFailure(Call<Photo> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
-
-            isegoria.getAPI().getPhotoLiked(photoId, loggedInUser.email).enqueue(new Callback<LikedResponse>() {
-                @Override
-                public void onResponse(Call<LikedResponse> call, Response<LikedResponse> response) {
-                    LikedResponse  likedResponse = response.body();
+        isegoria.getAPI().getPhotoLiked(photoId, loggedInUser.email).enqueue(new Callback<LikedResponse>() {
+            @Override
+            public void onResponse(Call<LikedResponse> call, Response<LikedResponse> response) {
+                if (response.isSuccessful()) {
+                    LikedResponse likedResponse = response.body();
                     if (likedResponse != null && likedResponse.liked) {
                         initiallyLiked();
                     }
                 }
+            }
 
-                @Override
-                public void onFailure(Call<LikedResponse> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
-
-        } else {
-            populatePhotoData(photo.title, photo.dateTimestamp, photo.hasInappropriateContent, photo.likeCount);
-
-            GlideApp.with(this).load(photo.thumbnailUrl).into(photoView);
-        }
+            @Override
+            public void onFailure(Call<LikedResponse> call, Throwable t) {
+                // Ignored (404 = user has not liked)
+            }
+        });
 
 		return rootView;
 	}
@@ -150,18 +142,4 @@ public class PhotoViewFragment extends Fragment {
         photoDateTextView.setText(dateStr);
         photoLikesTextView.setText(String.valueOf(numOfLikes));
     }
-	
-	private void setupPhotoView() {
-        getActivity().runOnUiThread(() -> {
-            try {
-                photoView.setScaleType(ScaleType.CENTER_CROP);
-                photoView.getLayoutParams().width = displayMetrics.widthPixels;
-                photoView.getLayoutParams().height = (int) (displayMetrics.heightPixels / 2.5);
-                photoView.setPadding(0, 0, 0, (displayMetrics.heightPixels / 20));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-	}
 }

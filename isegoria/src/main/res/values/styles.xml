@@ -18,6 +18,10 @@
         <item name="colorAccent">@color/lightBlue</item>
     </style>
 
+    <style name="AboutTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/about_background</item>
+    </style>
+
     <style name="DetailTheme" parent="AppTheme">
 
     </style>

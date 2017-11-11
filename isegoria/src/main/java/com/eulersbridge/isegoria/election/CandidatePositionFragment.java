@@ -33,12 +33,11 @@ import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CandidatePositionFragment extends Fragment {
@@ -62,18 +61,13 @@ public class CandidatePositionFragment extends Fragment {
 
         isegoria = (Isegoria)getActivity().getApplication();
 
-        isegoria.getAPI().getPositionCandidates(positionId).enqueue(new Callback<List<Candidate>>() {
+        isegoria.getAPI().getPositionCandidates(positionId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
-            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
+            public void handleResponse(Response<List<Candidate>> response) {
                 List<Candidate> candidates = response.body();
                 if (candidates != null && candidates.size() > 0) {
                     addCandidates(candidates);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Candidate>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 		
@@ -121,22 +115,15 @@ public class CandidatePositionFragment extends Fragment {
 		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 
-		isegoria.getAPI().getPhoto(userId).enqueue(new Callback<Photo>() {
+		isegoria.getAPI().getPhoto(userId).enqueue(new SimpleCallback<Photo>() {
             @Override
-            public void onResponse(Call<Photo> call, Response<Photo> response) {
-                if (response.isSuccessful()) {
-                    Photo photo = response.body();
-                    if (photo != null) {
-                        GlideApp.with(CandidatePositionFragment.this)
-                                .load(photo.thumbnailUrl)
-                                .into(candidateProfileView);
-                    }
+            protected void handleResponse(Response<Photo> response) {
+                Photo photo = response.body();
+                if (photo != null) {
+                    GlideApp.with(CandidatePositionFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .into(candidateProfileView);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Photo> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 		
@@ -165,21 +152,14 @@ public class CandidatePositionFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
-            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
-                if (response.isSuccessful()) {
-                    Ticket ticket = response.body();
-                    if (ticket != null) {
-                        textViewParty.setText(ticket.code);
-                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
-                    }
+            protected void handleResponse(Response<Ticket> response) {
+                Ticket ticket = response.body();
+                if (ticket != null) {
+                    textViewParty.setText(ticket.code);
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Ticket> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -208,20 +188,13 @@ public class CandidatePositionFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
+            public void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
             }
         });
         

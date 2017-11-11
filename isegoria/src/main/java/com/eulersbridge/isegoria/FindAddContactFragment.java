@@ -31,6 +31,7 @@ import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.GenericUser;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
@@ -39,7 +40,7 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public class FindAddContactFragment extends Fragment {
+public class FindAddContactFragment extends Fragment implements TitledFragment {
     private View rootView;
 
     private TableLayout searchResultsTableLayout;
@@ -69,7 +70,7 @@ public class FindAddContactFragment extends Fragment {
         friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
 
         mainActivity = (MainActivity) getActivity();
-        mainActivity.setToolbarTitle(getString(R.string.section_title_friends));
+        mainActivity.setShowNavigationBackButton(true);
 
         isegoria = (Isegoria)getActivity().getApplication();
 
@@ -112,12 +113,17 @@ public class FindAddContactFragment extends Fragment {
         return rootView;
     }
 
+    public String getTitle() {
+        return getString(R.string.section_title_friends);
+    }
+
     @Override
     public void onDetach() {
         super.onDetach();
 
         mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
         mainActivity.getTabLayout().setVisibility(View.VISIBLE);
+        mainActivity.setShowNavigationBackButton(false);
     }
 
     private final SimpleCallback<List<User>> searchCallback = new SimpleCallback<List<User>>() {

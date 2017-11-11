@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,10 +42,13 @@ import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.utilities.BottomNavigationViewHelper;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
 import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
+import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.securepreferences.SecurePreferences;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +56,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-	private Fragment mContent;
+	private TitledFragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
 
@@ -184,22 +188,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	}
 
 	public void setToolbarVisible(boolean visible) {
-		if (getSupportActionBar() != null) {
-			if (visible) {
-				getSupportActionBar().show();
-			} else {
-				getSupportActionBar().hide();
-			}
+		if (getSupportActionBar() == null) return;
+
+		if (visible) {
+			getSupportActionBar().show();
+		} else {
+			getSupportActionBar().hide();
 		}
 	}
 
-	private void setShowNavigationBackButton(boolean show) {
+	@Override
+	public boolean onSupportNavigateUp() {
+		onBackPressed();
+		return true;
+	}
+
+	public void setShowNavigationBackButton(boolean show) {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(show);
 		getSupportActionBar().setDisplayShowHomeEnabled(show);
 	}
 
 	private void setNavigationEnabled(boolean enabled) {
-        navigationView.setEnabled(enabled);
+        navigationView.setVisibility(enabled? View.VISIBLE : View.GONE);
 	}
 
 	public TabLayout getTabLayout() {
@@ -259,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		if (currentNavigationId != newNavigationId) {
 			switch(newNavigationId) {
 				case R.id.navigation_feed:
-					final FeedFragment feedFragment = new FeedFragment();
+					FeedFragment feedFragment = new FeedFragment();
 					feedFragment.setTabLayout(tabLayout);
 
 					switchContent(feedFragment);
@@ -270,22 +280,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 					break;
 
 				case R.id.navigation_poll:
-					final PollFragment pollFragment = new PollFragment();
+					PollFragment pollFragment = new PollFragment();
 					pollFragment.setTabLayout(tabLayout);
 
 					switchContent(pollFragment);
 					break;
 
-				/*case R.id.navigation_vote:
-					VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
+				case R.id.navigation_vote:
+					final VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
 					voteFragment.setTabLayout(tabLayout);
 
 					switchContent(voteFragment);
-					break;*/
+					break;
 
 				case R.id.navigation_profile:
-
-					final ProfileViewPagerFragment profileFragment = new ProfileViewPagerFragment();
+					ProfileViewPagerFragment profileFragment = new ProfileViewPagerFragment();
 					profileFragment.setTabLayout(tabLayout);
 
 					switchContent(profileFragment);
@@ -452,38 +461,39 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switchContent(new VoteFragmentDone());
     }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState){
-		super.onSaveInstanceState(outState);
-
-		if (mContent.isAdded()) {
-			getSupportFragmentManager().putFragment(outState, "mContent", mContent);
-		}
-	}
-
 	@UiThread
-	public void switchContent(Fragment fragment) {
+	public void switchContent(TitledFragment fragment) {
 		switchContent(fragment, true);
 	}
 
 	@UiThread
-	private void switchContent(Fragment fragment, boolean popBackStack) {
+	private void switchContent(TitledFragment fragment, boolean popBackStack) {
+        WeakReference<MainActivity> wrSelf = new WeakReference<>(this);
+
 	    runOnUiThread(() -> {
+	        if (wrSelf.get() == null || wrSelf.get().isFinishing()) return;
+
             mContent = fragment;
 
             if (popBackStack) {
-                getSupportFragmentManager().popBackStack();
+                getSupportFragmentManager().popBackStackImmediate();
             }
 
             FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, fragment, fragment.getClass().toString());
+                    .replace(R.id.container, (Fragment)fragment, fragment.getClass().toString());
 
             if (!popBackStack) {
                 transaction.addToBackStack(null);
             }
 
-            transaction.commit();
+            transaction
+					.runOnCommit(() -> {
+                        String title = fragment.getTitle();
+
+                        if (!TextUtils.isEmpty(title)) setToolbarTitle(title);
+                    })
+					.commitAllowingStateLoss();
         });
 	}
 }

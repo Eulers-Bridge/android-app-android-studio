@@ -16,13 +16,12 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.LikedResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class NewsDetailActivity extends AppCompatActivity {
@@ -53,17 +52,12 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         isegoria = (Isegoria)getApplication();
 
-        isegoria.getAPI().getNewsArticleLiked(article.id, isegoria.getLoggedInUser().email).enqueue(new Callback<LikedResponse>() {
+        isegoria.getAPI().getNewsArticleLiked(article.id, isegoria.getLoggedInUser().email).enqueue(new SimpleCallback<LikedResponse>() {
             @Override
-            public void onResponse(Call<LikedResponse> call, Response<LikedResponse> response) {
+            public void handleResponse(Response<LikedResponse> response) {
                 LikedResponse likedResponse = response.body();
 
                 if (likedResponse != null && likedResponse.liked) initiallyLiked();
-            }
-
-            @Override
-            public void onFailure(Call<LikedResponse> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 

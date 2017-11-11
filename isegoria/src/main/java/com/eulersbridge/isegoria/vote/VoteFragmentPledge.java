@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.VoteReminder;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
@@ -27,7 +28,7 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public class VoteFragmentPledge extends Fragment {
+public class VoteFragmentPledge extends Fragment implements TitledFragment {
     private NonSwipeableViewPager mPager;
     private VoteFragment voteFragment;
 
@@ -86,6 +87,11 @@ public class VoteFragmentPledge extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
     }
 
     public void setTabLayout(TabLayout tabLayout) {

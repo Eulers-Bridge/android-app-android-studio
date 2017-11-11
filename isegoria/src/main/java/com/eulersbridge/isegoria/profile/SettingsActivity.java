@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -116,12 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         final TextView aboutThisAppButton = findViewById(R.id.aboutThisAppButton);
-        aboutThisAppButton.setOnClickListener(view -> getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container, new AboutScreenFragment())
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .addToBackStack(null)
-                .commit());
+        aboutThisAppButton.setOnClickListener(view -> startActivity(new Intent(this, AboutActivity.class)));
 
         final TextView changePhotoButton = findViewById(R.id.changePhotoButton);
         changePhotoButton.setOnClickListener(view -> {

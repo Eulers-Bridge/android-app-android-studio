@@ -47,8 +47,6 @@ import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 @SuppressWarnings("deprecation")
@@ -97,20 +95,13 @@ public class CandidateTicketDetailFragment extends Fragment {
         }
 
         isegoria = (Isegoria)getActivity().getApplication();
-        isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new Callback<List<Candidate>>() {
+        isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
-            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
-                if (response.isSuccessful()) {
-                    List<Candidate> candidates = response.body();
-                    if (candidates != null) {
-                        addCandidates(candidates);
-                    }
+            public void handleResponse(Response<List<Candidate>> response) {
+                List<Candidate> candidates = response.body();
+                if (candidates != null) {
+                    addCandidates(candidates);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Candidate>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -132,24 +123,17 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        isegoria.getAPI().getUserSupportedTickets(isegoria.getLoggedInUser().email).enqueue(new Callback<List<Ticket>>() {
+        isegoria.getAPI().getUserSupportedTickets(isegoria.getLoggedInUser().email).enqueue(new SimpleCallback<List<Ticket>>() {
             @Override
-            public void onResponse(Call<List<Ticket>> call, Response<List<Ticket>> response) {
-                if (response.isSuccessful()) {
-                    List<Ticket> tickets = response.body();
-                    if (tickets != null && tickets.size() > 0) {
-                        for (Ticket ticket : tickets) {
-                            if (ticket.id == ticketId) {
-                                getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
-                            }
+            public void handleResponse(Response<List<Ticket>> response) {
+                List<Ticket> tickets = response.body();
+                if (tickets != null && tickets.size() > 0) {
+                    for (Ticket ticket : tickets) {
+                        if (ticket.id == ticketId) {
+                            getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
                         }
                     }
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Ticket>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -298,20 +282,13 @@ public class CandidateTicketDetailFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
+            public void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
             }
         });
         

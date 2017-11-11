@@ -156,7 +156,7 @@ public class PhotosFragment extends Fragment {
 	        textViewArticle.setOnClickListener(view12 -> {
 				PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
 				Bundle args = new Bundle();
-				args.putInt("albumId", albumId);
+				args.putLong("albumId", albumId);
 				albumFragment.setArguments(args);
 
 				getActivity().getSupportFragmentManager()
@@ -169,7 +169,7 @@ public class PhotosFragment extends Fragment {
 	       view.setOnClickListener(view1 -> {
 			   PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
 			   Bundle args = new Bundle();
-			   args.putInt("albumId", albumId);
+			   args.putLong("albumId", albumId);
 			   albumFragment.setArguments(args);
 
 			   getActivity().getSupportFragmentManager()

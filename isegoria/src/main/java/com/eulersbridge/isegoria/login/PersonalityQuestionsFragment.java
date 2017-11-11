@@ -8,14 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-public class PersonalityQuestionsFragment extends Fragment {
+public class PersonalityQuestionsFragment extends Fragment implements TitledFragment {
     private TabLayout tabLayout;
     private NonSwipeableViewPager viewPager;
 
@@ -23,12 +23,15 @@ public class PersonalityQuestionsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.personality_questions_fragment, container, false);
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_personality_questions));
-
         setupViewPager(rootView);
         setupTabLayout();
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.section_title_personality_questions);
     }
 
     private void setupViewPager(View rootView) {

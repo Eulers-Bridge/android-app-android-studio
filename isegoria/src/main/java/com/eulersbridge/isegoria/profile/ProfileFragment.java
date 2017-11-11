@@ -1,14 +1,14 @@
 package com.eulersbridge.isegoria.profile;
 
-import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +38,6 @@ import java.util.List;
 import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
-	private View rootView;
 
     private TextView friendsNumTextView;
     private TextView groupNumTextView;
@@ -49,13 +48,15 @@ public class ProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
-    private Isegoria isegoria;
+    private final TaskAdapter taskAdapter = new TaskAdapter(this);
 
-	@Override
+    private RecyclerView tasksListView;
+
+    @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-        isegoria = (Isegoria) getActivity().getApplication();
+        Isegoria isegoria = (Isegoria) getActivity().getApplication();
 
         MainActivity mainActivity = (MainActivity) getActivity();
 
@@ -66,7 +67,6 @@ public class ProfileFragment extends Fragment {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
         photoImageView.setLayoutParams(layoutParams);
 
-
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
 
         View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
@@ -74,21 +74,8 @@ public class ProfileFragment extends Fragment {
         friendsNumTextView.setOnClickListener(friendsClickListener);
         rootView.findViewById(R.id.friendsTitle).setOnClickListener(friendsClickListener);
 
-
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
-
-        Long userId = isegoria.getLoggedInUser().getId();
-
-        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
-            @Override
-            protected void handleResponse(Response<List<Badge>> response) {
-                List<Badge> remainingBadges = response.body();
-                if (remainingBadges != null) {
-                    updateRemainingBadgesCount(remainingBadges.size());
-                }
-            }
-        });
 
         /*final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
         showProgressButton.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +93,8 @@ public class ProfileFragment extends Fragment {
         circularSeekBar1.setCircleProgressColor(Color.parseColor("#2C9F47"));
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
+
+        setupTasksListView(rootView);
 
         User user = isegoria.getLoggedInUser();
 
@@ -134,6 +123,18 @@ public class ProfileFragment extends Fragment {
         updateCompletedBadgesCount(user.completedBadgesCount);
         updateCompletedTasksCount(user.completedTasksCount);
         updateExperience(user.level);
+
+        Long userId = isegoria.getLoggedInUser().getId();
+
+        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
+            @Override
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> remainingBadges = response.body();
+                if (remainingBadges != null) {
+                    updateRemainingBadgesCount(remainingBadges.size());
+                }
+            }
+        });
 
         TextView institutionTextView = rootView.findViewById(R.id.profile_institution);
 
@@ -173,7 +174,7 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void handleResponse(Response<List<Task>> response) {
                 List<Task> tasks = response.body();
-                if (tasks != null) addTasks(tasks);
+                if (tasks != null) setTasks(tasks);
             }
         });
 
@@ -189,6 +190,17 @@ public class ProfileFragment extends Fragment {
 
 		return rootView;
 	}
+
+	private void setupTasksListView(View rootView) {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        tasksListView = rootView.findViewById(R.id.profile_tasks_list_view);
+        tasksListView.setLayoutManager(layoutManager);
+        tasksListView.setAdapter(taskAdapter);
+        tasksListView.setNestedScrollingEnabled(false);
+
+        tasksListView.setDrawingCacheEnabled(true);
+        tasksListView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
+    }
 
     @UiThread
     private void updateCompletedBadgesCount(long count) {
@@ -247,90 +259,22 @@ public class ProfileFragment extends Fragment {
         t4.start();
     }
 
-    private void addTasks(@NonNull List<Task> tasks) {
+    private void setTasks(@NonNull List<Task> tasks) {
 	    if (getActivity() != null) {
+	        taskAdapter.replaceItems(tasks);
+	        taskAdapter.notifyDataSetChanged();
+
 	        getActivity().runOnUiThread(() -> {
-	            for (Task task : tasks) {
-	                addTask(task.id, task.action, task.xpValue);
-                }
+	            int heightDp = 40 * tasks.size();
+
+                int heightPx = Math.round(TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, heightDp, getResources().getDisplayMetrics()));
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
+
+                tasksListView.setLayoutParams(layoutParams);
             });
         }
-    }
-
-    @UiThread
-    private void addTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
-
-        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 43.33333333, getResources().getDisplayMetrics());
-        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 3.333333333, getResources().getDisplayMetrics());
-        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 10, getResources().getDisplayMetrics());
-
-        RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.START);
-        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin1));
-
-        LinearLayout leftLayout = new LinearLayout(getActivity());
-        LinearLayout rightLayout = new LinearLayout(getActivity());
-
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        rightLayout.setLayoutParams(lp);
-
-        LinearLayout.LayoutParams layoutParams =
-                new LinearLayout.LayoutParams(paddingMargin1, paddingMargin1);
-        ImageView iconImage = new ImageView(getActivity());
-        iconImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        iconImage.setLayoutParams(layoutParams);
-        iconImage.setPadding(paddingMargin2, 0, 0, 0);
-        //iconImage.setBackgroundColor(Color.BLACK);
-
-        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
-            @Override
-            protected void handleResponse(Response<PhotosResponse> response) {
-                PhotosResponse body = response.body();
-                if (body != null && body.totalPhotos > 0 && isAdded()) {
-                    GlideApp.with(ProfileFragment.this)
-                            .load(body.photos.get(0).thumbnailUrl)
-                            .into(iconImage);
-                }
-            }
-        });
-
-        TextView taskLabel = new TextView(getActivity());
-        taskLabel.setGravity(Gravity.CENTER_VERTICAL);
-        taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
-
-        TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.END);
-        xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
-        xpLabel.setText(String.valueOf(xpValue) + " XP");
-
-        taskLabel.setText(action);
-
-        leftLayout.addView(iconImage);
-        leftLayout.addView(taskLabel);
-        rightLayout.addView(xpLabel);
-
-        taskLayout.addView(leftLayout);
-        taskLayout.addView(rightLayout);
-
-        View divider = new View(getActivity());
-        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
-        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
-
-        tasksLinearLayout.addView(divider);
-        tasksLinearLayout.addView(taskLayout);
-
-        divider = new View(getActivity());
-        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
-        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
-        tasksLinearLayout.addView(divider);
     }
 
     @Override

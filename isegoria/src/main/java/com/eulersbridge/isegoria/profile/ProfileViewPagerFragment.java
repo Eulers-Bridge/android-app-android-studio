@@ -15,11 +15,12 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-public class ProfileViewPagerFragment extends Fragment {
+public class ProfileViewPagerFragment extends Fragment implements TitledFragment {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -34,12 +35,15 @@ public class ProfileViewPagerFragment extends Fragment {
 
         mainActivity = (MainActivity)getActivity();
 
-        mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
-
         setupViewPager(rootView);
         setupTabLayout();
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.section_title_profile);
     }
 
     @Override

@@ -1,100 +1,63 @@
 package com.eulersbridge.isegoria.feed;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.network.PhotosResponse;
-
-import org.parceler.Parcels;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PhotoAlbumFragment extends Fragment {
-    private TableLayout photosAlbumTableLayout;
-	private TableRow tr;
 
-	private int photosPerRow = -1;
-	private int fitPerRow = 0;
-	private int squareSize;
-	private int dividerPadding = 0;
-
-	private boolean insertedFirstRow = false;
-
-    private PhotoViewPagerFragment photoViewPagerFragment;
-
-	public PhotoAlbumFragment() {
-		insertedFirstRow = false;
-	}
+    private PhotoAdapter adapter;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
 
-		int photoAlbumId = getArguments().getInt("albumId");
+		long photoAlbumId = getArguments().getLong("albumId");
 
-		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-		photosAlbumTableLayout = rootView.findViewById(R.id.photosAlbumTableLayout);
+        adapter = new PhotoAdapter(this);
 
-        squareSize = displayMetrics.widthPixels / 4 - (10/4);
-        fitPerRow = 4;
-        dividerPadding = (10/4);
-
-        tr = new TableRow(getActivity());
-
-        photoViewPagerFragment = new PhotoViewPagerFragment();
+        RecyclerView photosGridView = rootView.findViewById(R.id.album_photos_grid_view);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 4, LinearLayoutManager.VERTICAL, false);
+        photosGridView.setLayoutManager(layoutManager);
+        photosGridView.setAdapter(adapter);
 
         Isegoria isegoria = (Isegoria)getActivity().getApplication();
 
-        isegoria.getAPI().getAlbumPhotos(photoAlbumId).enqueue(new Callback<PhotosResponse>() {
+        isegoria.getAPI().getAlbumPhotos(photoAlbumId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
-            public void onResponse(Call<PhotosResponse> call, Response<PhotosResponse> response) {
+            protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
                 if (body != null) {
-                    addPhotoThumbs(body.photos);
+                    setPhotos(body.photos);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<PhotosResponse> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
 		return rootView;
 	}
 
-	private void addPhotoThumbs(List<Photo> photos) {
-	    if (getActivity() != null && photos.size() > 0) {
-	        getActivity().runOnUiThread(() -> {
-                for (Photo photo : photos)
-                    addTableRow(photo);
-            });
-        }
+	private void setPhotos(@NonNull List<Photo> photos) {
+        adapter.replaceItems(photos);
+        adapter.notifyDataSetChanged();
     }
 
-	private void addTableRow(Photo photo) {
+	/*private void addTableRow(Photo photo) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                     (float) 6.666666667, getResources().getDisplayMetrics());
@@ -164,7 +127,7 @@ public class PhotoAlbumFragment extends Fragment {
                 fragmentTransaction2.add(R.id.photosFrameLayout, photoViewPagerFragment);
                 photoViewPagerFragment.setPosition(index);
                 fragmentTransaction2.commit();*/
-            });
+            /*});
 
             tr.addView(viewLinearLayout);
             tr.addView(linearLayout);
@@ -172,5 +135,5 @@ public class PhotoAlbumFragment extends Fragment {
         } catch(Exception ignored) {
 
         }
-	}
+	}*/
 }

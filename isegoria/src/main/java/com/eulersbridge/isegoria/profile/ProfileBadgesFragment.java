@@ -1,37 +1,29 @@
 package com.eulersbridge.isegoria.profile;
 
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
-import com.eulersbridge.isegoria.GlideApp;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Badge;
-import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
 
 public class ProfileBadgesFragment extends Fragment {
-    private TableLayout badgesTableLayout;
-    private TableRow tr;
 
     private int photosPerRow = -1;
     private int fitPerRow = 0;
@@ -44,13 +36,15 @@ public class ProfileBadgesFragment extends Fragment {
 
     private int targetLevel = 0;
 
+    private final BadgeAdapter badgeAdapter = new BadgeAdapter(this);
+
     public ProfileBadgesFragment() {
         insertedFirstRow = false;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.profile_badges_layout, container, false);
+        View rootView = inflater.inflate(R.layout.profile_badges_fragment, container, false);
 
         String targetName = null;
 
@@ -61,14 +55,19 @@ public class ProfileBadgesFragment extends Fragment {
         }
 
         DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        badgesTableLayout = rootView.findViewById(R.id.profileBadgesTableLayout);
-
         squareSize = displayMetrics.widthPixels / 3 - (10/3);
         fitPerRow = 3;
         dividerPadding = (10/3);
 
-        tr = new TableRow(getActivity());
-        badgesTableLayout.addView(tr);
+        Glide.get(getContext()).setMemoryCategory(MemoryCategory.HIGH);
+
+        RecyclerView badgesGridView = rootView.findViewById(R.id.profile_badges_grid_view);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3, LinearLayoutManager.VERTICAL, false);
+        badgesGridView.setLayoutManager(layoutManager);
+        badgesGridView.setAdapter(badgeAdapter);
+        badgesGridView.setItemViewCacheSize(21);
+        badgesGridView.setDrawingCacheEnabled(true);
+        badgesGridView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
         isegoria = (Isegoria) getActivity().getApplication();
 
@@ -97,29 +96,45 @@ public class ProfileBadgesFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        Glide.get(getContext()).setMemoryCategory(MemoryCategory.NORMAL);
+    }
+
     private void addRemainingBadges(List<Badge> badges) {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                for (Badge badge : badges) {
-                    addTableRow(badge.name, badge.description, badge.id, badge.level, true);
+
+            List<Badge> remainingBadges = new ArrayList<>();
+
+            for (Badge badge : badges) {
+                if (badge.level == targetLevel) {
+                    remainingBadges.add(badge);
                 }
-            });
+            }
+
+            badgeAdapter.replaceRemainingItems(remainingBadges);
+            badgeAdapter.notifyDataSetChanged();
         }
     }
 
     private void addCompletedBadges(List<Badge> badges) {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                for (Badge badge : badges) {
-                    if (badge.level == targetLevel) {
-                        addTableRow(badge.name, badge.description, badge.id, badge.level, false);
-                    }
+            List<Badge> completedBadges = new ArrayList<>();
+
+            for (Badge badge : badges) {
+                if (badge.level == targetLevel) {
+                    completedBadges.add(badge);
                 }
-            });
+            }
+
+            badgeAdapter.replaceCompletedItems(completedBadges);
+            badgeAdapter.notifyDataSetChanged();
         }
     }
 
-    private void addTableRow(final String name, final String description, final long badgeId,
+    /*private void addTableRow(final String name, final String description, final long badgeId,
                              final int maxLevel, final boolean remaining) {
         try {
             int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -227,6 +242,7 @@ public class ProfileBadgesFragment extends Fragment {
                             .beginTransaction()
                             .addToBackStack(null)
                             .add(R.id.profileFrameLayout, badgesFragment)
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                             .commit();
                 });
             }
@@ -235,5 +251,5 @@ public class ProfileBadgesFragment extends Fragment {
         } catch(Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }

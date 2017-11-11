@@ -31,13 +31,12 @@ import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class EventDetailActivity extends AppCompatActivity {
@@ -78,6 +77,7 @@ public class EventDetailActivity extends AppCompatActivity {
             populateContent(event);
 
             ImageView eventImageView = findViewById(R.id.event_image);
+            eventImageView.setImageResource(R.color.grey);
 
             if (!TextUtils.isEmpty(event.photos.get(0).thumbnailUrl)) {
                 GlideApp.with(this)
@@ -101,6 +101,8 @@ public class EventDetailActivity extends AppCompatActivity {
 
             TextView eventsTextField = findViewById(R.id.event_details);
             eventsTextField.setText(event.description);
+
+            addCandidate(event.organizerEmail);
         });
     }
 
@@ -123,7 +125,7 @@ public class EventDetailActivity extends AppCompatActivity {
         }
     }
 
-    public void addCandidate(String email) {
+    private void addCandidate(String email) {
         TableRow tr;
 
         tr = new TableRow(this);
@@ -197,19 +199,14 @@ public class EventDetailActivity extends AppCompatActivity {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
+        isegoria.getAPI().getTicket(ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
-            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
+            public void handleResponse(Response<Ticket> response) {
                 Ticket ticket = response.body();
                 if (ticket != null) {
                     textViewParty.setText(ticket.code);
                     textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Ticket> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -243,18 +240,11 @@ public class EventDetailActivity extends AppCompatActivity {
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
+            public void handleResponse(Response<Position> response) {
                 Position position = response.body();
-                if (position != null) {
-                    textViewPosition.setText(position.name);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
+                if (position != null) textViewPosition.setText(position.name);
             }
         });
 
