@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.signature.ObjectKey;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -79,7 +79,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
                             GlideApp.with(fragment)
                                     .load(url)
                                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                                    .signature(new ObjectKey(url))
+                                    .transition(DrawableTransitionOptions.withCrossFade())
                                     .into(viewHolder.imageView);
                         }
                     }

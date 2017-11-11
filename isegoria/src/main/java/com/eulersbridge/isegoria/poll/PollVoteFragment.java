@@ -25,6 +25,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.eulersbridge.isegoria.GlideApp;
@@ -123,6 +124,8 @@ public class PollVoteFragment extends Fragment {
 
                 GlideApp.with(this)
                         .load(option.photo.thumbnailUrl)
+                        .placeholder(R.color.grey)
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(new SimpleTarget<Drawable>() {
                             @Override
                             public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
@@ -138,9 +141,10 @@ public class PollVoteFragment extends Fragment {
 	}
 
     private void fetchCreatorPhoto() {
-	    if (creator != null && !TextUtils.isEmpty(creator.profilePhotoURL)) {
+	    if (creator != null) {
 	        GlideApp.with(this)
                     .load(creator.profilePhotoURL)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(creatorImageView);
         }
     }

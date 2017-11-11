@@ -33,4 +33,13 @@ public class NewsArticle {
 
     @Json(name = "inappropriateContent")
     public boolean hasInappropriateContent;
+
+    public @Nullable String getPhotoUrl() {
+        if (photos != null && photos.size() > 0) {
+            return photos.get(0).thumbnailUrl;
+
+        } else {
+            return null;
+        }
+    }
 }

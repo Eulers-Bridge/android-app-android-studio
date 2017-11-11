@@ -57,6 +57,16 @@
         </activity>
 
         <activity
+            android:name=".feed.PhotoDetailActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/PhotoDetailTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
+        <activity
             android:name=".feed.EventDetailActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"

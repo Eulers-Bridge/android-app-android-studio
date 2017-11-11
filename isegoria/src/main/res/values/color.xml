@@ -25,4 +25,6 @@
     <color name="divider">#1f000000</color>
 
     <color name="profile_circle_ring_base">#64d3d3d3</color>
+
+    <color name="photo_details_background">#B3000000</color> <!-- 70% opacity black -->
 </resources>

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -92,11 +92,10 @@ public class SettingsActivity extends AppCompatActivity {
         doNotTrackSwitch.setChecked(loggedInUser.isOptedOutOfDataCollection);
         optOutDataCollectionSwitch.setChecked(loggedInUser.trackingOff);
 
-        if (!TextUtils.isEmpty(loggedInUser.profilePhotoURL)) {
-            GlideApp.with(this)
-                    .load(loggedInUser.profilePhotoURL)
-                    .into(photoImageView);
-        }
+        GlideApp.with(this)
+                .load(loggedInUser.profilePhotoURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(photoImageView);
 
         ImageView backgroundImageView = findViewById(R.id.settings_image_background);
 
@@ -109,6 +108,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                     GlideApp.with(SettingsActivity.this)
                             .load(photo.thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .placeholder(R.color.profileImageBackground)
                             .into(backgroundImageView);
                 }
             }

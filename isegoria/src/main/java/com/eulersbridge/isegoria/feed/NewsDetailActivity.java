@@ -4,12 +4,12 @@ import android.os.Build;
 import android.support.annotation.UiThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -62,17 +62,18 @@ public class NewsDetailActivity extends AppCompatActivity {
         });
 
         GlideApp.with(this)
-                .load(article.photos.get(0).thumbnailUrl)
+                .load(article.getPhotoUrl())
                 .transforms(new CenterCrop(), new TintTransformation(0.6))
+                .placeholder(R.color.grey)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(articleImageView);
 
         String creatorPhotoURL = article.creator.profilePhotoURL;
 
-        if (!TextUtils.isEmpty(creatorPhotoURL)) {
-            GlideApp.with(this)
-                    .load(creatorPhotoURL)
-                    .into(authorImageView);
-        }
+        GlideApp.with(this)
+                .load(creatorPhotoURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(authorImageView);
     }
 
     private void initiallyLiked() {

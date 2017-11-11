@@ -25,22 +25,9 @@ import retrofit2.Response;
 
 public class ProfileBadgesFragment extends Fragment {
 
-    private int photosPerRow = -1;
-    private int fitPerRow = 0;
-    private int squareSize;
-    private int dividerPadding = 0;
-
-    private boolean insertedFirstRow = false;
-
-    private Isegoria isegoria;
-
     private int targetLevel = 0;
 
     private final BadgeAdapter badgeAdapter = new BadgeAdapter(this);
-
-    public ProfileBadgesFragment() {
-        insertedFirstRow = false;
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,11 +41,6 @@ public class ProfileBadgesFragment extends Fragment {
             targetLevel = bundle.getInt("level");
         }
 
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        squareSize = displayMetrics.widthPixels / 3 - (10/3);
-        fitPerRow = 3;
-        dividerPadding = (10/3);
-
         Glide.get(getContext()).setMemoryCategory(MemoryCategory.HIGH);
 
         RecyclerView badgesGridView = rootView.findViewById(R.id.profile_badges_grid_view);
@@ -69,7 +51,7 @@ public class ProfileBadgesFragment extends Fragment {
         badgesGridView.setDrawingCacheEnabled(true);
         badgesGridView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_AUTO);
 
-        isegoria = (Isegoria) getActivity().getApplication();
+        Isegoria isegoria = (Isegoria) getActivity().getApplication();
 
         long userId = isegoria.getLoggedInUser().getId();
 

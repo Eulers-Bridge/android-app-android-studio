@@ -29,6 +29,7 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
@@ -220,6 +221,7 @@ public class CandidateAllFragment extends Fragment {
                 if (body != null && body.totalPhotos > 0) {
                     GlideApp.with(CandidateAllFragment.this)
                             .load(body.photos.get(0).thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(candidateProfileView);
                 }
             }

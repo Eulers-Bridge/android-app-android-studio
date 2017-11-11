@@ -17,6 +17,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -145,6 +146,8 @@ public class PhotosFragment extends Fragment {
 
 			GlideApp.with(this)
 					.load(bitmap)
+                    .placeholder(R.color.grey)
+					.transition(DrawableTransitionOptions.withCrossFade())
 					.into(view);
 	        
 	        final TextView textViewArticle = new TextView(getActivity());

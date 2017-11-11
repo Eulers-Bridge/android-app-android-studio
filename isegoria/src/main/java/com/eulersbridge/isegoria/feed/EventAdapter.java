@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.signature.ObjectKey;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
@@ -51,15 +51,12 @@ class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements Recy
         String dateTime = Utils.convertTimestampToString(fragment.getContext(), item.date);
         viewHolder.detailsTextView.setText(dateTime);
 
-        if (item.photos != null && item.photos.size() > 0) {
-            String photoUrl = item.photos.get(0).thumbnailUrl;
-
-            GlideApp.with(fragment)
-                    .load(photoUrl)
-                    .transform(new TintTransformation())
-                    .signature(new ObjectKey(photoUrl))
-                    .into(viewHolder.imageView);
-        }
+        GlideApp.with(fragment)
+                .load(item.getPhotoUrl())
+                .placeholder(R.color.grey)
+                .transform(new TintTransformation())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(viewHolder.imageView);
     }
 
     @Override

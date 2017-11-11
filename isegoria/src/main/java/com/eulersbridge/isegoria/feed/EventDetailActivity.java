@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,6 +22,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
@@ -77,14 +77,13 @@ public class EventDetailActivity extends AppCompatActivity {
             populateContent(event);
 
             ImageView eventImageView = findViewById(R.id.event_image);
-            eventImageView.setImageResource(R.color.grey);
 
-            if (!TextUtils.isEmpty(event.photos.get(0).thumbnailUrl)) {
-                GlideApp.with(this)
-                        .load(event.photos.get(0).thumbnailUrl)
-                        .transform(new TintTransformation())
-                        .into(eventImageView);
-            }
+            GlideApp.with(this)
+                    .load(event.getPhotoUrl())
+                    .transform(new TintTransformation())
+                    .placeholder(R.color.grey)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(eventImageView);
         }
     }
 
@@ -170,9 +169,10 @@ public class EventDetailActivity extends AppCompatActivity {
         candidateProfileView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         candidateProfileView.setPadding(10, 0, 10, 0);
 
-        if (!TextUtils.isEmpty(user.profilePhotoURL)){
-            GlideApp.with(this).load(user.profilePhotoURL).into(candidateProfileView);
-        }
+        GlideApp.with(this)
+                .load(user.profilePhotoURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(candidateProfileView);
 
         ImageView candidateProfileImage = new ImageView(this);
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));

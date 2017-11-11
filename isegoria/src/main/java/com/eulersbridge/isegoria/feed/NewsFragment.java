@@ -24,6 +24,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
@@ -181,6 +182,8 @@ public class NewsFragment extends Fragment {
 			GlideApp.with(this)
 					.load(drawable1)
 					.transforms(new CenterCrop(), new TintTransformation())
+					.placeholder(R.color.grey)
+					.transition(DrawableTransitionOptions.withCrossFade())
 					.into(view);
 
 	        view.setOnClickListener(innerView -> {
@@ -243,6 +246,8 @@ public class NewsFragment extends Fragment {
 			GlideApp.with(this)
 					.load(drawable2)
 					.transforms(new CenterCrop(), new TintTransformation())
+                    .placeholder(R.color.grey)
+                    .transition(DrawableTransitionOptions.withCrossFade())
 					.into(view2);
 
 			view2.setOnClickListener(innerView -> {
@@ -286,6 +291,8 @@ public class NewsFragment extends Fragment {
 			GlideApp.with(this)
 					.load(drawable1)
 					.transforms(new CenterCrop(), new TintTransformation())
+                    .placeholder(R.color.grey)
+                    .transition(DrawableTransitionOptions.withCrossFade())
 					.into(imageView);
 
 			imageView.setOnClickListener(innerView -> {

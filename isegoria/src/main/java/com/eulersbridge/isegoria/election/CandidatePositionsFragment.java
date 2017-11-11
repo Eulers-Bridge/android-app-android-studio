@@ -21,24 +21,24 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Position;
+import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CandidatePositionsFragment extends Fragment {
 	private TableLayout positionsTableLayout;
-    private Isegoria isegoria;
+    private API api;
 	
 	private float dpWidth;
 
@@ -58,14 +58,9 @@ public class CandidatePositionsFragment extends Fragment {
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        
-        /*addTableRow(R.drawable.photo0, R.drawable.photo1, true, false, "President", "Secretary");
-        addTableRow(R.drawable.photo2, R.drawable.photo3, true, false, "Women's Officer", "LGBT Officer");
-        addTableRow(R.drawable.photo4, R.drawable.photopaddingMargin, true, false, "Clubs and Societies", "Environment Officer");
-        addTableRow(R.drawable.photo6, R.drawable.photo7, true, false, "Welfare Officer", "Creative Arts Officer");
-        addTableRow(R.drawable.photo8, R.drawable.photo9, true, false, "Faculty Liaison", "");*/
 
-        isegoria = (Isegoria)getActivity().getApplication();
+        Isegoria isegoria = (Isegoria)getActivity().getApplication();
+        api = isegoria.getAPI();
 
 		long institutionId = isegoria.getLoggedInUser().institutionId;
 
@@ -74,36 +69,26 @@ public class CandidatePositionsFragment extends Fragment {
 		return rootView;
 	}
 
-	private final Callback<List<Election>> electionsCallback = new Callback<List<Election>>() {
+	private final SimpleCallback<List<Election>> electionsCallback = new SimpleCallback<List<Election>>() {
 		@Override
-		public void onResponse(Call<List<Election>> call, Response<List<Election>> response) {
+        protected void handleResponse(Response<List<Election>> response) {
 			List<Election> elections = response.body();
 			if (elections != null && elections.size() > 0) {
 				Election election = elections.get(0);
 
-				isegoria.getAPI().getElectionPositions(election.id).enqueue(positionsCallback);
+				api.getElectionPositions(election.id).enqueue(positionsCallback);
 			}
-		}
-
-		@Override
-		public void onFailure(Call<List<Election>> call, Throwable t) {
-			t.printStackTrace();
 		}
 	};
 
-	private final Callback<List<Position>> positionsCallback = new Callback<List<Position>>() {
-		@Override
-		public void onResponse(Call<List<Position>> call, Response<List<Position>> response) {
-			List<Position> positions = response.body();
-			if (positions != null) {
-				addPositions(positions);
-			}
-		}
-
-		@Override
-		public void onFailure(Call<List<Position>> call, Throwable t) {
-			t.printStackTrace();
-		}
+	private final SimpleCallback<List<Position>> positionsCallback = new SimpleCallback<List<Position>>() {
+        @Override
+        protected void handleResponse(Response<List<Position>> response) {
+            List<Position> positions = response.body();
+            if (positions != null) {
+                addPositions(positions);
+            }
+        }
 	};
 
 	private void addPositions(List<Position> positions) {
@@ -125,7 +110,7 @@ public class CandidatePositionsFragment extends Fragment {
                     addRow = !addRow;
 
                     if (positions.size() == addedPositionsCount) {
-                        this.addTableRowOneSquare(position.electionId, position.id, position.name, position.description);
+                        addTableRowOneSquare(position.electionId, position.id, position.name, position.description);
                     }
                 }
             });
@@ -171,7 +156,7 @@ public class CandidatePositionsFragment extends Fragment {
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 			view.setScaleType(ScaleType.CENTER_CROP);
 
-			isegoria.getAPI().getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
+            api.getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
 				@Override
 				protected void handleResponse(Response<PhotosResponse> response) {
 					PhotosResponse body = response.body();
@@ -180,6 +165,7 @@ public class CandidatePositionsFragment extends Fragment {
 						GlideApp.with(CandidatePositionsFragment.this)
 								.load(body.photos.get(0).thumbnailUrl)
                                 .transforms(new TintTransformation())
+								.transition(DrawableTransitionOptions.withCrossFade())
 								.into(view);
 					}
 				}
@@ -226,7 +212,7 @@ public class CandidatePositionsFragment extends Fragment {
             view2.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
             view2.setScaleType(ScaleType.CENTER_CROP);
 
-            isegoria.getAPI().getPhotos(positionId).enqueue(new SimpleCallback<PhotosResponse>() {
+            api.getPhotos(positionId).enqueue(new SimpleCallback<PhotosResponse>() {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();
@@ -235,6 +221,7 @@ public class CandidatePositionsFragment extends Fragment {
                         GlideApp.with(CandidatePositionsFragment.this)
                                 .load(body.photos.get(0).thumbnailUrl)
                                 .transforms(new TintTransformation())
+                                .transition(DrawableTransitionOptions.withCrossFade())
                                 .into(view2);
                     }
                 }
@@ -336,7 +323,7 @@ public class CandidatePositionsFragment extends Fragment {
             ImageView view = new ImageView(getActivity());
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
 
-			isegoria.getAPI().getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
+        api.getPhotos(lastPositionId).enqueue(new SimpleCallback<PhotosResponse>() {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();
@@ -345,6 +332,7 @@ public class CandidatePositionsFragment extends Fragment {
                         GlideApp.with(CandidatePositionsFragment.this)
                                 .load(body.photos.get(0).thumbnailUrl)
                                 .transforms(new TintTransformation())
+                                .transition(DrawableTransitionOptions.withCrossFade())
                                 .into(view);
                     }
                 }

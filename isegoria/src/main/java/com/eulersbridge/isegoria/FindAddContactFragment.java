@@ -26,6 +26,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.GenericUser;
@@ -267,6 +268,7 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
 
         GlideApp.with(this)
                 .load(user.profilePhotoURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(candidateProfileView);
 
         TextView textViewCandidate = new TextView(getActivity());

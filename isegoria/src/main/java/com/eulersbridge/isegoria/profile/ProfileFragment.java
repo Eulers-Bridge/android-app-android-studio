@@ -7,7 +7,6 @@ import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
@@ -148,11 +148,10 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        if (!TextUtils.isEmpty(user.profilePhotoURL)) {
-            GlideApp.with(this)
-                    .load(user.profilePhotoURL)
-                    .into(photoImageView);
-        }
+        GlideApp.with(this)
+                .load(user.profilePhotoURL)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(photoImageView);
 
         ImageView backgroundImageView = rootView.findViewById(R.id.profile_image_background);
 
@@ -165,6 +164,7 @@ public class ProfileFragment extends Fragment {
 
                     GlideApp.with(ProfileFragment.this)
                             .load(photo.thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(backgroundImageView);
                 }
             }
