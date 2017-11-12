@@ -68,6 +68,8 @@
     <string name="election_efficacy_survey_start_button">Start Survey</string>
 
     <!-- Voting -->
+    <string name="vote_next_button">Next</string>
+
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
     <string name="vote_sign_pledge_next_button">Next</string>
     <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
@@ -81,6 +83,11 @@
     <string name="section_title_self_efficacy_questions">Self-Efficacy Questions</string>
     <string name="self_efficacy_done_button">Done</string>
     <string name="self_efficacy_questions_message">The PPSE-S composed of 4 items aimed to assess individuals’ beliefs in their capabilities to engage actively in politics. The 4 items are measured on a 5 point Likert scale, from 1 (not at all) to 5 (completely).</string>
+
+    <string name="self_efficacy_statement_1">Promote public initiatives to support political programs that you believe are just</string>
+    <string name="self_efficacy_statement_2">Maintain personal relationships with representatives of national government authorities</string>
+    <string name="self_efficacy_statement_3">Promote effective activities of information and mobilization in your own community (of work, friends, and family), to sustain political programs in which you believe</string>
+    <string name="self_efficacy_statement_4">Use the means you have as a citizen to critically monitor the actions of your political representatives</string>
 
     <string name="self_efficacy_slider_not_at_all">Not at all</string>
     <string name="self_efficacy_slider_unlikely">Somewhat unlikely</string>

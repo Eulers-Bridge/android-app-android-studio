@@ -242,7 +242,7 @@ public class CandidateAllFragment extends Fragment {
             args.putLong("ProfileId", userId);
             fragment2.setArguments(args);
             fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(R.id.candidate_frame1, fragment2);
+            fragmentTransaction2.replace(R.id.election_candidate_frame, fragment2);
             fragmentTransaction2.commit();
         });
 		

@@ -94,7 +94,7 @@ public class PollFragment extends Fragment implements TitledFragment {
     private void updateTabs() {
         pagerAdapter.notifyDataSetChanged();
 
-        this.tabLayout.setVisibility(fragments.size() < 2? View.GONE : View.VISIBLE);
+        tabLayout.setVisibility(fragments.size() < 2? View.GONE : View.VISIBLE);
     }
 
     @Override

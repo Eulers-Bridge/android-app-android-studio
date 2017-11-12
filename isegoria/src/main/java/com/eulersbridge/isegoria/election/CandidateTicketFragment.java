@@ -59,7 +59,7 @@ public class CandidateTicketFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
-		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
+		View rootView = inflater.inflate(R.layout.election_candidates_tickets_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -218,7 +218,7 @@ public class CandidateTicketFragment extends Fragment {
 
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                     fragmentTransaction2.commit();
             });
 
@@ -289,7 +289,7 @@ public class CandidateTicketFragment extends Fragment {
                     args.putString("Logo", logo2);
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                     fragmentTransaction2.commit();
             });
 	        
@@ -406,7 +406,7 @@ public class CandidateTicketFragment extends Fragment {
 
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                 fragmentTransaction2.commit();
             });
 

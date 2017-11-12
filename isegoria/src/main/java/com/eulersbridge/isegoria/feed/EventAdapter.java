@@ -44,8 +44,6 @@ class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements Recy
     public void onBindViewHolder(EventViewHolder viewHolder, int index) {
         final Event item = items.get(index);
 
-        viewHolder.imageView.setBackgroundResource(R.color.grey);
-
         viewHolder.titleTextView.setText(item.name);
 
         String dateTime = Utils.convertTimestampToString(fragment.getContext(), item.date);

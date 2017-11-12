@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		return application;
 	}
 	
-	public void signupClicked(View view) {
+	public void signupClicked() {
 		setShowNavigationBackButton(true);
 
 		switchContent(new UserSignupFragment(), false);
@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		alertDialog.show();
 	}
 	
-	public void userSignupNext(View view) {
+	public void userSignupNext() {
 		TextView firstNameField = findViewById(R.id.firstName);
 		TextView lastNameField = findViewById(R.id.lastName);
 		TextView universityEmailField = findViewById(R.id.universityEmail);
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		}
 	}
 	
-	public void userConsentNext(View view) {
+	public void userConsentNext() {
 		if(firstName.equals("") || lastName.equals("") || email.equals("") || password.equals("") || password.equals("") || confirmPassword.equals("")
 				|| country.equals("") || institution.equals("") || yearOfBirth.equals("") || gender.equals("")) {
 			
@@ -453,11 +453,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		switchContent(new LoginScreenFragment());
 	}
 
-    public void voteNext(View v) {
+    public void voteNext() {
         switchContent(new VoteFragmentPledge());
     }
 
-    public void voteDone(View v) {
+    public void voteDone() {
         switchContent(new VoteFragmentDone());
     }
 

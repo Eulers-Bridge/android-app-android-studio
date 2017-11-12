@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/election_candidate_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <TableLayout
-            android:id="@+id/positionsTableLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:stretchColumns="*" />
-</ScrollView>
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/election_positions_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</FrameLayout>

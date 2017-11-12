@@ -135,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/green_button"
                     android:gravity="center"
-                    android:text="Next"
+                    android:text="@string/vote_next_button"
                     android:textColor="#52BB42"
                     android:layout_gravity="top"
                     android:visibility="invisible" />

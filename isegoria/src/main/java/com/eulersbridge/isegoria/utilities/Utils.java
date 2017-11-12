@@ -103,15 +103,6 @@ public final class Utils {
         return inSampleSize;
     }
 
-    static Bitmap decodeSampledBitmapFromBitmap(InputStream is, int reqWidth, int reqHeight) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(is);
-    }
-
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                          int reqWidth, int reqHeight) {
 
@@ -126,29 +117,6 @@ public final class Utils {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    static Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-
-        float xScale = (float) newWidth / sourceWidth;
-        float yScale = (float) newHeight / sourceHeight;
-        float scale = Math.max(xScale, yScale);
-
-        float scaledWidth = scale * sourceWidth;
-        float scaledHeight = scale * sourceHeight;
-
-        float left = (newWidth - scaledWidth) / 2;
-        float top = (newHeight - scaledHeight) / 2;
-
-        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
-        Canvas canvas = new Canvas(dest);
-        canvas.drawBitmap(source, null, targetRect, null);
-
-        return dest;
     }
 
     public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {

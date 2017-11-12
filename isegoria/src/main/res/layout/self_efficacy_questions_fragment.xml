@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Promote public initiatives to support political programs that you believe are just"
+            android:text="@string/self_efficacy_statement_1"
             android:layout_marginTop="24dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Maintain personal relationships with representatives of national government authorities"
+            android:text="@string/self_efficacy_statement_2"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Promote effective activities of information and mobilization in your own community (of work, friends, and family), to sustain political programs in which you believe"
+            android:text="@string/self_efficacy_statement_3"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
@@ -55,7 +55,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Use the means you have as a citizen to critically monitor the actions of your political representatives"
+            android:text="@string/self_efficacy_statement_4"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
