@@ -5,7 +5,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -36,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-@SuppressWarnings("deprecation")
 public class CandidateTicketFragment extends Fragment {
 
 	private Isegoria isegoria;
@@ -200,11 +198,7 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			View view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rectShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rectShapeDrawable);
-			}
+			view.setBackground(rectShapeDrawable);
 	        view.setOnClickListener(view12 -> {
                     FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -272,11 +266,7 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rect2ShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rect2ShapeDrawable);
-			}
+			view.setBackground(rect2ShapeDrawable);
 	        view.setOnClickListener(view1 -> {
                     FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -387,11 +377,7 @@ public class CandidateTicketFragment extends Fragment {
 
             View view = new View(getActivity());
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rectShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rectShapeDrawable);
-			}
+			view.setBackground(rectShapeDrawable);
 
             view.setOnClickListener(view1 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();

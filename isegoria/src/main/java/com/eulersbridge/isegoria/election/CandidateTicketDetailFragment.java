@@ -10,7 +10,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -50,7 +49,6 @@ import java.util.List;
 
 import retrofit2.Response;
 
-@SuppressWarnings("deprecation")
 public class CandidateTicketDetailFragment extends Fragment {
     private TableLayout candidateTicketDetialTableLayout;
     private Button ticketSupportButton;
@@ -89,11 +87,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int) dpHeight /2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(b, 25));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            backgroundLinearLayout.setBackground(d);
-        } else {
-            backgroundLinearLayout.setBackgroundDrawable(d);
-        }
+        backgroundLinearLayout.setBackground(d);
 
         isegoria = (Isegoria)getActivity().getApplication();
         isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
@@ -264,11 +258,7 @@ public class CandidateTicketDetailFragment extends Fragment {
         		imageHeight, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            partyLayout.setBackground(rectShapeDrawable);
-        } else {
-            partyLayout.setBackgroundDrawable(rectShapeDrawable);
-        }
+        partyLayout.setBackground(rectShapeDrawable);
         partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());

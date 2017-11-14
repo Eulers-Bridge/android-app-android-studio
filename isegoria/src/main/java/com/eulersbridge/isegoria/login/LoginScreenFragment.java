@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -28,7 +27,6 @@ import com.securepreferences.SecurePreferences;
 
 public class LoginScreenFragment extends Fragment implements TitledFragment {
 
-    @SuppressWarnings("deprecation")
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_login_screen_fragment, container, false);
@@ -51,13 +49,7 @@ public class LoginScreenFragment extends Fragment implements TitledFragment {
 
 		Bitmap backgroundBitmap = Bitmap.createScaledBitmap(original, (int) dpWidth, (int) dpHeight /2, false);
 		final Drawable backgroundDrawable = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(backgroundBitmap, 25));
-        loginContainer.post(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                loginContainer.setBackground(backgroundDrawable);
-            } else {
-                loginContainer.setBackgroundDrawable(backgroundDrawable);
-            }
-        });
+        loginContainer.post(() -> loginContainer.setBackground(backgroundDrawable));
 
         TextView appNameLabel = rootView.findViewById(R.id.isegoria_label);
         Typeface appNameFont = Typeface.createFromAsset(mainActivity.getAssets(),

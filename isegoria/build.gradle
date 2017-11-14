@@ -19,7 +19,7 @@ android {
     buildToolsVersion '27.0.0'
     defaultConfig {
         applicationId "au.com.isegoria.app"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 27
         vectorDrawables.useSupportLibrary = true
         versionCode 7
