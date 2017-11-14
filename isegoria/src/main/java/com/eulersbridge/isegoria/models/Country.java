@@ -13,8 +13,4 @@ public class Country {
 	public String name;
 	public List<Institution> institutions;
 
-	public Country(String name) {
-	    this.name = name;
-    }
-
 }

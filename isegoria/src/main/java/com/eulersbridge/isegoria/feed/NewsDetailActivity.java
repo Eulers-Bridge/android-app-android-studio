@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -47,7 +48,7 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         ImageView authorImageView = findViewById(R.id.article_image_author);
 
-        NewsArticle article = Parcels.unwrap(getIntent().getExtras().getParcelable("article"));
+        NewsArticle article = Parcels.unwrap(getIntent().getExtras().getParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE));
         populateTextContent(article);
 
         isegoria = (Isegoria)getApplication();

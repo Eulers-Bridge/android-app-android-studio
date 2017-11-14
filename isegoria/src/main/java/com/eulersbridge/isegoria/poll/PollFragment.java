@@ -6,11 +6,11 @@ import android.support.annotation.UiThread;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
@@ -44,6 +44,7 @@ public class PollFragment extends Fragment implements TitledFragment {
 		fragments = new Vector<>();
 
 		Isegoria isegoria = (Isegoria)getActivity().getApplication();
+
 		long institutionId = isegoria.getLoggedInUser().institutionId;
 		isegoria.getAPI().getPolls(institutionId).enqueue(new SimpleCallback<PollsResponse>() {
             @Override
@@ -72,7 +73,7 @@ public class PollFragment extends Fragment implements TitledFragment {
         if (rootView == null) rootView = getView();
 
         if (viewPager == null && rootView != null) {
-            viewPager = rootView.findViewById(R.id.pollViewPager);
+            viewPager = rootView.findViewById(R.id.poll_vote_view_pager);
 
             pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
                 @Override
@@ -126,22 +127,19 @@ public class PollFragment extends Fragment implements TitledFragment {
         tabLayout.setVisibility(View.VISIBLE);
     }
 
-    private void addPoll(Poll poll) {
-		try {
-			getActivity().runOnUiThread(() -> {
+    private void addPoll(@NonNull Poll poll) {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
                 PollVoteFragment pollVoteFragment = new PollVoteFragment();
 
                 Bundle args = new Bundle();
-                args.putParcelable("poll", Parcels.wrap(poll));
+                args.putParcelable(Constant.ACTIVITY_EXTRA_POLL, Parcels.wrap(poll));
 
                 pollVoteFragment.setArguments(args);
 
                 fragments.add(pollVoteFragment);
                 updateTabs();
             });
-		} catch(Exception e) {
-            Log.d("Error adding poll", e.toString());
-            e.printStackTrace();
         }
 	}
 }

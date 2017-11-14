@@ -20,6 +20,7 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -61,8 +62,8 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
 
         setContentView(R.layout.photo_detail_activity);
 
-        photos = Parcels.unwrap(getIntent().getParcelableExtra("photos"));
-        int startIndex = getIntent().getIntExtra("position", 0);
+        photos = Parcels.unwrap(getIntent().getParcelableExtra(Constant.ACTIVITY_EXTRA_PHOTOS));
+        int startIndex = getIntent().getIntExtra(Constant.ACTIVITY_EXTRA_PHOTOS_POSITION, 0);
 
         Isegoria isegoria = (Isegoria)getApplication();
         loggedInUserEmail = isegoria.getLoggedInUser().email;

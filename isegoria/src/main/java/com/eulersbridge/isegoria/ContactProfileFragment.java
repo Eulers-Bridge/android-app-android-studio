@@ -73,7 +73,7 @@ public class ContactProfileFragment extends Fragment {
         setupTasksListView(rootView);
 
         Bundle bundle = this.getArguments();
-        User user = Parcels.unwrap(bundle.getParcelable("profile"));
+        User user = Parcels.unwrap(bundle.getParcelable(Constant.ACTIVITY_EXTRA_PROFILE));
 
         final TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());

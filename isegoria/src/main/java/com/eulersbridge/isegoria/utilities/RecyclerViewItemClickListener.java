@@ -1,9 +1,9 @@
 package com.eulersbridge.isegoria.utilities;
 
-import android.view.View;
+import android.support.v7.widget.RecyclerView;
 
 public interface RecyclerViewItemClickListener {
 
-    void onItemClick(View view, int position);
+    void onItemClick(RecyclerView.ViewHolder viewHolder, int position);
 
 }

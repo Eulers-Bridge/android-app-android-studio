@@ -23,6 +23,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
@@ -69,7 +70,7 @@ public class EventDetailActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        event = Parcels.unwrap(getIntent().getExtras().getParcelable("event"));
+        event = Parcels.unwrap(getIntent().getExtras().getParcelable(Constant.ACTIVITY_EXTRA_EVENT));
 
         isegoria = (Isegoria)getApplication();
 

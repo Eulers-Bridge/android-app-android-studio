@@ -23,6 +23,8 @@ public class Poll {
     @Json(name = "pollOptions")
     public List<PollOption> options;
 
+    public boolean closed;
+
     public void setCreator(Contact creator) {
         this.creator = creator;
     }

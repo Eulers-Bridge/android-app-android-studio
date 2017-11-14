@@ -73,9 +73,9 @@ dependencies {
     // Used in Candidate fragment for bottom tabs
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    compile 'com.amazonaws:aws-android-sdk-s3:2.6.5'
-    compile 'com.amazonaws:aws-android-sdk-cognito:2.6.5'
-    compile 'com.amazonaws:aws-android-sdk-sns:2.6.5'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.6.6'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.6.6'
+    compile 'com.amazonaws:aws-android-sdk-sns:2.6.6'
 
     // Required for push notifications
     compile 'com.google.firebase:firebase-messaging:11.6.0'

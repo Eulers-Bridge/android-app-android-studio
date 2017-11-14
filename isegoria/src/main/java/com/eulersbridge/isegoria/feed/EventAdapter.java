@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
@@ -58,22 +59,22 @@ class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements Recy
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
         Activity activity = fragment.getActivity();
         if (activity == null) return;
 
         int[] location = new int[] {0,0};
-        view.getLocationOnScreen(location);
+        viewHolder.itemView.getLocationOnScreen(location);
 
         Intent activityIntent = new Intent(activity, EventDetailActivity.class);
 
         Bundle extras = new Bundle();
-        extras.putParcelable("event", Parcels.wrap(items.get(position)));
+        extras.putParcelable(Constant.ACTIVITY_EXTRA_EVENT, Parcels.wrap(items.get(position)));
         activityIntent.putExtras(extras);
 
         //Animate with a scale-up transition between the activities
-        Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(view, location[0],
-                location[1], view.getWidth(), view.getHeight()).toBundle();
+        Bundle options = ActivityOptionsCompat.makeScaleUpAnimation(viewHolder.itemView, location[0],
+                location[1], viewHolder.itemView.getWidth(), viewHolder.itemView.getHeight()).toBundle();
 
         ActivityCompat.startActivity(activity, activityIntent, options);
     }

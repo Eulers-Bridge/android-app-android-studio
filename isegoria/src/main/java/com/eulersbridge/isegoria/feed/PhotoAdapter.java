@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;
@@ -50,11 +51,11 @@ class PhotoAdapter extends RecyclerView.Adapter<PhotoViewHolder> implements Recy
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
 
         Intent activityIntent = new Intent(fragment.getContext(), PhotoDetailActivity.class);
-        activityIntent.putExtra("photos", Parcels.wrap(items));
-        activityIntent.putExtra("position", position);
+        activityIntent.putExtra(Constant.ACTIVITY_EXTRA_PHOTOS, Parcels.wrap(items));
+        activityIntent.putExtra(Constant.ACTIVITY_EXTRA_PHOTOS_POSITION, position);
 
         fragment.startActivity(activityIntent);
     }

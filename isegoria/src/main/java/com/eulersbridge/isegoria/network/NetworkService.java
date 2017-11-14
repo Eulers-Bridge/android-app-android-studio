@@ -125,7 +125,7 @@ public class NetworkService {
 
         setup();
 
-        String snsPlatformArn = Constant.SNSPlatformApplicationArn;
+        String snsPlatformArn = Constant.SNS_PLATFORM_APPLICATION_ARN;
         String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
         api.attemptLogin(snsPlatformArn, deviceToken).enqueue(new Callback<LoginResponse>() {
@@ -231,12 +231,12 @@ public class NetworkService {
         long timestamp = System.currentTimeMillis() / 1000L;
         String filename = String.valueOf(application.getLoggedInUser().email) + "_" + String.valueOf(timestamp) + "_" + file.getName();
 
-        TransferObserver observer = transferUtility.upload(Constant.S3PicturesBucketName, filename, file);
+        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, filename, file);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 if (state == TransferState.COMPLETED) {
-                    updateDisplayPicturePhoto(Constant.S3PicturesPath + filename);
+                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + filename);
                 }
             }
 

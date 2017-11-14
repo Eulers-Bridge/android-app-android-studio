@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/loginContainer"
+    android:id="@+id/signup_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -30,7 +30,7 @@
                 android:src="@drawable/app_icon" />
 
             <TextView
-                android:id="@+id/photoTitle"
+                android:id="@+id/signup_photo_title"
                 android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -39,7 +39,7 @@
                 android:textAppearance="@style/SignUpHeadingTextAppearance" />
 
             <EditText
-                android:id="@+id/firstName"
+                android:id="@+id/signup_first_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -60,7 +60,7 @@
                 android:background="#676475" />
 
             <EditText
-                android:id="@+id/lastName"
+                android:id="@+id/signup_last_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -78,7 +78,7 @@
                 android:background="#676475" />
 
             <EditText
-                android:id="@+id/universityEmail"
+                android:id="@+id/signup_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -99,7 +99,7 @@
                 android:background="#676475" />
 
             <EditText
-                android:id="@+id/newPassword"
+                android:id="@+id/signup_new_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -120,7 +120,7 @@
                 android:background="#676475" />
 
             <EditText
-                android:id="@+id/confirmNewPassword"
+                android:id="@+id/signup_confirm_new_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -141,7 +141,7 @@
                 android:background="#676475" />
 
             <Spinner
-                android:id="@+id/gender"
+                android:id="@+id/signup_gender"
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
@@ -153,7 +153,7 @@
                 android:background="#676475" />
 
             <Spinner
-                android:id="@+id/yearOfBirth"
+                android:id="@+id/signup_birth_year"
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
@@ -165,7 +165,7 @@
                 android:background="#676475" />
 
             <Spinner
-                android:id="@+id/country"
+                android:id="@+id/signup_country"
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
@@ -177,18 +177,18 @@
                 android:background="#676475" />
 
             <Spinner
-                android:id="@+id/institution"
+                android:id="@+id/signup_institution"
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="40dp"
                 android:minHeight="40dp" />
 
             <Button
+                android:id="@+id/signup_next_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:minHeight="48dip"
-                android:onClick="userSignupNext"
                 android:text="@string/user_sign_up_next_button"
                 android:theme="@style/SignUpButton"/>
         </LinearLayout>

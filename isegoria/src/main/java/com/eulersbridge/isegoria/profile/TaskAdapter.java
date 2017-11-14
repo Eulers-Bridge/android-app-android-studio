@@ -37,7 +37,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     @Override
     public int getItemCount() { return items.size(); }
 
+    private boolean isValidFragment() {
+        return (fragment != null
+                && fragment.getActivity() != null
+                && !fragment.isDetached()
+                && fragment.isAdded());
+    }
+
     private int getImageIndex() {
+        if (!isValidFragment()) return 10; // (Medium density)
+
         DisplayMetrics dm = fragment.getResources().getDisplayMetrics();
 
         int dpi = dm.densityDpi;
@@ -62,9 +71,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         boolean newImageRequired = (oldContentDescription != null  && !oldContentDescription.toString().equals(item.action)
                 || oldContentDescription == null);
 
-        if (fragment != null
-                && fragment.getActivity() != null
-                && newImageRequired) {
+        if (isValidFragment() && newImageRequired) {
             Isegoria isegoria = (Isegoria)fragment.getActivity().getApplication();
 
             if (isegoria != null) {
@@ -76,11 +83,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
                             String url = body.photos.get(getImageIndex()).thumbnailUrl;
 
-                            GlideApp.with(fragment)
-                                    .load(url)
-                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                                    .transition(DrawableTransitionOptions.withCrossFade())
-                                    .into(viewHolder.imageView);
+                            if (isValidFragment()) {
+                                GlideApp.with(fragment)
+                                        .load(url)
+                                        .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                        .transition(DrawableTransitionOptions.withCrossFade())
+                                        .into(viewHolder.imageView);
+                            }
                         }
                     }
                 });

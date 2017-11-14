@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		getSupportActionBar().setDisplayShowHomeEnabled(show);
 	}
 
-	private void setNavigationEnabled(boolean enabled) {
+	public void setNavigationEnabled(boolean enabled) {
         navigationView.setVisibility(enabled? View.VISIBLE : View.GONE);
 	}
 
@@ -252,6 +252,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		LoginScreenFragment loginScreenFragment = new LoginScreenFragment();
 		loginScreenFragment.setTabLayout(tabLayout);
 		switchContent(loginScreenFragment);
+
+		setNavigationEnabled(false);
 	}
 
 	@Override
@@ -319,6 +321,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	
 	public void login(String email, String password) {
 		application.login(email, password);
+
+        View emailField = findViewById(R.id.login_email);
+        if (emailField != null) emailField.setEnabled(false);
+
+        View passwordField = findViewById(R.id.login_password);
+        if (passwordField != null) passwordField.setEnabled(false);
 		
 		//dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 	}
@@ -335,13 +343,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 FeedFragment feedFragment = new FeedFragment();
                 feedFragment.setTabLayout(tabLayout);
 
-                switchContent(feedFragment);
+                navigationView.setSelectedItemId(R.id.navigation_feed);
             }
 
         } else {
             PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
             personalityQuestionsFragment.setTabLayout(tabLayout);
             switchContent(personalityQuestionsFragment);
+            setNavigationEnabled(false);
         }
     }
 	
@@ -350,6 +359,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	}
 	
 	public void onLoginFailure() {
+
+        View emailField = findViewById(R.id.login_email);
+        if (emailField != null) emailField.setEnabled(true);
+
+        View passwordField = findViewById(R.id.login_password);
+        if (passwordField != null) passwordField.setEnabled(true);
 
 	    hideDialog();
 
@@ -391,16 +406,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		alertDialog.show();
 	}
 	
-	public void userSignupNext() {
-		TextView firstNameField = findViewById(R.id.firstName);
-		TextView lastNameField = findViewById(R.id.lastName);
-		TextView universityEmailField = findViewById(R.id.universityEmail);
-		TextView newPasswordField = findViewById(R.id.newPassword);
-		TextView confirmNewPasswordField = findViewById(R.id.confirmNewPassword);
-		Spinner countryField = findViewById(R.id.country);
-		Spinner institutionField = findViewById(R.id.institution);
-		Spinner yearOfBirthField = findViewById(R.id.yearOfBirth);
-		Spinner genderField = findViewById(R.id.gender);
+	public void userSignUpNext() {
+		TextView firstNameField = findViewById(R.id.signup_first_name);
+		TextView lastNameField = findViewById(R.id.signup_last_name);
+		TextView universityEmailField = findViewById(R.id.signup_email);
+		TextView newPasswordField = findViewById(R.id.signup_new_password);
+		TextView confirmNewPasswordField = findViewById(R.id.signup_confirm_new_password);
+		Spinner countryField = findViewById(R.id.signup_country);
+		Spinner institutionField = findViewById(R.id.signup_institution);
+		Spinner yearOfBirthField = findViewById(R.id.signup_birth_year);
+		Spinner genderField = findViewById(R.id.signup_gender);
 		
 		firstName = firstNameField.getText().toString();
 		lastName = lastNameField.getText().toString(); 
@@ -408,15 +423,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		password = newPasswordField.getText().toString(); 
 		confirmPassword = confirmNewPasswordField.getText().toString(); 
 		country = countryField.getSelectedItem().toString();
-		institution = institutionField.getSelectedItem().toString();
-		yearOfBirth = yearOfBirthField.getSelectedItem().toString();
+
+		if (institutionField.getSelectedItem() != null) {
+            institution = institutionField.getSelectedItem().toString();
+        } else {
+            institution = null;
+        }
+
+        if (yearOfBirthField.getSelectedItem() != null) {
+            yearOfBirth = yearOfBirthField.getSelectedItem().toString();
+        } else {
+            yearOfBirth = null;
+        }
+
 		gender = genderField.getSelectedItem().toString();
 		
-		if(firstName.equals("") || lastName.equals("") || email.equals("") || password.equals("") || password.equals("") || confirmPassword.equals("")
-				|| country.equals("") || institution.equals("") || yearOfBirth.equals("") || gender.equals("")) {
+		if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(email)
+                || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword) || confirmPassword.equals("")
+                || TextUtils.isEmpty(country) || TextUtils.isEmpty(institution)
+                || TextUtils.isEmpty(yearOfBirth) || TextUtils.isEmpty(gender)) {
 			
-		}
-		else {
+		} else {
 			UserConsentAgreementFragment userConsentAgreementFragment = new UserConsentAgreementFragment();
 			switchContent(userConsentAgreementFragment);
 		}
@@ -426,8 +453,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		if(firstName.equals("") || lastName.equals("") || email.equals("") || password.equals("") || password.equals("") || confirmPassword.equals("")
 				|| country.equals("") || institution.equals("") || yearOfBirth.equals("") || gender.equals("")) {
 			
-		}
-		else {
+		} else {
 			application.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
 				@Override
 				protected void handleResponse(Response<GeneralInfoResponse> response) {
@@ -438,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 						for (Country country : body.countries) {
 							for (Institution institution : country.institutions) {
-								if (institution.name.equals(institution)) {
+								if (institution.getName().equals(institution)) {
 									institutionId = institution.id;
 								}
 							}
@@ -484,16 +510,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .replace(R.id.container, (Fragment)fragment, fragment.getClass().toString());
 
             if (!popBackStack) {
-                transaction.addToBackStack(null);
+                transaction.addToBackStack(null).commitAllowingStateLoss();
+
+                getSupportFragmentManager().executePendingTransactions();
+
+                postFragmentCommit(fragment.getTitle());
+
+            } else {
+                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle())).commitAllowingStateLoss();
             }
-
-            transaction
-					.runOnCommit(() -> {
-                        String title = fragment.getTitle();
-
-                        if (!TextUtils.isEmpty(title)) setToolbarTitle(title);
-                    })
-					.commitAllowingStateLoss();
         });
 	}
+
+	private void postFragmentCommit(String fragmentTitle) {
+        if (!TextUtils.isEmpty(fragmentTitle)) setToolbarTitle(fragmentTitle);
+    }
 }

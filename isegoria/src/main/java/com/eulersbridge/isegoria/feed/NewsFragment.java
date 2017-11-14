@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
@@ -193,7 +194,7 @@ public class NewsFragment extends Fragment {
                 Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
 
                 Bundle extras = new Bundle();
-                extras.putParcelable("article", Parcels.wrap(article1));
+                extras.putParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE, Parcels.wrap(article1));
                 activityIntent.putExtras(extras);
 
                 //Animate with a scale-up transition between the activities
@@ -257,7 +258,7 @@ public class NewsFragment extends Fragment {
                 Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
 
                 Bundle extras = new Bundle();
-                extras.putParcelable("article", Parcels.wrap(article2));
+                extras.putParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE, Parcels.wrap(article2));
 
                 activityIntent.putExtras(extras);
 
@@ -302,7 +303,7 @@ public class NewsFragment extends Fragment {
                 Intent activityIntent = new Intent(getActivity(), NewsDetailActivity.class);
 
                 Bundle extras = new Bundle();
-                extras.putParcelable("article", Parcels.wrap(article1));
+                extras.putParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE, Parcels.wrap(article1));
                 activityIntent.putExtras(extras);
 
                 //Animate with a scale-up transition between the activities

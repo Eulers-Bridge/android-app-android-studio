@@ -143,7 +143,7 @@ public class ProfileFragment extends Fragment {
             protected void handleResponse(Response<Institution> response) {
                 Institution institution = response.body();
                 if (institution != null){
-                    institutionTextView.setText(institution.name);
+                    institutionTextView.setText(institution.getName());
                 }
             }
         });
@@ -164,6 +164,7 @@ public class ProfileFragment extends Fragment {
 
                     GlideApp.with(ProfileFragment.this)
                             .load(photo.thumbnailUrl)
+                            .placeholder(R.color.profileImageBackground)
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(backgroundImageView);
                 }

@@ -27,14 +27,14 @@
 
     <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
 
-    <string name="user_sign_up_first_name">First Name</string>
-    <string name="user_sign_up_last_name">Last Name</string>
-    <string name="user_sign_up_university_email">University Email</string>
+    <string name="user_sign_up_first_name">Given Name</string>
+    <string name="user_sign_up_last_name">Family Name</string>
+    <string name="user_sign_up_university_email">Email Address</string>
     <string name="user_sign_up_first_password">New Password</string>
     <string name="user_sign_up_confirm_password">Confirm Password</string>
     <string name="user_sign_up_next_button">Next</string>
-    <string name="user_sign_up_choose_country_hint">Select Country</string>
-    <string name="user_sign_up_choose_institution_hint">Select Institution</string>
+    <string name="user_sign_up_choose_country_hint">Country</string>
+    <string name="user_sign_up_choose_institution_hint">Institution</string>
 
     <!-- Email verification -->
     <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>

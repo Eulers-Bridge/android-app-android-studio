@@ -31,6 +31,6 @@ class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        onClickListener.onItemClick(view, getAdapterPosition());
+        onClickListener.onItemClick(this, getAdapterPosition());
     }
 }

@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.text.format.DateUtils;
@@ -18,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.eulersbridge.isegoria.R;
 
-import java.io.InputStream;
 import java.util.Date;
 
 public final class Utils {

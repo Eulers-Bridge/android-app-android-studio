@@ -72,7 +72,7 @@ class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implement
     }
 
     @Override
-    public void onItemClick(View view, int position) {
+    public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
         final Position item = items.get(position);
 
         Bundle arguments = new Bundle();

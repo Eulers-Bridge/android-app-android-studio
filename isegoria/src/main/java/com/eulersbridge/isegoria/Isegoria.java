@@ -102,7 +102,7 @@ public class Isegoria extends Application {
 	}
 
 	public API getAPI() {
-	    return network.getAPI();
+	    return getNetworkService().getAPI();
     }
 
 	public User getLoggedInUser() {
