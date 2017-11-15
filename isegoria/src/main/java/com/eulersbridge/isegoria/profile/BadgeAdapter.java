@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -33,12 +34,12 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
         this.fragment = fragment;
     }
 
-    void replaceCompletedItems(List<Badge> newItems) {
+    void replaceCompletedItems(@NonNull List<Badge> newItems) {
         completedItems.clear();
         completedItems.addAll(newItems);
     }
 
-    void replaceRemainingItems(List<Badge> newItems) {
+    void replaceRemainingItems(@NonNull List<Badge> newItems) {
         remainingItems.clear();
         remainingItems.addAll(newItems);
     }
@@ -131,7 +132,7 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
     @Override
     public BadgeViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.from(viewGroup.getContext()).
-                inflate(R.layout.profile_badges_partial_list_item, viewGroup, false);
+                inflate(R.layout.profile_badges_list_item, viewGroup, false);
         return new BadgeViewHolder(itemView);
     }
 }

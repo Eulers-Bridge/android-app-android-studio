@@ -22,7 +22,7 @@
         android:paddingHorizontal="@dimen/activity_horizontal_margin"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="20sp"/>
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/event_list_details_text_view"

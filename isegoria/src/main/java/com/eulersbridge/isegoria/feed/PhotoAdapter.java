@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,7 +28,7 @@ class PhotoAdapter extends RecyclerView.Adapter<PhotoViewHolder> implements Recy
         this.fragment = fragment;
     }
 
-    void replaceItems(List<Photo> newItems) {
+    void replaceItems(@NonNull List<Photo> newItems) {
         items.clear();
         items.addAll(newItems);
     }

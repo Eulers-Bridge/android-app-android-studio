@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -29,7 +30,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         this.fragment = fragment;
     }
 
-    public void replaceItems(List<Task> newItems) {
+    public void replaceItems(@NonNull List<Task> newItems) {
         items.clear();
         items.addAll(newItems);
     }
@@ -102,7 +103,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.from(viewGroup.getContext()).
-                inflate(R.layout.profile_tasks_partial_list_item, viewGroup, false);
+                inflate(R.layout.profile_tasks_list_item, viewGroup, false);
         return new TaskViewHolder(itemView);
     }
 }

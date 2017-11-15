@@ -12,12 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
-import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -26,35 +27,37 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
-class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements RecyclerViewItemClickListener {
+public class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> implements RecyclerViewItemClickListener {
     final private Fragment fragment;
-    final private List<Event> items = new ArrayList<>();
+    final private List<NewsArticle> items = new ArrayList<>();
 
-    EventAdapter(Fragment fragment) {
+    NewsAdapter(Fragment fragment) {
         this.fragment = fragment;
     }
 
-    void replaceItems(@NonNull List<Event> newItems) {
+    void replaceItems(@NonNull List<NewsArticle> newItems) {
         items.clear();
         items.addAll(newItems);
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public int getItemCount() {
+        return items.size();
+    }
 
     @Override
-    public void onBindViewHolder(EventViewHolder viewHolder, int index) {
-        Event item = items.get(index);
+    public void onBindViewHolder(NewsViewHolder viewHolder, int index) {
+        NewsArticle item = items.get(index);
 
-        viewHolder.titleTextView.setText(item.name);
+        viewHolder.titleTextView.setText(item.title);
 
-        String dateTime = Utils.convertTimestampToString(fragment.getContext(), item.date);
-        viewHolder.detailsTextView.setText(dateTime);
+        String dateTime = Utils.convertTimestampToString(fragment.getContext(), item.dateTimestamp);
+        viewHolder.dateTextView.setText(dateTime);
 
         GlideApp.with(fragment)
                 .load(item.getPhotoUrl())
                 .placeholder(R.color.grey)
-                .transform(new TintTransformation())
+                .transforms(new CenterCrop(), new TintTransformation())
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(viewHolder.imageView);
     }
@@ -67,10 +70,10 @@ class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements Recy
         int[] location = new int[] {0,0};
         viewHolder.itemView.getLocationOnScreen(location);
 
-        Intent activityIntent = new Intent(activity, EventDetailActivity.class);
+        Intent activityIntent = new Intent(activity, NewsDetailActivity.class);
 
         Bundle extras = new Bundle();
-        extras.putParcelable(Constant.ACTIVITY_EXTRA_EVENT, Parcels.wrap(items.get(position)));
+        extras.putParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE, Parcels.wrap(items.get(position)));
         activityIntent.putExtras(extras);
 
         //Animate with a scale-up transition between the activities
@@ -81,9 +84,9 @@ class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements Recy
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public NewsViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View itemView = LayoutInflater.from(viewGroup.getContext()).
-                inflate(R.layout.events_list_item, viewGroup, false);
-        return new EventViewHolder(itemView, this);
+                inflate(R.layout.news_partial_grid_item, viewGroup, false);
+        return new NewsViewHolder(itemView, this);
     }
 }

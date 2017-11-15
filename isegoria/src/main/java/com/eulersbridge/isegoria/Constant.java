@@ -19,6 +19,7 @@ public class Constant {
     static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
 
     public static final String ACTIVITY_EXTRA_NEWS_ARTICLE = "article";
+    public static final String ACTIVITY_EXTRA_PHOTO_ALBUM_ID = "albumId";
     public static final String ACTIVITY_EXTRA_PHOTOS = "photos";
     public static final String ACTIVITY_EXTRA_PHOTOS_POSITION = "position";
     public static final String ACTIVITY_EXTRA_EVENT = "event";

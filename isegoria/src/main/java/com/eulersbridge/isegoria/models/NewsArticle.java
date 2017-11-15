@@ -19,7 +19,7 @@ public class NewsArticle {
     public String title;
     public String content;
 
-    public List<Photo> photos;
+    private List<Photo> photos;
 
     @Json(name = "date")
     @Timestamp

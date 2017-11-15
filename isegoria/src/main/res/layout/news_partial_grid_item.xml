@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="200dp"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/news_grid_item_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin"
+        android:paddingHorizontal="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/news_grid_item_title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textSize="17sp"
+            android:lineSpacingMultiplier="1.05" />
+
+        <TextView
+            android:id="@+id/news_grid_item_date_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="13sp"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+</FrameLayout>
