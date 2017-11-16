@@ -60,6 +60,7 @@ public class PersonalityScreen2Fragment extends Fragment {
                         protected void handleResponse(Response response) {
                             mainActivity.getSupportFragmentManager().popBackStack();
                             mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
+                            mainActivity.setNavigationEnabled(true);
                         }
                     });
         });

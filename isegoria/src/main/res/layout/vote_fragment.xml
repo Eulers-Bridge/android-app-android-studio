@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white"
     android:gravity="center_vertical">
 
     <ScrollView
@@ -21,10 +20,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="center"
-                android:inputType="textMultiLine"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
-                android:text="Choose your vote location and time."
+                android:text="@string/vote_choose_location_time"
                 android:textColor="#757581"
                 android:textSize="20sp"
                 android:visibility="invisible" />
@@ -114,10 +112,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="center"
-                android:inputType="textMultiLine"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
-                android:text="Choose the location of the booth you will be voting at. Don't worry! all booths are listed down for you."
+                android:text="@string/vote_choose_both"
                 android:textColor="#757581"
                 android:textSize="20sp"
                 android:visibility="invisible" />
@@ -136,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/green_button"
                     android:gravity="center"
-                    android:text="Next"
+                    android:text="@string/vote_next_button"
                     android:textColor="#52BB42"
                     android:layout_gravity="top"
                     android:visibility="invisible" />

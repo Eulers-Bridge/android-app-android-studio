@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.models;
 
+import android.support.annotation.Nullable;
+
 import com.eulersbridge.isegoria.network.Timestamp;
 import com.squareup.moshi.Json;
 
@@ -20,4 +22,13 @@ public class Event {
     public long date;
 
     public List<Photo> photos;
+
+    public @Nullable String getPhotoUrl() {
+        if (photos != null && photos.size() > 0) {
+            return photos.get(0).thumbnailUrl;
+
+        } else {
+            return null;
+        }
+    }
 }

@@ -1,18 +1,17 @@
 package com.eulersbridge.isegoria.profile;
 
-import android.app.ActionBar;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,6 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
@@ -33,15 +35,19 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
+
+import org.parceler.Parcels;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
-	private View rootView;
+public class ProfileFragment extends Fragment implements TitledFragment {
+
+    private View rootView;
 
     private TextView friendsNumTextView;
     private TextView groupNumTextView;
@@ -52,48 +58,40 @@ public class ProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
+    private @Nullable ViewPager parentViewPager;
+
+    private final TaskAdapter taskAdapter = new TaskAdapter(this);
+    private RecyclerView tasksListView;
+
     private Isegoria isegoria;
 
-	@Override
-	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.profile_fragment, container, false);
+    private User user = null;
+    private boolean isLoggedInUser = false;
 
-		setHasOptionsMenu(true);
+    @Override
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
         isegoria = (Isegoria) getActivity().getApplication();
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
+        MainActivity mainActivity = (MainActivity) getActivity();
 
-        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 100.00, getResources().getDisplayMetrics());
-
-        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
-        photoImageView.setLayoutParams(layoutParams);
+        View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
+        friendsNumTextView.setOnClickListener(friendsClickListener);
+
+        rootView.findViewById(R.id.friendsTitle).setOnClickListener(friendsClickListener);
+
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        Long userId = isegoria.getLoggedInUser().getId();
-
-        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
-            @Override
-            protected void handleResponse(Response<List<Badge>> response) {
-                List<Badge> remainingBadges = response.body();
-                if (remainingBadges != null) {
-                    updateRemainingBadgesCount(remainingBadges.size());
-                }
-            }
-        });
-
-        /*final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
-        showProgressButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPager.setCurrentItem(1);
-            }
-        });*/
+        TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
+        if (parentViewPager == null) {
+            showProgressButton.setVisibility(View.GONE);
+        } else {
+            showProgressButton.setOnClickListener(view -> parentViewPager.setCurrentItem(1, true));
+        }
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
@@ -104,21 +102,68 @@ public class ProfileFragment extends Fragment {
         circularSeekBar2.setCircleProgressColor(Color.parseColor("#FFB400"));
         circularSeekBar3.setCircleProgressColor(Color.parseColor("#B61B1B"));
 
-        User user = isegoria.getLoggedInUser();
+        setupTasksListView(rootView);
 
-        final TextView name = rootView.findViewById(R.id.profile_name);
+        if (getArguments() != null) {
+            @Nullable Parcelable userParcelable = getArguments().getParcelable(Constant.FRAGMENT_EXTRA_USER);
+            if (userParcelable != null) {
+                user = Parcels.unwrap(userParcelable);
+
+            } else {
+                long userId = getArguments().getLong(Constant.FRAGMENT_EXTRA_PROFILE_ID);
+                fetchUser(userId);
+            }
+        }
+
+        if (user == null) {
+            user = isegoria.getLoggedInUser();
+            isLoggedInUser = true;
+        }
+
+        if (user != null) setupUI();
+
+		return rootView;
+	}
+
+	private void fetchUser(long id) {
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
+            @Override
+            protected void handleResponse(Response<Contact> response) {
+                Contact contact = response.body();
+                if (contact != null) {
+
+                    if (user == null) {
+                        user = new User(contact);
+
+                        setupUI();
+                    }
+
+                    updateStats(contact.contactsCount, contact.totalTasksCount);
+                }
+            }
+        });
+    }
+
+    private void setupUI() {
+        TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
 
-        final TextView personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
+        TextView personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
 
-        if (user.hasPersonality) {
+        if (isLoggedInUser || user.hasPersonality) {
+            // Don't show the personality test button if visiting someone else's profile,
+            // or if showing the logged in user's profile and they've completed personality Qs already
             personalityTestButton.setVisibility(View.GONE);
 
         } else {
+            final MainActivity mainActivity = (MainActivity)getActivity();
+
             personalityTestButton.setOnClickListener(view -> {
 
                 PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-                personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                if (mainActivity != null) {
+                    personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                }
 
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
@@ -130,7 +175,19 @@ public class ProfileFragment extends Fragment {
 
         updateCompletedBadgesCount(user.completedBadgesCount);
         updateCompletedTasksCount(user.completedTasksCount);
-        updateExperience(user.level);
+        updateExperience(user.level, user.experience);
+
+        long userId = user.getId();
+
+        isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
+            @Override
+            protected void handleResponse(Response<List<Badge>> response) {
+                List<Badge> remainingBadges = response.body();
+                if (remainingBadges != null) {
+                    updateRemainingBadgesCount(remainingBadges.size());
+                }
+            }
+        });
 
         TextView institutionTextView = rootView.findViewById(R.id.profile_institution);
 
@@ -139,16 +196,23 @@ public class ProfileFragment extends Fragment {
             protected void handleResponse(Response<Institution> response) {
                 Institution institution = response.body();
                 if (institution != null){
-                    institutionTextView.setText(institution.name);
+                    institutionTextView.setText(institution.getName());
                 }
             }
         });
 
-        if (!TextUtils.isEmpty(user.profilePhotoURL)) {
-            GlideApp.with(this)
-                    .load(user.profilePhotoURL)
-                    .into(photoImageView);
-        }
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 100.00, getResources().getDisplayMetrics());
+
+        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
+        photoImageView.setLayoutParams(layoutParams);
+
+        GlideApp.with(this)
+                .load(user.profilePhotoURL)
+                .priority(Priority.HIGH)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(photoImageView);
 
         ImageView backgroundImageView = rootView.findViewById(R.id.profile_image_background);
 
@@ -161,6 +225,9 @@ public class ProfileFragment extends Fragment {
 
                     GlideApp.with(ProfileFragment.this)
                             .load(photo.thumbnailUrl)
+                            .priority(Priority.HIGH)
+                            .placeholder(R.color.profileImageBackground)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(backgroundImageView);
                 }
             }
@@ -170,39 +237,20 @@ public class ProfileFragment extends Fragment {
             @Override
             protected void handleResponse(Response<List<Task>> response) {
                 List<Task> tasks = response.body();
-                if (tasks != null) addTasks(tasks);
+                if (tasks != null) setTasks(tasks);
             }
         });
-
-        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
-            @Override
-            protected void handleResponse(Response<Contact> response) {
-                Contact user = response.body();
-                if (user != null) {
-                    updateStats(user.contactsCount, user.totalTasksCount);
-                }
-            }
-        });
-
-		return rootView;
-	}
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.profile, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-	    if (item.getItemId() == R.id.profileLogout) {
+	private void setupTasksListView(View rootView) {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        tasksListView = rootView.findViewById(R.id.profile_tasks_list_view);
+        tasksListView.setLayoutManager(layoutManager);
+        tasksListView.setAdapter(taskAdapter);
+        tasksListView.setNestedScrollingEnabled(false);
 
-            ((Isegoria)getActivity().getApplication()).logOut();
-
-	        return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
+        tasksListView.setDrawingCacheEnabled(true);
+        tasksListView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
     }
 
     @UiThread
@@ -236,11 +284,17 @@ public class ProfileFragment extends Fragment {
     }
 
     @UiThread
-    private void updateExperience(long experience) {
-        circularSeekBar1.setTopLine(String.valueOf(experience));
-        circularSeekBar1.setBottomLine("NEED " + (1000 - (experience % 1000)));
-        circularSeekBar1.setProgress((int)experience);
-        circularSeekBar1.setMax((int) ((experience / 1000) % 1000));
+    private void updateExperience(long level, long experience) {
+        circularSeekBar1.setTopLine(String.valueOf(level));
+
+        long max = 1000;
+        long progress = experience % 1000;
+
+        circularSeekBar1.setBottomLine("NEED " + progress);
+
+        circularSeekBar1.setMax((int)max);
+
+        circularSeekBar1.setProgress((int)progress);
         Thread t1 = new Thread(circularSeekBar1);
         t1.start();
     }
@@ -262,92 +316,6 @@ public class ProfileFragment extends Fragment {
         t4.start();
     }
 
-    private void addTasks(@NonNull List<Task> tasks) {
-	    if (getActivity() != null) {
-	        getActivity().runOnUiThread(() -> {
-	            for (Task task : tasks) {
-	                addTask(task.id, task.action, task.xpValue);
-                }
-            });
-        }
-    }
-
-    @UiThread
-    private void addTask(long taskId, String action, long xpValue) {
-        LinearLayout tasksLinearLayout = rootView.findViewById(R.id.tasksLayout);
-
-        int paddingMargin1 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 43.33333333, getResources().getDisplayMetrics());
-        int paddingMargin2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 3.333333333, getResources().getDisplayMetrics());
-        int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 10, getResources().getDisplayMetrics());
-
-        RelativeLayout taskLayout = new RelativeLayout(getActivity());
-        taskLayout.setGravity(Gravity.START);
-        taskLayout.setLayoutParams(new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, paddingMargin1));
-
-        LinearLayout leftLayout = new LinearLayout(getActivity());
-        LinearLayout rightLayout = new LinearLayout(getActivity());
-
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        rightLayout.setLayoutParams(lp);
-
-        LinearLayout.LayoutParams layoutParams =
-                new LinearLayout.LayoutParams(paddingMargin1, paddingMargin1);
-        ImageView iconImage = new ImageView(getActivity());
-        iconImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        iconImage.setLayoutParams(layoutParams);
-        iconImage.setPadding(paddingMargin2, 0, 0, 0);
-        //iconImage.setBackgroundColor(Color.BLACK);
-
-        isegoria.getAPI().getPhotos(taskId).enqueue(new SimpleCallback<PhotosResponse>() {
-            @Override
-            protected void handleResponse(Response<PhotosResponse> response) {
-                PhotosResponse body = response.body();
-                if (body != null && body.totalPhotos > 0 && isAdded()) {
-                    GlideApp.with(ProfileFragment.this)
-                            .load(body.photos.get(0).thumbnailUrl)
-                            .into(iconImage);
-                }
-            }
-        });
-
-        TextView taskLabel = new TextView(getActivity());
-        taskLabel.setGravity(Gravity.CENTER_VERTICAL);
-        taskLabel.setPadding(paddingMargin3, paddingMargin3, 0, 0);
-
-        TextView xpLabel = new TextView(getActivity());
-        xpLabel.setGravity(Gravity.END);
-        xpLabel.setPadding(0, paddingMargin3, paddingMargin3, 0);
-        xpLabel.setText(String.valueOf(xpValue) + " XP");
-
-        taskLabel.setText(action);
-
-        leftLayout.addView(iconImage);
-        leftLayout.addView(taskLabel);
-        rightLayout.addView(xpLabel);
-
-        taskLayout.addView(leftLayout);
-        taskLayout.addView(rightLayout);
-
-        View divider = new View(getActivity());
-        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
-        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
-
-        tasksLinearLayout.addView(divider);
-        tasksLinearLayout.addView(taskLayout);
-
-        divider = new View(getActivity());
-        divider.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
-        divider.setBackgroundColor(Color.parseColor("#838a8a8a"));
-        tasksLinearLayout.addView(divider);
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -363,5 +331,33 @@ public class ProfileFragment extends Fragment {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setTasks(@NonNull List<Task> tasks) {
+        if (getActivity() != null) {
+            taskAdapter.replaceItems(tasks);
+            taskAdapter.notifyDataSetChanged();
+
+            // Calculate rough new list view size to 'autosize' it
+            getActivity().runOnUiThread(() -> {
+                int heightDp = 44 * tasks.size();
+
+                int heightPx = Math.round(TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, heightDp, getResources().getDisplayMetrics()));
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
+
+                tasksListView.setLayoutParams(layoutParams);
+            });
+        }
+    }
+
+    @Override
+    public String getTitle() {
+        return "Overview";
+    }
+
+    void setViewPager(ViewPager viewPager) {
+        parentViewPager = viewPager;
     }
 }

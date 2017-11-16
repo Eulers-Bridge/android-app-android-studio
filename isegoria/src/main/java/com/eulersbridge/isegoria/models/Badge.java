@@ -11,4 +11,5 @@ public class Badge {
     public String description;
     public int level;
     public int xpValue;
+
 }

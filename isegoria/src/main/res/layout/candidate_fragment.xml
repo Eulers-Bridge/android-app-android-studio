@@ -2,19 +2,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/candidate_frame1" >
-
-    <com.viewpagerindicator.TabPageIndicator
-        android:id="@+id/tabPageIndicatorCandidate"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent" />
+    android:id="@+id/election_candidate_frame" >
 
     <android.support.v4.view.ViewPager
         android:id="@+id/candidateViewPager"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/tabPageIndicatorCandidate" />
+        android:layout_above="@+id/tabPageIndicatorCandidate" />
+
+    <com.viewpagerindicator.TabPageIndicator
+        android:id="@id/tabPageIndicatorCandidate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

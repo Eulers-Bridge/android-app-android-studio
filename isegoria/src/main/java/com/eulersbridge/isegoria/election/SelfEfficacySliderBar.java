@@ -12,6 +12,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.views.SliderBarPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SelfEfficacySliderBar extends BaseSliderBar {
 
@@ -30,15 +31,17 @@ public class SelfEfficacySliderBar extends BaseSliderBar {
     }
 
     private void setupPoints() {
-        int parentWidth = getParentWidth();
-        int pointY = getParentHeight() / 2;
-        Resources resources = getResources();
+        if (getPoints().size() != 5) {
+            int parentWidth = getParentWidth();
+            int pointY = getParentHeight() / 2;
+            Resources resources = getResources();
 
-        addPoint(new SliderBarPoint(horizontalPadding, pointY, resources.getString(R.string.self_efficacy_slider_not_at_all)));
-        addPoint(new SliderBarPoint(parentWidth/4, pointY, resources.getString(R.string.self_efficacy_slider_unlikely)));
-        addPoint(new SliderBarPoint((parentWidth/4)*2, pointY, resources.getString(R.string.self_efficacy_slider_neutral)));
-        addPoint(new SliderBarPoint((parentWidth/4)*3, pointY, resources.getString(R.string.self_efficacy_slider_likely)));
-        addPoint(new SliderBarPoint(parentWidth - horizontalPadding, pointY, resources.getString(R.string.self_efficacy_slider_completely)));
+            addPoint(new SliderBarPoint(horizontalPadding, pointY, resources.getString(R.string.self_efficacy_slider_not_at_all)));
+            addPoint(new SliderBarPoint(parentWidth/4, pointY, resources.getString(R.string.self_efficacy_slider_unlikely)));
+            addPoint(new SliderBarPoint((parentWidth/4)*2, pointY, resources.getString(R.string.self_efficacy_slider_neutral)));
+            addPoint(new SliderBarPoint((parentWidth/4)*3, pointY, resources.getString(R.string.self_efficacy_slider_likely)));
+            addPoint(new SliderBarPoint(parentWidth - horizontalPadding, pointY, resources.getString(R.string.self_efficacy_slider_completely)));
+        }
     }
 
     @Override
@@ -72,7 +75,7 @@ public class SelfEfficacySliderBar extends BaseSliderBar {
     protected void onDraw(Canvas canvas) {
         int lineY = getParentHeight() / 2;
 
-        final ArrayList<SliderBarPoint> points = getPoints();
+        final List<SliderBarPoint> points = getPoints();
 
         for (int i = 0; i < points.size(); i++) {
             SliderBarPoint point = points.get(i);

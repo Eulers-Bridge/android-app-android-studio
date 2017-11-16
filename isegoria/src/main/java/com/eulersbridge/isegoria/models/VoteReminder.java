@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.models;
 
 import com.eulersbridge.isegoria.network.Timestamp;
 
+@SuppressWarnings("CanBeFinal")
 public class VoteReminder {
 
     public String userEmail;

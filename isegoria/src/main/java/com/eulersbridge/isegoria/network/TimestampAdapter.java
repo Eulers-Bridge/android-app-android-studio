@@ -9,6 +9,7 @@ import java.util.TimeZone;
 /**
  * Convert Unix timestamps in JSON to a Unix timestamp in the user's local timezone.
  */
+@SuppressWarnings("unused")
 class TimestampAdapter {
 
     private static int getUserOffsetFromUtc() {

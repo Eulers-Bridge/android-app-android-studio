@@ -5,7 +5,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -36,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-@SuppressWarnings("deprecation")
 public class CandidateTicketFragment extends Fragment {
 
 	private Isegoria isegoria;
@@ -59,7 +57,7 @@ public class CandidateTicketFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 
-		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
+		View rootView = inflater.inflate(R.layout.election_candidates_tickets_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.positionsTableLayout);
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -200,11 +198,7 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			View view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rectShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rectShapeDrawable);
-			}
+			view.setBackground(rectShapeDrawable);
 	        view.setOnClickListener(view12 -> {
                     FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -218,7 +212,7 @@ public class CandidateTicketFragment extends Fragment {
 
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                     fragmentTransaction2.commit();
             });
 
@@ -272,11 +266,7 @@ public class CandidateTicketFragment extends Fragment {
 	        
 			view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rect2ShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rect2ShapeDrawable);
-			}
+			view.setBackground(rect2ShapeDrawable);
 	        view.setOnClickListener(view1 -> {
                     FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
@@ -289,7 +279,7 @@ public class CandidateTicketFragment extends Fragment {
                     args.putString("Logo", logo2);
                     fragment2.setArguments(args);
                     fragmentTransaction2.addToBackStack(null);
-                    fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                    fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                     fragmentTransaction2.commit();
             });
 	        
@@ -387,11 +377,7 @@ public class CandidateTicketFragment extends Fragment {
 
             View view = new View(getActivity());
             view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-				view.setBackground(rectShapeDrawable);
-			} else {
-				view.setBackgroundDrawable(rectShapeDrawable);
-			}
+			view.setBackground(rectShapeDrawable);
 
             view.setOnClickListener(view1 -> {
                 FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
@@ -406,7 +392,7 @@ public class CandidateTicketFragment extends Fragment {
 
                 fragment2.setArguments(args);
                 fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.add(R.id.candidate_frame1, fragment2);
+                fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
                 fragmentTransaction2.commit();
             });
 

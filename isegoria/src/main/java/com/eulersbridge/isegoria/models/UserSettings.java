@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.models;
 
+@SuppressWarnings("CanBeFinal")
 public class UserSettings {
 
     public boolean trackingOff;

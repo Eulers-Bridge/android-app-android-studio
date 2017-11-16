@@ -26,6 +26,7 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
         MainActivity mainActivity = (MainActivity) getActivity();
 
         mainActivity.setToolbarTitle(getString(R.string.section_title_self_efficacy_questions));
+        mainActivity.getTabLayout().setVisibility(View.GONE);
 
         Isegoria isegoria = mainActivity.getIsegoriaApplication();
         String userEmail = isegoria.getLoggedInUser().email;
@@ -50,6 +51,7 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
                 protected void handleResponse(Response response) {
                     mainActivity.getSupportFragmentManager().popBackStack();
                     mainActivity.setToolbarTitle(getString(R.string.section_title_vote));
+                    mainActivity.getTabLayout().setVisibility(View.VISIBLE);
                 }
             });
         });

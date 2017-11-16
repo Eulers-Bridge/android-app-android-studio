@@ -1,16 +1,14 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">Isegoria</string>
 
     <string name="isegoria_logo_content_description">Isegoria Logo</string>
 
-    <!-- Navigation drawer labels -->
+    <!-- Navigation labels -->
     <string name="navigation_feed">Feed</string>
     <string name="navigation_election">Election</string>
     <string name="navigation_poll">Polls</string>
     <string name="navigation_vote">Vote</string>
-    <string name="navigation_friends">Friends</string>
     <string name="navigation_profile">Profile</string>
-    <string name="navigation_settings">Settings</string>
 
     <!-- Toolbar titles for each navigation item -->
     <string name="section_title_feed">Feed</string>
@@ -19,7 +17,6 @@
     <string name="section_title_vote">Vote</string>
     <string name="section_title_friends">Friends</string>
     <string name="section_title_profile">Profile</string>
-    <string name="section_title_settings">Settings</string>
 
     <!-- Login / Sign Up -->
     <string name="user_login_email_hint">Email</string>
@@ -30,14 +27,14 @@
 
     <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
 
-    <string name="user_sign_up_first_name">First Name</string>
-    <string name="user_sign_up_last_name">Last Name</string>
-    <string name="user_sign_up_university_email">University Email</string>
+    <string name="user_sign_up_first_name">Given Name</string>
+    <string name="user_sign_up_last_name">Family Name</string>
+    <string name="user_sign_up_university_email">Email Address</string>
     <string name="user_sign_up_first_password">New Password</string>
     <string name="user_sign_up_confirm_password">Confirm Password</string>
     <string name="user_sign_up_next_button">Next</string>
-    <string name="user_sign_up_choose_country_hint">Select Country</string>
-    <string name="user_sign_up_choose_institution_hint">Select Institution</string>
+    <string name="user_sign_up_choose_country_hint">Country</string>
+    <string name="user_sign_up_choose_institution_hint">Institution</string>
 
     <!-- Email verification -->
     <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
@@ -67,10 +64,14 @@
     <string name="election_overview_subheading">Overview</string>
     <string name="election_overview_process_subheading">Process</string>
 
+    <string name="election_efficacy_survey_message">Welcome to your election centre.\nLearn about your political efficacy by completing this survey.</string>
+    <string name="election_efficacy_survey_start_button">Start Survey</string>
+
     <!-- Voting -->
+    <string name="vote_next_button">Next</string>
+
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
     <string name="vote_sign_pledge_next_button">Next</string>
-    <string name="vote_sign_pledge_self_efficacy_button">Start Survey</string>
     <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
 
     <string name="vote_done_heading">Done and done.</string>
@@ -83,6 +84,11 @@
     <string name="self_efficacy_done_button">Done</string>
     <string name="self_efficacy_questions_message">The PPSE-S composed of 4 items aimed to assess individuals’ beliefs in their capabilities to engage actively in politics. The 4 items are measured on a 5 point Likert scale, from 1 (not at all) to 5 (completely).</string>
 
+    <string name="self_efficacy_statement_1">Promote public initiatives to support political programs that you believe are just</string>
+    <string name="self_efficacy_statement_2">Maintain personal relationships with representatives of national government authorities</string>
+    <string name="self_efficacy_statement_3">Promote effective activities of information and mobilization in your own community (of work, friends, and family), to sustain political programs in which you believe</string>
+    <string name="self_efficacy_statement_4">Use the means you have as a citizen to critically monitor the actions of your political representatives</string>
+
     <string name="self_efficacy_slider_not_at_all">Not at all</string>
     <string name="self_efficacy_slider_unlikely">Somewhat unlikely</string>
     <string name="self_efficacy_slider_neutral">Neutral</string>
@@ -91,15 +97,20 @@
 
     <!-- Polls -->
     <string name="poll_asked_by">Asked by %s</string>
-    <string name="poll_vote_submit_button">Vote</string>
 
     <!-- Feed/News -->
     <string name="news_article_star_content_description">Star news article</string>
     <string name="news_article_flag_content_description">Flag news article</string>
 
+    <string name="news_detail_activity_back_button_content_description">Back to News</string>
+
     <!-- Feed/Photos -->
     <string name="photo_detail_view_star">Star Photo</string>
     <string name="photo_detail_view_flag">Report Photo</string>
+
+    <!-- Feed/Event Detail -->
+    <string name="event_detail_activity_back_button_content_description">Back to Events</string>
+    <string name="event_detail_activity_organiser">Organizer: %s</string>
 
     <!-- Friends -->
     <string name="friends_search_title">Search</string>
@@ -118,12 +129,24 @@
     <string name="profile_section_events">Events</string>
     <string name="profile_show_progress">Show Progress</string>
     <string name="user_profile_personality_test_button">Complete Personality Test</string>
+
+    <string name="profile_settings">Settings</string>
     <string name="profile_logout">Logout</string>
 
+    <!-- User profile – tasks progress -->
+    <string name="profile_tasks_progress_level">Level %d</string>
+    <string name="profile_tasks_task_xp">%d XP</string>
+    <string name="profile_tasks_progress_description">%d out of %d XP till the next level!</string>
+    <string name="profile_tasks_progress_section_title_completed">Completed</string>
+    <string name="profile_tasks_progress_section_title_remaining">Remaining</string>
+
     <!-- Settings -->
+    <string name="settings_title">Isegoria Settings</string>
+
+    <string name="settings_back_button_content_description">Back to Profile</string>
     <string name="settings_profile_picture_content_description">Your profile picture</string>
     <string name="settings_change_photo">Change Photo</string>
-    <string name="settings_privacy_settings">Privacy Settings</string>
+    <string name="settings_privacy_settings">Privacy</string>
     <string name="settings_data_collection_opt_out">Opt Out of Data Collection</string>
     <string name="settings_do_not_track">Do not Track</string>
     <string name="settings_about_button">About this App</string>
@@ -131,11 +154,8 @@
 
     <!-- About -->
     <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
-
-    <!-- Misc -->
-    <string name="drawer_open" tools:keep="@string/drawer_open">Drawer Open</string>
-    <string name="drawer_close" tools:keep="@string/drawer_close">Drawer Close</string>
-
-    <string name="contact_profile_picture_content_description">Contact profile picture</string>
+    <string name="poll_title">Poll %d</string>
+    <string name="vote_choose_location_time">Choose your vote location and time.</string>
+    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
 
 </resources>

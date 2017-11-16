@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/newsFrameLayout"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,17 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
-            android:id="@+id/scrollView1"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/news_grid_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-                <TableLayout
-                    android:id="@+id/newsTableLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:stretchColumns="*"
-                    android:padding="2dp" />
-        </ScrollView>
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:paddingHorizontal="4dp"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

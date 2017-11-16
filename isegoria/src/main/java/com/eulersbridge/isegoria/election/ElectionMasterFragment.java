@@ -7,33 +7,43 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 
-public class ElectionMasterFragment extends Fragment {
+public class ElectionMasterFragment extends Fragment implements TitledFragment {
 
 	private ElectionOverviewFragment overviewFragment;
 	private CandidateFragment candidateFragment;
 
+    private MainActivity mainActivity;
+    private View rootView;
 	private TabLayout tabLayout;
 	
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		final View rootView = inflater.inflate(R.layout.election_master_layout, container, false);
+		rootView = inflater.inflate(R.layout.election_master_layout, container, false);
+
+		mainActivity = (MainActivity)getActivity();
 
 		// Ensure options menu from another fragment is not carried over
-		getActivity().invalidateOptionsMenu();
+		mainActivity.invalidateOptionsMenu();
 
-		((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_election));
+        setupTabLayout();
 
 		overviewFragment = new ElectionOverviewFragment();
 		candidateFragment = new CandidateFragment();
 
-		setupTabLayout();
-		showFirstTab();
+        showFirstTab();
 
 		return rootView;
+	}
+
+	@Override
+	public String getTitle() {
+		return getString(R.string.section_title_election);
 	}
 
 	public void setTabLayout(TabLayout tabLayout) {
@@ -52,10 +62,30 @@ public class ElectionMasterFragment extends Fragment {
 	}
 
 	private void showTabFragment(@NonNull Fragment fragment) {
-		getActivity().getSupportFragmentManager()
-				.beginTransaction()
-				.replace(R.id.election_frame, fragment)
-				.commitAllowingStateLoss();
+        mainActivity.getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.election_frame, fragment)
+                .commitAllowingStateLoss();
+
+        boolean userCompletedEfficacyQuestions = mainActivity.getIsegoriaApplication()
+                .getLoggedInUser().hasPPSEQuestions;
+
+        if (!userCompletedEfficacyQuestions) {
+
+            View overlay = rootView.findViewById(R.id.election_efficacy_overlay);
+            overlay.setVisibility(View.VISIBLE);
+
+            Button efficacyStartButton = overlay.findViewById(R.id.election_efficacy_overlay_start);
+            efficacyStartButton.setOnClickListener(view -> {
+                SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
+
+                mainActivity.getSupportFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .add(R.id.container, selfEfficacyQuestionsFragment)
+                        .commit();
+            });
+        }
 	}
 
 	private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {

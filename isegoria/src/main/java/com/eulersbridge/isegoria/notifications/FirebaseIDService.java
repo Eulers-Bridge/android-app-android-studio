@@ -37,7 +37,7 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
         CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest();
 
         request.setToken(refreshedToken);
-        request.setPlatformApplicationArn(Constant.SNSPlatformApplicationArn);
+        request.setPlatformApplicationArn(Constant.SNS_PLATFORM_APPLICATION_ARN);
 
         CreatePlatformEndpointResult result = getSNSClient().createPlatformEndpoint(request);
         if (result != null) {

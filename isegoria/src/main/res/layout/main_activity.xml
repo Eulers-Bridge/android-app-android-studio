@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@null"
-    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@null"
     android:fitsSystemWindows="true">
-    
+
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@null"
-        android:id="@+id/coordinatorLayout">
+        android:layout_above="@+id/navigation">
 
         <include layout="@layout/main_partial_appbar"/>
 
@@ -26,16 +25,14 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
     </android.support.design.widget.CoordinatorLayout>
 
-    <!-- Navigation drawer -->
-    <android.support.design.widget.NavigationView
-        android:fitsSystemWindows="true"
-        android:id="@+id/navigation"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@id/navigation"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
         app:itemIconTint="@color/nav_state_list"
         app:itemTextColor="@color/nav_state_list"
-        app:itemBackground="@drawable/nav_background_state_list"
-        app:menu="@menu/drawer" />
+        app:menu="@menu/navigation" />
 
-</android.support.v4.widget.DrawerLayout>
+</RelativeLayout>

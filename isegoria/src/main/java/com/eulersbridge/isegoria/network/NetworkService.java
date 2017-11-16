@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.network;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -44,10 +43,8 @@ public class NetworkService {
 
     private boolean needsSetup;
 
-    public NetworkService(Isegoria application, @Nullable String email, @Nullable String password) {
+    public NetworkService(Isegoria application) {
         this.application = application;
-        this.email = email;
-        this.password = password;
 
         Moshi moshi = new Moshi.Builder()
                 .add(new LenientLongAdapter())
@@ -128,7 +125,7 @@ public class NetworkService {
 
         setup();
 
-        String snsPlatformArn = Constant.SNSPlatformApplicationArn;
+        String snsPlatformArn = Constant.SNS_PLATFORM_APPLICATION_ARN;
         String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
         api.attemptLogin(snsPlatformArn, deviceToken).enqueue(new Callback<LoginResponse>() {
@@ -148,11 +145,7 @@ public class NetworkService {
                         if (user.accountVerified) {
                             userAccountVerified = true;
 
-                            if (user.hasPersonality) {
-                                application.setFeedFragment();
-                            } else {
-                                application.setPersonality();
-                            }
+                            application.onLoginSuccess();
                         }
                     }
                 }
@@ -163,7 +156,7 @@ public class NetworkService {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 t.printStackTrace();
-                application.getMainActivity().runOnUiThread(application::loginFailed);
+                application.getMainActivity().runOnUiThread(application::onLoginFailure);
             }
         });
     }
@@ -211,9 +204,9 @@ public class NetworkService {
 
         } finally {
             if (success) {
-                application.getMainActivity().runOnUiThread(application::signupSucceeded);
+                application.getMainActivity().runOnUiThread(application::onSignUpSuccess);
             } else {
-                application.getMainActivity().runOnUiThread(application::signupFailed);
+                application.getMainActivity().runOnUiThread(application::onSignUpFailure);
             }
         }
     }
@@ -238,12 +231,12 @@ public class NetworkService {
         long timestamp = System.currentTimeMillis() / 1000L;
         String filename = String.valueOf(application.getLoggedInUser().email) + "_" + String.valueOf(timestamp) + "_" + file.getName();
 
-        TransferObserver observer = transferUtility.upload(Constant.S3PicturesBucketName, filename, file);
+        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, filename, file);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 if (state == TransferState.COMPLETED) {
-                    updateDisplayPicturePhoto(Constant.S3PicturesPath + filename);
+                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + filename);
                 }
             }
 

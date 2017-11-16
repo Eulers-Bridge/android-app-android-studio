@@ -11,10 +11,11 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.R;
 
-public class EmailVerificationFragment extends Fragment {
+public class EmailVerificationFragment extends Fragment implements TitledFragment {
     private MainActivity mainActivity;
 
     @Override
@@ -39,5 +40,10 @@ public class EmailVerificationFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return null;
     }
 }

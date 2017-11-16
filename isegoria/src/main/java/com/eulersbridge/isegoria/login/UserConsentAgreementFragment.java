@@ -7,12 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 
-public class UserConsentAgreementFragment extends Fragment {
+public class UserConsentAgreementFragment extends Fragment implements TitledFragment {
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.user_consent_agreement_fragment, container, false);
+		View rootView = inflater.inflate(R.layout.user_consent_agreement_fragment, container, false);
+
+        rootView.findViewById(R.id.user_consent_next_button).setOnClickListener(view -> {
+            MainActivity mainActivity = (MainActivity)getActivity();
+
+            if (mainActivity != null) mainActivity.userConsentNext();
+        });
+
+		return rootView;
+	}
+
+	@Override
+	public String getTitle() {
+		return null;
 	}
 }

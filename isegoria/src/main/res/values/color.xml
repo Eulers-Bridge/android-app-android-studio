@@ -5,22 +5,26 @@
     <color name="searchBar">#CAC9CF</color>
     <color name="profileImageBackground">#AAAAAA</color>
     <color name="grey">#8A898A</color>
-    <color name="divider">#27313D</color>
     <color name="offGrey">#F4F4F4</color>
     <color name="lightGrey">#8694A3</color>
     <color name="darkBlue">#3C7EC9</color>
     <color name="lightBlue">#4A90E2</color>
-    <color name="navyBlue">#313E4D</color>
     <color name="lightGreen">#60C353</color>
     <color name="lightRed">#FF6D65</color>
-    <color name="pink">#FF65A7</color>
     <color name="barBackground">#313E4D</color>
-    <color name="barText">#A1B2C5</color>
-
-    <color name="navigation_selected_background">#F5F5F5</color> <!-- Grey 100 -->
 
     <color name="slider_text">#738192</color>
 
     <color name="self_efficacy_slider_2">#647EC7</color>
     <color name="self_efficacy_slider_3">#B4629A</color>
+
+    <color name="election_efficacy_overlay">#E6FFFFFF</color> <!-- 90% opacity white -->
+
+    <color name="about_background">#262e3b</color>
+
+    <color name="divider">#1f000000</color>
+
+    <color name="profile_circle_ring_base">#64d3d3d3</color>
+
+    <color name="photo_details_background">#B3000000</color> <!-- 70% opacity black -->
 </resources>

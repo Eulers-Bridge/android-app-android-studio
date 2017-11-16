@@ -8,8 +8,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -25,7 +23,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Photo;
@@ -33,12 +32,12 @@ import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
+import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class CandidatePositionFragment extends Fragment {
@@ -52,8 +51,8 @@ public class CandidatePositionFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
-        Bundle bundle = this.getArguments();
-        long positionId = bundle.getLong("PositionId");
+
+        long positionId = getArguments().getLong(Constant.FRAGMENT_EXTRA_CANDIDATE_POSITION);
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
@@ -62,18 +61,13 @@ public class CandidatePositionFragment extends Fragment {
 
         isegoria = (Isegoria)getActivity().getApplication();
 
-        isegoria.getAPI().getPositionCandidates(positionId).enqueue(new Callback<List<Candidate>>() {
+        isegoria.getAPI().getPositionCandidates(positionId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
-            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
+            public void handleResponse(Response<List<Candidate>> response) {
                 List<Candidate> candidates = response.body();
                 if (candidates != null && candidates.size() > 0) {
                     addCandidates(candidates);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Candidate>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 		
@@ -85,21 +79,13 @@ public class CandidatePositionFragment extends Fragment {
             getActivity().runOnUiThread(() -> {
 
                 for (Candidate candidate : candidates) {
-                    addTableRow(
-                            candidate.ticketId,
-                            candidate.positionId,
-                            candidate.userId,
-                            "",
-                            "",
-                            candidate.getName(),
-                            "",
-                            candidate.userId);
+                    addTableRow(candidate);
                 }
             });
         }
     }
 	
-	private void addTableRow(long ticketId, long positionId, long profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, long userId) {
+	private void addTableRow(Candidate candidate) {
 		TableRow tr;
 		
 		LinearLayout layout = new LinearLayout(getActivity());
@@ -121,22 +107,16 @@ public class CandidatePositionFragment extends Fragment {
 		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 
-		isegoria.getAPI().getPhoto(userId).enqueue(new Callback<Photo>() {
+		isegoria.getAPI().getPhoto(candidate.userId).enqueue(new SimpleCallback<Photo>() {
             @Override
-            public void onResponse(Call<Photo> call, Response<Photo> response) {
-                if (response.isSuccessful()) {
-                    Photo photo = response.body();
-                    if (photo != null) {
-                        GlideApp.with(CandidatePositionFragment.this)
-                                .load(photo.thumbnailUrl)
-                                .into(candidateProfileView);
-                    }
+            protected void handleResponse(Response<Photo> response) {
+                Photo photo = response.body();
+                if (photo != null) {
+                    GlideApp.with(CandidatePositionFragment.this)
+                            .load(photo.thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(candidateProfileView);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Photo> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 		
@@ -146,40 +126,36 @@ public class CandidatePositionFragment extends Fragment {
 		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
 		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         candidateProfileImage.setOnClickListener(view -> {
-            FragmentManager fragmentManager2 = getFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
+
             Bundle args = new Bundle();
-            args.putLong("ProfileId", userId);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();
+            args.putLong(Constant.FRAGMENT_EXTRA_PROFILE_ID, candidate.userId);
+
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(args);
+
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(android.R.id.content, profileFragment)
+                    .commit();
         });
 
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(12.0f);
-        textViewParty.setText(partyAbr);
+        textViewParty.setText("");
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
+        isegoria.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
-            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
-                if (response.isSuccessful()) {
-                    Ticket ticket = response.body();
-                    if (ticket != null) {
-                        textViewParty.setText(ticket.code);
-                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
-                    }
+            protected void handleResponse(Response<Ticket> response) {
+                Ticket ticket = response.body();
+                if (ticket != null) {
+                    textViewParty.setText(ticket.code);
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Ticket> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -197,31 +173,21 @@ public class CandidatePositionFragment extends Fragment {
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
-        textViewCandidate.setText(candidateName);
+        textViewCandidate.setText(candidate.getName());
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.0f);
-        textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
+            public void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) textViewPosition.setText(position.name);
             }
         });
         

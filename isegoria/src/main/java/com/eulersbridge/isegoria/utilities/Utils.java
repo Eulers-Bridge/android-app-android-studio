@@ -6,12 +6,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.text.format.DateUtils;
@@ -22,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.eulersbridge.isegoria.R;
 
-import java.io.InputStream;
 import java.util.Date;
 
 public final class Utils {
@@ -40,10 +33,15 @@ public final class Utils {
         }
     }
 
+    public static void setMultitaskTitle(Activity activity, String title) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setMultitaskDescription(activity, title, activity.getResources().getColor(R.color.darkBlue));
+        }
+    }
+
     //Change colour, use default title (app name)
     public static void setMultitaskColour(Activity activity, @ColorInt int colour) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
             setMultitaskDescription(activity, activity.getString(R.string.app_name), colour);
         }
     }
@@ -102,15 +100,6 @@ public final class Utils {
         return inSampleSize;
     }
 
-    static Bitmap decodeSampledBitmapFromBitmap(InputStream is, int reqWidth, int reqHeight) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeStream(is);
-    }
-
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                          int reqWidth, int reqHeight) {
 
@@ -125,41 +114,6 @@ public final class Utils {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    static Bitmap scaleCenterCrop(Bitmap source, int newHeight, int newWidth) {
-        int sourceWidth = source.getWidth();
-        int sourceHeight = source.getHeight();
-
-        float xScale = (float) newWidth / sourceWidth;
-        float yScale = (float) newHeight / sourceHeight;
-        float scale = Math.max(xScale, yScale);
-
-        float scaledWidth = scale * sourceWidth;
-        float scaledHeight = scale * sourceHeight;
-
-        float left = (newWidth - scaledWidth) / 2;
-        float top = (newHeight - scaledHeight) / 2;
-
-        RectF targetRect = new RectF(left, top, left + scaledWidth, top + scaledHeight);
-
-        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
-        Canvas canvas = new Canvas(dest);
-        canvas.drawBitmap(source, null, targetRect, null);
-
-        return dest;
-    }
-
-    public static Bitmap tintBitmap(Bitmap bitmap, @ColorInt int color) {
-        Bitmap resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-        Paint paint = new Paint();
-        paint.setColorFilter(new PorterDuffColorFilter(Color.argb(127, 0,0,0), PorterDuff.Mode.SRC_ATOP));
-
-        Canvas canvas = new Canvas(resultBitmap);
-        canvas.drawBitmap(bitmap, 0, 0, paint);
-
-        return resultBitmap;
     }
 
     public static Bitmap fastBlur(Bitmap sentBitmap, int radius) {

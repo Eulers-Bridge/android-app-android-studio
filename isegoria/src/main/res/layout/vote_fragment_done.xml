@@ -3,14 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white"
     android:gravity="center_vertical"
     android:padding="@dimen/activity_horizontal_margin">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
         android:gravity="center"
         android:text="@string/vote_done_heading"
         android:textColor="#757581"
@@ -20,7 +18,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:background="@android:color/white"
         android:gravity="center"
         android:paddingLeft="40dp"
         android:paddingRight="40dp"

@@ -13,10 +13,11 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements TitledFragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
@@ -31,12 +32,11 @@ public class FeedFragment extends Fragment {
             mainActivity.getWindow().setStatusBarColor(colour);
 
             Utils.setMultitaskColour(mainActivity, colour);
+            Utils.setStatusBarColour(mainActivity, colour);
         }
 
         // Ensure options menu from another fragment is not carried over
         mainActivity.invalidateOptionsMenu();
-
-        mainActivity.setToolbarTitle(getString(R.string.section_title_feed));
 
         setupViewPager(rootView);
         setupTabLayout();
@@ -45,6 +45,10 @@ public class FeedFragment extends Fragment {
 
 		return rootView;
 	}
+
+	public String getTitle() {
+	    return getString(R.string.section_title_feed);
+    }
 
 	private void setupViewPager(View rootView) {
         if (rootView == null) rootView = getView();

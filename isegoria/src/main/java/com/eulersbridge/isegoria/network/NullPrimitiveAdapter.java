@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import com.squareup.moshi.FromJson;
 
 
+@SuppressWarnings("unused")
 class NullPrimitiveAdapter {
 
     @FromJson

@@ -11,7 +11,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.views.BaseSliderBar;
 import com.eulersbridge.isegoria.views.SliderBarPoint;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class PersonalitySliderBar extends BaseSliderBar {
     private Paint disagreePaint;
@@ -71,7 +71,7 @@ public class PersonalitySliderBar extends BaseSliderBar {
         int lineY = getParentHeight() / 2;
         int parentWidth = getParentWidth();
 
-        final ArrayList<SliderBarPoint> points = getPoints();
+        final List<SliderBarPoint> points = getPoints();
 
         // Disagree segment
         canvas.drawLine(horizontalPadding, lineY, (parentWidth/3), lineY, disagreePaint);

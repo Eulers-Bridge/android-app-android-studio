@@ -4,6 +4,9 @@ import android.support.annotation.Nullable;
 
 import com.squareup.moshi.Json;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Position {
 
     @Json(name = "positionId")

@@ -17,11 +17,23 @@ public class TintTransformation extends BitmapTransformation {
     private static final String ID = "au.com.isegoria.app.TintTransformation";
     private static final byte[] ID_BYTES = ID.getBytes(CHARSET);
 
+    private final double alphaFactor;
+
+    public TintTransformation() {
+        this(0.5);
+    }
+
+    public TintTransformation(double alphaFactor) {
+        this.alphaFactor = alphaFactor;
+    }
+
     @Override
     protected Bitmap transform(@NonNull BitmapPool pool, @NonNull Bitmap toTransform, int outWidth, int outHeight) {
 
+        int alpha = (int) Math.round(alphaFactor * (double)255);
+
         Paint paint = new Paint();
-        paint.setColorFilter(new PorterDuffColorFilter(Color.argb(128, 0,0,0), PorterDuff.Mode.SRC_ATOP));
+        paint.setColorFilter(new PorterDuffColorFilter(Color.argb(alpha, 0,0,0), PorterDuff.Mode.SRC_ATOP));
 
         Bitmap bitmap = pool.get(outWidth, outHeight, Bitmap.Config.RGB_565);
 

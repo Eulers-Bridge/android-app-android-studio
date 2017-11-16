@@ -10,12 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -32,7 +29,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Photo;
@@ -43,15 +41,13 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
-@SuppressWarnings("deprecation")
 public class CandidateTicketDetailFragment extends Fragment {
     private TableLayout candidateTicketDetialTableLayout;
     private Button ticketSupportButton;
@@ -90,27 +86,16 @@ public class CandidateTicketDetailFragment extends Fragment {
 		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
 		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int) dpHeight /2, false);
 		Drawable d = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(b, 25));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            backgroundLinearLayout.setBackground(d);
-        } else {
-            backgroundLinearLayout.setBackgroundDrawable(d);
-        }
+        backgroundLinearLayout.setBackground(d);
 
         isegoria = (Isegoria)getActivity().getApplication();
-        isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new Callback<List<Candidate>>() {
+        isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
-            public void onResponse(Call<List<Candidate>> call, Response<List<Candidate>> response) {
-                if (response.isSuccessful()) {
-                    List<Candidate> candidates = response.body();
-                    if (candidates != null) {
-                        addCandidates(candidates);
-                    }
+            public void handleResponse(Response<List<Candidate>> response) {
+                List<Candidate> candidates = response.body();
+                if (candidates != null) {
+                    addCandidates(candidates);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Candidate>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -125,6 +110,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 
                     GlideApp.with(CandidateTicketDetailFragment.this)
                             .load(photo.thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(partyDetailLogo);
                 }
             }
@@ -132,24 +118,17 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        isegoria.getAPI().getUserSupportedTickets(isegoria.getLoggedInUser().email).enqueue(new Callback<List<Ticket>>() {
+        isegoria.getAPI().getUserSupportedTickets(isegoria.getLoggedInUser().email).enqueue(new SimpleCallback<List<Ticket>>() {
             @Override
-            public void onResponse(Call<List<Ticket>> call, Response<List<Ticket>> response) {
-                if (response.isSuccessful()) {
-                    List<Ticket> tickets = response.body();
-                    if (tickets != null && tickets.size() > 0) {
-                        for (Ticket ticket : tickets) {
-                            if (ticket.id == ticketId) {
-                                getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
-                            }
+            public void handleResponse(Response<List<Ticket>> response) {
+                List<Ticket> tickets = response.body();
+                if (tickets != null && tickets.size() > 0) {
+                    for (Ticket ticket : tickets) {
+                        if (ticket.id == ticketId) {
+                            getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
                         }
                     }
                 }
-            }
-
-            @Override
-            public void onFailure(Call<List<Ticket>> call, Throwable t) {
-                t.printStackTrace();
             }
         });
 
@@ -188,20 +167,13 @@ public class CandidateTicketDetailFragment extends Fragment {
 	        getActivity().runOnUiThread(() -> {
 
                 for (Candidate candidate : candidates) {
-                    addTableRow(
-                            (int)candidate.userId,
-                            code,
-                            colour,
-                            candidate.getName(),
-                            "",
-                            candidate.userId,
-                            candidate.positionId);
+                    addTableRow(candidate);
                 }
             });
         }
     }
 	
-	private void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, long userId, long positionId) {
+	private void addTableRow(Candidate candidate) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -220,10 +192,10 @@ public class CandidateTicketDetailFragment extends Fragment {
 		ImageView candidateProfileView = new ImageView(getActivity());
 		candidateProfileView.setLayoutParams(new LayoutParams(imageHeight, imageHeight));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
+		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), candidate.userId, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-		isegoria.getAPI().getPhotos(userId).enqueue(new SimpleCallback<PhotosResponse>() {
+		isegoria.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
@@ -232,6 +204,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 
                     GlideApp.with(CandidateTicketDetailFragment.this)
                             .load(photo.thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(candidateProfileView);
                 }
             }
@@ -245,15 +218,18 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
         candidateProfileImage.setOnClickListener(view -> {
-            FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
+
             Bundle args = new Bundle();
-            args.putInt("ProfileId", profileDrawable);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();
+            args.putLong(Constant.FRAGMENT_EXTRA_PROFILE_ID, candidate.userId);
+
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(args);
+
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(android.R.id.content, profileFragment)
+                    .commit();
         });
 		
         TextView textViewParty = new TextView(getActivity());
@@ -277,41 +253,29 @@ public class CandidateTicketDetailFragment extends Fragment {
         		imageHeight, 40);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            partyLayout.setBackground(rectShapeDrawable);
-        } else {
-            partyLayout.setBackgroundDrawable(rectShapeDrawable);
-        }
+        partyLayout.setBackground(rectShapeDrawable);
         partyLayout.addView(textViewParty);
 		
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-        textViewCandidate.setText(candidateName);
+        textViewCandidate.setText(candidate.getName());
         textViewCandidate.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
-        textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
+            public void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
             }
         });
         

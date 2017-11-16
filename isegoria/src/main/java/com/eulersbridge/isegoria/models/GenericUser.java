@@ -32,4 +32,22 @@ public class GenericUser {
         return String.format("%s %s", givenName, familyName);
     }
 
+    GenericUser() {
+        // Required empty constructor
+    }
+
+    GenericUser(GenericUser user) {
+        this.gender = user.gender;
+        this.nationality = user.nationality;
+        this.email = user.email;
+        this.givenName = user.givenName;
+        this.familyName = user.familyName;
+        this.institutionId = user.institutionId;
+        this.level = user.level;
+        this.experience = user.experience;
+        this.completedTasksCount = user.completedTasksCount;
+        this.completedBadgesCount = user.completedBadgesCount;
+        this.profilePhotoURL = user.profilePhotoURL;
+    }
+
 }

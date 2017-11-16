@@ -11,8 +11,6 @@ import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -29,7 +27,8 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Election;
@@ -39,7 +38,10 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,53 +168,41 @@ public class CandidateAllFragment extends Fragment {
         }
     }
 
-    private void addCandidates(List<Candidate> candidates) {
+    private void addCandidates(@NonNull List<Candidate> candidates) {
 	    if (getActivity() != null && candidates.size() > 0) {
 	        getActivity().runOnUiThread(() -> {
 
 	            for (Candidate candidate : candidates) {
-                    addTableRow(
-                            candidate.ticketId,
-                            candidate.userId,
-                            "GRN",
-                            "#4FBE3E",
-                            String.format("%s %s", candidate.givenName, candidate.familyName),
-                            "",
-                            candidate.positionId,
-                            candidate.givenName,
-                            candidate.familyName);
+                    addTableRow(candidate);
                 }
             });
         }
     }
-	
-	private void addTableRow(long ticketId, long userId, String partyAbr,
-                             String colour, String candidateName,
-                             String candidatePosition, long positionId,
-                             String firstName, String lastName) {
-		TableRow tr;
-		
-		LinearLayout layout = new LinearLayout(getActivity());
-		layout.setOrientation(LinearLayout.HORIZONTAL);
+
+    private void addTableRow(Candidate candidate) {
+        TableRow tr;
+
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.HORIZONTAL);
 
         int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 6.5, getResources().getDisplayMetrics());
-		
-		tr = new TableRow(getActivity());
-		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-		tr.setLayoutParams(rowParams);
-		tr.setPadding(0, paddingMargin, 0, paddingMargin);
+
+        tr = new TableRow(getActivity());
+        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
+        tr.setLayoutParams(rowParams);
+        tr.setPadding(0, paddingMargin, 0, paddingMargin);
 
         int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 53, getResources().getDisplayMetrics());
-		
-		ImageView candidateProfileView = new ImageView(getActivity());
-		candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+        ImageView candidateProfileView = new ImageView(getActivity());
+        candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
         candidateProfileView.setLayoutParams(layoutParams);
-		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
+        candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 
-        isegoria.getAPI().getPhotos(userId).enqueue(new SimpleCallback<PhotosResponse>() {
+        isegoria.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
@@ -220,149 +210,138 @@ public class CandidateAllFragment extends Fragment {
                 if (body != null && body.totalPhotos > 0) {
                     GlideApp.with(CandidateAllFragment.this)
                             .load(body.photos.get(0).thumbnailUrl)
+                            .transition(DrawableTransitionOptions.withCrossFade())
                             .into(candidateProfileView);
                 }
             }
         });
 
-		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
-		
-		ImageView candidateProfileImage = new ImageView(getActivity());
-		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
-		candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
+        candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
+
+        ImageView candidateProfileImage = new ImageView(getActivity());
+        candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
+        candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
+        candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
+        candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
         candidateProfileImage.setOnClickListener(view -> {
-            FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
+
             Bundle args = new Bundle();
-            args.putLong("ProfileId", userId);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(R.id.candidate_frame1, fragment2);
-            fragmentTransaction2.commit();
+            args.putParcelable(Constant.FRAGMENT_EXTRA_USER, Parcels.wrap(candidate));
+
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(args);
+
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.election_candidate_frame, profileFragment)
+                    .commit();
         });
-		
+
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
         textViewParty.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f);
-        textViewParty.setText(partyAbr);
+        textViewParty.setText("GRN");
         textViewParty.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoria.getAPI().getTicket(ticketId).enqueue(new Callback<Ticket>() {
+        isegoria.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
-            public void onResponse(Call<Ticket> call, Response<Ticket> response) {
-                if (response.isSuccessful()) {
+            protected void handleResponse(Response<Ticket> response) {
+                Ticket ticket = response.body();
 
-                    Ticket ticket = response.body();
-
-                    if (ticket != null) {
-                        textViewParty.setText(ticket.code);
-                        textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
-                    }
+                if (ticket != null) {
+                    textViewParty.setText(ticket.code);
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
                 }
             }
-
-            @Override
-            public void onFailure(Call<Ticket> call, Throwable t) {
-                t.printStackTrace();
-            }
         });
-		
+
         RectShape rect = new RectShape();
         ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
         Paint paint = rectShapeDrawable.getPaint();
-        paint.setColor(Color.parseColor(colour));
+        paint.setColor(Color.parseColor("#4FBE3E"));
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setStrokeWidth(5);
 
         int imageSize2 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 27, getResources().getDisplayMetrics());
-        
-		LinearLayout partyLayout = new LinearLayout(getActivity());
-		partyLayout.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout partyLayout = new LinearLayout(getActivity());
+        partyLayout.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 imageSize, imageSize2);
         params.gravity = Gravity.CENTER_VERTICAL;
         partyLayout.setLayoutParams(params);
-		//partyLayout.setBackgroundDrawable(rectShapeDrawable);
-		partyLayout.addView(textViewParty);
-		
+        //partyLayout.setBackgroundDrawable(rectShapeDrawable);
+        partyLayout.addView(textViewParty);
+
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
-        textViewCandidate.setText(candidateName);
+        textViewCandidate.setText(candidate.getName());
         textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewCandidate.setGravity(Gravity.START);
-        
+
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11.0f);
-        textViewPosition.setText(candidatePosition);
+        textViewPosition.setText("");
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new Callback<Position>() {
+        isegoria.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
-            public void onResponse(Call<Position> call, Response<Position> response) {
-                if (response.isSuccessful()) {
-                    Position position = response.body();
-                    if (position != null) {
-                        textViewPosition.setText(position.name);
-                    }
+            protected void handleResponse(Response<Position> response) {
+                Position position = response.body();
+                if (position != null) {
+                    textViewPosition.setText(position.name);
                 }
             }
-
-            @Override
-            public void onFailure(Call<Position> call, Throwable t) {
-                t.printStackTrace();
-            }
         });
-        
+
         View dividierView = new View(getActivity());
         dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
         dividierView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
-        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT); 
+        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
         relLayoutMaster.setLayoutParams(relLayoutMasterParam);
-        
+
         RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        
+
         RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        
+
         LinearLayout linLayout = new LinearLayout(getActivity());
         linLayout.setOrientation(LinearLayout.VERTICAL);
         linLayout.addView(textViewCandidate);
         linLayout.addView(textViewPosition);
-        
+
         LinearLayout linLayout2 = new LinearLayout(getActivity());
         linLayout2.setOrientation(LinearLayout.VERTICAL);
         linLayout2.addView(candidateProfileImage);
         linLayout2.setGravity(Gravity.END);
-        linLayout2.setLayoutParams(relativeParamsRight); 
-        
-		layout.addView(candidateProfileView);
-		layout.addView(partyLayout);
-		layout.addView(linLayout);
-		layout.setLayoutParams(relativeParamsLeft);
-		
-		relLayoutMaster.addView(layout);
-		relLayoutMaster.addView(linLayout2);
-        
+        linLayout2.setLayoutParams(relativeParamsRight);
+
+        layout.addView(candidateProfileView);
+        layout.addView(partyLayout);
+        layout.addView(linLayout);
+        layout.setLayoutParams(relativeParamsLeft);
+
+        relLayoutMaster.addView(layout);
+        relLayoutMaster.addView(linLayout2);
+
         tr.addView(relLayoutMaster);
-        
-		candidateAllTableLayout.addView(tr);
-		candidateAllTableLayout.addView(dividierView);
-        firstNames.add(firstName);
-        lastnNmes.add(lastName);
+
+        candidateAllTableLayout.addView(tr);
+        candidateAllTableLayout.addView(dividierView);
+        firstNames.add(candidate.givenName);
+        lastnNmes.add(candidate.familyName);
         rows.add(tr);
-	}
+    }
 	
 	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
                                                           int reqWidth, int reqHeight) {

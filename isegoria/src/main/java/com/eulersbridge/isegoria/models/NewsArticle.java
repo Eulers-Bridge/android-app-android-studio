@@ -19,7 +19,7 @@ public class NewsArticle {
     public String title;
     public String content;
 
-    public List<Photo> photos;
+    List<Photo> photos;
 
     @Json(name = "date")
     @Timestamp
@@ -33,4 +33,13 @@ public class NewsArticle {
 
     @Json(name = "inappropriateContent")
     public boolean hasInappropriateContent;
+
+    public @Nullable String getPhotoUrl() {
+        if (photos != null && photos.size() > 0) {
+            return photos.get(0).thumbnailUrl;
+
+        } else {
+            return null;
+        }
+    }
 }

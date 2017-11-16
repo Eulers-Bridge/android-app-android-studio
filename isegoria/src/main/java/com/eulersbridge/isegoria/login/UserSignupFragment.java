@@ -13,11 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,10 +28,14 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public class UserSignupFragment extends Fragment implements OnItemSelectedListener {
+public class UserSignupFragment extends Fragment implements OnItemSelectedListener, TitledFragment {
+
 	private List<Country> countries;
-	private ArrayAdapter<String> spinnerArrayAdapter;
-	private ArrayAdapter<String> spinnerInstitutionArrayAdapter;
+	private ArrayAdapter<String> countryAdapter;
+	private ArrayAdapter<String> institutionAdapter;
+
+    private Spinner countrySpinner;
+	private Spinner institutionSpinner;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,36 +43,30 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 
         countries = new ArrayList<>();
 
-		Isegoria isegoria = (Isegoria) getActivity().getApplication();
+        MainActivity mainActivity = (MainActivity)getActivity();
 
-        isegoria.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
-            @Override
-            protected void handleResponse(Response<GeneralInfoResponse> response) {
-                GeneralInfoResponse body = response.body();
-                if (body != null && body.countries.size() > 0) {
-                    setCountries(body.countries);
-                }
-            }
+        rootView.findViewById(R.id.signup_next_button).setOnClickListener(view -> {
+            if (mainActivity != null) mainActivity.userSignUpNext();
         });
+
+        countrySpinner = rootView.findViewById(R.id.signup_country);
+        countrySpinner.setOnItemSelectedListener(this);
+        countryAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_spinner_item);
+        countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        countrySpinner.setAdapter(countryAdapter);
+
+        institutionSpinner = rootView.findViewById(R.id.signup_institution);
+        institutionAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_spinner_item);
+        institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        institutionSpinner.setAdapter(institutionAdapter);
         
-        Spinner spinner = rootView.findViewById(R.id.country);
-        spinner.setOnItemSelectedListener(this);
-        spinnerArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(spinnerArrayAdapter);
- 
-        Spinner spinnerInstitution = rootView.findViewById(R.id.institution);
-        spinnerInstitutionArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
-        spinnerInstitutionArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerInstitution.setAdapter(spinnerInstitutionArrayAdapter);
-        
-        Spinner spinnerGender = rootView.findViewById(R.id.gender);
-		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, new String[]{ "Male", "Female" });
+        Spinner spinnerGender = rootView.findViewById(R.id.signup_gender);
+		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_spinner_item, new String[]{ "Male", "Female" });
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(spinnerGenderArrayAdapter);
         
-        Spinner spinnerYearOfBirth = rootView.findViewById(R.id.yearOfBirth);
-		ArrayAdapter<String> spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+        Spinner spinnerYearOfBirth = rootView.findViewById(R.id.signup_birth_year);
+		ArrayAdapter<String> spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_spinner_item);
 
 		int year = Calendar.getInstance().get(Calendar.YEAR);
 
@@ -79,40 +80,60 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         }
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerYearOfBirth.setAdapter(spinnerYearOfBirthArrayAdapter);
-        
-        Country countryPlaceholder = new Country(getString(R.string.user_sign_up_choose_country_hint));
-        spinnerArrayAdapter.add(countryPlaceholder.name);
-        spinnerInstitutionArrayAdapter.add(getString(R.string.user_sign_up_choose_institution_hint));
+
+        countryAdapter.add(getString(R.string.user_sign_up_choose_country_hint));
+        institutionAdapter.add(getString(R.string.user_sign_up_choose_institution_hint));
+
+        Isegoria isegoria = (Isegoria)mainActivity.getApplication();
+        isegoria.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
+            @Override
+            protected void handleResponse(Response<GeneralInfoResponse> response) {
+                GeneralInfoResponse body = response.body();
+                if (body != null && body.countries.size() > 0) {
+                    setCountries(body.countries);
+                }
+            }
+        });
+
+        Utils.showKeyboard(mainActivity.getWindow());
 		
 		return rootView;
 	}
-	
-	private void setCountries(List<Country> countries) {
+
+    @Override
+    public String getTitle() {
+        return null;
+    }
+
+    private void setCountries(List<Country> countries) {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {
 
 			    for (Country country : countries) {
-			        spinnerArrayAdapter.add(country.name);
+			        countryAdapter.add(country.name);
                 }
 
                 UserSignupFragment.this.countries = countries;
+
+                countrySpinner.setEnabled(true);
             });
 		}
 	}
 	
-    public void onItemSelected(AdapterView<?> parent, View view, 
-            int pos, long id) {
+    public void onItemSelected(AdapterView<?> parent, View view,  int pos, long id) {
     	String selectedCountry = (String) parent.getSelectedItem();
-    	spinnerInstitutionArrayAdapter.clear();
+    	institutionAdapter.clear();
 
     	for (Country country : countries) {
             if (selectedCountry.equals(country.name)) {
                 for (Institution institution : country.institutions) {
-                    spinnerInstitutionArrayAdapter.add(institution.name);
+                    institutionAdapter.add(institution.getName());
                 }
             }
         }
+
+        institutionSpinner.setEnabled(true);
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

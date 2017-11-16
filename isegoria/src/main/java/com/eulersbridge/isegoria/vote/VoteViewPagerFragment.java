@@ -8,14 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-public class VoteViewPagerFragment extends Fragment {
+public class VoteViewPagerFragment extends Fragment implements TitledFragment {
     private TabLayout tabLayout;
     private NonSwipeableViewPager viewPager;
 
@@ -26,12 +26,15 @@ public class VoteViewPagerFragment extends Fragment {
         // Ensure options menu from another fragment is not carried over
         getActivity().invalidateOptionsMenu();
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_vote));
-
         setupViewPager(rootView);
         setupTabLayout();
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.section_title_vote);
     }
 
     private void setupViewPager(View rootView) {

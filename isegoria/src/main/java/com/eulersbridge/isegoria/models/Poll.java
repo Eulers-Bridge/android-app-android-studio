@@ -4,7 +4,7 @@ import com.squareup.moshi.Json;
 
 import org.parceler.Transient;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 @org.parceler.Parcel
@@ -21,7 +21,9 @@ public class Poll {
     public String question;
 
     @Json(name = "pollOptions")
-    public ArrayList<PollOption> options;
+    public List<PollOption> options;
+
+    public boolean closed;
 
     public void setCreator(Contact creator) {
         this.creator = creator;

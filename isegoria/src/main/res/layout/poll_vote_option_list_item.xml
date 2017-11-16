@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingVertical="8dp">
+
+    <ImageView
+        android:id="@+id/poll_vote_option_list_item_image_view"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id="@+id/poll_vote_option_list_item_check_box"
+        android:src="@drawable/tickempty"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/poll_vote_option_list_item_image_view"
+        android:layout_marginTop="8dp"/>
+
+    <ProgressBar
+        android:id="@+id/poll_vote_option_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/poll_vote_option_list_item_check_box"
+        android:layout_toEndOf="@id/poll_vote_option_list_item_check_box"
+        android:layout_below="@id/poll_vote_option_list_item_image_view"
+        android:layout_marginTop="14dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="1000"
+        android:progress="0"/>
+
+    <TextView
+        android:id="@+id/poll_vote_option_list_item_text_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/poll_vote_option_progress_bar"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"
+        android:gravity="end"
+        android:textColor="@color/black" />
+
+</RelativeLayout>

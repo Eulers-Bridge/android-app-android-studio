@@ -1,35 +1,72 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-public class ProfileViewPagerFragment extends Fragment {
+public class ProfileViewPagerFragment extends Fragment implements TitledFragment {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private MainActivity mainActivity;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
-        ((MainActivity)getActivity()).setToolbarTitle(getString(R.string.section_title_profile));
+        setHasOptionsMenu(true);
+
+        mainActivity = (MainActivity)getActivity();
 
         setupViewPager(rootView);
         setupTabLayout();
 
         return rootView;
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.section_title_profile);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.profile_settings:
+                startActivity(new Intent(getContext(), SettingsActivity.class));
+                return true;
+
+            case R.id.profile_logout:
+                mainActivity.getIsegoriaApplication().logOut();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setupViewPager(View rootView) {
@@ -40,22 +77,23 @@ public class ProfileViewPagerFragment extends Fragment {
 
             final ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-            fragmentList.add(new ProfileFragment());
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setViewPager(viewPager);
+
+            fragmentList.add(profileFragment);
             fragmentList.add(new TaskDetailProgressFragment());
             fragmentList.add(new ProfileBadgesFragment());
 
             final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
                 @Override
                 public CharSequence getPageTitle(int position) {
-                    switch (position) {
-                        case 0:
-                            return "Profile";
-                        case 1:
-                            return "Progress";
-                        case 2:
-                            return "Badges";
+                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
+                    if (fragment != null) {
+                        return fragment.getTitle();
+
+                    } else {
+                        return null;
                     }
-                    return null;
                 }
             };
             viewPager.setAdapter(pagerAdapter);
