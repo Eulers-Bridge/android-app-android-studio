@@ -25,6 +25,7 @@ import retrofit2.Response;
 public class NewsFragment extends Fragment {
 	
 	private NewsAdapter newsAdapter;
+    private SwipeRefreshLayout refreshLayout;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -35,14 +36,14 @@ public class NewsFragment extends Fragment {
 
 		long institutionId = isegoria.getLoggedInUser().institutionId;
 
-        SwipeRefreshLayout swipeContainerNews = rootView.findViewById(R.id.swipeContainerNews);
-		swipeContainerNews.setColorSchemeResources(R.color.lightBlue);
-        swipeContainerNews.setOnRefreshListener(() -> {
-            swipeContainerNews.setRefreshing(true);
+        refreshLayout = rootView.findViewById(R.id.swipeContainerNews);
+        refreshLayout.setColorSchemeResources(R.color.lightBlue);
+        refreshLayout.setOnRefreshListener(() -> {
+            refreshLayout.setRefreshing(true);
 
 			isegoria.getAPI().getNewsArticles(institutionId).enqueue(callback);
 
-            (new android.os.Handler()).postDelayed(() -> swipeContainerNews.setRefreshing(false), 6000);
+            refreshLayout.postDelayed(() -> refreshLayout.setRefreshing(false), 6000);
         });
 
 		GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
@@ -68,6 +69,8 @@ public class NewsFragment extends Fragment {
     private final Callback<List<NewsArticle>> callback = new SimpleCallback<List<NewsArticle>>() {
         @Override
         protected void handleResponse(Response<List<NewsArticle>> response) {
+            if (refreshLayout != null) refreshLayout.post(() -> refreshLayout.setRefreshing(false));
+
             List<NewsArticle> articles = response.body();
 
             if (articles != null) {

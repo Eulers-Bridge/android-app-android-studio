@@ -78,7 +78,7 @@ public class PollFragment extends Fragment implements TitledFragment {
             pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
                 @Override
                 public CharSequence getPageTitle(int position) {
-                    return String.format("Poll %d", position + 1);
+                    return getString(R.string.poll_title, position + 1);
                 }
             };
             viewPager.setAdapter(pagerAdapter);

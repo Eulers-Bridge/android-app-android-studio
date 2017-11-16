@@ -20,10 +20,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="center"
-                android:inputType="textMultiLine"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
-                android:text="Choose your vote location and time."
+                android:text="@string/vote_choose_location_time"
                 android:textColor="#757581"
                 android:textSize="20sp"
                 android:visibility="invisible" />
@@ -113,10 +112,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="center"
-                android:inputType="textMultiLine"
                 android:paddingLeft="40dp"
                 android:paddingRight="40dp"
-                android:text="Choose the location of the booth you will be voting at. Don't worry! all booths are listed down for you."
+                android:text="@string/vote_choose_both"
                 android:textColor="#757581"
                 android:textSize="20sp"
                 android:visibility="invisible" />

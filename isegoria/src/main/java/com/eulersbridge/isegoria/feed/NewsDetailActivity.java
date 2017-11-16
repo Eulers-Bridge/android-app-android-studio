@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.Constant;
@@ -61,6 +62,7 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         GlideApp.with(this)
                 .load(article.getPhotoUrl())
+                .priority(Priority.HIGH)
                 .transforms(new CenterCrop(), new TintTransformation(0.6))
                 .placeholder(R.color.grey)
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -70,6 +72,7 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         GlideApp.with(this)
                 .load(creatorPhotoURL)
+                .priority(Priority.LOW)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(authorImageView);
     }

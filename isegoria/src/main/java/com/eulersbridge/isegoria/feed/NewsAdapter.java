@@ -18,7 +18,7 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -27,7 +27,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> implements RecyclerViewItemClickListener {
+public class NewsAdapter extends RecyclerView.Adapter<NewsViewHolder> implements ClickableViewHolder.ClickListener {
     final private Fragment fragment;
     final private List<NewsArticle> items = new ArrayList<>();
 

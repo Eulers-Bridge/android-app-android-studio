@@ -1,26 +1,21 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 
-public class PhotoAlbumViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-    private @NonNull final RecyclerViewItemClickListener onClickListener;
+public class PhotoAlbumViewHolder extends ClickableViewHolder {
 
     final ImageView imageView;
     final TextView nameTextView;
     final TextView descriptionTextView;
 
-    PhotoAlbumViewHolder(View view, @NonNull RecyclerViewItemClickListener onClickListener) {
-        super(view);
-
-        this.onClickListener = onClickListener;
+    PhotoAlbumViewHolder(View view, @NonNull ClickListener onClickListener) {
+        super(view, onClickListener);
 
         view.setOnClickListener(this);
 
@@ -28,10 +23,5 @@ public class PhotoAlbumViewHolder extends RecyclerView.ViewHolder implements Vie
 
         nameTextView = view.findViewById(R.id.photo_album_list_item_title_text_view);
         descriptionTextView = view.findViewById(R.id.photo_album_list_item_description_text_view);
-    }
-
-    @Override
-    public void onClick(View view) {
-        onClickListener.onItemClick(this, getAdapterPosition());
     }
 }

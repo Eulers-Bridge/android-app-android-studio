@@ -13,8 +13,6 @@ import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -32,7 +30,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.ContactProfileFragment;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Photo;
@@ -43,6 +41,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import java.util.List;
@@ -168,20 +167,13 @@ public class CandidateTicketDetailFragment extends Fragment {
 	        getActivity().runOnUiThread(() -> {
 
                 for (Candidate candidate : candidates) {
-                    addTableRow(
-                            (int)candidate.userId,
-                            code,
-                            colour,
-                            candidate.getName(),
-                            "",
-                            candidate.userId,
-                            candidate.positionId);
+                    addTableRow(candidate);
                 }
             });
         }
     }
 	
-	private void addTableRow(int profileDrawable, String partyAbr, String colour, String candidateName, String candidatePosition, long userId, long positionId) {
+	private void addTableRow(Candidate candidate) {
 		TableRow tr;
 
         int paddingMargin3 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -200,10 +192,10 @@ public class CandidateTicketDetailFragment extends Fragment {
 		ImageView candidateProfileView = new ImageView(getActivity());
 		candidateProfileView.setLayoutParams(new LayoutParams(imageHeight, imageHeight));
 		candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageHeight, imageHeight));
+		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), candidate.userId, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-		isegoria.getAPI().getPhotos(userId).enqueue(new SimpleCallback<PhotosResponse>() {
+		isegoria.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
@@ -226,15 +218,18 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
         candidateProfileImage.setOnClickListener(view -> {
-            FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
+
             Bundle args = new Bundle();
-            args.putInt("ProfileId", profileDrawable);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();
+            args.putLong(Constant.FRAGMENT_EXTRA_PROFILE_ID, candidate.userId);
+
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setArguments(args);
+
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(android.R.id.content, profileFragment)
+                    .commit();
         });
 		
         TextView textViewParty = new TextView(getActivity());
@@ -264,18 +259,17 @@ public class CandidateTicketDetailFragment extends Fragment {
         TextView textViewCandidate = new TextView(getActivity());
         textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
         textViewCandidate.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-        textViewCandidate.setText(candidateName);
+        textViewCandidate.setText(candidate.getName());
         textViewCandidate.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewCandidate.setGravity(Gravity.START);
         
         TextView textViewPosition = new TextView(getActivity());
         textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
         textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_DIP,12.0f);
-        textViewPosition.setText(candidatePosition);
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoria.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
+        isegoria.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
             public void handleResponse(Response<Position> response) {
                 Position position = response.body();

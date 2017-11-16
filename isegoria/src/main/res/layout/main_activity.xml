@@ -25,10 +25,10 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
     </android.support.design.widget.CoordinatorLayout>
 
-    <android.support.design.widget.BottomNavigationView
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
         android:id="@id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         app:itemIconTint="@color/nav_state_list"

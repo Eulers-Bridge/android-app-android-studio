@@ -32,6 +32,7 @@ import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.GenericUser;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -169,19 +170,13 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.length() > 2) {
-                    clearSearchResults();
-                    isegoria.getAPI().searchForUsers(query).enqueue(searchCallback);
-                    return true;
-                }
-                return false;
+                return query.length() > 2 && search(query);
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() > 2) {
-                    clearSearchResults();
-                    isegoria.getAPI().searchForUsers(newText).enqueue(searchCallback);
+                    search(newText);
 
                 } else {
                     clearSearchResults();
@@ -191,6 +186,14 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
                 return true;
             }
         });
+    }
+
+    @SuppressWarnings("SameReturnValue")
+    private boolean search(String query) {
+        clearSearchResults();
+        isegoria.getAPI().searchForUsers(query).enqueue(searchCallback);
+
+        return true;
     }
 
     public void setTabLayout(TabLayout tabLayout) {
@@ -295,25 +298,13 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
             candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
             candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-            candidateProfileImage.setOnClickListener(view -> {
-                // candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-            /*FragmentManager fragmentManager2 = getFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
-            Bundle args = new Bundle();
-            //args.putInt("ProfileId", userId);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();*/
-                isegoria.getAPI().addFriend(isegoria.getLoggedInUser().email, user.email)
-                        .enqueue(new SimpleCallback<Void>() {
-                            @Override
-                            protected void handleResponse(Response<Void> response) {
-                                showAddedMessage();
-                            }
-                        });
-            });
+            candidateProfileImage.setOnClickListener(view -> isegoria.getAPI().addFriend(isegoria.getLoggedInUser().email, user.email)
+                    .enqueue(new SimpleCallback<Void>() {
+                        @Override
+                        protected void handleResponse(Response<Void> response) {
+                            showAddedMessage();
+                        }
+                    }));
 
             linLayout2.addView(candidateProfileImage);
         }
@@ -327,13 +318,13 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             viewProfileImage.setOnClickListener(view -> {
                 viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
 
-                ContactProfileFragment profileFragment = new ContactProfileFragment();
+                ProfileFragment profileFragment = new ProfileFragment();
 
                 Bundle args = new Bundle();
-                args.putParcelable("profile", Parcels.wrap(user));
+                args.putParcelable(Constant.FRAGMENT_EXTRA_USER, Parcels.wrap(user));
                 profileFragment.setArguments(args);
 
-                getFragmentManager().beginTransaction()
+                getChildFragmentManager().beginTransaction()
                         .addToBackStack(null)
                         .replace(R.id.container, profileFragment)
                         .commit();
@@ -349,16 +340,6 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             acceptImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
             acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
             acceptImage.setOnClickListener(view -> {
-                //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-            /*FragmentManager fragmentManager2 = getFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
-            Bundle args = new Bundle();
-            //args.putInt("ProfileId", userId);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
                 addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequestType.UNKNOWN);
 
@@ -376,16 +357,6 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             denyImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
             denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
             denyImage.setOnClickListener(view -> {
-                //candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.addedactive, imageSize, imageSize));
-            /*FragmentManager fragmentManager2 = getFragmentManager();
-            FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-            ContactProfileFragment fragment2 = new ContactProfileFragment();
-            Bundle args = new Bundle();
-            //args.putInt("ProfileId", userId);
-            fragment2.setArguments(args);
-            fragmentTransaction2.addToBackStack(null);
-            fragmentTransaction2.replace(android.R.id.content, fragment2);
-            fragmentTransaction2.commit();*/
                 tr.setVisibility(ViewGroup.GONE);
 
                 isegoria.getAPI().rejectFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {

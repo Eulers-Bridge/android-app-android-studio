@@ -13,12 +13,12 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.PhotoAlbum;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoAlbumAdapter extends RecyclerView.Adapter<PhotoAlbumViewHolder> implements RecyclerViewItemClickListener {
+public class PhotoAlbumAdapter extends RecyclerView.Adapter<PhotoAlbumViewHolder> implements ClickableViewHolder.ClickListener {
     final private Fragment fragment;
     final private List<PhotoAlbum> items = new ArrayList<>();
 
@@ -64,10 +64,10 @@ public class PhotoAlbumAdapter extends RecyclerView.Adapter<PhotoAlbumViewHolder
 
             PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
             Bundle args = new Bundle();
-            args.putLong(Constant.ACTIVITY_EXTRA_PHOTO_ALBUM_ID, item.id);
+            args.putLong(Constant.FRAGMENT_EXTRA_PHOTO_ALBUM_ID, item.id);
             albumFragment.setArguments(args);
 
-            fragment.getChildFragmentManager()
+            fragment.getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .addToBackStack(null)
                     .add(R.id.photos_frame_layout, albumFragment)

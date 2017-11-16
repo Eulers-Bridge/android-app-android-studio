@@ -66,8 +66,6 @@
                 android:layout_marginBottom="@dimen/activity_vertical_margin" />
         </RelativeLayout>
 
-        <include layout="@layout/divider_horizontal" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -288,6 +286,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/profile_show_progress"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

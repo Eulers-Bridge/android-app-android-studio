@@ -21,9 +21,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.Constant;
-import com.eulersbridge.isegoria.ContactProfileFragment;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -32,6 +32,7 @@ import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -78,6 +79,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
             GlideApp.with(this)
                     .load(event.getPhotoUrl())
+                    .priority(Priority.HIGH)
                     .transform(new TintTransformation())
                     .placeholder(R.color.grey)
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -135,7 +137,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
         TextView contactTextView = new TextView(this);
         contactTextView.setTypeface(null, Typeface.BOLD);
-        contactTextView.setText("Organizer: " + email);
+        contactTextView.setText(getString(R.string.event_detail_activity_organiser, email));
         layout.addView(contactTextView);
         tr.addView(layout);
 
@@ -179,9 +181,9 @@ public class EventDetailActivity extends AppCompatActivity {
         candidateProfileImage.setPadding(10, 0, 10, 0);
         candidateProfileImage.setOnClickListener(view -> {
 
-            ContactProfileFragment profileFragment = new ContactProfileFragment();
+            ProfileFragment profileFragment = new ProfileFragment();
             Bundle args = new Bundle();
-            args.putInt("ProfileId", userId);
+            args.putInt(Constant.FRAGMENT_EXTRA_PROFILE_ID, userId);
 
             getSupportFragmentManager().beginTransaction()
                     .addToBackStack(null)

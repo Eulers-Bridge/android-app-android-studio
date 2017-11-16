@@ -9,9 +9,11 @@ import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,13 +21,14 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import retrofit2.Response;
 
-public class TaskDetailProgressFragment extends Fragment {
+public class TaskDetailProgressFragment extends Fragment implements TitledFragment {
 
     private Isegoria isegoria;
 
@@ -33,6 +36,8 @@ public class TaskDetailProgressFragment extends Fragment {
 
     private final TaskAdapter completedAdapter = new TaskAdapter(this);
     private final TaskAdapter remainingAdapter = new TaskAdapter(this);
+
+    private RecyclerView remainingListView;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +53,7 @@ public class TaskDetailProgressFragment extends Fragment {
         RecyclerView completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
         setupRecyclerView(completedListView, completedAdapter);
 
-        RecyclerView remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
+        remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
         setupRecyclerView(remainingListView, remainingAdapter);
 
         fetchData();
@@ -59,7 +64,6 @@ public class TaskDetailProgressFragment extends Fragment {
     private void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
     }
 
@@ -140,6 +144,23 @@ public class TaskDetailProgressFragment extends Fragment {
         if (getActivity() != null) {
             remainingAdapter.replaceItems(remainingTasks);
             remainingAdapter.notifyDataSetChanged();
+
+            // Calculate rough new list view size to 'autosize' it
+            getActivity().runOnUiThread(() -> {
+                int heightDp = 44 * remainingTasks.size();
+
+                int heightPx = Math.round(TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, heightDp, getResources().getDisplayMetrics()));
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
+
+                remainingListView.setLayoutParams(layoutParams);
+            });
         }
+    }
+
+    @Override
+    public String getTitle() {
+        return "Progress";
     }
 }

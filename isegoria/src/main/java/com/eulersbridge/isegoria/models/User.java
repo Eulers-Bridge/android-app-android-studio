@@ -26,6 +26,14 @@ public class User extends GenericUser {
     @Transient
     private transient Long id;
 
+    public User() {
+        // Required empty constructor for @Parcel
+    }
+
+    public User(Contact contact) {
+        super(contact);
+    }
+
     public long getId() {
         return (id == null)? 0 : id;
     }

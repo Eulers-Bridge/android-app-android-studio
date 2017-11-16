@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.PhotoAlbum;
+import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.network.NewsFeedResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.List;
@@ -24,6 +26,9 @@ public class PhotosFragment extends Fragment {
     private Isegoria isegoria;
 
     private final PhotoAlbumAdapter adapter = new PhotoAlbumAdapter(this);
+    private SwipeRefreshLayout refreshLayout;
+
+    private boolean fetchedPhotos = false;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,13 +36,13 @@ public class PhotosFragment extends Fragment {
 
         isegoria = (Isegoria)getActivity().getApplication();
 
-		SwipeRefreshLayout swipeContainerPhotos = rootView.findViewById(R.id.swipeContainerPhotos);
-        swipeContainerPhotos.setOnRefreshListener(() -> {
-            swipeContainerPhotos.setRefreshing(true);
+        refreshLayout = rootView.findViewById(R.id.swipeContainerPhotos);
+        refreshLayout.setOnRefreshListener(() -> {
+            refreshLayout.setRefreshing(true);
 
-			refreshPhotoAlbums();
+            refresh();
 
-            new android.os.Handler().postDelayed(() -> swipeContainerPhotos.setRefreshing(false), 6000);
+            refreshLayout.postDelayed(() -> refreshLayout.setRefreshing(false), 6000);
         });
 
         RecyclerView photoAlbumsListView = rootView.findViewById(R.id.photo_albums_list_view);
@@ -45,26 +50,58 @@ public class PhotosFragment extends Fragment {
         photoAlbumsListView.setLayoutManager(layoutManager);
         photoAlbumsListView.setAdapter(adapter);
 
-        refreshPhotoAlbums();
+        refresh();
 
 		return rootView;
 	}
 
-    private void refreshPhotoAlbums() {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (getView() != null && isegoria != null && !fetchedPhotos) {
+            refresh();
+        }
+    }
+
+    private void refresh() {
+        fetchedPhotos = true;
+
 	    long newsFeedId = isegoria.getLoggedInUser().getNewsFeedId();
 
-	    if (newsFeedId > 0) {
-            isegoria.getAPI().getPhotoAlbums(isegoria.getLoggedInUser().getNewsFeedId()).enqueue(new SimpleCallback<List<PhotoAlbum>>() {
+        User loggedInUser = isegoria.getLoggedInUser();
+        if (newsFeedId == 0) {
+            isegoria.getAPI().getInstitutionNewsFeed(loggedInUser.institutionId).enqueue(new SimpleCallback<NewsFeedResponse>() {
                 @Override
-                protected void handleResponse(Response<List<PhotoAlbum>> response) {
-                    List<PhotoAlbum> albums = response.body();
-                    if (albums != null) {
-                        addPhotoAlbums(albums);
+                protected void handleResponse(Response<NewsFeedResponse> response) {
+                    NewsFeedResponse body = response.body();
+
+                    if (body != null) {
+                        loggedInUser.setNewsFeedId(body.newsFeedId);
+
+                        fetchPhotoAlbums(loggedInUser);
                     }
                 }
             });
+
+        } else {
+            fetchPhotoAlbums(loggedInUser);
         }
 	}
+
+	private void fetchPhotoAlbums(User loggedInUser) {
+        isegoria.getAPI().getPhotoAlbums(loggedInUser.getNewsFeedId()).enqueue(new SimpleCallback<List<PhotoAlbum>>() {
+            @Override
+            protected void handleResponse(Response<List<PhotoAlbum>> response) {
+                if (refreshLayout != null) refreshLayout.post(() -> refreshLayout.setRefreshing(false));
+
+                List<PhotoAlbum> albums = response.body();
+                if (albums != null) {
+                    addPhotoAlbums(albums);
+                }
+            }
+        });
+    }
 
 	private void addPhotoAlbums(@NonNull List<PhotoAlbum> albums) {
         adapter.replaceItems(albums);

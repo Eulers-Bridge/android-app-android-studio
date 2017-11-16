@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.election;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,13 +10,14 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 
 import org.parceler.Parcels;
@@ -25,7 +27,7 @@ import java.util.List;
 
 import retrofit2.Response;
 
-class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implements RecyclerViewItemClickListener {
+class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implements ClickableViewHolder.ClickListener {
 
     final private Fragment fragment;
     final private API api;
@@ -37,7 +39,7 @@ class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implement
         this.api = api;
     }
 
-    void replaceItems(List<Position> newItems) {
+    void replaceItems(@NonNull List<Position> newItems) {
         items.clear();
         items.addAll(newItems);
     }
@@ -45,9 +47,16 @@ class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implement
     @Override
     public int getItemCount() { return items.size(); }
 
+    private boolean isValidFragment() {
+        return (fragment != null
+                && fragment.getActivity() != null
+                && !fragment.isDetached()
+                && fragment.isAdded());
+    }
+
     @Override
     public void onBindViewHolder(PositionViewHolder viewHolder, int index) {
-        final Position item = items.get(index);
+        Position item = items.get(index);
 
         viewHolder.imageView.setContentDescription(item.name);
         viewHolder.imageView.setImageResource(R.color.grey);
@@ -59,7 +68,7 @@ class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implement
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
 
-                if (body != null && body.totalPhotos > 0) {
+                if (body != null && body.totalPhotos > 0 && isValidFragment()) {
                     GlideApp.with(fragment)
                             .load(body.photos.get(0).thumbnailUrl)
                             .placeholder(R.color.grey)
@@ -76,7 +85,7 @@ class PositionAdapter extends RecyclerView.Adapter<PositionViewHolder> implement
         final Position item = items.get(position);
 
         Bundle arguments = new Bundle();
-        arguments.putParcelable("position", Parcels.wrap(item));
+        arguments.putParcelable(Constant.FRAGMENT_EXTRA_CANDIDATE_POSITION, Parcels.wrap(item));
 
         CandidatePositionFragment detailFragment = new CandidatePositionFragment();
         detailFragment.setArguments(arguments);

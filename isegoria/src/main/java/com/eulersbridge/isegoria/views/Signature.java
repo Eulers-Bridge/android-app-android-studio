@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.views;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -89,6 +90,7 @@ public class Signature extends View {
         canvas.drawPath(path, paint);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {

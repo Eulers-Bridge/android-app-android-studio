@@ -102,9 +102,15 @@
     <string name="news_article_star_content_description">Star news article</string>
     <string name="news_article_flag_content_description">Flag news article</string>
 
+    <string name="news_detail_activity_back_button_content_description">Back to News</string>
+
     <!-- Feed/Photos -->
     <string name="photo_detail_view_star">Star Photo</string>
     <string name="photo_detail_view_flag">Report Photo</string>
+
+    <!-- Feed/Event Detail -->
+    <string name="event_detail_activity_back_button_content_description">Back to Events</string>
+    <string name="event_detail_activity_organiser">Organizer: %s</string>
 
     <!-- Friends -->
     <string name="friends_search_title">Search</string>
@@ -148,10 +154,8 @@
 
     <!-- About -->
     <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
-
-    <!-- Misc -->
-
-    <string name="event_detail_activity_back_button_content_description">Back to Events</string>
-    <string name="news_detail_activity_back_button_content_description">Back to News</string>
+    <string name="poll_title">Poll %d</string>
+    <string name="vote_choose_location_time">Choose your vote location and time.</string>
+    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
 
 </resources>

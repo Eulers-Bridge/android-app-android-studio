@@ -14,13 +14,9 @@ import com.eulersbridge.isegoria.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.NetworkService;
-import com.eulersbridge.isegoria.network.NewsFeedResponse;
 import com.securepreferences.SecurePreferences;
 
 import java.util.Arrays;
-
-import retrofit2.Call;
-import retrofit2.Response;
 
 public class Isegoria extends Application {
 
@@ -112,34 +108,13 @@ public class Isegoria extends Application {
 	public void setLoggedInUser(User user, String password) {
 		loggedInUser = user;
 
-		new SecurePreferences(getApplicationContext())
-				.edit()
-				.putString("userEmail", loggedInUser.email)
-				.putString("userPassword", password)
-				.apply();
+        new SecurePreferences(getApplicationContext())
+                .edit()
+                .putString("userEmail", loggedInUser.email)
+                .putString("userPassword", password)
+                .apply();
 
         setupAppShortcuts();
-
-        Runnable runnable = () -> {
-            try {
-                Call<NewsFeedResponse> call = network.getAPI().getInstitutionNewsFeed(loggedInUser.institutionId);
-                Response<NewsFeedResponse> response = call.execute();
-
-                if (response.isSuccessful()) {
-                    NewsFeedResponse body = response.body();
-
-                    if (body != null) {
-                        loggedInUser.setNewsFeedId(body.newsFeedId);
-                    }
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        };
-
-        Thread thread = new Thread(runnable);
-        thread.start();
 	}
 
 	public void login(@Nullable String email, @Nullable String password) {

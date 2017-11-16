@@ -1,7 +1,6 @@
 package com.eulersbridge.isegoria.feed;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +24,7 @@ import retrofit2.Response;
 public class EventsFragment extends Fragment {
 
     private final EventAdapter adapter = new EventAdapter(this);
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -38,12 +38,12 @@ public class EventsFragment extends Fragment {
         eventsListView.setHasFixedSize(true);
         eventsListView.setAdapter(adapter);
 
-        SwipeRefreshLayout swipeRefreshLayout = rootView.findViewById(R.id.events_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
+        refreshLayout = rootView.findViewById(R.id.events_refresh_layout);
+        refreshLayout.setOnRefreshListener(() -> {
             getEvents(isegoria);
 
-            swipeRefreshLayout.setRefreshing(true);
-            new Handler().postDelayed(() -> swipeRefreshLayout.setRefreshing(false), 7000);
+            refreshLayout.setRefreshing(true);
+            refreshLayout.postDelayed(() -> refreshLayout.setRefreshing(false), 7000);
         });
 
         getEvents(isegoria);
@@ -69,6 +69,8 @@ public class EventsFragment extends Fragment {
     }
 
     private void setEvents(@Nullable List<Event> events) {
+        if (refreshLayout != null) refreshLayout.post(() -> refreshLayout.setRefreshing(false));
+
         if (events != null) {
             adapter.replaceItems(events);
             adapter.notifyDataSetChanged();

@@ -9,7 +9,10 @@
     android:paddingStart="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingEnd="@dimen/activity_horizontal_margin"
-    android:paddingHorizontal="@dimen/activity_horizontal_margin">
+    android:paddingHorizontal="@dimen/activity_horizontal_margin"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingVertical="8dp">
 
     <ImageView
         android:id="@+id/poll_vote_option_list_item_image_view"

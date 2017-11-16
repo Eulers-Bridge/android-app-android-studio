@@ -11,12 +11,12 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.PollOption;
 import com.eulersbridge.isegoria.models.PollResult;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder> implements RecyclerViewItemClickListener {
+public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder> implements ClickableViewHolder.ClickListener {
 
     public interface PollOptionVoteListener {
         /**

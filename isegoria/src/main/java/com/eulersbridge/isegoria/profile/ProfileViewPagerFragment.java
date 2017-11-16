@@ -77,22 +77,23 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
 
             final ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-            fragmentList.add(new ProfileFragment());
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setViewPager(viewPager);
+
+            fragmentList.add(profileFragment);
             fragmentList.add(new TaskDetailProgressFragment());
             fragmentList.add(new ProfileBadgesFragment());
 
             final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
                 @Override
                 public CharSequence getPageTitle(int position) {
-                    switch (position) {
-                        case 0:
-                            return "Overview";
-                        case 1:
-                            return "Progress";
-                        case 2:
-                            return "Badges";
+                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
+                    if (fragment != null) {
+                        return fragment.getTitle();
+
+                    } else {
+                        return null;
                     }
-                    return null;
                 }
             };
             viewPager.setAdapter(pagerAdapter);

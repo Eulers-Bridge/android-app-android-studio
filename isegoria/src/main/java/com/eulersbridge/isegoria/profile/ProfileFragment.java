@@ -2,9 +2,12 @@ package com.eulersbridge.isegoria.profile;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -16,7 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
@@ -30,14 +35,19 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
+
+import org.parceler.Parcels;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements TitledFragment {
+
+    private View rootView;
 
     private TextView friendsNumTextView;
     private TextView groupNumTextView;
@@ -48,42 +58,40 @@ public class ProfileFragment extends Fragment {
     private CircularSeekBar circularSeekBar3;
     private CircularSeekBar circularSeekBar4;
 
-    private final TaskAdapter taskAdapter = new TaskAdapter(this);
+    private @Nullable ViewPager parentViewPager;
 
+    private final TaskAdapter taskAdapter = new TaskAdapter(this);
     private RecyclerView tasksListView;
+
+    private Isegoria isegoria;
+
+    private User user = null;
+    private boolean isLoggedInUser = false;
 
     @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.profile_fragment, container, false);
+        rootView = inflater.inflate(R.layout.profile_fragment, container, false);
 
-        Isegoria isegoria = (Isegoria) getActivity().getApplication();
+        isegoria = (Isegoria) getActivity().getApplication();
 
         MainActivity mainActivity = (MainActivity) getActivity();
 
-        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 100.00, getResources().getDisplayMetrics());
-
-        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
-        photoImageView.setLayoutParams(layoutParams);
-
-        friendsNumTextView = rootView.findViewById(R.id.friendsNum);
-
         View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
 
+        friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         friendsNumTextView.setOnClickListener(friendsClickListener);
+
         rootView.findViewById(R.id.friendsTitle).setOnClickListener(friendsClickListener);
 
         groupNumTextView = rootView.findViewById(R.id.groupNum);
         rewardsNumTextView = rootView.findViewById(R.id.rewardsNum);
 
-        /*final TextView showProgressButton = (TextView) rootView.findViewById(R.id.showProfile);
-        showProgressButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mPager.setCurrentItem(1);
-            }
-        });*/
+        TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
+        if (parentViewPager == null) {
+            showProgressButton.setVisibility(View.GONE);
+        } else {
+            showProgressButton.setOnClickListener(view -> parentViewPager.setCurrentItem(1, true));
+        }
 
         circularSeekBar1 = rootView.findViewById(R.id.circularSeekBar1);
         circularSeekBar2 = rootView.findViewById(R.id.circularSeekBar2);
@@ -96,21 +104,66 @@ public class ProfileFragment extends Fragment {
 
         setupTasksListView(rootView);
 
-        User user = isegoria.getLoggedInUser();
+        if (getArguments() != null) {
+            @Nullable Parcelable userParcelable = getArguments().getParcelable(Constant.FRAGMENT_EXTRA_USER);
+            if (userParcelable != null) {
+                user = Parcels.unwrap(userParcelable);
 
-        final TextView name = rootView.findViewById(R.id.profile_name);
+            } else {
+                long userId = getArguments().getLong(Constant.FRAGMENT_EXTRA_PROFILE_ID);
+                fetchUser(userId);
+            }
+        }
+
+        if (user == null) {
+            user = isegoria.getLoggedInUser();
+            isLoggedInUser = true;
+        }
+
+        if (user != null) setupUI();
+
+		return rootView;
+	}
+
+	private void fetchUser(long id) {
+        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
+            @Override
+            protected void handleResponse(Response<Contact> response) {
+                Contact contact = response.body();
+                if (contact != null) {
+
+                    if (user == null) {
+                        user = new User(contact);
+
+                        setupUI();
+                    }
+
+                    updateStats(contact.contactsCount, contact.totalTasksCount);
+                }
+            }
+        });
+    }
+
+    private void setupUI() {
+        TextView name = rootView.findViewById(R.id.profile_name);
         name.setText(user.getFullName());
 
-        final TextView personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
+        TextView personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
 
-        if (user.hasPersonality) {
+        if (isLoggedInUser || user.hasPersonality) {
+            // Don't show the personality test button if visiting someone else's profile,
+            // or if showing the logged in user's profile and they've completed personality Qs already
             personalityTestButton.setVisibility(View.GONE);
 
         } else {
+            final MainActivity mainActivity = (MainActivity)getActivity();
+
             personalityTestButton.setOnClickListener(view -> {
 
                 PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-                personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                if (mainActivity != null) {
+                    personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
+                }
 
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
@@ -122,9 +175,9 @@ public class ProfileFragment extends Fragment {
 
         updateCompletedBadgesCount(user.completedBadgesCount);
         updateCompletedTasksCount(user.completedTasksCount);
-        updateExperience(user.level);
+        updateExperience(user.level, user.experience);
 
-        Long userId = isegoria.getLoggedInUser().getId();
+        long userId = user.getId();
 
         isegoria.getAPI().getRemainingBadges(userId).enqueue(new SimpleCallback<List<Badge>>() {
             @Override
@@ -148,8 +201,16 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                (float) 100.00, getResources().getDisplayMetrics());
+
+        ImageView photoImageView = rootView.findViewById(R.id.profile_image_small);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(imageHeight, imageHeight);
+        photoImageView.setLayoutParams(layoutParams);
+
         GlideApp.with(this)
                 .load(user.profilePhotoURL)
+                .priority(Priority.HIGH)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(photoImageView);
 
@@ -164,6 +225,7 @@ public class ProfileFragment extends Fragment {
 
                     GlideApp.with(ProfileFragment.this)
                             .load(photo.thumbnailUrl)
+                            .priority(Priority.HIGH)
                             .placeholder(R.color.profileImageBackground)
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(backgroundImageView);
@@ -178,19 +240,7 @@ public class ProfileFragment extends Fragment {
                 if (tasks != null) setTasks(tasks);
             }
         });
-
-        isegoria.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
-            @Override
-            protected void handleResponse(Response<Contact> response) {
-                Contact user = response.body();
-                if (user != null) {
-                    updateStats(user.contactsCount, user.totalTasksCount);
-                }
-            }
-        });
-
-		return rootView;
-	}
+    }
 
 	private void setupTasksListView(View rootView) {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -234,11 +284,17 @@ public class ProfileFragment extends Fragment {
     }
 
     @UiThread
-    private void updateExperience(long experience) {
-        circularSeekBar1.setTopLine(String.valueOf(experience));
-        circularSeekBar1.setBottomLine("NEED " + (1000 - (experience % 1000)));
-        circularSeekBar1.setProgress((int)experience);
-        circularSeekBar1.setMax((int) ((experience / 1000) % 1000));
+    private void updateExperience(long level, long experience) {
+        circularSeekBar1.setTopLine(String.valueOf(level));
+
+        long max = 1000;
+        long progress = experience % 1000;
+
+        circularSeekBar1.setBottomLine("NEED " + progress);
+
+        circularSeekBar1.setMax((int)max);
+
+        circularSeekBar1.setProgress((int)progress);
         Thread t1 = new Thread(circularSeekBar1);
         t1.start();
     }
@@ -260,24 +316,6 @@ public class ProfileFragment extends Fragment {
         t4.start();
     }
 
-    private void setTasks(@NonNull List<Task> tasks) {
-	    if (getActivity() != null) {
-	        taskAdapter.replaceItems(tasks);
-	        taskAdapter.notifyDataSetChanged();
-
-	        getActivity().runOnUiThread(() -> {
-	            int heightDp = 40 * tasks.size();
-
-                int heightPx = Math.round(TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, heightDp, getResources().getDisplayMetrics()));
-
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
-
-                tasksListView.setLayoutParams(layoutParams);
-            });
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -293,5 +331,33 @@ public class ProfileFragment extends Fragment {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setTasks(@NonNull List<Task> tasks) {
+        if (getActivity() != null) {
+            taskAdapter.replaceItems(tasks);
+            taskAdapter.notifyDataSetChanged();
+
+            // Calculate rough new list view size to 'autosize' it
+            getActivity().runOnUiThread(() -> {
+                int heightDp = 44 * tasks.size();
+
+                int heightPx = Math.round(TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, heightDp, getResources().getDisplayMetrics()));
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx);
+
+                tasksListView.setLayoutParams(layoutParams);
+            });
+        }
+    }
+
+    @Override
+    public String getTitle() {
+        return "Overview";
+    }
+
+    void setViewPager(ViewPager viewPager) {
+        parentViewPager = viewPager;
     }
 }

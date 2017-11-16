@@ -29,7 +29,7 @@ public class PhotoAlbumFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photo_album_fragment, container, false);
 
-		long albumId = getArguments().getLong(Constant.ACTIVITY_EXTRA_PHOTO_ALBUM_ID);
+		long albumId = getArguments().getLong(Constant.FRAGMENT_EXTRA_PHOTO_ALBUM_ID);
 
         adapter = new PhotoAdapter(this);
 

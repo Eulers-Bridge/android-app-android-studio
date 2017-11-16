@@ -6,8 +6,6 @@
     <!-- For Amazon SDK and API server interaction -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- To write voting reminders to the user's calendar -->
-    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application

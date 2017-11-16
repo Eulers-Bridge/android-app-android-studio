@@ -13,14 +13,14 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class PhotoAdapter extends RecyclerView.Adapter<PhotoViewHolder> implements RecyclerViewItemClickListener {
+class PhotoAdapter extends RecyclerView.Adapter<PhotoViewHolder> implements ClickableViewHolder.ClickListener {
     final private Fragment fragment;
     final private List<Photo> items = new ArrayList<>();
 

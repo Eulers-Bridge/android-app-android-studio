@@ -2,6 +2,9 @@ package com.eulersbridge.isegoria.models;
 
 import com.squareup.moshi.Json;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Candidate {
 
     @Json(name = "candidateId")

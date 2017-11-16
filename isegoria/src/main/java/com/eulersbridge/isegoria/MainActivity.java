@@ -41,11 +41,11 @@ import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
-import com.eulersbridge.isegoria.utilities.BottomNavigationViewHelper;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
 import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.securepreferences.SecurePreferences;
 
 import java.lang.ref.WeakReference;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	private Isegoria application;
 	public ProgressDialog dialog;
 
-    private BottomNavigationView navigationView;
+    private BottomNavigationViewEx navigationView;
 
 	private TextView toolbarTitleTextView;
 	private TabLayout tabLayout;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         //switchContent(new PersonalityQuestionsFragment());
 	}
 
-	private boolean handleAppShortcutIntent() {
+    private boolean handleAppShortcutIntent() {
 	    boolean handledShortcut = false;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -173,7 +173,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		if (navigationView != null) {
 		    navigationView.setOnNavigationItemSelectedListener(this);
 
-            BottomNavigationViewHelper.disableShiftMode(navigationView);
+            navigationView.enableShiftingMode(false);
+            navigationView.setTextVisibility(false);
 		}
 
 		tabLayout = findViewById(R.id.tabLayout);
@@ -318,15 +319,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 		switchContent(new UserSignupFragment(), false);
 	}
+
+	private void setViewEnabled(@IdRes int viewId, boolean enabled) {
+		View view = findViewById(viewId);
+		if (view != null) view.setEnabled(enabled);
+	}
 	
 	public void login(String email, String password) {
 		application.login(email, password);
 
-        View emailField = findViewById(R.id.login_email);
-        if (emailField != null) emailField.setEnabled(false);
-
-        View passwordField = findViewById(R.id.login_password);
-        if (passwordField != null) passwordField.setEnabled(false);
+		setViewEnabled(R.id.login_email, false);
+		setViewEnabled(R.id.login_password, false);
+		setViewEnabled(R.id.login_button, false);
+		setViewEnabled(R.id.login_signup_button, false);
 		
 		//dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 	}
@@ -360,11 +365,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	
 	public void onLoginFailure() {
 
-        View emailField = findViewById(R.id.login_email);
-        if (emailField != null) emailField.setEnabled(true);
-
-        View passwordField = findViewById(R.id.login_password);
-        if (passwordField != null) passwordField.setEnabled(true);
+		setViewEnabled(R.id.login_email, true);
+		setViewEnabled(R.id.login_password, true);
+		setViewEnabled(R.id.login_button, true);
+		setViewEnabled(R.id.login_signup_button, true);
 
 	    hideDialog();
 

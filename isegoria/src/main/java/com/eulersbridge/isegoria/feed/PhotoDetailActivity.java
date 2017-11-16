@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
@@ -129,6 +130,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
                 GlideApp.with(context)
                         .asBitmap()
                         .load(photo.thumbnailUrl)
+                        .priority(Priority.HIGH)
                         .placeholder(R.color.black)
                         .override(Target.SIZE_ORIGINAL)
                         .into(new SimpleTarget<Bitmap>() {

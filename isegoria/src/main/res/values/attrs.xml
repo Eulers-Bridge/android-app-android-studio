@@ -12,14 +12,13 @@
         <attr name="circle_y_radius" format="float" />
         <attr name="circle_stroke_width" format="float" />
         <attr name="pointer_radius" format="float" />
-        <attr name="pointer_halo_width" format="float" />
         <attr name="pointer_halo_border_width" format="float" />
         <attr name="circle_color" format="color" />
         <attr name="circle_progress_color" format="color" />
         <attr name="pointer_color" format="color" />
         <attr name="pointer_halo_color" format="color" />
-        <attr name="pointer_halo_color_ontouch" format="color" />
-        <attr name="pointer_alpha_ontouch" format="integer" />
+        <attr name="pointer_halo_color_on_touch" format="color" />
+        <attr name="pointer_alpha_on_touch" format="integer" />
         <attr name="start_angle" format="float" />
         <attr name="end_angle" format="float" />
         <attr name="circle_fill" format="string" />

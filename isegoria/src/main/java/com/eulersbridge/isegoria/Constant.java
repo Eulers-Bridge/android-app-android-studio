@@ -19,10 +19,12 @@ public class Constant {
     static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
 
     public static final String ACTIVITY_EXTRA_NEWS_ARTICLE = "article";
-    public static final String ACTIVITY_EXTRA_PHOTO_ALBUM_ID = "albumId";
+    public static final String FRAGMENT_EXTRA_PHOTO_ALBUM_ID = "albumId";
     public static final String ACTIVITY_EXTRA_PHOTOS = "photos";
     public static final String ACTIVITY_EXTRA_PHOTOS_POSITION = "position";
     public static final String ACTIVITY_EXTRA_EVENT = "event";
+    public static final String FRAGMENT_EXTRA_CANDIDATE_POSITION = "position";
     public static final String ACTIVITY_EXTRA_POLL = "poll";
-    static final String ACTIVITY_EXTRA_PROFILE = "profile";
+    public static final String FRAGMENT_EXTRA_USER = "user";
+    public static final String FRAGMENT_EXTRA_PROFILE_ID = "profileId";
 }

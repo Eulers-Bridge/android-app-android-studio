@@ -16,8 +16,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.RecyclerViewItemClickListener;
 import com.eulersbridge.isegoria.models.Event;
+import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
 import com.eulersbridge.isegoria.utilities.TintTransformation;
 import com.eulersbridge.isegoria.utilities.Utils;
 
@@ -26,7 +26,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
-class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements RecyclerViewItemClickListener {
+class EventAdapter extends RecyclerView.Adapter<EventViewHolder> implements ClickableViewHolder.ClickListener {
     final private Fragment fragment;
     final private List<Event> items = new ArrayList<>();
 

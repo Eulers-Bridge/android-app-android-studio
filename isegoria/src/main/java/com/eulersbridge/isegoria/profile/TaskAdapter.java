@@ -22,11 +22,11 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
+class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     private final Fragment fragment;
     final private List<Task> items = new ArrayList<>();
 
-    public TaskAdapter(Fragment fragment) {
+    TaskAdapter(Fragment fragment) {
         this.fragment = fragment;
     }
 
