@@ -22,8 +22,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         vectorDrawables.useSupportLibrary = true
-        versionCode 9
-        versionName "1.0.8"
+        versionCode 10
+        versionName "1.0.9"
     }
     lintOptions {
         abortOnError false
@@ -67,17 +67,17 @@ dependencies {
 
     compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
-    compile 'com.squareup.okhttp3:okhttp:3.9.0'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
     // Used in Candidate fragment for bottom tabs
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    compile 'com.amazonaws:aws-android-sdk-s3:2.6.6'
-    compile 'com.amazonaws:aws-android-sdk-cognito:2.6.6'
-    compile 'com.amazonaws:aws-android-sdk-sns:2.6.6'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.6.7'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.6.7'
+    compile 'com.amazonaws:aws-android-sdk-sns:2.6.7'
 
     // Required for push notifications
     compile 'com.google.firebase:firebase-messaging:11.6.0'
