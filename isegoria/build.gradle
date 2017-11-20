@@ -22,8 +22,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         vectorDrawables.useSupportLibrary = true
-        versionCode 9
-        versionName "1.0.8"
+        versionCode 10
+        versionName "1.0.9"
     }
     lintOptions {
         abortOnError false
