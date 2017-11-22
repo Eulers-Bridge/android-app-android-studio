@@ -44,7 +44,7 @@
     <!-- Personality Questions -->
     <string name="section_title_personality_questions">Personality Questions</string>
 
-    <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science! All you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
+    <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science!\n\nAll you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
     <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
     <string name="personality_screen_skip_button">Skip</string>
     <string name="personality_questions_done_button">Done</string>

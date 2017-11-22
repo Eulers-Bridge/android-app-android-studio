@@ -133,7 +133,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:minHeight="48dip"
             android:text="@string/personality_questions_done_button"
             android:layout_gravity="center"
             android:theme="@style/PositiveButton" />

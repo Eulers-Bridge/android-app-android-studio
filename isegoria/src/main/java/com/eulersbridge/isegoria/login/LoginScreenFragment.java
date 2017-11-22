@@ -36,7 +36,7 @@ public class LoginScreenFragment extends Fragment implements TitledFragment {
         mainActivity.setToolbarVisible(false);
 
         rootView.findViewById(R.id.login_signup_button).setOnClickListener(view -> {
-            if (mainActivity != null) mainActivity.signupClicked();
+            if (mainActivity != null) mainActivity.signUpClicked();
         });
 
         final LinearLayout loginContainer = rootView.findViewById(R.id.loginContainer);
