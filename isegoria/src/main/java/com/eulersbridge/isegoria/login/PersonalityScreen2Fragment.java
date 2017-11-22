@@ -3,29 +3,25 @@ package com.eulersbridge.isegoria.login;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.models.UserPersonality;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.network.SimpleCallback;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Created by Anthony on 01/04/2015.
-*/
 public class PersonalityScreen2Fragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.personality_screen2_fragment, container, false);
-
-        MainActivity mainActivity = (MainActivity) getActivity();
 
         PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);
         PersonalitySliderBar personalitySliderBar2 = rootView.findViewById(R.id.personalitySliderBar2);
@@ -38,8 +34,8 @@ public class PersonalityScreen2Fragment extends Fragment {
         PersonalitySliderBar personalitySliderBar9 = rootView.findViewById(R.id.personalitySliderBar9);
         PersonalitySliderBar personalitySliderBar10 = rootView.findViewById(R.id.personalitySliderBar10);
 
-        Button donePersonalityQuestions = rootView.findViewById(R.id.donePersonalityQuestions);
-        donePersonalityQuestions.setOnClickListener(v -> {
+        Button doneButton = rootView.findViewById(R.id.donePersonalityQuestions);
+        doneButton.setOnClickListener(v -> {
             float extraversion = (personalitySliderBar1.getScore() + (8-personalitySliderBar6.getScore()))/2;
             float agreeableness = (personalitySliderBar7.getScore() + (8-personalitySliderBar2.getScore()))/2;
             float conscientiousness = (personalitySliderBar3.getScore() + (8-personalitySliderBar8.getScore()))/2;
@@ -49,20 +45,30 @@ public class PersonalityScreen2Fragment extends Fragment {
             UserPersonality personality = new UserPersonality(agreeableness, conscientiousness,
                     emotionalStability, extraversion, opennessToExperiences);
 
-            Isegoria isegoria = mainActivity.getIsegoriaApplication();
+            final AppCompatActivity activity = (AppCompatActivity) getActivity();
+
+            Isegoria isegoria = (Isegoria)activity.getApplication();
 
             String userEmail = isegoria.getLoggedInUser().email;
 
             isegoria.getAPI()
                     .addUserPersonality(userEmail, personality)
-                    .enqueue(new SimpleCallback<Void>() {
+                    .enqueue(new Callback<Void>() {
                         @Override
-                        protected void handleResponse(Response response) {
-                            mainActivity.getSupportFragmentManager().popBackStack();
-                            mainActivity.setToolbarTitle(getString(R.string.section_title_profile));
-                            mainActivity.setNavigationEnabled(true);
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.isSuccessful()) {
+                                activity.finish();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            t.printStackTrace();
+                            doneButton.post(() -> doneButton.setEnabled(true));
                         }
                     });
+
+            doneButton.setEnabled(false);
         });
 
         return rootView;

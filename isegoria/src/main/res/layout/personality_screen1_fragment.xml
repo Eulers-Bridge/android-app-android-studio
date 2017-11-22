@@ -1,59 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ImageView
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/science"
+        android:contentDescription="@null"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/personality_screen_1_message"
+        android:lineSpacingMultiplier="1.1"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/takePersonalityButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:weightSum="1"
-        android:paddingTop="40dp">
+        android:layout_marginTop="32dp"
+        android:text="@string/personality_screen_1_begin_questions"
+        android:theme="@style/PositiveButton" />
 
-        <ImageView
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/science" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_screen_1_message"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:paddingBottom="25dp" />
-
-        <Button
-            android:id="@+id/takePersonalityButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:background="#52BB42"
-            android:minHeight="40dip"
-            android:text="@string/personality_screen_1_begin_questions"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal" />
-
-        <Button
-            android:id="@+id/skipPersonality"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:background="#52BB42"
-            android:minHeight="48dip"
-            android:text="@string/personality_screen_skip_button"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal" />
-    </LinearLayout>
-</ScrollView>
+    <Button
+        android:id="@+id/skipPersonality"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/personality_screen_skip_button"
+        android:theme="@style/PositiveButton" />
+</LinearLayout>

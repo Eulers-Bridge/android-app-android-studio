@@ -11,10 +11,7 @@
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
 
--keepclassmembers class com.eulersbridge.isegoria.** {
-    public <fields>;
-    private <fields>;
-}
+-keep class com.eulersbridge.** { *; }
 
 ## AWS SDK ##
 # Class names are needed in reflection

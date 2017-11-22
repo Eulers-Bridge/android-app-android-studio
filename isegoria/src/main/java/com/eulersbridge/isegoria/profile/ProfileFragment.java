@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -25,12 +26,12 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.login.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.PhotosResponse;
@@ -156,21 +157,7 @@ public class ProfileFragment extends Fragment implements TitledFragment {
             personalityTestButton.setVisibility(View.GONE);
 
         } else {
-            final MainActivity mainActivity = (MainActivity)getActivity();
-
-            personalityTestButton.setOnClickListener(view -> {
-
-                PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-                if (mainActivity != null) {
-                    personalityQuestionsFragment.setTabLayout(mainActivity.getTabLayout());
-                }
-
-                getActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, personalityQuestionsFragment)
-                        .commit();
-            });
+            personalityTestButton.setOnClickListener(view -> startActivity(new Intent(getActivity(), PersonalityQuestionsActivity.class)));
         }
 
         updateCompletedBadgesCount(user.completedBadgesCount);
