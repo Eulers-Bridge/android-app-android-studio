@@ -36,6 +36,8 @@ import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.profile.ProfileFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import retrofit2.Response;
@@ -52,7 +54,9 @@ public class CandidatePositionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false);
 		positionsTableLayout = rootView.findViewById(R.id.candidatePositionTable);
 
-        long positionId = getArguments().getLong(Constant.FRAGMENT_EXTRA_CANDIDATE_POSITION);
+        Position position = Parcels.unwrap(getArguments().getParcelable(Constant.FRAGMENT_EXTRA_CANDIDATE_POSITION));
+
+        long positionId = position.id;
 		
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;

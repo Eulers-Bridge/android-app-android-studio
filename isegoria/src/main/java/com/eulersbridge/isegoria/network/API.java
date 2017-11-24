@@ -193,6 +193,7 @@ public interface API {
     @GET("positions/{electionId}")
     Call<List<Position>> getElectionPositions(@Path("electionId") long electionId);
 
+    @Paginated
     @GET("position/{selectionPositionId}/candidates")
     Call<List<Candidate>> getPositionCandidates(@Path("selectionPositionId") long selectionPositionId);
 
