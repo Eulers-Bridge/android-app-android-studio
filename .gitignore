@@ -128,3 +128,5 @@ $RECYCLE.BIN/
 
 # Default Android Studio 'Generated Signed APK' output folder
 release/
+
+keystore.properties
