@@ -31,7 +31,7 @@ public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder
 
     final private List<PollOption> items = new ArrayList<>();
 
-    PollOptionAdapter(PollOptionVoteListener optionVoteListener) {
+    PollOptionAdapter(@NonNull PollOptionVoteListener optionVoteListener) {
         this.optionVoteListener = optionVoteListener;
     }
 

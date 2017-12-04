@@ -103,8 +103,10 @@ public class VoteFragment extends Fragment implements OnItemSelectedListener {
 	private void updateDatePicker(Election election) {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                datePicker.setMinDate(election.startVotingTimestamp);
-                datePicker.setMaxDate(election.endVotingTimestamp);
+                if (election.startVotingTimestamp < election.endVotingTimestamp) {
+                    datePicker.setMinDate(election.startVotingTimestamp);
+                    datePicker.setMaxDate(election.endVotingTimestamp);
+                }
             });
         }
     }

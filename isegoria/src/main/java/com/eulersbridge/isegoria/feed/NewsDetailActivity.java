@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.LikedResponse;
@@ -23,11 +25,16 @@ import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
 import retrofit2.Response;
 
 public class NewsDetailActivity extends AppCompatActivity {
 
     private Isegoria isegoria;
+
+    private TextView likesTextView;
+    private ImageView starView;
 
     private boolean setLiked = false;
 
@@ -43,20 +50,30 @@ public class NewsDetailActivity extends AppCompatActivity {
         findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
 
         ImageView articleImageView = findViewById(R.id.article_image);
-
         ImageView authorImageView = findViewById(R.id.article_image_author);
+        likesTextView = findViewById(R.id.article_likes);
+        starView = findViewById(R.id.article_star);
 
         NewsArticle article = Parcels.unwrap(getIntent().getExtras().getParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE));
         populateTextContent(article);
 
         isegoria = (Isegoria)getApplication();
 
+        isegoria.getAPI().getNewsArticleLikes(article.id).enqueue(new SimpleCallback<List<LikeInfo>>() {
+            @Override
+            protected void handleResponse(Response<List<LikeInfo>> response) {
+                List<LikeInfo> likes = response.body();
+
+                if (likes != null) populateLikesCount(likes);
+            }
+        });
+
         isegoria.getAPI().getNewsArticleLiked(article.id, isegoria.getLoggedInUser().email).enqueue(new SimpleCallback<LikedResponse>() {
             @Override
             public void handleResponse(Response<LikedResponse> response) {
                 LikedResponse likedResponse = response.body();
 
-                if (likedResponse != null && likedResponse.liked) initiallyLiked();
+                if (likedResponse != null) initiallyLiked(likedResponse.liked);
             }
         });
 
@@ -77,10 +94,18 @@ public class NewsDetailActivity extends AppCompatActivity {
                 .into(authorImageView);
     }
 
-    private void initiallyLiked() {
-        final ImageView starView = findViewById(R.id.article_star);
-        starView.setImageResource(R.drawable.star);
-        setLiked = true;
+    private void populateLikesCount(@NonNull List<LikeInfo> likes) {
+        likesTextView.setText(String.valueOf(likes.size()));
+    }
+
+    private void initiallyLiked(boolean liked) {
+        if (liked) {
+            starView.setImageResource(R.drawable.star);
+        }
+
+        setLiked = liked;
+
+        starView.setEnabled(true);
     }
 
     @UiThread
@@ -89,7 +114,6 @@ public class NewsDetailActivity extends AppCompatActivity {
         TextView newsTitle = findViewById(R.id.article_title);
         newsTitle.setText(article.title);
 
-        final TextView likesTextView = findViewById(R.id.article_likes);
         likesTextView.setText(String.valueOf(article.likeCount));
 
         TextView contentTextView = findViewById(R.id.article_content);
@@ -110,8 +134,10 @@ public class NewsDetailActivity extends AppCompatActivity {
         starView.setOnClickListener(view -> {
             setLiked = !setLiked;
 
+            IgnoredCallback callback = new IgnoredCallback<>();
+
             if (setLiked) {
-                isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(new IgnoredCallback<>());
+                isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
                 starView.setImageResource(R.drawable.star);
 
@@ -119,7 +145,7 @@ public class NewsDetailActivity extends AppCompatActivity {
                 likesTextView.setText(String.valueOf(newLikes));
 
             } else {
-                isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(new IgnoredCallback<>());
+                isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
                 starView.setImageResource(R.drawable.stardefault);
 
