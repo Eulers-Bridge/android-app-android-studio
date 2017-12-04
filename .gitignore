@@ -125,3 +125,8 @@ $RECYCLE.BIN/
 
 # Google Services (e.g. APIs or Firebase)
 #google-services.json
+
+# Default Android Studio 'Generated Signed APK' output folder
+release/
+
+keystore.properties

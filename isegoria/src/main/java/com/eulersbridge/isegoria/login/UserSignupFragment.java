@@ -105,16 +105,18 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
         return null;
     }
 
-    private void setCountries(List<Country> countries) {
+    private void setCountries(List<Country> newCountries) {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {
 
-			    for (Country country : countries) {
+                countrySpinner.setEnabled(false);
+
+			    for (Country country : newCountries) {
 			        countryAdapter.add(country.name);
                 }
 
-                UserSignupFragment.this.countries = countries;
+                countries = newCountries;
 
                 countrySpinner.setEnabled(true);
             });
@@ -124,9 +126,10 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
     public void onItemSelected(AdapterView<?> parent, View view,  int pos, long id) {
     	String selectedCountry = (String) parent.getSelectedItem();
     	institutionAdapter.clear();
+        institutionSpinner.setEnabled(false);
 
     	for (Country country : countries) {
-            if (selectedCountry.equals(country.name)) {
+            if (selectedCountry.equals(country.name) && country.institutions != null) {
                 for (Institution institution : country.institutions) {
                     institutionAdapter.add(institution.getName());
                 }

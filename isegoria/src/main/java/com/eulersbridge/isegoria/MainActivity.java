@@ -31,7 +31,7 @@ import android.widget.TextView;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.login.LoginScreenFragment;
-import com.eulersbridge.isegoria.login.PersonalityQuestionsFragment;
+import com.eulersbridge.isegoria.login.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.login.UserConsentAgreementFragment;
 import com.eulersbridge.isegoria.login.UserSignupFragment;
 import com.eulersbridge.isegoria.models.Country;
@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		} else {
 			showLogin();
 		}
-        //switchContent(new PersonalityQuestionsFragment());
 	}
 
     private boolean handleAppShortcutIntent() {
@@ -209,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		getSupportActionBar().setDisplayShowHomeEnabled(show);
 	}
 
-	public void setNavigationEnabled(boolean enabled) {
+	private void setNavigationEnabled(boolean enabled) {
         navigationView.setVisibility(enabled? View.VISIBLE : View.GONE);
 	}
 
@@ -314,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		return application;
 	}
 	
-	public void signupClicked() {
+	public void signUpClicked() {
 		setShowNavigationBackButton(true);
 
 		switchContent(new UserSignupFragment(), false);
@@ -339,23 +338,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	public void onLoginSuccess(User loggedInUser) {
         hideDialog();
 
-        if (loggedInUser.hasPersonality) {
+        setNavigationEnabled(true);
+        setToolbarVisible(true);
 
-            setNavigationEnabled(true);
-            setToolbarVisible(true);
+        if (!handleAppShortcutIntent()) {
+            FeedFragment feedFragment = new FeedFragment();
+            feedFragment.setTabLayout(tabLayout);
 
-            if (!handleAppShortcutIntent()) {
-                FeedFragment feedFragment = new FeedFragment();
-                feedFragment.setTabLayout(tabLayout);
+            navigationView.setSelectedItemId(R.id.navigation_feed);
+        }
 
-                navigationView.setSelectedItemId(R.id.navigation_feed);
-            }
-
-        } else {
-            PersonalityQuestionsFragment personalityQuestionsFragment = new PersonalityQuestionsFragment();
-            personalityQuestionsFragment.setTabLayout(tabLayout);
-            switchContent(personalityQuestionsFragment);
-            setNavigationEnabled(false);
+        if (!loggedInUser.hasPersonality) {
+            startActivity(new Intent(this, PersonalityQuestionsActivity.class));
         }
     }
 	
