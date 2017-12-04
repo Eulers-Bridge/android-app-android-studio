@@ -8,6 +8,7 @@ import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.Event;
 import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.models.PhotoAlbum;
@@ -127,10 +128,13 @@ public interface API {
     @GET("newsArticles/{institutionId}")
     Call<List<NewsArticle>> getNewsArticles(@Path("institutionId") long institutionId);
 
-    @GET("newsArticle/{articleId}/likedBy/{userEmail}")
+    @GET("newsArticle/{articleId}/likes")
+    Call<List<LikeInfo>> getNewsArticleLikes(@Path("articleId") long articleId);
+
+    @GET("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<LikedResponse> getNewsArticleLiked(@Path("articleId") long articleId, @Path("userEmail") String userEmail);
 
-    @PUT("newsArticle/{articleId}/likedBy/{userEmail}")
+    @PUT("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<Void> likeArticle(@Path("articleId") long photoId, @Path("userEmail") String userEmail);
 
     @DELETE("newsArticle/{articleId}/unlikedBy/{userEmail}")

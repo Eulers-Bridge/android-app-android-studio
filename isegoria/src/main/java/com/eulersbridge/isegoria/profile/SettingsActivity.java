@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
@@ -105,8 +106,8 @@ public class SettingsActivity extends AppCompatActivity {
 
                     GlideApp.with(SettingsActivity.this)
                             .load(photo.thumbnailUrl)
+                            .priority(Priority.HIGH)
                             .transition(DrawableTransitionOptions.withCrossFade())
-                            .placeholder(R.color.profileImageBackground)
                             .into(backgroundImageView);
                 }
             }

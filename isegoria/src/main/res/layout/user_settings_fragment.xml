@@ -10,7 +10,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -18,7 +17,8 @@
 			android:id="@+id/settings_image_background"
 			android:layout_width="match_parent"
 			android:layout_height="260dp"
-			android:scaleType="centerInside" />
+			android:scaleType="centerInside"
+			android:background="@color/profileImageBackground"/>
 
         <ImageView
             android:id="@+id/back_button"
