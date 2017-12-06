@@ -25,22 +25,23 @@ import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
-import com.eulersbridge.isegoria.network.LikedResponse;
+import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.utilities.Utils;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
+    private Isegoria isegoria;
     private API api;
     private String loggedInUserEmail;
 
@@ -66,7 +67,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
         photos = Parcels.unwrap(getIntent().getParcelableExtra(Constant.ACTIVITY_EXTRA_PHOTOS));
         int startIndex = getIntent().getIntExtra(Constant.ACTIVITY_EXTRA_PHOTOS_POSITION, 0);
 
-        Isegoria isegoria = (Isegoria)getApplication();
+        isegoria = (Isegoria)getApplication();
         loggedInUserEmail = isegoria.getLoggedInUser().email;
 
         api = isegoria.getAPI();
@@ -190,31 +191,32 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
 
             likesTextView.setText(String.valueOf(photo.likeCount));
 
-            checkPhotoLikedByUser(photo.id);
+            getPhotoLikes(photo.id);
 
             @DrawableRes int flagImage = photo.hasInappropriateContent? R.drawable.flag : R.drawable.flagdefault;
             flagImageView.setImageResource(flagImage);
         });
     }
 
-    private void checkPhotoLikedByUser(final long photoId) {
-        api.getPhotoLiked(photoId, loggedInUserEmail).enqueue(new Callback<LikedResponse>() {
+    private void getPhotoLikes(final long photoId) {
+        api.getPhotoLikes(photoId).enqueue(new SimpleCallback<List<LikeInfo>>() {
             @Override
-            public void onResponse(Call<LikedResponse> call, Response<LikedResponse> response) {
-                if (response.isSuccessful()) {
-                    LikedResponse likedResponse = response.body();
-                    if (likedResponse != null && likedResponse.liked && photoId == getCurrentPhoto().id) {
-                        runOnUiThread(() -> {
-                            userLikedCurrentPhoto = true;
-                            starImageView.setImageResource(R.drawable.star);
-                        });
-                    }
-                }
-            }
+            protected void handleResponse(Response<List<LikeInfo>> response) {
+                List<LikeInfo> likes = response.body();
 
-            @Override
-            public void onFailure(Call<LikedResponse> call, Throwable t) {
-                // Ignored (404 = user has not liked)
+                Photo currentPhoto = getCurrentPhoto();
+                if (likes != null && photoId == currentPhoto.id) {
+                    runOnUiThread(() -> {
+                        likesTextView.setText(String.valueOf(likes.size()));
+
+                        for (LikeInfo likeInfo : likes) {
+                            if (likeInfo.email.equals(isegoria.getLoggedInUser().email)) {
+                                userLikedCurrentPhoto = true;
+                                starImageView.setImageResource(R.drawable.star);
+                            }
+                        }
+                    });
+                }
             }
         });
     }

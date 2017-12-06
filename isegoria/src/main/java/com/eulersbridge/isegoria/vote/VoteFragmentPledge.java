@@ -60,13 +60,15 @@ public class VoteFragmentPledge extends Fragment implements TitledFragment {
 
         Button voteNextButton = rootView.findViewById(R.id.voteNextButton);
         voteNextButton.setOnClickListener(view -> {
-            mPager.setCurrentItem(2);
-
             Spinner voteSpinner = voteFragment.getSpinnerLocation();
+
+            Object voteSpinnerSelection = voteSpinner.getSelectedItem();
+            if (voteSpinnerSelection == null) return;
+
             DatePicker datePicker = voteFragment.getDatePicker();
             TimePicker timePicker = voteFragment.getTimePicker();
 
-            String location = voteSpinner.getSelectedItem().toString();
+            String location = voteSpinnerSelection.toString();
             Calendar calendar = new GregorianCalendar(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -82,8 +84,9 @@ public class VoteFragmentPledge extends Fragment implements TitledFragment {
             String userEmail = isegoria.getLoggedInUser().email;
 
             VoteReminder reminder = new VoteReminder(userEmail, electionId, location, date);
-
             isegoria.getAPI().addVoteReminder(userEmail, reminder).enqueue(new IgnoredCallback<>());
+
+            mPager.setCurrentItem(2);
         });
 
         return rootView;

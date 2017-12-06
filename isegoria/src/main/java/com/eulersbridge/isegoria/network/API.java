@@ -157,13 +157,13 @@ public interface API {
     @GET("photos/{userEmail}")
     Call<PhotosResponse> getPhotos(@Path("userEmail") String userEmail);
 
-    @GET("photo/{photoId}/likedBy/{userEmail}")
-    Call<LikedResponse> getPhotoLiked(@Path("photoId") long photoId, @Path("userEmail") String userEmail);
+    @GET("photo/{photoId}/likes")
+    Call<List<LikeInfo>> getPhotoLikes(@Path("photoId") long photoId);
 
-    @PUT("photo/{photoId}/likedBy/{userEmail}")
+    @PUT("photo/{photoId}/likedBy/{userEmail}/")
     Call<Void> likePhoto(@Path("photoId") long photoId, @Path("userEmail") String userEmail);
 
-    @DELETE("photo/{photoId}/unlikedBy/{userEmail}")
+    @DELETE("photo/{photoId}/likedBy/{userEmail}/")
     Call<Void> unlikePhoto(@Path("photoId") long photoId, @Path("userEmail") String userEmail);
 
 

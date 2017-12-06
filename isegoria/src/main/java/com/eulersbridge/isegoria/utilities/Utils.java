@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.text.format.DateUtils;
@@ -19,6 +21,18 @@ import com.eulersbridge.isegoria.R;
 import java.util.Date;
 
 public final class Utils {
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+
+        } else {
+            return false;
+        }
+    }
 
     public static String convertTimestampToString(Context context, long timestamp) {
         Date date = new Date(timestamp);
