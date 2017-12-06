@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria;
 
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -42,6 +41,7 @@ import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.utilities.Utils;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
 import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
@@ -250,10 +250,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 	public void showLogin() {
 		LoginScreenFragment loginScreenFragment = new LoginScreenFragment();
-		loginScreenFragment.setTabLayout(tabLayout);
-		switchContent(loginScreenFragment);
+        loginScreenFragment.setTabLayout(tabLayout);
+        switchContent(loginScreenFragment);
 
-		setNavigationEnabled(false);
+        setNavigationEnabled(false);
 	}
 
 	@Override
@@ -325,14 +325,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	}
 	
 	public void login(String email, String password) {
-		application.login(email, password);
+	    if (Utils.isNetworkAvailable(this)) {
+            application.login(email, password);
 
-		setViewEnabled(R.id.login_email, false);
-		setViewEnabled(R.id.login_password, false);
-		setViewEnabled(R.id.login_button, false);
-		setViewEnabled(R.id.login_signup_button, false);
-		
-		//dialog = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+            setViewEnabled(R.id.login_email, false);
+            setViewEnabled(R.id.login_password, false);
+            setViewEnabled(R.id.login_button, false);
+            setViewEnabled(R.id.login_signup_button, false);
+
+        } else {
+            new AlertDialog.Builder(this)
+                    .setTitle("Failed to login")
+                    .setMessage("Check you have an active internet connection and try again soon.")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
 	}
 
 	public void onLoginSuccess(User loggedInUser) {
@@ -372,36 +379,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 			switchContent(new LoginScreenFragment());
 		}
 
-		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
-		alertDialog.setTitle("Isegoria");
-		alertDialog.setMessage("Login Failed");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
-
-            });
-		alertDialog.show();
+        new AlertDialog.Builder(this)
+                .setTitle("Login failed")
+                .setMessage("Check your email and password are correct, and you have an active internet connection.")
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
 	}
 	
 	public void onSignUpSuccess() {
 		setShowNavigationBackButton(false);
 		setToolbarVisible(true);
 
-		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
-		alertDialog.setTitle("Isegoria");
-		alertDialog.setMessage("Signup Succeeded");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
-
-            });
-		alertDialog.show();
+        new AlertDialog.Builder(this)
+                .setTitle("Welcome to Isegoria!")
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
 	}
 	
 	public void onSignUpFailure() {
-		AlertDialog alertDialog = new AlertDialog.Builder(application.getMainActivity()).create();
-		alertDialog.setTitle("Isegoria");
-		alertDialog.setMessage("Signup Failed");
-		alertDialog.setButton(Dialog.BUTTON_POSITIVE, "OK", (dialog, which) -> {
-
-            });
-		alertDialog.show();
+        new AlertDialog.Builder(this)
+                .setTitle("Signup failed")
+                .setMessage("Make sure you've entered your details correctly, and you have an active internet connection.")
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
 	}
 	
 	public void userSignUpNext() {
