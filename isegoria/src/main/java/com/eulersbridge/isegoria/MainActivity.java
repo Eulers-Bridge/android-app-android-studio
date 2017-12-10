@@ -477,10 +477,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		switchContent(new LoginScreenFragment());
 	}
 
-    public void voteNext() {
-        switchContent(new VoteFragmentPledge());
-    }
-
     public void voteDone() {
         switchContent(new VoteFragmentDone());
     }

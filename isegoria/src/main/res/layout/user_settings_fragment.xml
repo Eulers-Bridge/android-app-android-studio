@@ -18,7 +18,8 @@
 			android:layout_width="match_parent"
 			android:layout_height="260dp"
 			android:scaleType="centerInside"
-			android:background="@color/profileImageBackground"/>
+			android:background="@color/profileImageBackground"
+			android:contentDescription="@null"/>
 
         <ImageView
             android:id="@+id/back_button"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -15,7 +16,8 @@
             android:id="@+id/poll_vote_creator_image_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:contentDescription="@null"/>
 
         <TextView
             android:id="@+id/poll_vote_question_text_view"
@@ -26,7 +28,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:textColor="@color/black"
-            android:textSize="18sp"/>
+            android:textSize="18sp"
+            android:maxLines="1"/>
 
         <TextView
             android:id="@+id/poll_vote_creator_name_text_view"
@@ -38,6 +41,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:maxLines="1"
             android:visibility="gone" />
 
         <TextView
@@ -47,9 +51,11 @@
             android:layout_toLeftOf="@+id/poll_vote_answers_count_image_view"
             android:layout_toStartOf="@+id/poll_vote_answers_count_image_view"
             android:text="0"
+            android:maxLines="1"
             android:layout_marginTop="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginEnd="4dp" />
+            android:layout_marginEnd="4dp"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/poll_vote_answers_count_image_view"
@@ -57,7 +63,8 @@
             android:layout_height="28dp"
             android:src="@drawable/votecount"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@null"/>
 
     </RelativeLayout>
 

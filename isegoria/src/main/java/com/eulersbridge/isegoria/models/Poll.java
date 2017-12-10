@@ -15,8 +15,7 @@ public class Poll {
 
     public String creatorEmail;
 
-    @Transient
-    private Contact creator;
+    public Contact creator;
 
     public String question;
 
@@ -24,13 +23,5 @@ public class Poll {
     public List<PollOption> options;
 
     public boolean closed;
-
-    public void setCreator(Contact creator) {
-        this.creator = creator;
-    }
-
-    public Contact getCreator() {
-        return creator;
-    }
 
 }

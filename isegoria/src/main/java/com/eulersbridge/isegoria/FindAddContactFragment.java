@@ -64,17 +64,18 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.find_add_contact_fragment, container, false);
 
-        getActivity().invalidateOptionsMenu();
+        mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            mainActivity.invalidateOptionsMenu();
+            mainActivity.setShowNavigationBackButton(true);
+        }
 
         setHasOptionsMenu(true);
 
         searchResultsTableLayout = rootView.findViewById(R.id.searchResultsTable);
         friendsAllTableLayout = rootView.findViewById(R.id.friendsAllTableLayout);
 
-        mainActivity = (MainActivity) getActivity();
-        mainActivity.setShowNavigationBackButton(true);
-
-        isegoria = (Isegoria)getActivity().getApplication();
+        isegoria = (Isegoria) mainActivity.getApplication();
 
         isegoria.getAPI().getFriends().enqueue(new SimpleCallback<List<Contact>>() {
             @Override
@@ -93,9 +94,11 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             protected void handleResponse(Response<List<FriendRequest>> response) {
                 List<FriendRequest> friendRequestsSent = response.body();
                 if (friendRequestsSent != null) {
-                    for (FriendRequest friendRequest : friendRequestsSent) {
-                        addFriendRequest(friendRequest, FriendRequestType.SENT);
-                    }
+                    mainActivity.runOnUiThread(() -> {
+                        for (FriendRequest friendRequest : friendRequestsSent) {
+                            addFriendRequest(friendRequest, FriendRequestType.SENT);
+                        }
+                    });
                 }
             }
         });
@@ -105,9 +108,11 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             protected void handleResponse(Response<List<FriendRequest>> response) {
                 List<FriendRequest> friendRequestsReceived = response.body();
                 if (friendRequestsReceived != null) {
-                    for (FriendRequest friendRequest : friendRequestsReceived) {
-                        addFriendRequest(friendRequest, FriendRequestType.RECEIVED);
-                    }
+                    mainActivity.runOnUiThread(() -> {
+                        for (FriendRequest friendRequest : friendRequestsReceived) {
+                            addFriendRequest(friendRequest, FriendRequestType.RECEIVED);
+                        }
+                    });
                 }
             }
         });
@@ -208,7 +213,7 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         rootView.findViewById(R.id.searchResultsSection).setVisibility(View.GONE);
     }
 
-    private void addUsers(List<User> users) {
+    private void addUsers(@NonNull List<User> users) {
         clearSearchResults();
 
         for (User user : users) {
@@ -218,13 +223,13 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         }
     }
 
-    private void setFriends(List<Contact> friends) {
+    private void setFriends(@NonNull List<Contact> friends) {
         for (Contact friend : friends) {
             addTableRow(friendsAllTableLayout, friend, -1, UserType.FRIEND, FriendRequestType.UNKNOWN);
         }
     }
 
-    private void addFriendRequest(FriendRequest friendRequest, FriendRequestType type) {
+    private void addFriendRequest(@NonNull FriendRequest friendRequest, FriendRequestType type) {
         View sectionContainer;
         TableLayout tableLayout;
 

@@ -83,7 +83,7 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
 	        getActivity().runOnUiThread(() -> {
                 questionTextView.setText(poll.question);
 
-                if (poll.getCreator() == null && !TextUtils.isEmpty(poll.creatorEmail)) {
+                if (poll.creator == null && !TextUtils.isEmpty(poll.creatorEmail)) {
                     api.getContact(poll.creatorEmail).enqueue(new SimpleCallback<Contact>() {
                         @Override
                         protected void handleResponse(Response<Contact> response) {
@@ -140,7 +140,10 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
 
                             List<PollResult> results = body.results;
 
-                            answersCountTextView.setText(String.valueOf(body.results.size()));
+                            int answersCount = results.size();
+
+                            answersCountTextView.setText(String.valueOf(answersCount));
+                            answersCountTextView.setContentDescription(getString(R.string.poll_vote_answers_content_description, answersCount));
 
                             for (int i = 0; i < results.size(); i++) {
                                 PollOption pollOption = pollOptions.get(i);

@@ -16,7 +16,8 @@
             android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/unimelb"
-            android:paddingTop="10dp" />
+            android:paddingTop="10dp"
+            android:contentDescription="@string/user_consent_melbourne_image_content_description"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -24,15 +25,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:text="PLAIN LANGUAGE STATEMENT
-    Please read the following statement carefully.
-    The project is being conducted by researchers in CIS at the University of Melbourne to observe how personality traits influence interaction with online information during political campaigns.
-    Should you participate, you will be asked to fill in demographic information and use the app on your phone for 5 weeks. Participation in this research is voluntary and confidential. However, this confidentiality is subject to legal limitations. You may cease involvement at any time by updating your consent status in the user profile tab. Research papers resulting from the project will only have aggregate data and will be made public. Results are available on request by email: campaignapp@gmail.com. If you are in a dependent relationship with any of the researchers (e.g., being taught by a researcher) the researcher will be unable to access your raw data and therefore your participation will not affect any ongoing assessment.
-    Data is collected and stored in accordance with University policy and disposed 5 years after final publication. There are no risks to individuals participating in this study beyond those that exist in daily life.
-    This project has been approved by the University of Melbourne's Human Research Ethics Committee (HREC Reference ID 1441638).If participants have any concerns about the conduct of this research project they can contact the Executive Officer, Human Research Ethics, The University of Melbourne, ph: 03 8344 2073; fax: 03 9347 6739; email: HumanEthics-Enquiries@unimelb.edu.au
-    If you have any further questions about the research itself, please contact the researchers: Miguel Wood (m.wood@student.unimelb.edu.au), Prof. Graeme Shanks (gshanks@unimelb.edu.au or 03 8344 1577), and A/Prof Simon Milton (smilton@unimelb.edu.au or 03 8344 1528).
-    1st January 2015
-    "
+            android:text="@string/user_consent_statement_message"
             android:textSize="16sp" />
 
         <Button

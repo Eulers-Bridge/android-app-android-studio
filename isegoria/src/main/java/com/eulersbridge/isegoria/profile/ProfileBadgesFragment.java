@@ -118,6 +118,6 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
 
     @Override
     public String getTitle() {
-        return "Badges";
+        return getString(R.string.profile_badges_section_title);
     }
 }
