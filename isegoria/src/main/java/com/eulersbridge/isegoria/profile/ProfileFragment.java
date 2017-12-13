@@ -342,7 +342,7 @@ public class ProfileFragment extends Fragment implements TitledFragment {
 
     @Override
     public String getTitle(Context context) {
-        return getString(R.string.profile_overview_section_title);
+        return context.getString(R.string.profile_overview_section_title);
     }
 
     void setViewPager(ViewPager viewPager) {

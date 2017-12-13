@@ -17,9 +17,6 @@ import com.eulersbridge.isegoria.models.User;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -36,6 +33,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkService {
+
+    private String apiBaseURL = Constant.SERVER_URL;
 
     private final Isegoria application;
 
@@ -75,7 +74,7 @@ public class NetworkService {
     private void setup() {
         if (needsSetup) {
             createHttpClient();
-            createAPI(Constant.SERVER_URL);
+            createAPI();
         }
     }
 
@@ -107,10 +106,10 @@ public class NetworkService {
         httpClient = httpClientBuilder.build();
     }
 
-    private void createAPI(String baseUrl) {
+    private void createAPI() {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(httpClient)
-                .baseUrl(baseUrl)
+                .baseUrl(apiBaseURL)
                 .addConverterFactory(new UnwrapConverterFactory(moshiConverterFactory))
                 .addConverterFactory(moshiConverterFactory)
                 .build();
@@ -124,49 +123,8 @@ public class NetworkService {
         return api;
     }
 
-    private String getInstitutionBaseURL(String institutionName) {
-        okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(Constant.CLIENT_URL)
-                .addHeader("Accept", "application/json")
-                .addHeader("Content-type", "application/json")
-                .addHeader("User-Agent", "Isegoria Android")
-                .build();
-
-        // Create new HTTP client rather than using application's, as no auth is required
-        OkHttpClient httpClient = new OkHttpClient();
-
-        try {
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.isSuccessful() && response.body() != null) {
-
-                String bodyString = response.body().toString();
-                if (!TextUtils.isEmpty(bodyString)) {
-                    JSONArray institutions = new JSONArray(bodyString);
-
-                    String apiRoot = null;
-
-                    for (int i = 0; i < institutions.length(); i++) {
-                        JSONObject institution = institutions.getJSONObject(i);
-                        if (institution.getString("name").equals(institutionName)) {
-                            apiRoot = institution.getString("apiRoot");
-                        }
-                    }
-
-                    return apiRoot;
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
+    // Updates the base URL of the API by fetching the API root for the user's institution
     private void updateAPIBaseURL(final User user) {
-        if (!user.accountVerified) return;
-
         if (user.institutionId == null) {
             finishedLogin(user);
             return;
@@ -189,8 +147,13 @@ public class NetworkService {
                                     for (ClientInstitution institution : institutions) {
                                         if (institution.name.equals(institutionName)
                                                 && !TextUtils.isEmpty(institution.apiRoot)) {
+
+                                            apiBaseURL = institution.apiRoot + "api/";
+
                                             // Recreate the API with the new base URL
-                                            createAPI(institution.apiRoot);
+                                            //createAPI(institution.apiRoot);
+                                            createAPI();
+
                                             finishedLogin(user);
                                         }
                                     }
@@ -205,6 +168,7 @@ public class NetworkService {
         });
     }
 
+    // Allow the rest of the first-launch actions to take place
     private void finishedLogin(User user) {
         application.setLoggedInUser(user, password);
 
@@ -234,7 +198,9 @@ public class NetworkService {
 
                         userAccountVerified = user.accountVerified;
 
-                        updateAPIBaseURL(user);
+                        if (userAccountVerified) {
+                            updateAPIBaseURL(user);
+                        }
                     }
                 }
 

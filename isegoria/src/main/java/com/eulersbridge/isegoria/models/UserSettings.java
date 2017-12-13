@@ -1,6 +1,6 @@
 package com.eulersbridge.isegoria.models;
 
-@SuppressWarnings("CanBeFinal")
+@SuppressWarnings({"CanBeFinal", "WeakerAccess"})
 public class UserSettings {
 
     public boolean trackingOff;

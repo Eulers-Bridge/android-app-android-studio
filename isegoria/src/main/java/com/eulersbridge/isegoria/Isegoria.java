@@ -9,20 +9,14 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.eulersbridge.isegoria.login.EmailVerificationFragment;
-import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.NetworkService;
-import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.securepreferences.SecurePreferences;
 
 import java.util.Arrays;
-
-import retrofit2.Response;
 
 public class Isegoria extends Application {
 

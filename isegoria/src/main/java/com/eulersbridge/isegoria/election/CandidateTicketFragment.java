@@ -260,7 +260,6 @@ public class CandidateTicketFragment extends Fragment {
 	        
 	        linLayout = new LinearLayout(getActivity());
 	        linLayout.setOrientation(LinearLayout.VERTICAL);
-	        linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
 	        linLayout.addView(textViewTitle);
 	        linLayout.addView(textViewTitleSuport2);
 	        

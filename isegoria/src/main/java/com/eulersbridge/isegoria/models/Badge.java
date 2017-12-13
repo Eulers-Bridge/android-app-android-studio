@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.models;
 
 import com.squareup.moshi.Json;
 
+@SuppressWarnings("unused")
 public class Badge {
 
     @Json(name = "badgeId")

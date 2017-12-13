@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.models;
 import com.eulersbridge.isegoria.network.Timestamp;
 import com.squareup.moshi.Json;
 
+@SuppressWarnings("unused")
 public class Election {
 
     @Json(name = "electionId")

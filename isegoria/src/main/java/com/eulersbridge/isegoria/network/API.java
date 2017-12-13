@@ -43,6 +43,7 @@ public interface API {
     Call<LoginResponse> attemptLogin(@Query("topicArn") String snsTopicArn, @Query("deviceToken") String deviceToken);
 
 
+    // Note: Specifying a full absolute path ignores Retrofit's base API URL
     @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
     Call<List<ClientInstitution>> getInstitutionURLs();
 

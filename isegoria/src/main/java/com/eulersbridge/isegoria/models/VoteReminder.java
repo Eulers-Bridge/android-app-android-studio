@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.models;
 
 import com.eulersbridge.isegoria.network.Timestamp;
 
-@SuppressWarnings("CanBeFinal")
+@SuppressWarnings({"WeakerAccess", "CanBeFinal"})
 public class VoteReminder {
 
     public String userEmail;

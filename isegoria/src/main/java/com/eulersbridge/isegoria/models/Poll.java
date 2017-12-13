@@ -2,8 +2,6 @@ package com.eulersbridge.isegoria.models;
 
 import com.squareup.moshi.Json;
 
-import org.parceler.Transient;
-
 import java.util.List;
 
 

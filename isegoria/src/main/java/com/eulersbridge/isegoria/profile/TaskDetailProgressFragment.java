@@ -162,6 +162,6 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
 
     @Override
     public String getTitle(Context context) {
-        return getString(R.string.profile_progress_section_title);
+        return context.getString(R.string.profile_progress_section_title);
     }
 }

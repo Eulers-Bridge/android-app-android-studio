@@ -43,7 +43,6 @@ import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
 import com.eulersbridge.isegoria.utilities.Utils;
 import com.eulersbridge.isegoria.vote.VoteFragmentDone;
-import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.securepreferences.SecurePreferences;
@@ -461,9 +460,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 						long institutionId = -1;
 
 						for (Country country : body.countries) {
-							for (Institution institution : country.institutions) {
-								if (institution.getName().equals(institution)) {
-									institutionId = institution.id;
+							for (Institution countryInstitution : country.institutions) {
+								if (countryInstitution.getName().equals(institution)) {
+									institutionId = countryInstitution.id;
 								}
 							}
 						}
