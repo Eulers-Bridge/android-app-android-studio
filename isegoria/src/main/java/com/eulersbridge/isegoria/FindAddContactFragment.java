@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -81,9 +82,7 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
             @Override
             protected void handleResponse(Response<List<Contact>> response) {
                 List<Contact> friends = response.body();
-                if (friends != null) {
-                    setFriends(friends);
-                }
+                if (friends != null) setFriends(friends);
             }
         });
 
@@ -120,8 +119,8 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         return rootView;
     }
 
-    public String getTitle() {
-        return getString(R.string.section_title_friends);
+    public String getTitle(Context context) {
+        return context.getString(R.string.section_title_friends);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.poll;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
@@ -65,8 +66,8 @@ public class PollFragment extends Fragment implements TitledFragment {
 	}
 
     @Override
-    public String getTitle() {
-        return getString(R.string.section_title_poll);
+    public String getTitle(Context context) {
+        return context.getString(R.string.section_title_poll);
     }
 
     private void setupViewPager(View rootView) {

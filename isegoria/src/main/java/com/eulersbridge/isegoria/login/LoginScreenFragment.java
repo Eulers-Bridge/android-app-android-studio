@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.login;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -88,7 +89,7 @@ public class LoginScreenFragment extends Fragment implements TitledFragment {
 	}
 
     @Override
-    public String getTitle() {
+    public String getTitle(Context context) {
         return null;
     }
 

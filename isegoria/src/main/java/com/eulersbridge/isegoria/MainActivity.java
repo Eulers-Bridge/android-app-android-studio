@@ -508,10 +508,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
                 getSupportFragmentManager().executePendingTransactions();
 
-                postFragmentCommit(fragment.getTitle());
+                postFragmentCommit(fragment.getTitle(this));
 
             } else {
-                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle())).commitAllowingStateLoss();
+                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle(this))).commitAllowingStateLoss();
             }
         });
 	}

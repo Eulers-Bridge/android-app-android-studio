@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.vote;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -33,8 +34,8 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
-        return getString(R.string.section_title_vote);
+    public String getTitle(Context context) {
+        return context.getString(R.string.section_title_vote);
     }
 
     private void setupViewPager(View rootView) {

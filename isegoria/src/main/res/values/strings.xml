@@ -71,6 +71,9 @@
     <string name="election_efficacy_survey_start_button">Start Survey</string>
 
     <!-- Voting -->
+    <string name="vote_choose_location_time">Choose your vote location and time.</string>
+    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
+
     <string name="vote_next_button">Next</string>
 
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
@@ -125,6 +128,10 @@
     <string name="friends_subheading_all_friends">Friends</string>
 
     <!-- User profile page -->
+    <string name="profile_badges_section_title">Badges</string>
+    <string name="profile_overview_section_title">Overview</string>
+    <string name="profile_progress_section_title">Progress</string>
+
     <string name="profile_section_friends">FRIENDS</string>
     <string name="profile_section_groups">GROUPS</string>
     <string name="profile_section_rewards">REWARDS</string>
@@ -160,13 +167,6 @@
     <!-- About -->
     <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
 
-    <!-- Misc -->
-
-    <string name="vote_choose_location_time">Choose your vote location and time.</string>
-    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
-
-    <string name="checkbox_checked">Checked checkbox</string>
-    <string name="checkbox_unchecked">Unchecked checkbox</string>
     <string name="about_directed_by">Directed By</string>
     <string name="about_director_name">Miguel Wood</string>
     <string name="about_android_heading">Android Client</string>
@@ -174,6 +174,9 @@
     <string name="about_behavioral">Behavioral Team</string>
     <string name="about_thanks">Special Thanks To</string>
     <string name="about_thanks_people">The Eulers Bridge Advisory Network Members</string>
-    <string name="profile_badges_section_title">Badges</string>
+
+    <!-- Misc -->
+    <string name="checkbox_checked">Checked checkbox</string>
+    <string name="checkbox_unchecked">Unchecked checkbox</string>
 
 </resources>
