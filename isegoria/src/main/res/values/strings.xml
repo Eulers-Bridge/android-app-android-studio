@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Isegoria</string>
 
     <string name="isegoria_logo_content_description">Isegoria Logo</string>
@@ -36,6 +36,9 @@
     <string name="user_sign_up_choose_country_hint">Country</string>
     <string name="user_sign_up_choose_institution_hint">Institution</string>
 
+    <string name="user_consent_statement_message">PLAIN LANGUAGE STATEMENT Please read the following statement carefully. The project is being conducted by researchers in CIS at the University of Melbourne to observe how personality traits influence interaction with online information during political campaigns. Should you participate, you will be asked to fill in demographic information and use the app on your phone for 5 weeks. Participation in this research is voluntary and confidential. However, this confidentiality is subject to legal limitations. You may cease involvement at any time by updating your consent status in the user profile tab. Research papers resulting from the project will only have aggregate data and will be made public. Results are available on request by email: campaignapp@gmail.com. If you are in a dependent relationship with any of the researchers (e.g., being taught by a researcher) the researcher will be unable to access your raw data and therefore your participation will not affect any ongoing assessment. Data is collected and stored in accordance with University policy and disposed 5 years after final publication. There are no risks to individuals participating in this study beyond those that exist in daily life. This project has been approved by the University of Melbourne\'s Human Research Ethics Committee (HREC Reference ID 1441638).If participants have any concerns about the conduct of this research project they can contact the Executive Officer, Human Research Ethics, The University of Melbourne, ph: 03 8344 2073; fax: 03 9347 6739; email: HumanEthics-Enquiries@unimelb.edu.au If you have any further questions about the research itself, please contact the researchers: Miguel Wood (m.wood@student.unimelb.edu.au), Prof. Graeme Shanks (gshanks@unimelb.edu.au or 03 8344 1577), and A/Prof Simon Milton (smilton@unimelb.edu.au or 03 8344 1528). 1st January 2015</string>
+    <string name="user_consent_melbourne_image_content_description">University of Melbourne coat of arms</string>
+
     <!-- Email verification -->
     <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
     <string name="email_verification_success_button">Verified, Please Log Me In</string>
@@ -68,6 +71,9 @@
     <string name="election_efficacy_survey_start_button">Start Survey</string>
 
     <!-- Voting -->
+    <string name="vote_choose_location_time">Choose your vote location and time.</string>
+    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
+
     <string name="vote_next_button">Next</string>
 
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
@@ -96,7 +102,9 @@
     <string name="self_efficacy_slider_completely">Completely</string>
 
     <!-- Polls -->
+    <string name="poll_title">Poll %d</string>
     <string name="poll_asked_by">Asked by %s</string>
+    <string name="poll_vote_answers_content_description">%d answers</string>
 
     <!-- Feed/News -->
     <string name="news_article_star_content_description">Star news article</string>
@@ -120,6 +128,10 @@
     <string name="friends_subheading_all_friends">Friends</string>
 
     <!-- User profile page -->
+    <string name="profile_badges_section_title">Badges</string>
+    <string name="profile_overview_section_title">Overview</string>
+    <string name="profile_progress_section_title">Progress</string>
+
     <string name="profile_section_friends">FRIENDS</string>
     <string name="profile_section_groups">GROUPS</string>
     <string name="profile_section_rewards">REWARDS</string>
@@ -136,7 +148,7 @@
     <!-- User profile – tasks progress -->
     <string name="profile_tasks_progress_level">Level %d</string>
     <string name="profile_tasks_task_xp">%d XP</string>
-    <string name="profile_tasks_progress_description">%d out of %d XP till the next level!</string>
+    <string name="profile_tasks_progress_description" tools:ignore="PluralsCandidate">%d out of %d XP till the next level!</string>
     <string name="profile_tasks_progress_section_title_completed">Completed</string>
     <string name="profile_tasks_progress_section_title_remaining">Remaining</string>
 
@@ -154,8 +166,17 @@
 
     <!-- About -->
     <string name="about_version">Version 1.0 \"Tesla\" Beta</string>
-    <string name="poll_title">Poll %d</string>
-    <string name="vote_choose_location_time">Choose your vote location and time.</string>
-    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
+
+    <string name="about_directed_by">Directed By</string>
+    <string name="about_director_name">Miguel Wood</string>
+    <string name="about_android_heading">Android Client</string>
+    <string name="about_android_person">Anthony Quattrone</string>
+    <string name="about_behavioral">Behavioral Team</string>
+    <string name="about_thanks">Special Thanks To</string>
+    <string name="about_thanks_people">The Eulers Bridge Advisory Network Members</string>
+
+    <!-- Misc -->
+    <string name="checkbox_checked">Checked checkbox</string>
+    <string name="checkbox_unchecked">Unchecked checkbox</string>
 
 </resources>

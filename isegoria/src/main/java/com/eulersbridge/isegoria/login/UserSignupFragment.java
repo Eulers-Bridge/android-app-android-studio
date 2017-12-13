@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.login;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -101,7 +102,7 @@ public class UserSignupFragment extends Fragment implements OnItemSelectedListen
 	}
 
     @Override
-    public String getTitle() {
+    public String getTitle(Context context) {
         return null;
     }
 

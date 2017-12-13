@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.poll;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -64,7 +65,15 @@ public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder
             viewHolder.imageView.setVisibility(View.GONE);
         }
 
-        viewHolder.checkBoxImageView.setImageResource(item.hasVoted? R.drawable.tickgreen : R.drawable.tickempty);
+        Context context = viewHolder.checkBoxImageView.getContext();
+
+        if (item.hasVoted) {
+            viewHolder.checkBoxImageView.setImageResource(R.drawable.tickgreen);
+            viewHolder.checkBoxImageView.setContentDescription(context.getString(R.string.checkbox_checked));
+        } else {
+            viewHolder.checkBoxImageView.setImageResource(R.drawable.tickempty);
+            viewHolder.checkBoxImageView.setContentDescription(context.getString(R.string.checkbox_unchecked));
+        }
 
         PollResult result = item.getResult();
         if (result != null) {

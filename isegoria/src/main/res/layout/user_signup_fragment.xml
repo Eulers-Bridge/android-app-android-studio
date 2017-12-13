@@ -27,7 +27,8 @@
                 android:layout_gravity="center_horizontal"
                 android:minHeight="100dp"
                 android:minWidth="100dp"
-                android:src="@drawable/app_icon" />
+                android:src="@drawable/app_icon"
+                android:contentDescription="@null"/>
 
             <TextView
                 android:id="@+id/signup_photo_title"

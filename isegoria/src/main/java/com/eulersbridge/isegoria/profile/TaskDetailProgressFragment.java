@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -160,7 +161,7 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
     }
 
     @Override
-    public String getTitle() {
-        return "Progress";
+    public String getTitle(Context context) {
+        return getString(R.string.profile_progress_section_title);
     }
 }

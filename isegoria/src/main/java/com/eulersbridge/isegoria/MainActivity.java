@@ -477,10 +477,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		switchContent(new LoginScreenFragment());
 	}
 
-    public void voteNext() {
-        switchContent(new VoteFragmentPledge());
-    }
-
     public void voteDone() {
         switchContent(new VoteFragmentDone());
     }
@@ -512,10 +508,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
                 getSupportFragmentManager().executePendingTransactions();
 
-                postFragmentCommit(fragment.getTitle());
+                postFragmentCommit(fragment.getTitle(this));
 
             } else {
-                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle())).commitAllowingStateLoss();
+                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle(this))).commitAllowingStateLoss();
             }
         });
 	}

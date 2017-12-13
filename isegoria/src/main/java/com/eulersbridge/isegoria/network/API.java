@@ -131,13 +131,10 @@ public interface API {
     @GET("newsArticle/{articleId}/likes")
     Call<List<LikeInfo>> getNewsArticleLikes(@Path("articleId") long articleId);
 
-    @GET("newsArticle/{articleId}/likedBy/{userEmail}/")
-    Call<LikedResponse> getNewsArticleLiked(@Path("articleId") long articleId, @Path("userEmail") String userEmail);
-
     @PUT("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<Void> likeArticle(@Path("articleId") long photoId, @Path("userEmail") String userEmail);
 
-    @DELETE("newsArticle/{articleId}/unlikedBy/{userEmail}")
+    @DELETE("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<Void> unlikeArticle(@Path("articleId") long photoId, @Path("userEmail") String userEmail);
 
 

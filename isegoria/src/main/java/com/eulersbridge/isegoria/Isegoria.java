@@ -152,4 +152,8 @@ public class Isegoria extends Application {
 	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
 		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
 	}
+
+	public void onUserSelfEfficacyCompleted() {
+        loggedInUser.setPPSEQuestionsCompleted();
+	}
 }

@@ -63,7 +63,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Directed By"
+                android:text="@string/about_directed_by"
                 android:layout_gravity="center_vertical"
                 android:textSize="18sp"
                 android:textColor="#ff4c74cc"
@@ -73,7 +73,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Miguel Wood"
+                android:text="@string/about_director_name"
                 android:layout_gravity="center|end"
                 android:textSize="19sp"
                 android:textColor="#fffff0ef" />
@@ -89,7 +89,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Android Client"
+                android:text="@string/about_android_heading"
                 android:layout_gravity="center_vertical"
                 android:textSize="18sp"
                 android:textColor="#ff4c74cc"
@@ -99,7 +99,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Anthony Quattrone"
+                android:text="@string/about_android_person"
                 android:layout_gravity="center|end"
                 android:textSize="18sp"
                 android:textColor="#fffff0ef" />
@@ -121,7 +121,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Behavioral Team"
+                    android:text="@string/about_behavioral"
                     android:textSize="18sp"
                     android:textColor="#ff4c74cc"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -279,7 +279,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Special Thanks To"
+                    android:text="@string/about_thanks"
                     android:textSize="18sp"
                     android:textColor="#ff4c74cc"
                     android:layout_gravity="center_vertical|end"
@@ -291,7 +291,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="The Eulers Bridge\nAdvisory Network Members"
+                    android:text="@string/about_thanks_people"
                     android:textSize="15sp"
                     android:textColor="#fffff0ef"
                     android:paddingRight="@dimen/activity_horizontal_margin"

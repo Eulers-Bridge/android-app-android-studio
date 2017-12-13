@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -75,9 +76,9 @@ public class ProfileFragment extends Fragment implements TitledFragment {
 
         isegoria = (Isegoria) getActivity().getApplication();
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-
-        View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
+        View.OnClickListener friendsClickListener = view -> {
+            if (getActivity() != null) ((MainActivity)getActivity()).showFriends();
+        };
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         friendsNumTextView.setOnClickListener(friendsClickListener);
@@ -340,8 +341,8 @@ public class ProfileFragment extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
-        return "Overview";
+    public String getTitle(Context context) {
+        return getString(R.string.profile_overview_section_title);
     }
 
     void setViewPager(ViewPager viewPager) {

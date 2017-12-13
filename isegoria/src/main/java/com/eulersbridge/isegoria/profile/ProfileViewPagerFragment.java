@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.utilities.TitledFragment;
@@ -25,15 +27,11 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private MainActivity mainActivity;
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
         setHasOptionsMenu(true);
-
-        mainActivity = (MainActivity)getActivity();
 
         setupViewPager(rootView);
         setupTabLayout();
@@ -42,8 +40,8 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
     }
 
     @Override
-    public String getTitle() {
-        return getString(R.string.section_title_profile);
+    public String getTitle(Context context) {
+        return context.getString(R.string.section_title_profile);
     }
 
     @Override
@@ -61,7 +59,9 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
                 return true;
 
             case R.id.profile_logout:
-                mainActivity.getIsegoriaApplication().logOut();
+                if (getActivity() != null) {
+                    ((Isegoria)getActivity().getApplication()).logOut();
+                }
                 return true;
 
             default:
@@ -89,15 +89,16 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
                 public CharSequence getPageTitle(int position) {
                     TitledFragment fragment = (TitledFragment)fragmentList.get(position);
                     if (fragment != null) {
-                        return fragment.getTitle();
+                        return fragment.getTitle(getContext());
 
                     } else {
                         return null;
                     }
                 }
             };
-            viewPager.setAdapter(pagerAdapter);
 
+            viewPager.setAdapter(pagerAdapter);
+            viewPager.setOffscreenPageLimit(3);
             viewPager.setCurrentItem(0);
         }
     }

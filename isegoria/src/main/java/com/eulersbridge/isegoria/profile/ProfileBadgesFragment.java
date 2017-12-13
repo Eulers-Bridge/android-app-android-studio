@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -117,7 +118,7 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
-        return "Badges";
+    public String getTitle(Context context) {
+        return context.getString(R.string.profile_badges_section_title);
     }
 }
