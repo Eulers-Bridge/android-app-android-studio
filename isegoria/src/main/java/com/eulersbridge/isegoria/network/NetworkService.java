@@ -12,12 +12,17 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
 import com.eulersbridge.isegoria.Constant;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.User;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -70,7 +75,7 @@ public class NetworkService {
     private void setup() {
         if (needsSetup) {
             createHttpClient();
-            createAPI();
+            createAPI(Constant.SERVER_URL);
         }
     }
 
@@ -102,10 +107,10 @@ public class NetworkService {
         httpClient = httpClientBuilder.build();
     }
 
-    private void createAPI() {
+    private void createAPI(String baseUrl) {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(httpClient)
-                .baseUrl(Constant.SERVER_URL)
+                .baseUrl(baseUrl)
                 .addConverterFactory(new UnwrapConverterFactory(moshiConverterFactory))
                 .addConverterFactory(moshiConverterFactory)
                 .build();
@@ -117,6 +122,93 @@ public class NetworkService {
         setup();
 
         return api;
+    }
+
+    private String getInstitutionBaseURL(String institutionName) {
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(Constant.CLIENT_URL)
+                .addHeader("Accept", "application/json")
+                .addHeader("Content-type", "application/json")
+                .addHeader("User-Agent", "Isegoria Android")
+                .build();
+
+        // Create new HTTP client rather than using application's, as no auth is required
+        OkHttpClient httpClient = new OkHttpClient();
+
+        try {
+            Response response = httpClient.newCall(request).execute();
+
+            if (response.isSuccessful() && response.body() != null) {
+
+                String bodyString = response.body().toString();
+                if (!TextUtils.isEmpty(bodyString)) {
+                    JSONArray institutions = new JSONArray(bodyString);
+
+                    String apiRoot = null;
+
+                    for (int i = 0; i < institutions.length(); i++) {
+                        JSONObject institution = institutions.getJSONObject(i);
+                        if (institution.getString("name").equals(institutionName)) {
+                            apiRoot = institution.getString("apiRoot");
+                        }
+                    }
+
+                    return apiRoot;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private void updateAPIBaseURL(final User user) {
+        if (!user.accountVerified) return;
+
+        if (user.institutionId == null) {
+            finishedLogin(user);
+            return;
+        }
+
+        api.getInstitution(user.institutionId).enqueue(new SimpleCallback<Institution>() {
+            @Override
+            protected void handleResponse(retrofit2.Response<Institution> response) {
+                Institution institution = response.body();
+                if (institution != null) {
+
+                    final String institutionName = institution.getName();
+                    if (!TextUtils.isEmpty(institutionName)) {
+
+                        final SimpleCallback<List<ClientInstitution>> URLsCallback = new SimpleCallback<List<ClientInstitution>>() {
+                            @Override
+                            protected void handleResponse(retrofit2.Response<List<ClientInstitution>> response) {
+                                List<ClientInstitution> institutions = response.body();
+                                if (institutions != null) {
+                                    for (ClientInstitution institution : institutions) {
+                                        if (institution.name.equals(institutionName)
+                                                && !TextUtils.isEmpty(institution.apiRoot)) {
+                                            // Recreate the API with the new base URL
+                                            createAPI(institution.apiRoot);
+                                            finishedLogin(user);
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        api.getInstitutionURLs().enqueue(URLsCallback);
+                    }
+                }
+            }
+        });
+    }
+
+    private void finishedLogin(User user) {
+        application.setLoggedInUser(user, password);
+
+        if (user.accountVerified) application.onLoginSuccess();
     }
 
 	public void login(String email, String password) {
@@ -140,13 +232,9 @@ public class NetworkService {
                         User user = loginResponse.user;
                         user.setId(loginResponse.userId);
 
-                        application.setLoggedInUser(user, password);
+                        userAccountVerified = user.accountVerified;
 
-                        if (user.accountVerified) {
-                            userAccountVerified = true;
-
-                            application.onLoginSuccess();
-                        }
+                        updateAPIBaseURL(user);
                     }
                 }
 

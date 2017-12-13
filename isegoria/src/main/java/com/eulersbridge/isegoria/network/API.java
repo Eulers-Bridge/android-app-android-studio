@@ -35,12 +35,16 @@ import retrofit2.http.Query;
 
 public interface API {
 
+    @GET("general-info")
+    Call<GeneralInfoResponse> getGeneralInfo();
+
+
     @GET("login")
     Call<LoginResponse> attemptLogin(@Query("topicArn") String snsTopicArn, @Query("deviceToken") String deviceToken);
 
 
-    @GET("general-info")
-    Call<GeneralInfoResponse> getGeneralInfo();
+    @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
+    Call<List<ClientInstitution>> getInstitutionURLs();
 
 
     @GET("emailVerification/{userEmail}/resend")

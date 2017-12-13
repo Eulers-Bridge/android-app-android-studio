@@ -14,6 +14,8 @@ public class Constant {
     public static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/";
     //public static final String PICTURES_URL "https://s3-ap-southeast-2.amazonaws.com/isegoria/";
 
+    public static final String CLIENT_URL = "https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json";
+
     // Used for home screen long-press app shortcuts on Android 7.1+
     static final String SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION";
     static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
