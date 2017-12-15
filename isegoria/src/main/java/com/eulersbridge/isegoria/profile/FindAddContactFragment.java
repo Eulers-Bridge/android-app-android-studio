@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.TypedValue;
@@ -152,7 +153,7 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         inflater.inflate(R.menu.friends, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem searchItem = menu.findItem(R.id.search);
+        MenuItem searchItem = menu.findItem(R.id.friends_search_view);
 
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
@@ -253,162 +254,165 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
         sectionContainer.setVisibility(View.VISIBLE);
     }
 
-    @UiThread
     private void addTableRow(TableLayout tableLayout, final GenericUser user, long contactRequestId, UserType type, FriendRequestType friendRequestType) {
-        final TableRow tr;
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                final TableRow tr;
 
-        final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 6.666666667, getResources().getDisplayMetrics());
-        final int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                (float) 53.333333333, getResources().getDisplayMetrics());
+                final int paddingMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        (float) 6.666666667, getResources().getDisplayMetrics());
+                final int imageSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                        (float) 53.333333333, getResources().getDisplayMetrics());
 
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout layout = new LinearLayout(getActivity());
+                layout.setOrientation(LinearLayout.HORIZONTAL);
 
-        tr = new TableRow(getActivity());
-        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-        tr.setLayoutParams(rowParams);
-        tr.setPadding(0, paddingMargin, 0, paddingMargin);
+                tr = new TableRow(getActivity());
+                LayoutParams rowParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                tr.setLayoutParams(rowParams);
+                tr.setPadding(0, paddingMargin, 0, paddingMargin);
 
-        ImageView candidateProfileView = new ImageView(getActivity());
-        candidateProfileView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
-        candidateProfileView.setLayoutParams(layoutParams);
-        //network.getFirstPhoto(0, userId, candidateProfileView);
-        candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
+                ImageView candidateProfileView = new ImageView(getActivity());
+                candidateProfileView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(imageSize, imageSize);
+                candidateProfileView.setLayoutParams(layoutParams);
+                //network.getFirstPhoto(0, userId, candidateProfileView);
+                candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 
-        GlideApp.with(this)
-                .load(user.profilePhotoURL)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(candidateProfileView);
+                GlideApp.with(FindAddContactFragment.this)
+                        .load(user.profilePhotoURL)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(candidateProfileView);
 
-        TextView textViewCandidate = new TextView(getActivity());
-        textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
-        textViewCandidate.setTextSize(16.0f);
-        textViewCandidate.setText(user.getFullName());
-        textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewCandidate.setGravity(Gravity.START);
+                TextView textViewCandidate = new TextView(getActivity());
+                textViewCandidate.setTextColor(Color.parseColor("#3A3F43"));
+                textViewCandidate.setTextSize(16.0f);
+                textViewCandidate.setText(user.getFullName());
+                textViewCandidate.setPadding(paddingMargin, 0, paddingMargin, 0);
+                textViewCandidate.setGravity(Gravity.START);
 
-        TextView textViewPosition = new TextView(getActivity());
-        textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
-        textViewPosition.setTextSize(12.0f);
-        textViewPosition.setText("The University of Melbourne");
-        textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
-        textViewPosition.setGravity(Gravity.START);
+                TextView textViewPosition = new TextView(getActivity());
+                textViewPosition.setTextColor(Color.parseColor("#3A3F43"));
+                textViewPosition.setTextSize(12.0f);
+                textViewPosition.setText("The University of Melbourne");
+                textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
+                textViewPosition.setGravity(Gravity.START);
 
-        //network.getPositionText(textViewPosition, positionId);
+                //network.getPositionText(textViewPosition, positionId);
 
-        LinearLayout linLayout2 = new LinearLayout(getActivity());
-        //linLayout2.setBackgroundColor((Color.parseColor("#000000")));
-        linLayout2.setOrientation(LinearLayout.HORIZONTAL);
-        if (type == UserType.SEARCH) {
-            final ImageView candidateProfileImage = new ImageView(getActivity());
-            candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
-            candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-            candidateProfileImage.setOnClickListener(view -> isegoria.getAPI().addFriend(isegoria.getLoggedInUser().email, user.email)
-                    .enqueue(new SimpleCallback<Void>() {
-                        @Override
-                        protected void handleResponse(Response<Void> response) {
-                            showAddedMessage();
-                        }
-                    }));
+                LinearLayout linLayout2 = new LinearLayout(getActivity());
+                //linLayout2.setBackgroundColor((Color.parseColor("#000000")));
+                linLayout2.setOrientation(LinearLayout.HORIZONTAL);
+                if (type == UserType.SEARCH) {
+                    final ImageView candidateProfileImage = new ImageView(getActivity());
+                    candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
+                    candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+                    candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
+                    candidateProfileImage.setOnClickListener(view -> isegoria.getAPI().addFriend(isegoria.getLoggedInUser().email, user.email)
+                            .enqueue(new SimpleCallback<Void>() {
+                                @Override
+                                protected void handleResponse(Response<Void> response) {
+                                    showAddedMessage();
+                                }
+                            }));
 
-            linLayout2.addView(candidateProfileImage);
-        }
+                    linLayout2.addView(candidateProfileImage);
+                }
 
-        if (type == UserType.FRIEND) {
-            final ImageView viewProfileImage = new ImageView(getActivity());
-            viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
-            viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
-            viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-            viewProfileImage.setOnClickListener(view -> {
-                viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
+                if (type == UserType.FRIEND) {
+                    final ImageView viewProfileImage = new ImageView(getActivity());
+                    viewProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
+                    viewProfileImage.setScaleType(ScaleType.CENTER_CROP);
+                    viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profileactive, imageSize, imageSize));
+                    viewProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
+                    viewProfileImage.setOnClickListener(view -> {
+                        viewProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profiledark, imageSize, imageSize));
 
-                ProfileFragment profileFragment = new ProfileFragment();
+                        ProfileFragment profileFragment = new ProfileFragment();
 
-                Bundle args = new Bundle();
-                args.putParcelable(Constant.FRAGMENT_EXTRA_USER, Parcels.wrap(user));
-                profileFragment.setArguments(args);
+                        Bundle args = new Bundle();
+                        args.putParcelable(Constant.FRAGMENT_EXTRA_USER, Parcels.wrap(user));
+                        profileFragment.setArguments(args);
 
-                getChildFragmentManager().beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.container, profileFragment)
-                        .commit();
+                        getChildFragmentManager().beginTransaction()
+                                .addToBackStack(null)
+                                .replace(R.id.container, profileFragment)
+                                .commit();
+                    });
+
+                    linLayout2.addView(viewProfileImage);
+                }
+
+                if (friendRequestType == FriendRequestType.RECEIVED) {
+                    final ImageView acceptImage = new ImageView(getActivity());
+                    acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
+                    acceptImage.setScaleType(ScaleType.CENTER_CROP);
+                    acceptImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+                    acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
+                    acceptImage.setOnClickListener(view -> {
+                        tr.setVisibility(ViewGroup.GONE);
+                        addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequestType.UNKNOWN);
+
+                        isegoria.getAPI().acceptFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
+                            @Override
+                            protected void handleResponse(Response<Void> response) {
+                                showAcceptMessage();
+                            }
+                        });
+                    });
+
+                    final ImageView denyImage = new ImageView(getActivity());
+                    denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
+                    denyImage.setScaleType(ScaleType.CENTER_CROP);
+                    denyImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
+                    denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
+                    denyImage.setOnClickListener(view -> {
+                        tr.setVisibility(ViewGroup.GONE);
+
+                        isegoria.getAPI().rejectFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
+                            @Override
+                            protected void handleResponse(Response<Void> response) {
+                                showDenyMessage();
+                            }
+                        });
+                    });
+
+                    linLayout2.addView(denyImage);
+                    linLayout2.addView(acceptImage);
+                }
+
+                RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+
+                RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+                linLayout2.setGravity(Gravity.END);
+                linLayout2.setLayoutParams(relativeParamsRight);
+
+                layout.addView(candidateProfileView);
+
+                LinearLayout linLayout = new LinearLayout(getActivity());
+                linLayout.setOrientation(LinearLayout.VERTICAL);
+                linLayout.addView(textViewCandidate);
+                linLayout.addView(textViewPosition);
+
+                layout.addView(linLayout);
+
+                layout.setLayoutParams(relativeParamsLeft);
+
+                RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
+                LayoutParams relLayoutMasterParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                relLayoutMaster.setLayoutParams(relLayoutMasterParam);
+
+                relLayoutMaster.addView(layout);
+                relLayoutMaster.addView(linLayout2);
+
+                tr.addView(relLayoutMaster);
+
+                tableLayout.addView(tr);
             });
-
-            linLayout2.addView(viewProfileImage);
         }
-
-        if (friendRequestType == FriendRequestType.RECEIVED) {
-            final ImageView acceptImage = new ImageView(getActivity());
-            acceptImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            acceptImage.setScaleType(ScaleType.CENTER_CROP);
-            acceptImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
-            acceptImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-            acceptImage.setOnClickListener(view -> {
-                tr.setVisibility(ViewGroup.GONE);
-                addTableRow(friendsAllTableLayout, user, contactRequestId, UserType.FRIEND, FriendRequestType.UNKNOWN);
-
-                isegoria.getAPI().acceptFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
-                    @Override
-                    protected void handleResponse(Response<Void> response) {
-                        showAcceptMessage();
-                    }
-                });
-            });
-
-            final ImageView denyImage = new ImageView(getActivity());
-            denyImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
-            denyImage.setScaleType(ScaleType.CENTER_CROP);
-            denyImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.addedinactive, imageSize, imageSize));
-            denyImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-            denyImage.setOnClickListener(view -> {
-                tr.setVisibility(ViewGroup.GONE);
-
-                isegoria.getAPI().rejectFriendRequest(contactRequestId).enqueue(new SimpleCallback<Void>() {
-                    @Override
-                    protected void handleResponse(Response<Void> response) {
-                        showDenyMessage();
-                    }
-                });
-            });
-
-            linLayout2.addView(denyImage);
-            linLayout2.addView(acceptImage);
-        }
-
-        RelativeLayout.LayoutParams relativeParamsLeft = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-
-        RelativeLayout.LayoutParams relativeParamsRight = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        linLayout2.setGravity(Gravity.END);
-        linLayout2.setLayoutParams(relativeParamsRight);
-
-        layout.addView(candidateProfileView);
-
-        LinearLayout linLayout = new LinearLayout(getActivity());
-        linLayout.setOrientation(LinearLayout.VERTICAL);
-        linLayout.addView(textViewCandidate);
-        linLayout.addView(textViewPosition);
-
-        layout.addView(linLayout);
-
-        layout.setLayoutParams(relativeParamsLeft);
-
-        RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
-        TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams(LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        relLayoutMaster.setLayoutParams(relLayoutMasterParam);
-
-        relLayoutMaster.addView(layout);
-        relLayoutMaster.addView(linLayout2);
-
-        tr.addView(relLayoutMaster);
-
-        tableLayout.addView(tr);
     }
 
     private void showAddedMessage() {
