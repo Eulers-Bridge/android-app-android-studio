@@ -1,6 +1,7 @@
-package com.eulersbridge.isegoria.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,7 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.R;
 
@@ -43,7 +44,7 @@ public class EmailVerificationFragment extends Fragment implements TitledFragmen
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(Context context) {
         return null;
     }
 }

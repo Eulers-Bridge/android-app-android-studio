@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,8 +14,8 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.common.Utils;
 
 
 public class FeedFragment extends Fragment implements TitledFragment {
@@ -46,8 +47,8 @@ public class FeedFragment extends Fragment implements TitledFragment {
 		return rootView;
 	}
 
-	public String getTitle() {
-	    return getString(R.string.section_title_feed);
+	public String getTitle(Context context) {
+	    return context.getString(R.string.section_title_feed);
     }
 
 	private void setupViewPager(View rootView) {

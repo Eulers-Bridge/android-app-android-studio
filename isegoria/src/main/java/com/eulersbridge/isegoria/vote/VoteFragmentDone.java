@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.vote;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -12,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.VoteReminder;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.SimpleCallback;
@@ -72,7 +73,7 @@ public class VoteFragmentDone extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(Context context) {
         return null;
     }
 }

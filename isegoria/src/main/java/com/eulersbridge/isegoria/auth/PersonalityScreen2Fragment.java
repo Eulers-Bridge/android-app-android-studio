@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

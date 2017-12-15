@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,7 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,8 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_badges_fragment, container, false);
 
-        String targetName = null;
-
         Bundle bundle = getArguments();
         if (bundle != null) {
-            targetName = bundle.getString("name");
             targetLevel = bundle.getInt("level");
         }
 
@@ -117,7 +115,7 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
-        return "Badges";
+    public String getTitle(Context context) {
+        return context.getString(R.string.profile_badges_section_title);
     }
 }

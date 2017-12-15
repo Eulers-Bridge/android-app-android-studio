@@ -62,6 +62,13 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
         }
     }
 
+    private boolean isValidFragment() {
+        return (fragment != null
+                && fragment.getActivity() != null
+                && !fragment.isDetached()
+                && fragment.isAdded());
+    }
+
     @Override
     public void onBindViewHolder(BadgeViewHolder viewHolder, int index) {
 
@@ -97,9 +104,7 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
         boolean newImageRequired = (oldContentDescription != null  && !oldContentDescription.toString().equals(item.name)
                 || oldContentDescription == null);
 
-        if (fragment != null
-                && fragment.getActivity() != null
-                && newImageRequired) {
+        if (isValidFragment() && newImageRequired) {
             Isegoria isegoria = (Isegoria)fragment.getActivity().getApplication();
 
             if (isegoria != null) {
@@ -111,7 +116,7 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
                     @Override
                     protected void handleResponse(Response<PhotosResponse> response) {
                         PhotosResponse body = response.body();
-                        if (body != null && body.totalPhotos > (imageIndex + 1)) {
+                        if (body != null && body.totalPhotos > (imageIndex + 1) && isValidFragment()) {
 
                             String url = body.photos.get(imageIndex).thumbnailUrl;
 

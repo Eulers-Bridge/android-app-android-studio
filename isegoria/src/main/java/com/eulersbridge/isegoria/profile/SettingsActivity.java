@@ -31,7 +31,7 @@ import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.Utils;
 
 import java.io.File;
 

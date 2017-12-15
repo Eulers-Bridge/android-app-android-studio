@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.squareup.moshi.Json;
 
+@SuppressWarnings("unused")
 public class Ticket {
 
     @Json(name = "ticketId")

@@ -10,7 +10,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.eulersbridge.isegoria.login.EmailVerificationFragment;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.auth.EmailVerificationFragment;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.NetworkService;
@@ -40,8 +41,8 @@ public class Isegoria extends Application {
             if (shortcutManager != null) {
 
                 ShortcutInfo election = new ShortcutInfo.Builder(this, Constant.SHORTCUT_ACTION_ELECTION)
-                        .setShortLabel(getString(R.string.section_title_election))
-                        .setLongLabel("View the latest election")
+                        .setShortLabel(getString(R.string.shortcut_view_latest_election_label_short))
+                        .setLongLabel(getString(R.string.shortcut_view_latest_election_label_long))
                         .setIcon(Icon.createWithResource(this, R.drawable.electionblue))
                         .setRank(1)
                         .setIntent(new Intent(this, MainActivity.class)
@@ -51,8 +52,8 @@ public class Isegoria extends Application {
                         .build();
 
                 ShortcutInfo friends = new ShortcutInfo.Builder(this, Constant.SHORTCUT_ACTION_FRIENDS)
-                        .setShortLabel(getString(R.string.section_title_friends))
-                        .setLongLabel("Add a friend")
+                        .setShortLabel(getString(R.string.shortcut_add_friend_label_short))
+                        .setLongLabel(getString(R.string.shortcut_add_friend_label_long))
                         .setIcon(Icon.createWithResource(this, R.drawable.friends))
                         .setRank(2)
                         .setIntent(new Intent(this, MainActivity.class)
@@ -80,14 +81,6 @@ public class Isegoria extends Application {
             mainActivity.switchContent(new EmailVerificationFragment());
         });
     }
-
-	public void onSignUpSuccess() {
-		mainActivity.onSignUpSuccess();
-	}
-	
-	public void onSignUpFailure() {
-		mainActivity.onSignUpFailure();
-	}
 	
 	public @NonNull NetworkService getNetworkService() {
         if (network == null) {
@@ -110,8 +103,8 @@ public class Isegoria extends Application {
 
         new SecurePreferences(getApplicationContext())
                 .edit()
-                .putString("userEmail", loggedInUser.email)
-                .putString("userPassword", password)
+                .putString(Constant.USER_EMAIL_KEY, loggedInUser.email)
+                .putString(Constant.USER_PASSWORD_KEY, password)
                 .apply();
 
         setupAppShortcuts();
@@ -129,7 +122,7 @@ public class Isegoria extends Application {
 
 		new SecurePreferences(getApplicationContext())
 				.edit()
-				.remove("userPassword")
+				.remove(Constant.USER_PASSWORD_KEY)
 				.apply();
 
 		// Remove any notifications that are still visible
@@ -151,5 +144,9 @@ public class Isegoria extends Application {
 
 	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
 		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
+	}
+
+	public void onUserSelfEfficacyCompleted() {
+        loggedInUser.setPPSEQuestionsCompleted();
 	}
 }

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,11 +23,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.login.PersonalityQuestionsActivity;
+import com.eulersbridge.isegoria.auth.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Institution;
@@ -36,7 +37,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.views.CircularSeekBar;
 
 import org.parceler.Parcels;
@@ -75,9 +76,9 @@ public class ProfileFragment extends Fragment implements TitledFragment {
 
         isegoria = (Isegoria) getActivity().getApplication();
 
-        MainActivity mainActivity = (MainActivity) getActivity();
-
-        View.OnClickListener friendsClickListener = view -> mainActivity.showFriends();
+        View.OnClickListener friendsClickListener = view -> {
+            if (getActivity() != null) ((MainActivity)getActivity()).showFriends();
+        };
 
         friendsNumTextView = rootView.findViewById(R.id.friendsNum);
         friendsNumTextView.setOnClickListener(friendsClickListener);
@@ -340,8 +341,8 @@ public class ProfileFragment extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
-        return "Overview";
+    public String getTitle(Context context) {
+        return context.getString(R.string.profile_overview_section_title);
     }
 
     void setViewPager(ViewPager viewPager) {

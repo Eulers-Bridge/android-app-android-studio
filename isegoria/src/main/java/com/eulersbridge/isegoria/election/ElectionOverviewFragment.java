@@ -13,7 +13,7 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.Utils;
 
 import java.util.List;
 

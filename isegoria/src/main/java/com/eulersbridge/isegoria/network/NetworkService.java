@@ -10,14 +10,17 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.SignUpUser;
 import com.eulersbridge.isegoria.models.User;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -31,6 +34,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkService {
+
+    private String apiBaseURL = Constant.SERVER_URL;
 
     private final Isegoria application;
 
@@ -105,7 +110,7 @@ public class NetworkService {
     private void createAPI() {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(httpClient)
-                .baseUrl(Constant.SERVER_URL)
+                .baseUrl(apiBaseURL)
                 .addConverterFactory(new UnwrapConverterFactory(moshiConverterFactory))
                 .addConverterFactory(moshiConverterFactory)
                 .build();
@@ -117,6 +122,58 @@ public class NetworkService {
         setup();
 
         return api;
+    }
+
+    // Updates the base URL of the API by fetching the API root for the user's institution
+    private void updateAPIBaseURL(final User user) {
+        if (user.institutionId == null) {
+            finishedLogin(user);
+            return;
+        }
+
+        api.getInstitution(user.institutionId).enqueue(new SimpleCallback<Institution>() {
+            @Override
+            protected void handleResponse(retrofit2.Response<Institution> response) {
+                Institution institution = response.body();
+                if (institution != null) {
+
+                    final String institutionName = institution.getName();
+                    if (!TextUtils.isEmpty(institutionName)) {
+
+                        final SimpleCallback<List<ClientInstitution>> URLsCallback = new SimpleCallback<List<ClientInstitution>>() {
+                            @Override
+                            protected void handleResponse(retrofit2.Response<List<ClientInstitution>> response) {
+                                List<ClientInstitution> institutions = response.body();
+                                if (institutions != null) {
+                                    for (ClientInstitution institution : institutions) {
+                                        if (institution.name.equals(institutionName)
+                                                && !TextUtils.isEmpty(institution.apiRoot)) {
+
+                                            apiBaseURL = institution.apiRoot + "api/";
+
+                                            // Recreate the API with the new base URL
+                                            //createAPI(institution.apiRoot);
+                                            createAPI();
+
+                                            finishedLogin(user);
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        api.getInstitutionURLs().enqueue(URLsCallback);
+                    }
+                }
+            }
+        });
+    }
+
+    // Allow the rest of the first-launch actions to take place
+    private void finishedLogin(User user) {
+        application.setLoggedInUser(user, password);
+
+        if (user.accountVerified) application.onLoginSuccess();
     }
 
 	public void login(String email, String password) {
@@ -132,48 +189,53 @@ public class NetworkService {
             @Override
             public void onResponse(Call<LoginResponse> call, retrofit2.Response<LoginResponse> response) {
                 boolean userAccountVerified = false;
+                boolean success = false;
 
                 if (response.isSuccessful()) {
                     LoginResponse loginResponse = response.body();
 
                     if (loginResponse != null) {
+                        success = true;
+
                         User user = loginResponse.user;
                         user.setId(loginResponse.userId);
 
-                        application.setLoggedInUser(user, password);
+                        userAccountVerified = user.accountVerified;
 
-                        if (user.accountVerified) {
-                            userAccountVerified = true;
-
-                            application.onLoginSuccess();
-                        }
+                        if (userAccountVerified) updateAPIBaseURL(user);
                     }
                 }
 
-                if (!userAccountVerified) application.setVerification();
+                if (!success) {
+                    application.onLoginFailure();
+
+                } else if (!userAccountVerified) {
+                    application.setVerification();
+                }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 t.printStackTrace();
-                application.getMainActivity().runOnUiThread(application::onLoginFailure);
+                application.onLoginFailure();
             }
         });
     }
 
-    public void signUp(String firstName, String lastName, String gender, String country, String yearOfBirth, String email, String password, long institution) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean signUp(SignUpUser user) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)
-                .addFormDataPart("givenName", firstName)
-                .addFormDataPart("familyName", lastName)
-                .addFormDataPart("gender", gender)
-                .addFormDataPart("nationality", country)
-                .addFormDataPart("yearOfBirth",yearOfBirth)
-                .addFormDataPart("accountVerified", String.valueOf(false))
+                .addFormDataPart("givenName", user.givenName)
+                .addFormDataPart("familyName", user.familyName)
+                .addFormDataPart("gender", user.gender)
+                .addFormDataPart("nationality", user.nationality)
+                .addFormDataPart("yearOfBirth", user.yearOfBirth)
+                .addFormDataPart("accountVerified", String.valueOf(user.accountVerified))
                 .addFormDataPart("password", password)
-                .addFormDataPart("institutionId", String.valueOf(institution))
-                .addFormDataPart("hasPersonality", String.valueOf(false))
+                .addFormDataPart("institutionId", String.valueOf(user.institutionId))
+                .addFormDataPart("hasPersonality", String.valueOf(user.hasPersonality))
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
@@ -194,7 +256,6 @@ public class NetworkService {
             Response response = httpClient.newCall(request).execute();
 
             if (response.isSuccessful() && response.body() != null) {
-
                 String bodyString = response.body().toString();
                 success = (bodyString != null && bodyString.contains(email));
             }
@@ -202,13 +263,9 @@ public class NetworkService {
         } catch (IOException e) {
             e.printStackTrace();
 
-        } finally {
-            if (success) {
-                application.getMainActivity().runOnUiThread(application::onSignUpSuccess);
-            } else {
-                application.getMainActivity().runOnUiThread(application::onSignUpFailure);
-            }
         }
+
+        return success;
     }
 
     public void s3Upload(File file) {

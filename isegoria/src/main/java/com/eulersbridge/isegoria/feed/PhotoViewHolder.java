@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.ClickableViewHolder;
 
 class PhotoViewHolder extends ClickableViewHolder {
 

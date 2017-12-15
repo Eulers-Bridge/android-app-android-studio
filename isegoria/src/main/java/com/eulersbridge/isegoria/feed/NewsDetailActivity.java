@@ -11,17 +11,16 @@ import android.widget.TextView;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
-import com.eulersbridge.isegoria.network.LikedResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.TintTransformation;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.TintTransformation;
+import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 
@@ -36,7 +35,7 @@ public class NewsDetailActivity extends AppCompatActivity {
     private TextView likesTextView;
     private ImageView starView;
 
-    private boolean setLiked = false;
+    private boolean userLikedArticle = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +63,7 @@ public class NewsDetailActivity extends AppCompatActivity {
             protected void handleResponse(Response<List<LikeInfo>> response) {
                 List<LikeInfo> likes = response.body();
 
-                if (likes != null) populateLikesCount(likes);
-            }
-        });
-
-        isegoria.getAPI().getNewsArticleLiked(article.id, isegoria.getLoggedInUser().email).enqueue(new SimpleCallback<LikedResponse>() {
-            @Override
-            public void handleResponse(Response<LikedResponse> response) {
-                LikedResponse likedResponse = response.body();
-
-                if (likedResponse != null) initiallyLiked(likedResponse.liked);
+                if (likes != null) populateLikes(likes);
             }
         });
 
@@ -94,20 +84,19 @@ public class NewsDetailActivity extends AppCompatActivity {
                 .into(authorImageView);
     }
 
-    private void populateLikesCount(@NonNull List<LikeInfo> likes) {
+    private void populateLikes(@NonNull List<LikeInfo> likes) {
         likesTextView.setText(String.valueOf(likes.size()));
-    }
 
-    private void initiallyLiked(boolean liked) {
-        if (liked) {
-            starView.setImageResource(R.drawable.star);
+        for (LikeInfo likeInfo : likes) {
+            if (likeInfo.email.equals(isegoria.getLoggedInUser().email)) {
+                userLikedArticle = true;
+                starView.setImageResource(R.drawable.star);
+                starView.setEnabled(true);
+            }
         }
-
-        setLiked = liked;
-
-        starView.setEnabled(true);
     }
 
+    @SuppressWarnings("unchecked")
     @UiThread
     private void populateTextContent(final NewsArticle article) {
 
@@ -132,12 +121,12 @@ public class NewsDetailActivity extends AppCompatActivity {
 
         final ImageView starView = findViewById(R.id.article_star);
         starView.setOnClickListener(view -> {
-            setLiked = !setLiked;
+            userLikedArticle = !userLikedArticle;
 
             IgnoredCallback callback = new IgnoredCallback<>();
 
-            if (setLiked) {
-                isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
+            if (userLikedArticle) {
+                isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
                 starView.setImageResource(R.drawable.star);
 
@@ -145,7 +134,7 @@ public class NewsDetailActivity extends AppCompatActivity {
                 likesTextView.setText(String.valueOf(newLikes));
 
             } else {
-                isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
+                isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
                 starView.setImageResource(R.drawable.stardefault);
 

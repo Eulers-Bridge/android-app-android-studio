@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.network;
 
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.models.CandidateTicket;
@@ -35,12 +36,17 @@ import retrofit2.http.Query;
 
 public interface API {
 
+    @GET("general-info")
+    Call<GeneralInfoResponse> getGeneralInfo();
+
+
     @GET("login")
     Call<LoginResponse> attemptLogin(@Query("topicArn") String snsTopicArn, @Query("deviceToken") String deviceToken);
 
 
-    @GET("general-info")
-    Call<GeneralInfoResponse> getGeneralInfo();
+    // Note: Specifying a full absolute path ignores Retrofit's base API URL
+    @GET(Constant.CLIENT_URL)
+    Call<List<ClientInstitution>> getInstitutionURLs();
 
 
     @GET("emailVerification/{userEmail}/resend")
@@ -131,13 +137,10 @@ public interface API {
     @GET("newsArticle/{articleId}/likes")
     Call<List<LikeInfo>> getNewsArticleLikes(@Path("articleId") long articleId);
 
-    @GET("newsArticle/{articleId}/likedBy/{userEmail}/")
-    Call<LikedResponse> getNewsArticleLiked(@Path("articleId") long articleId, @Path("userEmail") String userEmail);
-
     @PUT("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<Void> likeArticle(@Path("articleId") long photoId, @Path("userEmail") String userEmail);
 
-    @DELETE("newsArticle/{articleId}/unlikedBy/{userEmail}")
+    @DELETE("newsArticle/{articleId}/likedBy/{userEmail}/")
     Call<Void> unlikeArticle(@Path("articleId") long photoId, @Path("userEmail") String userEmail);
 
 

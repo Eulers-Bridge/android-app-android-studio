@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top" >
@@ -22,7 +23,8 @@
                 android:background="@color/profileImageBackground"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                android:contentDescription="@null"/>
 
             <ImageView
                 android:id="@+id/profile_image_small"
@@ -31,7 +33,8 @@
                 android:layout_centerHorizontal="true"
                 android:adjustViewBounds="true"
                 android:maxHeight="100dp"
-                android:maxWidth="100dp" />
+                android:maxWidth="100dp"
+                android:contentDescription="@null"/>
 
             <TextView
                 android:id="@+id/profile_name"
@@ -88,7 +91,8 @@
                     android:textStyle="bold"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/profileTextSize" />
+                    android:textSize="@dimen/profileTextSize"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/friendsTitle"
@@ -118,7 +122,8 @@
                     android:textStyle="bold"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/profileTextSize" />
+                    android:textSize="@dimen/profileTextSize"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:layout_width="90dp"
@@ -147,7 +152,8 @@
                     android:textStyle="bold"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/black"
-                    android:textSize="@dimen/profileTextSize" />
+                    android:textSize="@dimen/profileTextSize"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:layout_width="100dp"
@@ -293,6 +299,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:layout_toRightOf="@id/taskLevelField"
+                android:layout_toEndOf="@id/taskLevelField"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:gravity="end"
                 android:text="@string/profile_show_progress"
                 android:textColor="#0781ff"
                 android:textSize="15sp"

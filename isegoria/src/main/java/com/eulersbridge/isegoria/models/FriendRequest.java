@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.squareup.moshi.Json;
 
+@SuppressWarnings("unused")
 public class FriendRequest {
 
     public long id;

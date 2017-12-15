@@ -145,6 +145,17 @@ public class BaseSliderBar extends View {
     }
 
     @Override
+    public boolean performClick() {
+        /*
+            Calls the super implementation, which generates an AccessibilityEvent
+            and calls the onClick() listener on the view, if any
+         */
+        super.performClick();
+
+        return true;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         int x = (int) event.getX();
@@ -154,6 +165,8 @@ public class BaseSliderBar extends View {
                 || event.getAction() == MotionEvent.ACTION_CANCEL) {
             dragX = -1;
             snapToPoint(x);
+
+            performClick();
 
         } else if (x >= horizontalPadding && x <= parentWidth - horizontalPadding) {
             dragX = x;

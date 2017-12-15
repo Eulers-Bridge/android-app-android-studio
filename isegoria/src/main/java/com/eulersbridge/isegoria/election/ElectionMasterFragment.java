@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
@@ -11,7 +12,7 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
 public class ElectionMasterFragment extends Fragment implements TitledFragment {
 
@@ -42,8 +43,8 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 	}
 
 	@Override
-	public String getTitle() {
-		return getString(R.string.section_title_election);
+	public String getTitle(Context context) {
+		return context.getString(R.string.section_title_election);
 	}
 
 	public void setTabLayout(TabLayout tabLayout) {

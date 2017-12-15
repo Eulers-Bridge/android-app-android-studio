@@ -49,6 +49,8 @@ public class SelfEfficacyQuestionsFragment extends Fragment {
             isegoria.getAPI().addUserEfficacy(userEmail, answers).enqueue(new SimpleCallback<Void>() {
                 @Override
                 protected void handleResponse(Response response) {
+                    isegoria.onUserSelfEfficacyCompleted();
+
                     mainActivity.getSupportFragmentManager().popBackStack();
                     mainActivity.setToolbarTitle(getString(R.string.section_title_vote));
                     mainActivity.getTabLayout().setVisibility(View.VISIBLE);

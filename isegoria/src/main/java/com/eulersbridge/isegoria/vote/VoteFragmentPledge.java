@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.vote;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,12 +15,12 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.VoteReminder;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.R;
 
 import java.util.Calendar;
@@ -93,7 +94,7 @@ public class VoteFragmentPledge extends Fragment implements TitledFragment {
     }
 
     @Override
-    public String getTitle() {
+    public String getTitle(Context context) {
         return null;
     }
 

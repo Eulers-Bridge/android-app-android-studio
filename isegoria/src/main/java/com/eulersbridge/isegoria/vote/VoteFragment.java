@@ -29,6 +29,7 @@ import retrofit2.Response;
 
 public class VoteFragment extends Fragment implements OnItemSelectedListener {
     private ArrayAdapter<String> voteLocationArrayAdapter;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private ArrayList<VoteLocation> voteLocationArray;
 
     private Spinner spinnerLocation;

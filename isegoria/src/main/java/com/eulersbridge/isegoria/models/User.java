@@ -57,4 +57,8 @@ public class User extends GenericUser {
     public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
         this.isOptedOutOfDataCollection = optedOutOfDataCollection;
     }
+
+    public void setPPSEQuestionsCompleted() {
+        this.hasPPSEQuestions = true;
+    }
 }
