@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Photo;

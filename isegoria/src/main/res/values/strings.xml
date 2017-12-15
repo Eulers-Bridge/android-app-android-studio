@@ -27,14 +27,21 @@
 
     <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
 
+    <string name="user_login_error_message">Couldn\'t login. Check your email and password, and make sure you have an internet connection.</string>
+    <string name="connection_error_message">No connection</string>
+    <string name="connection_error_action">Retry</string>
+
     <string name="user_sign_up_first_name">Given Name</string>
     <string name="user_sign_up_last_name">Family Name</string>
     <string name="user_sign_up_university_email">Email Address</string>
     <string name="user_sign_up_first_password">New Password</string>
     <string name="user_sign_up_confirm_password">Confirm Password</string>
-    <string name="user_sign_up_next_button">Next</string>
     <string name="user_sign_up_choose_country_hint">Country</string>
     <string name="user_sign_up_choose_institution_hint">Institution</string>
+    <string name="user_sign_up_next_button">Next</string>
+
+    <string name="user_sign_up_error_title">Sign Up Failed</string>
+    <string name="user_sign_up_error_message">Make sure you\'ve entered your details correctly, and you have an active internet connection.</string>
 
     <string name="user_consent_statement_message">PLAIN LANGUAGE STATEMENT Please read the following statement carefully. The project is being conducted by researchers in CIS at the University of Melbourne to observe how personality traits influence interaction with online information during political campaigns. Should you participate, you will be asked to fill in demographic information and use the app on your phone for 5 weeks. Participation in this research is voluntary and confidential. However, this confidentiality is subject to legal limitations. You may cease involvement at any time by updating your consent status in the user profile tab. Research papers resulting from the project will only have aggregate data and will be made public. Results are available on request by email: campaignapp@gmail.com. If you are in a dependent relationship with any of the researchers (e.g., being taught by a researcher) the researcher will be unable to access your raw data and therefore your participation will not affect any ongoing assessment. Data is collected and stored in accordance with University policy and disposed 5 years after final publication. There are no risks to individuals participating in this study beyond those that exist in daily life. This project has been approved by the University of Melbourne\'s Human Research Ethics Committee (HREC Reference ID 1441638).If participants have any concerns about the conduct of this research project they can contact the Executive Officer, Human Research Ethics, The University of Melbourne, ph: 03 8344 2073; fax: 03 9347 6739; email: HumanEthics-Enquiries@unimelb.edu.au If you have any further questions about the research itself, please contact the researchers: Miguel Wood (m.wood@student.unimelb.edu.au), Prof. Graeme Shanks (gshanks@unimelb.edu.au or 03 8344 1577), and A/Prof Simon Milton (smilton@unimelb.edu.au or 03 8344 1528). 1st January 2015</string>
     <string name="user_consent_melbourne_image_content_description">University of Melbourne coat of arms</string>
@@ -176,7 +183,15 @@
     <string name="about_thanks_people">The Eulers Bridge Advisory Network Members</string>
 
     <!-- Misc -->
+    <string name="shortcut_view_latest_election_label_short">Latest Election</string>
+    <string name="shortcut_view_latest_election_label_long">View the latest election</string>
+
+    <string name="shortcut_add_friend_label_short">Friends</string>
+    <string name="shortcut_add_friend_label_long">Add a Friend</string>
+
     <string name="checkbox_checked">Checked checkbox</string>
     <string name="checkbox_unchecked">Unchecked checkbox</string>
+    <string name="user_login_password_error_required">A password is required</string>
+    <string name="user_login_email_error_required">An email address is required</string>
 
 </resources>

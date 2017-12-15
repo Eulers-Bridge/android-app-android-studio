@@ -24,7 +24,7 @@
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar1"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -35,7 +35,7 @@
             android:text="Critical, quarrelsome"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar2"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -46,7 +46,7 @@
             android:text="Dependable, self-disciplined"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar3"
             android:layout_width="match_parent"
             android:layout_height="48dp"/>
@@ -57,7 +57,7 @@
             android:text="Anxious, easily upset"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar4"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -68,7 +68,7 @@
             android:text="Open to new experiences"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar5"
             android:layout_width="match_parent"
             android:layout_height="48dp"/>
@@ -79,7 +79,7 @@
             android:text="Reserved, quiet"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar6"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -90,7 +90,7 @@
             android:text="Sympathetic, warm"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar7"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -101,7 +101,7 @@
             android:text="Disorganized, careless"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar8"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -112,7 +112,7 @@
             android:text="Calm, emotionally stable"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar9"
             android:layout_width="match_parent"
             android:layout_height="48dp" />
@@ -123,7 +123,7 @@
             android:text="Conventional, uncreative"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
-        <com.eulersbridge.isegoria.login.PersonalitySliderBar
+        <com.eulersbridge.isegoria.auth.PersonalitySliderBar
             android:id="@+id/personalitySliderBar10"
             android:layout_width="match_parent"
             android:layout_height="48dp" />

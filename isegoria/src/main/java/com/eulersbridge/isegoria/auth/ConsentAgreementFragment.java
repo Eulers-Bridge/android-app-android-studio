@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
-public class UserConsentAgreementFragment extends Fragment implements TitledFragment {
+public class ConsentAgreementFragment extends Fragment implements TitledFragment {
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

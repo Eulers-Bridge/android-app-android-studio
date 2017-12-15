@@ -12,7 +12,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@null"
-        android:layout_above="@+id/navigation">
+        android:layout_above="@+id/navigation"
+        android:id="@+id/coordinator_layout">
 
         <include layout="@layout/main_partial_appbar"/>
 

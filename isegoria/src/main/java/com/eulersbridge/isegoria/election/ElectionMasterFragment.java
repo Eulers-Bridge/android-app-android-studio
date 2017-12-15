@@ -12,7 +12,7 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
 public class ElectionMasterFragment extends Fragment implements TitledFragment {
 

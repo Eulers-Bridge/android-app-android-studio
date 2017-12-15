@@ -21,7 +21,7 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
@@ -30,7 +30,7 @@ import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 

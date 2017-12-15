@@ -24,7 +24,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Photo;
@@ -34,7 +34,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.profile.ProfileFragment;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 

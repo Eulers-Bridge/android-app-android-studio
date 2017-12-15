@@ -22,7 +22,7 @@ import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -162,6 +162,6 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
 
     @Override
     public String getTitle(Context context) {
-        return getString(R.string.profile_progress_section_title);
+        return context.getString(R.string.profile_progress_section_title);
     }
 }

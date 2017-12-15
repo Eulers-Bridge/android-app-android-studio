@@ -14,13 +14,13 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.NewsArticle;
-import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
-import com.eulersbridge.isegoria.utilities.TintTransformation;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.TintTransformation;
+import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 

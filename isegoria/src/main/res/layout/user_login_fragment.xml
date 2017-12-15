@@ -32,6 +32,7 @@
 		android:textAppearance="@style/LoginHeadingTextAppearance"  />
 
     <android.support.design.widget.TextInputLayout
+		android:id="@+id/login_email_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
@@ -47,6 +48,7 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+		android:id="@+id/login_password_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

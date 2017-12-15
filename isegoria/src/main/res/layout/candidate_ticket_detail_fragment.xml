@@ -42,7 +42,8 @@
                     android:layout_height="108dp"
                     android:adjustViewBounds="true"
                     android:layout_gravity="center_vertical|center_horizontal"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"

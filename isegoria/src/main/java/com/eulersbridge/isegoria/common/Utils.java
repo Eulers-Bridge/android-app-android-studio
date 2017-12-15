@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.utilities;
+package com.eulersbridge.isegoria.common;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -10,7 +10,11 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,16 +26,24 @@ import java.util.Date;
 
 public final class Utils {
 
+    public static boolean validEmail(@Nullable String emailAddress) {
+        return !TextUtils.isEmpty(emailAddress) && Patterns.EMAIL_ADDRESS.matcher(emailAddress).matches();
+    }
+
+    public static String notificationChannelIDFromName(@NonNull String name) {
+        return name.toLowerCase().replace(" ","_");
+    }
+
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
         if (connectivityManager != null) {
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
             return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
-
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public static String convertTimestampToString(Context context, long timestamp) {

@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 
 import java.io.File;
 import java.io.FileOutputStream;

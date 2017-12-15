@@ -1,12 +1,12 @@
-package com.eulersbridge.isegoria.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.NonSwipeableViewPager;
-import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,8 +13,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -24,26 +25,26 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
-import com.eulersbridge.isegoria.login.LoginScreenFragment;
-import com.eulersbridge.isegoria.login.PersonalityQuestionsActivity;
-import com.eulersbridge.isegoria.login.UserConsentAgreementFragment;
-import com.eulersbridge.isegoria.login.UserSignupFragment;
+import com.eulersbridge.isegoria.auth.LoginFragment;
+import com.eulersbridge.isegoria.auth.PersonalityQuestionsActivity;
+import com.eulersbridge.isegoria.auth.ConsentAgreementFragment;
+import com.eulersbridge.isegoria.auth.SignUpFragment;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.SignUpUser;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.poll.PollFragment;
+import com.eulersbridge.isegoria.profile.FindAddContactFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
-import com.eulersbridge.isegoria.utilities.Utils;
-import com.eulersbridge.isegoria.vote.VoteFragmentDone;
-import com.eulersbridge.isegoria.vote.VoteFragmentPledge;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.securepreferences.SecurePreferences;
@@ -54,11 +55,14 @@ import java.util.Map;
 
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        SignUpFragment.SignUpListener {
 
 	private TitledFragment mContent;
 	private Isegoria application;
 	public ProgressDialog dialog;
+
+	private CoordinatorLayout coordinatorLayout;
 
     private BottomNavigationViewEx navigationView;
 
@@ -66,15 +70,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	private TabLayout tabLayout;
 	private @IdRes int currentNavigationId;
 	
-	private String firstName;
-	private String lastName; 
-	private String email;
-	private String password; 
-	private String confirmPassword; 
-	private String country;
-	private String institution;
-	private String yearOfBirth;
-	private String gender;
+	private SignUpUser signUpUser;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -91,16 +87,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 		setNavigationEnabled(false);
 
-		String userEmail = new SecurePreferences(this).getString("userEmail", null);
-		String userPassword = new SecurePreferences(this).getString("userPassword", null);
+		coordinatorLayout = findViewById(R.id.coordinator_layout);
+
+		String userEmail = new SecurePreferences(this).getString(Constant.USER_EMAIL_KEY, null);
+		String userPassword = new SecurePreferences(this).getString(Constant.USER_PASSWORD_KEY, null);
 
 		if (userEmail != null && userPassword != null) {
-			login(userEmail, userPassword);
+			application.login(userEmail, userPassword);
+
+            setViewEnabled(R.id.login_email, false);
+            setViewEnabled(R.id.login_password, false);
+            setViewEnabled(R.id.login_button, false);
+            setViewEnabled(R.id.login_signup_button, false);
 
 		} else {
 			showLogin();
 		}
 	}
+
+	public CoordinatorLayout getCoordinatorLayout() {
+        return coordinatorLayout;
+    }
 
     private boolean handleAppShortcutIntent() {
 	    boolean handledShortcut = false;
@@ -135,18 +142,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
 	private void setupNotificationChannels() {
+	    // Notification channels are only supported on Android O+
 		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-			HashMap<CharSequence, Integer> channels = new HashMap<>();
-			channels.put("Friends", NotificationManager.IMPORTANCE_DEFAULT);
-			channels.put("Vote Reminder", NotificationManager.IMPORTANCE_DEFAULT);
+
+		    //Build a simple map of channel names (Strings) to their importance level (Integer)
+			HashMap<String, Integer> channels = new HashMap<>();
+			channels.put(Constant.NOTIFICATION_CHANNEL_FRIENDS, NotificationManager.IMPORTANCE_DEFAULT);
+			channels.put(Constant.NOTIFICATION_CHANNEL_VOTE_REMINDERS, NotificationManager.IMPORTANCE_DEFAULT);
 
 			NotificationManager notificationManager =
 					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 			if (notificationManager != null) {
-				for (Map.Entry<CharSequence, Integer> entry : channels.entrySet()) {
-					CharSequence channelName = entry.getKey();
-					String channelId = channelName.toString().toLowerCase().replace(" ","_");
+			    /* Loop through the map, creating notification channels based on the names/importances
+			        in the map. `createNotificationChannel` is no-op if the channels have already
+			        been created from a previous launch.
+			     */
+				for (Map.Entry<String, Integer> entry : channels.entrySet()) {
+					String channelName = entry.getKey();
+					String channelId = Utils.notificationChannelIDFromName(channelName);
 					int importance = entry.getValue();
 
 					NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
@@ -179,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		tabLayout = findViewById(R.id.tabLayout);
 	}
 
-	void setToolbarShowsTitle(boolean visible) {
+	public void setToolbarShowsTitle(boolean visible) {
 		toolbarTitleTextView.setVisibility(visible? View.VISIBLE : View.GONE);
 	}
 
@@ -249,9 +263,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
 	public void showLogin() {
-		LoginScreenFragment loginScreenFragment = new LoginScreenFragment();
-        loginScreenFragment.setTabLayout(tabLayout);
-        switchContent(loginScreenFragment);
+		LoginFragment loginFragment = new LoginFragment();
+        loginFragment.setTabLayout(tabLayout);
+        switchContent(loginFragment);
 
         setNavigationEnabled(false);
 	}
@@ -269,7 +283,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		final int newNavigationId = item.getItemId();
 
 		if (currentNavigationId != newNavigationId) {
+
 			switch(newNavigationId) {
+                case R.id.navigation_election:
+                    showElection();
+                    break;
+
 				case R.id.navigation_feed:
 					FeedFragment feedFragment = new FeedFragment();
 					feedFragment.setTabLayout(tabLayout);
@@ -277,9 +296,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 					switchContent(feedFragment);
 					break;
 
-				case R.id.navigation_election:
-					showElection();
-					break;
+
 
 				case R.id.navigation_poll:
 					PollFragment pollFragment = new PollFragment();
@@ -312,34 +329,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	public Isegoria getIsegoriaApplication() {
 		return application;
 	}
-	
-	public void signUpClicked() {
+
+	// When the Sign Up button in the launch screen is tapped
+	public void onSignUpClicked() {
 		setShowNavigationBackButton(true);
 
-		switchContent(new UserSignupFragment(), false);
+		SignUpFragment signUpFragment = new SignUpFragment();
+		signUpFragment.setListener(this);
+
+		switchContent(signUpFragment, false);
 	}
 
 	private void setViewEnabled(@IdRes int viewId, boolean enabled) {
 		View view = findViewById(viewId);
 		if (view != null) view.setEnabled(enabled);
-	}
-	
-	public void login(String email, String password) {
-	    if (Utils.isNetworkAvailable(this)) {
-            application.login(email, password);
-
-            setViewEnabled(R.id.login_email, false);
-            setViewEnabled(R.id.login_password, false);
-            setViewEnabled(R.id.login_button, false);
-            setViewEnabled(R.id.login_signup_button, false);
-
-        } else {
-            new AlertDialog.Builder(this)
-                    .setTitle("Failed to login")
-                    .setMessage("Check you have an active internet connection and try again soon.")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-        }
 	}
 
 	public void onLoginSuccess(User loggedInUser) {
@@ -365,128 +368,73 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	}
 	
 	public void onLoginFailure() {
+	    runOnUiThread(() -> {
+            setViewEnabled(R.id.login_email, true);
+            setViewEnabled(R.id.login_password, true);
+            setViewEnabled(R.id.login_button, true);
+            setViewEnabled(R.id.login_signup_button, true);
 
-		setViewEnabled(R.id.login_email, true);
-		setViewEnabled(R.id.login_password, true);
-		setViewEnabled(R.id.login_button, true);
-		setViewEnabled(R.id.login_signup_button, true);
+            hideDialog();
 
-	    hideDialog();
+            if (mContent.getClass() != LoginFragment.class) {
+                //Tried to login user based on stored email/password, but they since deleted account
+                //or the login otherwise failed. Not currently showing the Login fragment so we need to.
+                switchContent(new LoginFragment());
+            }
 
-		if (mContent.getClass() != LoginScreenFragment.class) {
-			//Tried to login user based on stored email/password, but they since deleted account
-			//or the login otherwise failed. Not currently showing the Login fragment so we need to.
-			switchContent(new LoginScreenFragment());
-		}
-
+            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
+                    .setDuration(Constant.SNACKBAR_LENGTH_EXTENDED)
+                    .show();
+        });
+    }
+	
+	private void onSignUpFailure() {
         new AlertDialog.Builder(this)
-                .setTitle("Login failed")
-                .setMessage("Check your email and password are correct, and you have an active internet connection.")
+                .setTitle(getString(R.string.user_sign_up_error_title))
+                .setMessage(getString(R.string.user_sign_up_error_message))
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
 	}
-	
-	public void onSignUpSuccess() {
-		setShowNavigationBackButton(false);
-		setToolbarVisible(true);
 
-        new AlertDialog.Builder(this)
-                .setTitle("Welcome to Isegoria!")
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
-	}
-	
-	public void onSignUpFailure() {
-        new AlertDialog.Builder(this)
-                .setTitle("Signup failed")
-                .setMessage("Make sure you've entered your details correctly, and you have an active internet connection.")
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
-	}
-	
-	public void userSignUpNext() {
-		TextView firstNameField = findViewById(R.id.signup_first_name);
-		TextView lastNameField = findViewById(R.id.signup_last_name);
-		TextView universityEmailField = findViewById(R.id.signup_email);
-		TextView newPasswordField = findViewById(R.id.signup_new_password);
-		TextView confirmNewPasswordField = findViewById(R.id.signup_confirm_new_password);
-		Spinner countryField = findViewById(R.id.signup_country);
-		Spinner institutionField = findViewById(R.id.signup_institution);
-		Spinner yearOfBirthField = findViewById(R.id.signup_birth_year);
-		Spinner genderField = findViewById(R.id.signup_gender);
-		
-		firstName = firstNameField.getText().toString();
-		lastName = lastNameField.getText().toString(); 
-		email = universityEmailField.getText().toString();
-		password = newPasswordField.getText().toString(); 
-		confirmPassword = confirmNewPasswordField.getText().toString(); 
-		country = countryField.getSelectedItem().toString();
+	@Override
+	public void onSignUpNextClick(SignUpUser user) {
+	    this.signUpUser = user;
 
-		if (institutionField.getSelectedItem() != null) {
-            institution = institutionField.getSelectedItem().toString();
-        } else {
-            institution = null;
-        }
-
-        if (yearOfBirthField.getSelectedItem() != null) {
-            yearOfBirth = yearOfBirthField.getSelectedItem().toString();
-        } else {
-            yearOfBirth = null;
-        }
-
-		gender = genderField.getSelectedItem().toString();
-		
-		if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) || TextUtils.isEmpty(email)
-                || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword) || confirmPassword.equals("")
-                || TextUtils.isEmpty(country) || TextUtils.isEmpty(institution)
-                || TextUtils.isEmpty(yearOfBirth) || TextUtils.isEmpty(gender)) {
-			
-		} else {
-			UserConsentAgreementFragment userConsentAgreementFragment = new UserConsentAgreementFragment();
-			switchContent(userConsentAgreementFragment);
-		}
+        ConsentAgreementFragment consentAgreementFragment = new ConsentAgreementFragment();
+        switchContent(consentAgreementFragment);
 	}
 	
 	public void userConsentNext() {
-		if(firstName.equals("") || lastName.equals("") || email.equals("") || password.equals("") || password.equals("") || confirmPassword.equals("")
-				|| country.equals("") || institution.equals("") || yearOfBirth.equals("") || gender.equals("")) {
-			
-		} else {
-			application.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
-				@Override
-				protected void handleResponse(Response<GeneralInfoResponse> response) {
-					GeneralInfoResponse body = response.body();
-					if (body != null && body.countries.size() > 0) {
+        application.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
+            @Override
+            protected void handleResponse(Response<GeneralInfoResponse> response) {
+                GeneralInfoResponse body = response.body();
+                if (body != null && body.countries.size() > 0) {
 
-						long institutionId = -1;
+                    long institutionId = -1;
 
-						for (Country country : body.countries) {
-							for (Institution institution : country.institutions) {
-								if (institution.getName().equals(institution)) {
-									institutionId = institution.id;
-								}
-							}
-						}
+                    for (Country country : body.countries) {
+                        for (Institution countryInstitution : country.institutions) {
+                            if (countryInstitution.getName().equals(signUpUser.institutionName)) {
+                                institutionId = countryInstitution.id;
+                            }
+                        }
+                    }
 
-						application.getNetworkService().signUp(firstName, lastName, gender, country, yearOfBirth, email, password, institutionId);
-					}
-				}
-			});
-		}
+                    signUpUser.institutionId = institutionId;
+
+                    if (!application.getNetworkService().signUp(signUpUser)) onSignUpFailure();
+                }
+            }
+        });
 		
-		switchContent(new LoginScreenFragment());
+		switchContent(new LoginFragment());
 	}
 
-    public void voteDone() {
-        switchContent(new VoteFragmentDone());
-    }
-
-	@UiThread
 	public void switchContent(TitledFragment fragment) {
 		switchContent(fragment, true);
 	}
 
-	@UiThread
 	private void switchContent(TitledFragment fragment, boolean popBackStack) {
         WeakReference<MainActivity> wrSelf = new WeakReference<>(this);
 

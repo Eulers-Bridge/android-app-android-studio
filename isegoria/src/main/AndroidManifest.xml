@@ -45,7 +45,7 @@
         </activity>
 
         <activity
-            android:name=".login.PersonalityQuestionsActivity"
+            android:name=".auth.PersonalityQuestionsActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/PersonalityQuestionsTheme">

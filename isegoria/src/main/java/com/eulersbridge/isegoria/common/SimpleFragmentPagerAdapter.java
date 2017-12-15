@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.utilities;
+package com.eulersbridge.isegoria.common;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

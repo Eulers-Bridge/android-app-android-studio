@@ -7,7 +7,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.ClickableViewHolder;
 
 class PollOptionViewHolder extends ClickableViewHolder {
 
