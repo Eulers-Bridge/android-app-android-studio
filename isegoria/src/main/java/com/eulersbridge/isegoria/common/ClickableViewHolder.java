@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.utilities;
+package com.eulersbridge.isegoria.common;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;

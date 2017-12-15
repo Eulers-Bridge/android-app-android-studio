@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.VoteReminder;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.SimpleCallback;

@@ -12,7 +12,7 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.PollOption;
 import com.eulersbridge.isegoria.models.PollResult;
-import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.ClickableViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,9 +10,10 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.SignUpUser;
 import com.eulersbridge.isegoria.models.User;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
@@ -188,46 +189,53 @@ public class NetworkService {
             @Override
             public void onResponse(Call<LoginResponse> call, retrofit2.Response<LoginResponse> response) {
                 boolean userAccountVerified = false;
+                boolean success = false;
 
                 if (response.isSuccessful()) {
                     LoginResponse loginResponse = response.body();
 
                     if (loginResponse != null) {
+                        success = true;
+
                         User user = loginResponse.user;
                         user.setId(loginResponse.userId);
 
                         userAccountVerified = user.accountVerified;
 
-                        if (userAccountVerified) {
-                            updateAPIBaseURL(user);
-                        }
+                        if (userAccountVerified) updateAPIBaseURL(user);
                     }
                 }
 
-                if (!userAccountVerified) application.setVerification();
+                if (!success) {
+                    application.onLoginFailure();
+
+                } else if (!userAccountVerified) {
+                    application.setVerification();
+                }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 t.printStackTrace();
-                application.getMainActivity().runOnUiThread(application::onLoginFailure);
+                application.onLoginFailure();
             }
         });
     }
 
-    public void signUp(String firstName, String lastName, String gender, String country, String yearOfBirth, String email, String password, long institution) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean signUp(SignUpUser user) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)
-                .addFormDataPart("givenName", firstName)
-                .addFormDataPart("familyName", lastName)
-                .addFormDataPart("gender", gender)
-                .addFormDataPart("nationality", country)
-                .addFormDataPart("yearOfBirth",yearOfBirth)
-                .addFormDataPart("accountVerified", String.valueOf(false))
+                .addFormDataPart("givenName", user.givenName)
+                .addFormDataPart("familyName", user.familyName)
+                .addFormDataPart("gender", user.gender)
+                .addFormDataPart("nationality", user.nationality)
+                .addFormDataPart("yearOfBirth", user.yearOfBirth)
+                .addFormDataPart("accountVerified", String.valueOf(user.accountVerified))
                 .addFormDataPart("password", password)
-                .addFormDataPart("institutionId", String.valueOf(institution))
-                .addFormDataPart("hasPersonality", String.valueOf(false))
+                .addFormDataPart("institutionId", String.valueOf(user.institutionId))
+                .addFormDataPart("hasPersonality", String.valueOf(user.hasPersonality))
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
@@ -248,7 +256,6 @@ public class NetworkService {
             Response response = httpClient.newCall(request).execute();
 
             if (response.isSuccessful() && response.body() != null) {
-
                 String bodyString = response.body().toString();
                 success = (bodyString != null && bodyString.contains(email));
             }
@@ -256,13 +263,9 @@ public class NetworkService {
         } catch (IOException e) {
             e.printStackTrace();
 
-        } finally {
-            if (success) {
-                application.getMainActivity().runOnUiThread(application::onSignUpSuccess);
-            } else {
-                application.getMainActivity().runOnUiThread(application::onSignUpFailure);
-            }
         }
+
+        return success;
     }
 
     public void s3Upload(File file) {

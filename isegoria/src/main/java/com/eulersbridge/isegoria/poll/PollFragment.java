@@ -11,14 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.network.PollsResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
 
 import org.parceler.Parcels;
 

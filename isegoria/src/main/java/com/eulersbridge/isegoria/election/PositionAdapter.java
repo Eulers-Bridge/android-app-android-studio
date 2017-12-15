@@ -10,15 +10,15 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.utilities.ClickableViewHolder;
-import com.eulersbridge.isegoria.utilities.TintTransformation;
+import com.eulersbridge.isegoria.common.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.TintTransformation;
 
 import org.parceler.Parcels;
 

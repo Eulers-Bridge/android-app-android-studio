@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.utilities;
+package com.eulersbridge.isegoria.common;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

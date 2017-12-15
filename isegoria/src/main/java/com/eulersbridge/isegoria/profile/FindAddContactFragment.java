@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.profile;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -28,14 +28,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.FriendRequest;
 import com.eulersbridge.isegoria.models.GenericUser;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.profile.ProfileFragment;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 
@@ -408,20 +412,17 @@ public class FindAddContactFragment extends Fragment implements TitledFragment {
     }
 
     private void showAddedMessage() {
-        if (getActivity() != null) {
+        if (getActivity() != null)
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
-        }
     }
 
     private void showAcceptMessage() {
-        if (getActivity() != null) {
+        if (getActivity() != null)
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
-        }
     }
 
     private void showDenyMessage() {
-        if (getActivity() != null) {
+        if (getActivity() != null)
             getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Friend request has been accepted", Toast.LENGTH_LONG).show());
-        }
     }
 }

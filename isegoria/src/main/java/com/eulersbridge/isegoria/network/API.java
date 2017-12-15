@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.network;
 
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.models.CandidateTicket;
@@ -44,7 +45,7 @@ public interface API {
 
 
     // Note: Specifying a full absolute path ignores Retrofit's base API URL
-    @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
+    @GET(Constant.CLIENT_URL)
     Call<List<ClientInstitution>> getInstitutionURLs();
 
 

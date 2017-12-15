@@ -30,7 +30,7 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.Constant;
+import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.models.Photo;
@@ -42,7 +42,7 @@ import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 import com.eulersbridge.isegoria.profile.ProfileFragment;
-import com.eulersbridge.isegoria.utilities.Utils;
+import com.eulersbridge.isegoria.common.Utils;
 
 import java.util.List;
 
@@ -157,6 +157,9 @@ public class CandidateTicketDetailFragment extends Fragment {
         TextView partyDetailName = rootView.findViewById(R.id.partyNameDetail);
         partyDetailSupporters.setText(String.valueOf(noOfSupporters));
         partyDetailName.setText(ticketName);
+
+        ImageView partyImageView = rootView.findViewById(R.id.partyDetailLogo);
+        partyImageView.setContentDescription(String.format("Logo for %s", partyDetailName));
 
 		return rootView;
 	}

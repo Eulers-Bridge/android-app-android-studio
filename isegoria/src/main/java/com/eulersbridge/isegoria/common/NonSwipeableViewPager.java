@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.utilities;
+package com.eulersbridge.isegoria.common;
 
 /*
   Created by Anthony on 02/04/2015.

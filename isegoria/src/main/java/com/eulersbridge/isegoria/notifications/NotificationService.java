@@ -7,6 +7,8 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.common.Utils;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -38,7 +40,7 @@ public class NotificationService extends FirebaseMessagingService {
         //TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,
-                "friends")
+                Utils.notificationChannelIDFromName(Constant.NOTIFICATION_CHANNEL_FRIENDS))
                 .setContentTitle(title)
                 .setSmallIcon(R.mipmap.notification_icon);
 

@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria;
+package com.eulersbridge.isegoria.common;
 
 public class Constant {
 
@@ -16,9 +16,13 @@ public class Constant {
 
     public static final String CLIENT_URL = "https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json";
 
+    // Used for storing the user's email to automatically log them in on subsequent app launches
+    public static final String USER_EMAIL_KEY = "userEmail";
+    public static final String USER_PASSWORD_KEY = "userPassword";
+
     // Used for home screen long-press app shortcuts on Android 7.1+
-    static final String SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION";
-    static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
+    public static final String SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION";
+    public static final String SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS";
 
     public static final String ACTIVITY_EXTRA_NEWS_ARTICLE = "article";
     public static final String FRAGMENT_EXTRA_PHOTO_ALBUM_ID = "albumId";
@@ -29,4 +33,10 @@ public class Constant {
     public static final String ACTIVITY_EXTRA_POLL = "poll";
     public static final String FRAGMENT_EXTRA_USER = "user";
     public static final String FRAGMENT_EXTRA_PROFILE_ID = "profileId";
+
+    public static final String NOTIFICATION_CHANNEL_FRIENDS = "Friends";
+    public static final String NOTIFICATION_CHANNEL_VOTE_REMINDERS = "Vote Reminder";
+
+    // Longer duration than Snackbar's default LENGTH_LONG
+    public static final int SNACKBAR_LENGTH_EXTENDED = 5500;
 }

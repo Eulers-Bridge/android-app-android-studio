@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.widget.Button;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.utilities.TitledFragment;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.R;
 
