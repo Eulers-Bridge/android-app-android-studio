@@ -13,6 +13,8 @@
 
 -keep class com.eulersbridge.** { *; }
 
+-keep class android.support.v7.widget.SearchView { *; }
+
 ## AWS SDK ##
 # Class names are needed in reflection
 -keepnames class com.amazonaws.**
