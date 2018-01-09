@@ -17,7 +17,7 @@ class AuthenticationInterceptor implements Interceptor {
     private final String username;
     private final String password;
 
-    public AuthenticationInterceptor(String username, String password) {
+    AuthenticationInterceptor(String username, String password) {
         this.username = username;
         this.password = password;
     }

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +14,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -21,16 +22,16 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 
@@ -49,7 +50,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
 
     private ViewPager pager;
 
-    private RelativeLayout detailsContainer;
+    private ConstraintLayout detailsContainer;
     private TextView titleTextView;
     private TextView dateTextView;
     private TextView likesTextView;
@@ -90,7 +91,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
             if (userLikedCurrentPhoto) {
                 api.likePhoto(photoId, loggedInUserEmail).enqueue(new IgnoredCallback<>());
 
-                starImageView.setImageResource(R.drawable.star);
+                starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active));
 
                 int likes = Integer.parseInt(String.valueOf(likesTextView.getText())) + 1;
                 likesTextView.setText(String.valueOf(likes));
@@ -98,7 +99,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
             else {
                 api.unlikePhoto(photoId, loggedInUserEmail).enqueue(new IgnoredCallback<>());
 
-                starImageView.setImageResource(R.drawable.stardefault);
+                starImageView.setColorFilter(null);
 
                 int likes = Integer.parseInt(String.valueOf(likesTextView.getText())) - 1;
                 likesTextView.setText(String.valueOf(likes));
@@ -123,7 +124,6 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
                 Context context = PhotoDetailActivity.this;
 
                 SubsamplingScaleImageView imageView = new SubsamplingScaleImageView(context);
-                imageView.setContentDescription(photo.title);
 
                 ViewPager.LayoutParams layoutParams = new ViewPager.LayoutParams();
                 imageView.setLayoutParams(layoutParams);
@@ -163,9 +163,9 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
         };
         pager.setAdapter(pagerAdapter);
 
-        int marginDp = 8;
-        float marginPixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp, getResources().getDisplayMetrics());
-        pager.setPageMargin((int)marginPixels);
+        final int marginDp = 8;
+        final int marginPixels = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp, getResources().getDisplayMetrics()));
+        pager.setPageMargin(marginPixels);
 
         pager.addOnPageChangeListener(this);
 
@@ -187,7 +187,7 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
             titleTextView.setText(photo.title);
 
             String dateStr = Utils.convertTimestampToString(this, photo.dateTimestamp);
-            dateTextView.setText(dateStr);
+            dateTextView.setText(dateStr.toUpperCase());
 
             likesTextView.setText(String.valueOf(photo.likeCount));
 
@@ -227,9 +227,9 @@ public class PhotoDetailActivity extends AppCompatActivity implements ViewPager.
     @Override
     public void onPageScrollStateChanged(int state) {
 
-        boolean dragging = (state == ViewPager.SCROLL_STATE_DRAGGING);
-        long durationMillis = dragging? 100 : 250;
-        float alpha = dragging? 0.3f : 1.0f;
+        final boolean dragging = (state == ViewPager.SCROLL_STATE_DRAGGING);
+        final long durationMillis = dragging? 100 : 250;
+        final float alpha = dragging? 0.3f : 1.0f;
 
         detailsContainer.animate().setDuration(durationMillis).alpha(alpha);
     }

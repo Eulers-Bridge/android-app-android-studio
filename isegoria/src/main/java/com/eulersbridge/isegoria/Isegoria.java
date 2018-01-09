@@ -11,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.auth.EmailVerificationFragment;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.NetworkService;
@@ -76,10 +75,7 @@ public class Isegoria extends Application {
     }
 
     public void setVerification() {
-        mainActivity.runOnUiThread(() -> {
-            mainActivity.hideDialog();
-            mainActivity.switchContent(new EmailVerificationFragment());
-        });
+        mainActivity.setVerification();
     }
 	
 	public @NonNull NetworkService getNetworkService() {

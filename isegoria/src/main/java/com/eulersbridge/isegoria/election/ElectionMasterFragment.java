@@ -14,7 +14,7 @@ import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.common.TitledFragment;
 
-public class ElectionMasterFragment extends Fragment implements TitledFragment {
+public class ElectionMasterFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
 
 	private ElectionOverviewFragment overviewFragment;
 	private CandidateFragment candidateFragment;
@@ -29,10 +29,9 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 
 		mainActivity = (MainActivity)getActivity();
 
-		// Ensure options menu from another fragment is not carried over
-		mainActivity.invalidateOptionsMenu();
-
-        setupTabLayout();
+		if (mainActivity != null)
+            // Ensure options menu from another fragment is not carried over
+            mainActivity.invalidateOptionsMenu();
 
 		overviewFragment = new ElectionOverviewFragment();
 		candidateFragment = new CandidateFragment();
@@ -47,8 +46,22 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 		return context.getString(R.string.section_title_election);
 	}
 
-	public void setTabLayout(TabLayout tabLayout) {
-		this.tabLayout = tabLayout;
+	@Override
+	public void setupTabLayout(TabLayout tabLayout) {
+	    this.tabLayout = tabLayout;
+
+		tabLayout.removeAllTabs();
+		tabLayout.setVisibility(View.VISIBLE);
+
+        final String[] tabNames = {
+                getString(R.string.election_section_title_overview),
+                getString(R.string.election_section_title_candidates)
+        };
+
+        for (String tabName : tabNames)
+            tabLayout.addTab(tabLayout.newTab().setText(tabName));
+
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 	}
 
 	@Override
@@ -111,19 +124,4 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 		@Override
 		public void onTabReselected(TabLayout.Tab tab) { }
 	};
-
-	private void setupTabLayout() {
-		if (tabLayout == null) return;
-
-		tabLayout.removeAllTabs();
-
-		final String[] tabNames = {"Overview", "Candidates"};
-
-		for (String tabName : tabNames) {
-			tabLayout.addTab(tabLayout.newTab().setText(tabName));
-		}
-
-		tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-		tabLayout.setVisibility(View.VISIBLE);
-	}
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="UnusedAttribute"
+    tools:keep="@font/museo">
+
+    <font
+        android:fontStyle="normal"
+        app:fontStyle="normal"
+        android:fontWeight="300"
+        app:fontWeight="300"
+        android:font="@font/museo_sans_rounded_300"
+        app:font="@font/museo_sans_rounded_300" />
+    <font
+        android:fontStyle="normal"
+        app:fontStyle="normal"
+        android:fontWeight="500"
+        app:fontWeight="500"
+        android:font="@font/museo_sans_rounded_500"
+        app:font="@font/museo_sans_rounded_500" />
+</font-family>

@@ -1,24 +1,76 @@
 package com.eulersbridge.isegoria.election;
 
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.ClickableViewHolder;
+import com.eulersbridge.isegoria.common.LoadingAdapter;
+import com.eulersbridge.isegoria.common.TintTransformation;
+import com.eulersbridge.isegoria.models.Position;
 
-class PositionViewHolder extends ClickableViewHolder {
+class PositionViewHolder extends LoadingAdapter.ItemViewHolder<Position> {
 
-    final ImageView imageView;
-    final TextView titleTextView;
+    interface PositionItemListener {
+        void onClick(Position item);
+        void getPhoto(PositionViewHolder viewHolder, long itemId);
+    }
 
-    PositionViewHolder(View view, @NonNull ClickListener onClickListener) {
-        super(view, onClickListener);
+    final private PositionItemListener listener;
 
-        view.setOnClickListener(this);
+    private Position item;
+    final private ImageView imageView;
+    final private TextView titleTextView;
 
-        imageView = view.findViewById(R.id.election_position_grid_item_image_view);
-        titleTextView = view.findViewById(R.id.election_position_grid_item_title_text_view);
+    PositionViewHolder(View itemView, PositionItemListener listener) {
+        super(itemView);
+
+        this.listener = listener;
+
+        itemView.setOnClickListener(view -> {
+            if (listener != null)
+                listener.onClick(item);
+        });
+
+        imageView = itemView.findViewById(R.id.election_position_grid_item_image_view);
+        titleTextView = itemView.findViewById(R.id.election_position_grid_item_title_text_view);
+    }
+
+    @Override
+    protected void setItem(@Nullable Position item) {
+        this.item = item;
+
+        imageView.setImageResource(R.color.lightGrey);
+
+        if (item == null) {
+            titleTextView.setText(null);
+            imageView.setImageDrawable(null);
+
+        } else {
+            titleTextView.setText(item.name);
+
+            if (listener != null)
+                listener.getPhoto(this, item.id);
+        }
+    }
+
+    @Override
+    protected void onRecycled() {
+        GlideApp.with(imageView.getContext()).clear(imageView);
+    }
+
+    void setImageURL(@Nullable String imageURL, long itemId) {
+        if (itemId == item.id && !TextUtils.isEmpty(imageURL)) {
+            GlideApp.with(imageView.getContext())
+                    .load(imageURL)
+                    .placeholder(R.color.lightGrey)
+                    .transform(new TintTransformation())
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView);
+        }
     }
 }

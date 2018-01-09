@@ -52,6 +52,9 @@ public interface API {
     @GET("emailVerification/{userEmail}/resend")
     Call<Void> sendVerificationEmail(@Path("userEmail") String userEmail);
 
+    @POST("requestPwdReset/{userEmail}/")
+    Call<Void> requestPasswordReset(@Path("userEmail") String userEmail);
+
     @PUT("user/{userEmail}")
     Call<Void> updateUserDetails(@Path("userEmail") String userEmail, @Body UserSettings user);
 

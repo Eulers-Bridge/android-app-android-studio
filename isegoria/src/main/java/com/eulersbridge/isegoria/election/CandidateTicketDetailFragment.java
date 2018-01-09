@@ -1,12 +1,8 @@
 package com.eulersbridge.isegoria.election;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
@@ -29,20 +25,24 @@ import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.common.Constant;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.BlurTransformation;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.models.Photo;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
-import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.profile.ProfileFragment;
-import com.eulersbridge.isegoria.common.Utils;
+import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
 
 import java.util.List;
 
@@ -80,13 +80,21 @@ public class CandidateTicketDetailFragment extends Fragment {
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
 		
 		LinearLayout backgroundLinearLayout = rootView.findViewById(R.id.topBackgroundDetail);
-		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.birmingham);
-		Bitmap b = Bitmap.createScaledBitmap(original, (int)dpWidth, (int) dpHeight /2, false);
-		Drawable d = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(b, 25));
-        backgroundLinearLayout.setBackground(d);
+
+        GlideApp.with(this)
+                .load(R.drawable.birmingham)
+                .transforms(new CenterCrop(), new BlurTransformation(getContext()))
+                .priority(Priority.HIGH)
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        if (isAdded() && !isDetached()) {
+                            backgroundLinearLayout.post(() -> backgroundLinearLayout.setBackground(resource));
+                        }
+                    }
+                });
 
         isegoria = (Isegoria)getActivity().getApplication();
         isegoria.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
@@ -99,7 +107,7 @@ public class CandidateTicketDetailFragment extends Fragment {
             }
         });
 
-        ImageView partyDetailLogo = rootView.findViewById(R.id.partyDetailLogo);
+        ImageView partyLogoImageView = rootView.findViewById(R.id.partyDetailLogo);
 
         isegoria.getAPI().getPhotos(ticketId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
@@ -111,7 +119,7 @@ public class CandidateTicketDetailFragment extends Fragment {
                     GlideApp.with(CandidateTicketDetailFragment.this)
                             .load(photo.thumbnailUrl)
                             .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(partyDetailLogo);
+                            .into(partyLogoImageView);
                 }
             }
         });
@@ -157,9 +165,6 @@ public class CandidateTicketDetailFragment extends Fragment {
         TextView partyDetailName = rootView.findViewById(R.id.partyNameDetail);
         partyDetailSupporters.setText(String.valueOf(noOfSupporters));
         partyDetailName.setText(ticketName);
-
-        ImageView partyImageView = rootView.findViewById(R.id.partyDetailLogo);
-        partyImageView.setContentDescription(String.format("Logo for %s", partyDetailName));
 
 		return rootView;
 	}
@@ -217,7 +222,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 		candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 
 				Gravity.END));
 		candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-		candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageHeight, imageHeight));
+		candidateProfileImage.setImageResource(R.drawable.profilelight);
 		candidateProfileImage.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
         candidateProfileImage.setOnClickListener(view -> {
@@ -225,13 +230,13 @@ public class CandidateTicketDetailFragment extends Fragment {
             Bundle args = new Bundle();
             args.putLong(Constant.FRAGMENT_EXTRA_PROFILE_ID, candidate.userId);
 
-            ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setArguments(args);
+            ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
+            profileOverviewFragment.setArguments(args);
 
             getChildFragmentManager()
                     .beginTransaction()
                     .addToBackStack(null)
-                    .replace(android.R.id.content, profileFragment)
+                    .replace(android.R.id.content, profileOverviewFragment)
                     .commit();
         });
 		
@@ -319,21 +324,5 @@ public class CandidateTicketDetailFragment extends Fragment {
         
         candidateTicketDetialTableLayout.addView(tr);
         candidateTicketDetialTableLayout.addView(dividerView);
-	}
-	
-	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                          int reqWidth, int reqHeight) {
-
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
-
-	    // Calculate inSampleSize
-	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
 	}
 }

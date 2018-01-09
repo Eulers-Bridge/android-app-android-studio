@@ -1,45 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:padding="4dp">
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    android:layout_marginEnd="2dp"
+    android:layout_marginRight="2dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginLeft="2dp">
 
     <ImageView
         android:id="@+id/news_grid_item_image_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@null" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/round_rect_placeholder"
+        android:scaleType="centerCrop"
+        android:contentDescription="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/news_grid_item_title_text_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
-        android:paddingHorizontal="@dimen/activity_horizontal_margin">
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:fontFamily="@font/museo_sans_rounded_300"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintBottom_toBottomOf="@+id/news_grid_item_image_view"
+        app:layout_constraintEnd_toEndOf="@+id/news_grid_item_image_view"
+        app:layout_constraintStart_toStartOf="@+id/news_grid_item_image_view"
+        app:layout_constraintTop_toTopOf="@+id/news_grid_item_image_view"
+        tools:text="Article Title" />
 
-        <TextView
-            android:id="@+id/news_grid_item_title_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textSize="17sp"
-            android:lineSpacingMultiplier="1.05" />
+    <TextView
+        android:id="@+id/news_grid_item_date_text_view"
+        android:layout_width="0dp"
+        android:layout_height="15dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/white"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@+id/news_grid_item_image_view"
+        app:layout_constraintEnd_toEndOf="@+id/news_grid_item_image_view"
+        app:layout_constraintStart_toStartOf="@+id/news_grid_item_image_view"
+        app:layout_constraintTop_toBottomOf="@+id/news_grid_item_title_text_view"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="14th May 2017" />
 
-        <TextView
-            android:id="@+id/news_grid_item_date_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="13sp"
-            android:layout_marginTop="10dp"/>
-    </LinearLayout>
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

@@ -1,37 +1,38 @@
 package com.eulersbridge.isegoria.auth;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.graphics.Typeface;
 
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.BlurTransformation;
 import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.common.Utils;
 import com.securepreferences.SecurePreferences;
 
-public class LoginFragment extends Fragment implements TitledFragment {
+public class LoginFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
 
     private TextInputLayout emailLayout;
     private EditText emailField;
@@ -56,22 +57,21 @@ public class LoginFragment extends Fragment implements TitledFragment {
             if (getActivity() != null) ((MainActivity)getActivity()).onSignUpClicked();
         });
 
-        final LinearLayout loginContainer = rootView.findViewById(R.id.loginContainer);
-		Bitmap original = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.tumblr_static_aphc);
+        final ConstraintLayout loginContainer = rootView.findViewById(R.id.loginContainer);
 
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-
-		Bitmap backgroundBitmap = Bitmap.createScaledBitmap(original, (int) dpWidth, (int) dpHeight /2, false);
-		final Drawable backgroundDrawable = new BitmapDrawable(getActivity().getResources(), Utils.fastBlur(backgroundBitmap, 25));
-        loginContainer.post(() -> loginContainer.setBackground(backgroundDrawable));
-
-        TextView appNameLabel = rootView.findViewById(R.id.isegoria_label);
-        Typeface appNameFont = Typeface.createFromAsset(mainActivity.getAssets(),
-                "MuseoSansRounded-300.otf");
-        appNameLabel.setTypeface(appNameFont);
+        GlideApp.with(this)
+                .load(R.drawable.tumblr_static_aphc)
+                //DiskCacheStrategy.RESOURCE causes the image to be blurred multiple times
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .transforms(new CenterCrop(), new BlurTransformation(getContext(),5))
+                .priority(Priority.HIGH)
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        if (isAdded() && !isDetached())
+                            loginContainer.post(() -> loginContainer.setBackground(resource));
+                    }
+                });
 
         emailField = rootView.findViewById(R.id.login_email);
         emailLayout = rootView.findViewById(R.id.login_email_layout);
@@ -162,7 +162,8 @@ public class LoginFragment extends Fragment implements TitledFragment {
         return null;
     }
 
-    public void setTabLayout(TabLayout tabLayout) {
+    @Override
+    public void setupTabLayout(TabLayout tabLayout) {
         tabLayout.setVisibility(View.GONE);
     }
 

@@ -1,8 +1,5 @@
 package com.eulersbridge.isegoria.election;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -28,20 +25,15 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.models.Election;
 import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
-import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Candidate;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.profile.ProfileFragment;
-import com.eulersbridge.isegoria.common.Utils;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -221,14 +213,14 @@ public class CandidateAllFragment extends Fragment {
         ImageView candidateProfileImage = new ImageView(getActivity());
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ScaleType.CENTER_CROP);
-        candidateProfileImage.setImageBitmap(decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, imageSize, imageSize));
+        candidateProfileImage.setImageResource(R.drawable.profilelight);
         candidateProfileImage.setPadding(paddingMargin, 0, paddingMargin, 0);
-        candidateProfileImage.setOnClickListener(view -> {
+        /*candidateProfileImage.setOnClickListener(view -> {
 
             Bundle args = new Bundle();
             args.putParcelable(Constant.FRAGMENT_EXTRA_USER, Parcels.wrap(candidate));
 
-            ProfileFragment profileFragment = new ProfileFragment();
+            ProfileOverviewFragment profileFragment = new ProfileOverviewFragment();
             profileFragment.setArguments(args);
 
             getChildFragmentManager()
@@ -236,7 +228,7 @@ public class CandidateAllFragment extends Fragment {
                     .addToBackStack(null)
                     .replace(R.id.election_candidate_frame, profileFragment)
                     .commit();
-        });
+        });*/
 
         TextView textViewParty = new TextView(getActivity());
         textViewParty.setTextColor(Color.parseColor("#FFFFFF"));
@@ -342,20 +334,4 @@ public class CandidateAllFragment extends Fragment {
         lastnNmes.add(candidate.familyName);
         rows.add(tr);
     }
-	
-	private static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                          int reqWidth, int reqHeight) {
-
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
-
-	    // Calculate inSampleSize
-	    options.inSampleSize = Utils.calculateInSampleSize(options, reqWidth, reqHeight);
-
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
-	}
 }

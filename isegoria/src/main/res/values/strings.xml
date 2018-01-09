@@ -43,11 +43,11 @@
     <string name="user_sign_up_error_title">Sign Up Failed</string>
     <string name="user_sign_up_error_message">Make sure you\'ve entered your details correctly, and you have an active internet connection.</string>
 
-    <string name="user_consent_statement_message">PLAIN LANGUAGE STATEMENT Please read the following statement carefully. The project is being conducted by researchers in CIS at the University of Melbourne to observe how personality traits influence interaction with online information during political campaigns. Should you participate, you will be asked to fill in demographic information and use the app on your phone for 5 weeks. Participation in this research is voluntary and confidential. However, this confidentiality is subject to legal limitations. You may cease involvement at any time by updating your consent status in the user profile tab. Research papers resulting from the project will only have aggregate data and will be made public. Results are available on request by email: campaignapp@gmail.com. If you are in a dependent relationship with any of the researchers (e.g., being taught by a researcher) the researcher will be unable to access your raw data and therefore your participation will not affect any ongoing assessment. Data is collected and stored in accordance with University policy and disposed 5 years after final publication. There are no risks to individuals participating in this study beyond those that exist in daily life. This project has been approved by the University of Melbourne\'s Human Research Ethics Committee (HREC Reference ID 1441638).If participants have any concerns about the conduct of this research project they can contact the Executive Officer, Human Research Ethics, The University of Melbourne, ph: 03 8344 2073; fax: 03 9347 6739; email: HumanEthics-Enquiries@unimelb.edu.au If you have any further questions about the research itself, please contact the researchers: Miguel Wood (m.wood@student.unimelb.edu.au), Prof. Graeme Shanks (gshanks@unimelb.edu.au or 03 8344 1577), and A/Prof Simon Milton (smilton@unimelb.edu.au or 03 8344 1528). 1st January 2015</string>
+    <string name="user_consent_statement_message">PLAIN LANGUAGE STATEMENT\n\nPlease read the following statement carefully.\n\nThe project is being conducted by researchers in CIS at the University of Melbourne to observe how personality traits influence interaction with online information during political campaigns. Should you participate, you will be asked to fill in demographic information and use the app on your phone for 5 weeks. Participation in this research is voluntary and confidential. However, this confidentiality is subject to legal limitations. You may cease involvement at any time by updating your consent status in the user profile tab. Research papers resulting from the project will only have aggregate data and will be made public. Results are available on request by email: campaignapp@gmail.com. If you are in a dependent relationship with any of the researchers (e.g., being taught by a researcher) the researcher will be unable to access your raw data and therefore your participation will not affect any ongoing assessment. Data is collected and stored in accordance with University policy and disposed 5 years after final publication. There are no risks to individuals participating in this study beyond those that exist in daily life. This project has been approved by the University of Melbourne\'s Human Research Ethics Committee (HREC Reference ID 1441638).\n\nIf participants have any concerns about the conduct of this research project they can contact the Executive Officer, Human Research Ethics, The University of Melbourne, ph: 03 8344 2073; fax: 03 9347 6739; email: HumanEthics-Enquiries@unimelb.edu.au\n\nIf you have any further questions about the research itself, please contact the researchers: Miguel Wood (m.wood@student.unimelb.edu.au), Prof. Graeme Shanks (gshanks@unimelb.edu.au or 03 8344 1577), and A/Prof Simon Milton (smilton@unimelb.edu.au or 03 8344 1528).\n\n1st January 2015</string>
     <string name="user_consent_melbourne_image_content_description">University of Melbourne coat of arms</string>
 
     <!-- Email verification -->
-    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resent.</string>
+    <string name="email_verification_description">Please check your Inbox for a verification email so we can get your account up and running. If you haven\'t received it, please tap resend.</string>
     <string name="email_verification_success_button">Verified, Please Log Me In</string>
     <string name="email_verification_resend_button">Resend Verification Email</string>
 
@@ -57,7 +57,7 @@
     <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science!\n\nAll you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
     <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
     <string name="personality_screen_skip_button">Skip</string>
-    <string name="personality_questions_done_button">Done</string>
+    <string name="personality_questions_done_button">Complete and Finish</string>
     <string name="personality_screen_2_description">Simply select a number next to each statement to indicate the extent to which you agree or disagree. You should rate the extend to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.</string>
 
     <string name="user_consent_next_button">Next</string>
@@ -71,26 +71,33 @@
     <string name="personality_slider_agree_strongly">Agree Strongly</string>
 
     <!-- Election -->
-    <string name="election_overview_subheading">Overview</string>
-    <string name="election_overview_process_subheading">Process</string>
+    <string name="election_section_title_overview">Overview</string>
+    <string name="election_section_title_candidates">Candidates</string>
+
+    <string name="election_overview_subheading">OVERVIEW</string>
+    <string name="election_overview_process_subheading">ELECTION PROCESS</string>
 
     <string name="election_efficacy_survey_message">Welcome to your election centre.\nLearn about your political efficacy by completing this survey.</string>
     <string name="election_efficacy_survey_start_button">Start Survey</string>
 
     <!-- Voting -->
-    <string name="vote_choose_location_time">Choose your vote location and time.</string>
-    <string name="vote_choose_both">Choose the location of the booth you will be voting at. Don\'t worry! all booths are listed down for you.</string>
+    <string name="vote_location_hint">I will be voting in the next community election at</string>
+    <string name="vote_date_time_hint">And I\'ll set a reminder for my vote at the time of</string>
 
     <string name="vote_next_button">Next</string>
 
     <string name="vote_sign_pledge_message">Make it official and sign on the line above to finish your democratic pledge.</string>
     <string name="vote_sign_pledge_next_button">Next</string>
-    <string name="vote_done_add_to_calendar">Add to Local Calendar</string>
+    <string name="vote_done_add_to_calendar">Add to Calendar</string>
 
     <string name="vote_done_heading">Done and done.</string>
     <string name="vote_done_message">You\'re ready to go!\n\nMake sure you check with the university before then to find out where polling booths are positioned, and make sure you scan your QR code at the polling booth to receive your exclusive voting badge!</string>
 
     <string name="event_add_to_calendar">Add to Calendar</string>
+
+    <string name="vote_tab_1">Vote</string>
+    <string name="vote_tab_2">Pledge</string>
+    <string name="vote_tab_3">Done</string>
 
     <!-- Self Efficacy Questions -->
     <string name="section_title_self_efficacy_questions">Self-Efficacy Questions</string>
@@ -118,6 +125,8 @@
     <string name="news_article_flag_content_description">Flag news article</string>
 
     <string name="news_detail_activity_back_button_content_description">Back to News</string>
+
+    <string name="feed_menu_item_friends">Friends</string>
 
     <!-- Feed/Photos -->
     <string name="photo_detail_view_star">Star Photo</string>
@@ -160,8 +169,6 @@
     <string name="profile_tasks_progress_section_title_remaining">Remaining</string>
 
     <!-- Settings -->
-    <string name="settings_title">Isegoria Settings</string>
-
     <string name="settings_back_button_content_description">Back to Profile</string>
     <string name="settings_profile_picture_content_description">Your profile picture</string>
     <string name="settings_change_photo">Change Photo</string>
@@ -193,5 +200,6 @@
     <string name="checkbox_unchecked">Unchecked checkbox</string>
     <string name="user_login_password_error_required">A password is required</string>
     <string name="user_login_email_error_required">An email address is required</string>
+    <string name="image_crop_title">Crop Image</string>
 
 </resources>

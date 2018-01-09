@@ -72,7 +72,7 @@
             android:layout_marginTop="16dp"
             android:minHeight="40dip"
             android:text="@string/self_efficacy_done_button"
-            android:theme="@style/PositiveButton"
+            android:theme="@style/GreenButton"
             android:layout_gravity="center" />
     </LinearLayout>
 </ScrollView>

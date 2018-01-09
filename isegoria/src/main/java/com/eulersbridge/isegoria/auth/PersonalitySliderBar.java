@@ -49,19 +49,19 @@ public class PersonalitySliderBar extends BaseSliderBar {
     protected void setupPaints() {
         super.setupPaints();
 
-        disagreePaint = new Paint();
+        disagreePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         disagreePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightRed));
         disagreePaint.setStrokeWidth(4);
 
-        centrePaint = new Paint();
+        centrePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         centrePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightGrey));
         centrePaint.setStrokeWidth(4);
 
-        agreePaint = new Paint();
+        agreePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         agreePaint.setColor(ContextCompat.getColor(getContext(), R.color.lightGreen));
         agreePaint.setStrokeWidth(4);
 
-        notchPaint = new Paint();
+        notchPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         notchPaint.setColor(ContextCompat.getColor(getContext(), R.color.barBackground));
         notchPaint.setStrokeWidth(4);
     }
@@ -70,8 +70,6 @@ public class PersonalitySliderBar extends BaseSliderBar {
     protected void onDraw(Canvas canvas) {
         int lineY = getParentHeight() / 2;
         int parentWidth = getParentWidth();
-
-        final List<SliderBarPoint> points = getPoints();
 
         // Disagree segment
         canvas.drawLine(horizontalPadding, lineY, (parentWidth/3), lineY, disagreePaint);
@@ -84,9 +82,11 @@ public class PersonalitySliderBar extends BaseSliderBar {
         canvas.drawLine((parentWidth/3)*2, lineY,
                 parentWidth - horizontalPadding, lineY, agreePaint);
 
+
+        final List<SliderBarPoint> points = getPoints();
+
         // Notches
-        for (int i = 0; i < points.size() - 1; i++) {
-            SliderBarPoint point = points.get(i);
+        for (SliderBarPoint point : points) {
             canvas.drawLine(point.getX(), point.getY() - 10, point.getX(), point.getY() + 10,
                     notchPaint);
         }

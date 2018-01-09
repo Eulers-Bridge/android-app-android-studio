@@ -15,13 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.common.TitledFragment;
 
 import java.util.ArrayList;
 
-public class ProfileViewPagerFragment extends Fragment implements TitledFragment {
+public class ProfileViewPagerFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -33,7 +34,6 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         setHasOptionsMenu(true);
 
         setupViewPager(rootView);
-        setupTabLayout();
 
         return rootView;
     }
@@ -68,19 +68,17 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         }
     }
 
-    private void setupViewPager(View rootView) {
-        if (rootView == null) rootView = getView();
-
-        if (viewPager == null && rootView != null) {
+    private void setupViewPager(@NonNull View rootView) {
+        if (viewPager == null) {
             viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
 
             final ArrayList<Fragment> fragmentList = new ArrayList<>();
 
-            ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setViewPager(viewPager);
+            ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
+            profileOverviewFragment.setViewPager(viewPager);
 
-            fragmentList.add(profileFragment);
-            fragmentList.add(new TaskDetailProgressFragment());
+            fragmentList.add(profileOverviewFragment);
+            fragmentList.add(new ProfileTaskProgressFragment());
             fragmentList.add(new ProfileBadgesFragment());
 
             final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
@@ -102,8 +100,15 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         }
     }
 
-    public void setTabLayout(TabLayout tabLayout) {
+    @Override
+    public void setupTabLayout(TabLayout tabLayout) {
         this.tabLayout = tabLayout;
+
+        tabLayout.removeAllTabs();
+        tabLayout.setVisibility(View.VISIBLE);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
     }
 
     @Override
@@ -125,13 +130,4 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         @Override
         public void onTabReselected(TabLayout.Tab tab) { }
     };
-
-    private void setupTabLayout() {
-        if (tabLayout == null) return;
-
-        tabLayout.removeAllTabs();
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-        tabLayout.setVisibility(View.VISIBLE);
-    }
 }

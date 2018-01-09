@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.views.SliderBarPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,32 +71,30 @@ public class BaseSliderBar extends View {
     protected void setupPaints() {
         Context context = getContext();
 
-        circleFillPaint = new Paint();
+        circleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circleFillPaint.setColor(ContextCompat.getColor(context, R.color.white));
         circleFillPaint.setStyle(Paint.Style.FILL);
         circleFillPaint.setStrokeWidth(circleStrokeWidth);
-        circleFillPaint.setAntiAlias(true);
 
-        circleStrokePaint = new Paint();
+        circleStrokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circleStrokePaint.setColor(ContextCompat.getColor(context, R.color.lightBlue));
         circleStrokePaint.setStyle(Paint.Style.STROKE);
         circleStrokePaint.setStrokeWidth(circleStrokeWidth);
-        circleStrokePaint.setAntiAlias(true);
 
-        textPaint = new Paint();
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(ContextCompat.getColor(context, R.color.slider_text));
 
         // Convert text size from SP (screen density dependent) to pixels
-        int pixelSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 11,
+        int pixelSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12,
                 getResources().getDisplayMetrics());
 
         textPaint.setTextSize(pixelSize);
-        textPaint.setAntiAlias(true);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (currentPoint == null) currentPoint = points.get((points.size() - 1) / 2); // Centre point
+        if (currentPoint == null)
+            currentPoint = points.get((points.size() - 1) / 2); // Centre point
 
         int lineY = parentHeight / 2;
 
@@ -124,9 +121,7 @@ public class BaseSliderBar extends View {
         int currentDistance = parentWidth;
         SliderBarPoint newPoint = null;
 
-        for (int i = 0; i < points.size(); i++) {
-            SliderBarPoint point = points.get(i);
-
+        for (SliderBarPoint point : points) {
             if (Math.abs(point.getX() - x) < currentDistance) {
                 currentDistance = Math.abs(point.getX() - x);
                 newPoint = point;

@@ -42,7 +42,7 @@
             android:paddingEnd="@dimen/activity_horizontal_margin"
             android:paddingHorizontal="@dimen/activity_horizontal_margin"
             android:text="@string/election_efficacy_survey_start_button"
-            android:theme="@style/PositiveButton"/>
+            android:theme="@style/GreenButton"/>
     </LinearLayout>
 
 </FrameLayout>

@@ -9,10 +9,11 @@ android {
         }
     }
     compileSdkVersion 27
-    buildToolsVersion '27.0.0'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "au.com.isegoria.app"
         minSdkVersion 16
+        renderscriptSupportModeEnabled true
         targetSdkVersion 27
         vectorDrawables.useSupportLibrary = true
         versionCode 14
@@ -35,59 +36,66 @@ android {
     }
 }
 
-def keystorePropsFile = rootProject.file('keystore.properties')
-def keystoreProps = new Properties()
-if (keystorePropsFile.canRead()) {
-    keystoreProps.load(new FileInputStream(keystorePropsFile))
-
-    if (keystoreProps != null && keystoreProps.containsKey('storeFile')) {
-        android.signingConfigs.release.storeFile = file(keystoreProps['storeFile'])
-    }
+if (project.hasProperty('devBuild')) {
+    android.aaptOptions.cruncherEnabled = false
 
 } else {
-    android.buildTypes.release.signingConfig = null
+    def keystorePropsFile = rootProject.file('keystore.properties')
+    def keystoreProps = new Properties()
+    if (keystorePropsFile.canRead()) {
+        keystoreProps.load(new FileInputStream(keystorePropsFile))
+
+        if (keystoreProps != null && keystoreProps.containsKey('storeFile')) {
+            android.signingConfigs.release.storeFile = file(keystoreProps['storeFile'])
+        }
+
+    } else {
+        android.buildTypes.release.signingConfig = null
+    }
 }
 
 dependencies {
     // Annotation to parcel/un-parcel a given class
-    compile 'org.parceler:parceler-api:1.1.9'
+    implementation 'org.parceler:parceler-api:1.1.9'
     annotationProcessor 'org.parceler:parceler:1.1.9'
 
     // Image loading / caching
-    compile 'com.github.bumptech.glide:glide:4.4.0'
+    implementation 'com.github.bumptech.glide:glide:4.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
-    compile 'com.github.bumptech.glide:okhttp3-integration:4.4.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.4.0'
 
-    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.9.0'
-    compile 'com.android.support:exifinterface:27.0.2'
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.9.0'
 
-    compile 'com.android.support:support-fragment:27.0.2'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
+
+    implementation 'com.android.support:support-fragment:27.0.2'
     // core-ui in order to access `ViewPager` (does not affect APK size)
-    compile 'com.android.support:support-core-ui:27.0.2'
-    compile 'com.android.support:appcompat-v7:27.0.2'
-    compile 'com.android.support:design:27.0.2'
-    compile 'com.android.support:recyclerview-v7:27.0.2'
-    compile 'com.android.support:support-vector-drawable:27.0.2'
+    implementation 'com.android.support:support-core-ui:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta4'
+    implementation 'com.android.support:recyclerview-v7:27.0.2'
+    implementation 'com.android.support:support-vector-drawable:27.0.2'
 
-    compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 
     // Used in Candidate fragment for bottom tabs
-    compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
+    implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    compile 'com.amazonaws:aws-android-sdk-s3:2.6.10'
-    compile 'com.amazonaws:aws-android-sdk-cognito:2.6.10'
-    compile 'com.amazonaws:aws-android-sdk-sns:2.6.10'
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.13'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.13'
+    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.13'
 
     // Required for push notifications
-    compile 'com.google.firebase:firebase-messaging:11.6.2'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
 
     // Secures user email/password storage for auto-login
-    compile 'com.scottyab:secure-preferences-lib:0.1.4'
+    implementation 'com.scottyab:secure-preferences-lib:0.1.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

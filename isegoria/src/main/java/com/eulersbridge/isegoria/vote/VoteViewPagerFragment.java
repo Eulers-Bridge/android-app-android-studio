@@ -9,15 +9,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
 import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.models.VoteLocation;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
-public class VoteViewPagerFragment extends Fragment implements TitledFragment {
+public class VoteViewPagerFragment extends Fragment
+        implements TitledFragment, MainActivity.TabbedFragment, VoteFragment.VoteFragmentListener, VotePledgeFragment.VotePledgeListener {
+
     private TabLayout tabLayout;
+
+    private SimpleFragmentPagerAdapter viewPagerAdapter;
     private NonSwipeableViewPager viewPager;
 
     @Override
@@ -28,7 +37,6 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         getActivity().invalidateOptionsMenu();
 
         setupViewPager(rootView);
-        setupTabLayout();
 
         return rootView;
     }
@@ -42,45 +50,66 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         if (rootView == null) rootView = getView();
 
         if (viewPager == null && rootView != null) {
-            viewPager = rootView.findViewById(R.id.voteViewPagerFragment);
+            viewPager = rootView.findViewById(R.id.vote_view_pager_fragment);
 
             ArrayList<Fragment> fragments = new ArrayList<>();
 
             VoteFragment voteFragment = new VoteFragment();
-            VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();
-            VoteFragmentDone voteFragmentDone = new VoteFragmentDone();
+            voteFragment.setListener(this);
 
-            voteFragment.setViewPager(viewPager);
-            voteFragmentPledge.setViewPager(viewPager);
+            VotePledgeFragment votePledgeFragment = new VotePledgeFragment();
+            votePledgeFragment.setListener(this);
 
             fragments.add(voteFragment);
-            fragments.add(voteFragmentPledge);
-            fragments.add(voteFragmentDone);
+            fragments.add(votePledgeFragment);
+            fragments.add(new VoteDoneFragment());
 
-            voteFragmentPledge.setVoteFragment(voteFragment);
-
-            SimpleFragmentPagerAdapter viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
+            viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
                 @Override
                 public CharSequence getPageTitle(int position) {
-                    switch (position) {
-                        case 0:
-                            return "Vote";
-                        case 1:
-                            return "Pledge";
-                        case 2:
-                            return "Done";
+
+                    Fragment fragment = viewPagerAdapter.getItem(position);
+                    if (fragment instanceof TitledFragment) {
+                        return ((TitledFragment) fragment).getTitle(getContext());
+
+                    } else {
+                        return null;
                     }
-                    return null;
                 }
             };
+
             viewPager.setAdapter(viewPagerAdapter);
 
             viewPager.setCurrentItem(0);
         }
     }
 
-    public void setTabLayout(TabLayout tabLayout) {
+    @Override
+    public void onComplete(VoteLocation voteLocation, Calendar dateTime) {
+        viewPager.setCurrentItem(1);
+
+        Bundle arguments = new Bundle();
+        arguments.putParcelable("voteLocation", Parcels.wrap(voteLocation));
+        arguments.putLong("dateTimeMillis", dateTime.getTimeInMillis());
+
+        viewPagerAdapter.getItem(1).setArguments(arguments);
+    }
+
+    @Override
+    public void onComplete() {
+        viewPager.setCurrentItem(2);
+    }
+
+    @Override
+    public void setupTabLayout(TabLayout tabLayout) {
         this.tabLayout = tabLayout;
+
+        tabLayout.removeAllTabs();
+        tabLayout.setVisibility(View.VISIBLE);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        tabLayout.setEnabled(false);
     }
 
     @Override
@@ -92,9 +121,7 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
         @Override
-        public void onTabSelected(TabLayout.Tab tab) {
-            viewPager.setCurrentItem(tab.getPosition());
-        }
+        public void onTabSelected(TabLayout.Tab tab) { }
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) { }
@@ -102,13 +129,4 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         @Override
         public void onTabReselected(TabLayout.Tab tab) { }
     };
-
-    private void setupTabLayout() {
-        if (tabLayout == null) return;
-
-        tabLayout.removeAllTabs();
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-        tabLayout.setVisibility(View.VISIBLE);
-    }
 }

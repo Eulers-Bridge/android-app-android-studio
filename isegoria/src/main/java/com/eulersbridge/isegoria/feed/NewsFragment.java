@@ -1,6 +1,6 @@
 package com.eulersbridge.isegoria.feed;
 
-
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,9 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.NewsArticle;
+import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.List;
@@ -22,65 +23,77 @@ import java.util.List;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NewsFragment extends Fragment {
-	
-	private NewsAdapter newsAdapter;
+public class NewsFragment extends Fragment implements TitledFragment {
+
+    private NewsAdapter newsAdapter;
     private SwipeRefreshLayout refreshLayout;
 
-	@Override
+    @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.news_fragment, container, false);
-
-		MainActivity mainActivity = (MainActivity) getActivity();
-        Isegoria isegoria = mainActivity.getIsegoriaApplication();
-
-		long institutionId = isegoria.getLoggedInUser().institutionId;
 
         refreshLayout = rootView.findViewById(R.id.swipeContainerNews);
         refreshLayout.setColorSchemeResources(R.color.lightBlue);
         refreshLayout.setOnRefreshListener(() -> {
             refreshLayout.setRefreshing(true);
 
-			isegoria.getAPI().getNewsArticles(institutionId).enqueue(callback);
+			refresh();
 
             refreshLayout.postDelayed(() -> refreshLayout.setRefreshing(false), 6000);
         });
 
-		GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+		newsAdapter = new NewsAdapter();
+		newsAdapter.setLoading(true);
 
-		layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-			@Override
-			public int getSpanSize(int position) {
-				return (position == 0)? 2 : 1;
-			}
-		});
+        RecyclerView recyclerView = rootView.findViewById(R.id.news_grid_view);
 
-		newsAdapter = new NewsAdapter(this);
+        GridLayoutManager layoutManager = (GridLayoutManager)recyclerView.getLayoutManager();
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return (position == 0)? 2 : 1;
+            }
+        });
 
-		RecyclerView recyclerView = rootView.findViewById(R.id.news_grid_view);
-		recyclerView.setLayoutManager(layoutManager);
 		recyclerView.setAdapter(newsAdapter);
 
-		isegoria.getAPI().getNewsArticles(institutionId).enqueue(callback);
+        refresh();
         
 		return rootView;
 	}
 
+    @Override
+    public String getTitle(Context context) {
+        return "News";
+    }
+
+	private void refresh() {
+        Isegoria isegoria = (getActivity() != null)? (Isegoria) getActivity().getApplication() : null;
+
+        if (isegoria != null) {
+            User user = isegoria.getLoggedInUser();
+
+            if (user != null && user.institutionId != null)
+                isegoria.getAPI().getNewsArticles(user.institutionId).enqueue(callback);
+        }
+    }
+
     private final Callback<List<NewsArticle>> callback = new SimpleCallback<List<NewsArticle>>() {
         @Override
         protected void handleResponse(Response<List<NewsArticle>> response) {
-            if (refreshLayout != null) refreshLayout.post(() -> refreshLayout.setRefreshing(false));
+            newsAdapter.setLoading(false);
+
+            if (refreshLayout != null)
+                refreshLayout.post(() -> refreshLayout.setRefreshing(false));
 
             List<NewsArticle> articles = response.body();
 
-            if (articles != null) {
+            if (articles != null)
                 setNewsArticles(articles);
-            }
         }
     };
 
 	private void setNewsArticles(@NonNull List<NewsArticle> articles) {
-		newsAdapter.replaceItems(articles);
-		newsAdapter.notifyDataSetChanged();
+        newsAdapter.replaceItems(articles);
 	}
 }
