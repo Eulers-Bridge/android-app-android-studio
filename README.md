@@ -1,12 +1,10 @@
 # Isegoria for Android
 
-*Isegoria's primary app for Android.*
-
 This project is Gradle-based, and is primarily developed using [Android Studio](https://developer.android.com/studio/index.html).
 
 A [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model is followed in this repository, using the `master` branch for releases and the `dev` branch for development.
 
-Report bugs via Slack or Trello.
+Bugs should be reported via Slack or Trello.
 
 ## Pre-Requisites
 * [Android Studio](https://developer.android.com/studio/index.html)
