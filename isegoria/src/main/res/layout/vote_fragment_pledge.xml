@@ -1,68 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_weight="1"
-        android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp">
+    <com.eulersbridge.isegoria.views.Signature
+        android:id="@+id/vote_pledge_signature"
+        android:layout_width="0dp"
+        android:layout_height="128dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-        <com.eulersbridge.isegoria.views.Signature
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:background="@color/white"
-        android:layout_height="10dp"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:orientation="horizontal">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="#676475" />
-    </LinearLayout>
+    <View
+        android:id="@+id/vote_pledge_divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vote_pledge_signature"
+        android:background="#676475" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/vote_pledge_text"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        android:ems="10"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vote_pledge_divider"
         android:gravity="center"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
         android:text="@string/vote_sign_pledge_message"
         android:textColor="#757581"
         android:textSize="20sp" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/vote_pledge_next_button"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:layout_weight="1"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:theme="@style/GreenButton"
+        android:text="@string/vote_sign_pledge_next_button" />
 
-        <Button
-            android:id="@+id/voteNextButton"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/green_button"
-            android:text="@string/vote_sign_pledge_next_button"
-            android:textColor="#52BB42"
-            android:layout_gravity="center" />
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

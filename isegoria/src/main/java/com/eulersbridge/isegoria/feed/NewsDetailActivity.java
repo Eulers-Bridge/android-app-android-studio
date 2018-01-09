@@ -1,26 +1,28 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.BlurTransformation;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.common.TintTransformation;
+import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.models.LikeInfo;
 import com.eulersbridge.isegoria.models.NewsArticle;
 import com.eulersbridge.isegoria.network.IgnoredCallback;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.common.TintTransformation;
-import com.eulersbridge.isegoria.common.Utils;
 
 import org.parceler.Parcels;
 
@@ -53,7 +55,9 @@ public class NewsDetailActivity extends AppCompatActivity {
         likesTextView = findViewById(R.id.article_likes);
         starView = findViewById(R.id.article_star);
 
-        NewsArticle article = Parcels.unwrap(getIntent().getExtras().getParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE));
+        Bundle extras = getIntent().getExtras();
+
+        NewsArticle article = Parcels.unwrap(extras.getParcelable(Constant.ACTIVITY_EXTRA_NEWS_ARTICLE));
         populateTextContent(article);
 
         isegoria = (Isegoria)getApplication();
@@ -70,18 +74,23 @@ public class NewsDetailActivity extends AppCompatActivity {
         GlideApp.with(this)
                 .load(article.getPhotoUrl())
                 .priority(Priority.HIGH)
-                .transforms(new CenterCrop(), new TintTransformation(0.6))
-                .placeholder(R.color.grey)
+                .transforms(new BlurTransformation(NewsDetailActivity.this), new TintTransformation())
+                .placeholder(R.color.lightGrey)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(articleImageView);
 
         String creatorPhotoURL = article.creator.profilePhotoURL;
 
-        GlideApp.with(this)
-                .load(creatorPhotoURL)
-                .priority(Priority.LOW)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(authorImageView);
+        if (TextUtils.isEmpty(creatorPhotoURL)) {
+            authorImageView.setVisibility(View.GONE);
+
+        } else {
+            GlideApp.with(this)
+                    .load(creatorPhotoURL)
+                    .priority(Priority.LOW)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(authorImageView);
+        }
     }
 
     private void populateLikes(@NonNull List<LikeInfo> likes) {
@@ -100,8 +109,8 @@ public class NewsDetailActivity extends AppCompatActivity {
     @UiThread
     private void populateTextContent(final NewsArticle article) {
 
-        TextView newsTitle = findViewById(R.id.article_title);
-        newsTitle.setText(article.title);
+        TextView titleTextView = findViewById(R.id.article_title);
+        titleTextView.setText(article.title);
 
         likesTextView.setText(String.valueOf(article.likeCount));
 
@@ -128,7 +137,7 @@ public class NewsDetailActivity extends AppCompatActivity {
             if (userLikedArticle) {
                 isegoria.getAPI().likeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
-                starView.setImageResource(R.drawable.star);
+                starView.setColorFilter(ContextCompat.getColor(this, R.color.star_active));
 
                 int newLikes = Integer.parseInt(String.valueOf(likesTextView.getText())) + 1;
                 likesTextView.setText(String.valueOf(newLikes));
@@ -136,7 +145,7 @@ public class NewsDetailActivity extends AppCompatActivity {
             } else {
                 isegoria.getAPI().unlikeArticle(article.id, isegoria.getLoggedInUser().email).enqueue(callback);
 
-                starView.setImageResource(R.drawable.stardefault);
+                starView.setColorFilter(null);
 
                 int newLikes = Integer.parseInt(String.valueOf(likesTextView.getText())) - 1;
                 likesTextView.setText(String.valueOf(newLikes));

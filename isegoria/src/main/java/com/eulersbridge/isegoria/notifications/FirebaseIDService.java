@@ -1,7 +1,5 @@
 package com.eulersbridge.isegoria.notifications;
 
-import android.util.Log;
-
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -20,6 +18,10 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
 
     private static AmazonSNSClient snsClient = null;
 
+    public FirebaseIDService() {
+        super();
+    }
+
     private static AmazonSNSClient getSNSClient() {
         if (snsClient == null){
             snsClient = new AmazonSNSClient(new BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY));
@@ -30,9 +32,11 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
+        super.onTokenRefresh();
+
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(Constant.TAG, "Refreshed token: " + refreshedToken);
+        //Log.d(getClass().getSimpleName(), "Refreshed token: " + refreshedToken);
 
         CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest();
 

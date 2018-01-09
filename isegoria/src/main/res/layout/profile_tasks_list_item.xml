@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingStart="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingEnd="@dimen/activity_horizontal_margin"
-    android:paddingHorizontal="@dimen/activity_horizontal_margin"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
-    android:paddingVertical="4dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/task_list_image_view"
@@ -20,26 +13,39 @@
         android:layout_height="36dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        tools:ignore="ContentDescription" />
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@null"
+        tools:background="@color/grey" />
 
     <TextView
         android:id="@+id/task_list_name_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/task_list_image_view"
-        android:layout_toEndOf="@id/task_list_image_view"
-        android:layout_toLeftOf="@+id/task_list_xp_text_view"
-        android:layout_toStartOf="@+id/task_list_xp_text_view"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginStart="20dp"/>
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/task_list_xp_text_view"
+        app:layout_constraintStart_toEndOf="@id/task_list_image_view"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Task Name" />
 
     <TextView
         android:id="@+id/task_list_xp_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true" />
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="10 XP"/>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

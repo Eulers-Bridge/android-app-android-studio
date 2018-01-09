@@ -32,7 +32,7 @@ import com.eulersbridge.isegoria.models.Position;
 import com.eulersbridge.isegoria.models.Ticket;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.profile.ProfileFragment;
+import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
 import com.eulersbridge.isegoria.common.TintTransformation;
 import com.eulersbridge.isegoria.common.Utils;
 
@@ -81,7 +81,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     .load(event.getPhotoUrl())
                     .priority(Priority.HIGH)
                     .transform(new TintTransformation())
-                    .placeholder(R.color.grey)
+                    .placeholder(R.color.lightGrey)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(eventImageView);
         }
@@ -95,7 +95,7 @@ public class EventDetailActivity extends AppCompatActivity {
             TextView eventTime = findViewById(R.id.event_time);
             eventTime.setText(Utils.convertTimestampToString(this, event.date));
 
-            TextView eventLocationLine1 = findViewById(R.id.event_location_1);
+            TextView eventLocationLine1 = findViewById(R.id.event_location);
             eventLocationLine1.setText(event.location);
 
             TextView eventsTextField = findViewById(R.id.event_details);
@@ -177,17 +177,18 @@ public class EventDetailActivity extends AppCompatActivity {
         ImageView candidateProfileImage = new ImageView(this);
         candidateProfileImage.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, Gravity.END));
         candidateProfileImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        candidateProfileImage.setImageBitmap(Utils.decodeSampledBitmapFromResource(getResources(), R.drawable.profilelight, 80, 80));
+        candidateProfileImage.setImageResource(R.drawable.profilelight);
         candidateProfileImage.setPadding(10, 0, 10, 0);
         candidateProfileImage.setOnClickListener(view -> {
 
-            ProfileFragment profileFragment = new ProfileFragment();
+            ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
             Bundle args = new Bundle();
             args.putInt(Constant.FRAGMENT_EXTRA_PROFILE_ID, userId);
 
             getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
                     .addToBackStack(null)
-                    .replace(R.id.container, profileFragment)
+                    .replace(R.id.container, profileOverviewFragment)
                     .commit();
         });
 

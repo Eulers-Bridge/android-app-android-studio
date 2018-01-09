@@ -1,23 +1,15 @@
 package com.eulersbridge.isegoria.poll;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.LoadingAdapter;
 import com.eulersbridge.isegoria.models.PollOption;
-import com.eulersbridge.isegoria.models.PollResult;
-import com.eulersbridge.isegoria.common.ClickableViewHolder;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder> implements ClickableViewHolder.ClickListener {
+public class PollOptionAdapter extends LoadingAdapter<PollOption, PollOptionViewHolder> implements PollOptionViewHolder.ClickListener {
 
     public interface PollOptionVoteListener {
         /**
@@ -30,15 +22,11 @@ public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder
 
     final private @NonNull PollOptionVoteListener optionVoteListener;
 
-    final private List<PollOption> items = new ArrayList<>();
-
     PollOptionAdapter(@NonNull PollOptionVoteListener optionVoteListener) {
-        this.optionVoteListener = optionVoteListener;
-    }
+        // A poll must have at least 2 options to choose between
+        super(2);
 
-    void replaceItems(List<PollOption> newItems) {
-        items.clear();
-        items.addAll(newItems);
+        this.optionVoteListener = optionVoteListener;
     }
 
     void setPollVotingEnabled(boolean pollVotingEnabled) {
@@ -46,52 +34,12 @@ public class PollOptionAdapter extends RecyclerView.Adapter<PollOptionViewHolder
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
+    public void onClick(PollOption item, int position) {
+        if (pollVotingEnabled && !item.hasVoted) {
+            optionVoteListener.onPollOptionClick(position);
 
-    @Override
-    public void onBindViewHolder(PollOptionViewHolder viewHolder, int index) {
-        final PollOption item = items.get(index);
-
-        viewHolder.textTextView.setText(item.text);
-
-        if (item.photo != null) {
-            viewHolder.imageView.setVisibility(View.VISIBLE);
-
-            GlideApp.with(viewHolder.imageView)
-                    .load(item.photo.thumbnailUrl)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(viewHolder.imageView);
-        } else {
-            viewHolder.imageView.setVisibility(View.GONE);
-        }
-
-        Context context = viewHolder.checkBoxImageView.getContext();
-
-        if (item.hasVoted) {
-            viewHolder.checkBoxImageView.setImageResource(R.drawable.tickgreen);
-            viewHolder.checkBoxImageView.setContentDescription(context.getString(R.string.checkbox_checked));
-        } else {
-            viewHolder.checkBoxImageView.setImageResource(R.drawable.tickempty);
-            viewHolder.checkBoxImageView.setContentDescription(context.getString(R.string.checkbox_unchecked));
-        }
-
-        PollResult result = item.getResult();
-        if (result != null) {
-            viewHolder.progressBar.setProgress((int)result.count);
-        }
-    }
-
-    @Override
-    public void onItemClick(RecyclerView.ViewHolder viewHolder, int position) {
-        if (pollVotingEnabled) {
-            PollOption option = items.get(position);
-
-            if (!option.hasVoted) {
-                optionVoteListener.onPollOptionClick(position);
-
-                PollOptionViewHolder pollOptionViewHolder = (PollOptionViewHolder)viewHolder;
-                pollOptionViewHolder.progressBar.setProgress(pollOptionViewHolder.progressBar.getMax());
-            }
+            getItems().get(position).hasVoted = true;
+            notifyItemChanged(position);
         }
     }
 

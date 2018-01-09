@@ -1,34 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="4dp">
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp">
 
     <ImageView
         android:id="@+id/badge_list_image_view"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:layout_gravity="center"
-        tools:ignore="ContentDescription" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@null"
+        tools:background="@color/grey" />
 
     <TextView
         android:id="@+id/badge_list_name_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/badge_list_image_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:text="Badge Name" />
 
     <TextView
-        android:id="@+id/badge_list_xp_text_view"
+        android:id="@+id/badge_list_description_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/badge_list_name_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
         android:gravity="center"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        tools:text="Badge Description" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

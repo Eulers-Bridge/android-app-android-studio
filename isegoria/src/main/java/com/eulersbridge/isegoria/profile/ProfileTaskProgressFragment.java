@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -20,16 +19,16 @@ import android.widget.TextView;
 
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.TitledFragment;
 import com.eulersbridge.isegoria.models.Task;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.common.TitledFragment;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 import retrofit2.Response;
 
-public class TaskDetailProgressFragment extends Fragment implements TitledFragment {
+public class ProfileTaskProgressFragment extends Fragment implements TitledFragment {
 
     private Isegoria isegoria;
 
@@ -42,9 +41,7 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.task_detail_fragment, container, false);
-
-        isegoria = (Isegoria) getActivity().getApplication();
+        rootView = inflater.inflate(R.layout.profile_task_progress_fragment, container, false);
 
         ProgressBar progressBar = rootView.findViewById(R.id.profile_tasks_progress_bar);
         progressBar.setProgress(50);
@@ -52,23 +49,21 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
         progressBar.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
         RecyclerView completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
-        setupRecyclerView(completedListView, completedAdapter);
+        completedListView.setAdapter(completedAdapter);
 
         remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
-        setupRecyclerView(remainingListView, remainingAdapter);
+        remainingListView.setAdapter(remainingAdapter);
 
-        fetchData();
+        if (getActivity() != null) {
+            isegoria = (Isegoria) getActivity().getApplication();
+
+            fetchTasks();
+        }
 
         return rootView;
     }
 
-    private void setupRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void fetchData() {
+    private void fetchTasks() {
         long userId = isegoria.getLoggedInUser().getId();
 
         isegoria.getAPI().getRemainingTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
@@ -129,7 +124,6 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
     private void setCompletedTasks(@NonNull List<Task> completedTasks) {
         if (getActivity() != null) {
             completedAdapter.replaceItems(completedTasks);
-            completedAdapter.notifyDataSetChanged();
 
             long totalXp = 0;
 
@@ -144,7 +138,6 @@ public class TaskDetailProgressFragment extends Fragment implements TitledFragme
     private void setRemainingTasks(@NonNull List<Task> remainingTasks) {
         if (getActivity() != null) {
             remainingAdapter.replaceItems(remainingTasks);
-            remainingAdapter.notifyDataSetChanged();
 
             // Calculate rough new list view size to 'autosize' it
             getActivity().runOnUiThread(() -> {

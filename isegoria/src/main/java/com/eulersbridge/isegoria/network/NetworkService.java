@@ -10,8 +10,9 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
-import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.SignUpUser;
 import com.eulersbridge.isegoria.models.User;
@@ -21,7 +22,10 @@ import com.squareup.moshi.Moshi;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
+import okhttp3.Cache;
+import okhttp3.Interceptor;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,6 +43,7 @@ public class NetworkService {
 
     private final Isegoria application;
 
+    private final File cacheDirectory;
     private OkHttpClient httpClient;
     private final MoshiConverterFactory moshiConverterFactory;
     private API api;
@@ -50,6 +55,8 @@ public class NetworkService {
 
     public NetworkService(Isegoria application) {
         this.application = application;
+
+        cacheDirectory = new File(application.getCacheDir(), "network");
 
         Moshi moshi = new Moshi.Builder()
                 .add(new LenientLongAdapter())
@@ -80,6 +87,30 @@ public class NetworkService {
     }
 
     private void createHttpClient() {
+        // Force caching of GET requests for 1 minute, or 5 minutes if no network connection.
+        Interceptor interceptor = chain -> {
+            Request request = chain.request();
+
+            Response response = chain.proceed(request);
+
+            if (request.method().equals("GET")) {
+                String cacheHeaderValue = Utils.isNetworkAvailable(application)
+                        ? "public, max-age=60" // 60 seconds / 1 minute
+                        : "public, only-if-cached, max-stale=300"; // 300 seconds / 5 minutes
+
+                return response.newBuilder()
+                        .removeHeader("Pragma")
+                        .removeHeader("Cache-Control")
+                        .header("Cache-Control", cacheHeaderValue)
+                        .build();
+            } else {
+                return response;
+            }
+        };
+
+        int cacheSize = 40 * 1024 * 1024; // Maximum cache size of 40 MiB
+        Cache cache = new Cache(cacheDirectory, cacheSize);
+
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request.Builder request = chain.request().newBuilder()
@@ -88,7 +119,10 @@ public class NetworkService {
                             .addHeader("User-Agent", "Isegoria Android");
 
                     return chain.proceed(request.build());
-                });
+                })
+                .addInterceptor(interceptor)
+                .addNetworkInterceptor(interceptor)
+                .cache(cache);
 
         if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -100,9 +134,8 @@ public class NetworkService {
             httpClientBuilder.addInterceptor(logging);
         }
 
-        if (!TextUtils.isEmpty(password)) {
+        if (!TextUtils.isEmpty(password))
             httpClientBuilder.addInterceptor(new AuthenticationInterceptor(email, password));
-        }
 
         httpClient = httpClientBuilder.build();
     }
@@ -239,7 +272,7 @@ public class NetworkService {
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(Constant.SERVER_URL + "/signUp")
+                .url(Constant.SERVER_URL + "signUp")
                 .method("POST", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
@@ -268,7 +301,7 @@ public class NetworkService {
         return success;
     }
 
-    public void s3Upload(File file) {
+    public void s3Upload(File imageFile) {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 application.getApplicationContext(), // Context,
                 "715927704730",
@@ -285,16 +318,25 @@ public class NetworkService {
                 .context(application.getApplicationContext())
                 .build();
 
-        long timestamp = System.currentTimeMillis() / 1000L;
-        String filename = String.valueOf(application.getLoggedInUser().email) + "_" + String.valueOf(timestamp) + "_" + file.getName();
+        String path = imageFile.getPath();
+        int dotIndex = path.lastIndexOf('.');
 
-        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, filename, file);
+        String imageFileExtension = null;
+
+        if (dotIndex > -1)
+            imageFileExtension = imageFile.getPath().substring( + 1);
+
+        if (TextUtils.isEmpty(imageFileExtension))
+            imageFileExtension = "jpg";
+
+        String key = String.format("%s.%s", UUID.randomUUID().toString(), imageFileExtension);
+
+        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, key, imageFile);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
-                if (state == TransferState.COMPLETED) {
-                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + filename);
-                }
+                if (state == TransferState.COMPLETED)
+                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + key);
             }
 
             @Override
@@ -326,10 +368,11 @@ public class NetworkService {
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(Constant.SERVER_URL + "photo")
+                .url(apiBaseURL + "photo")
                 .method("PUT", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
+                .addHeader("User-Agent", "Isegoria Android")
                 .post(requestBody)
                 .build();
 

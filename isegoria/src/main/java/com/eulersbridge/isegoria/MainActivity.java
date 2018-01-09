@@ -8,16 +8,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutManager;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,40 +26,48 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.election.ElectionMasterFragment;
-import com.eulersbridge.isegoria.feed.FeedFragment;
+import com.eulersbridge.isegoria.auth.ConsentAgreementFragment;
+import com.eulersbridge.isegoria.auth.EmailVerificationFragment;
 import com.eulersbridge.isegoria.auth.LoginFragment;
 import com.eulersbridge.isegoria.auth.PersonalityQuestionsActivity;
-import com.eulersbridge.isegoria.auth.ConsentAgreementFragment;
 import com.eulersbridge.isegoria.auth.SignUpFragment;
+import com.eulersbridge.isegoria.common.BlurTransformation;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.common.RoundedCornersTransformation;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.common.Utils;
+import com.eulersbridge.isegoria.election.ElectionMasterFragment;
+import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
 import com.eulersbridge.isegoria.models.SignUpUser;
 import com.eulersbridge.isegoria.models.User;
 import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.poll.PollFragment;
-import com.eulersbridge.isegoria.profile.FindAddContactFragment;
+import com.eulersbridge.isegoria.poll.PollsFragment;
+import com.eulersbridge.isegoria.profile.FriendsFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
+import com.google.firebase.FirebaseApp;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.securepreferences.SecurePreferences;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
-        SignUpFragment.SignUpListener {
+public class MainActivity extends AppCompatActivity implements
+        BottomNavigationView.OnNavigationItemSelectedListener, SignUpFragment.SignUpListener, FragmentManager.OnBackStackChangedListener {
 
-	private TitledFragment mContent;
+    public interface TabbedFragment {
+        void setupTabLayout(TabLayout tabLayout);
+    }
+
+	private Deque<Fragment> tabFragments;
 	private Isegoria application;
 	public ProgressDialog dialog;
 
@@ -66,15 +75,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private BottomNavigationViewEx navigationView;
 
-	private TextView toolbarTitleTextView;
 	private TabLayout tabLayout;
-	private @IdRes int currentNavigationId;
 	
 	private SignUpUser signUpUser;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+
+		if (savedInstanceState == null) FirebaseApp.initializeApp(this);
 
 		setContentView(R.layout.main_activity);
 
@@ -85,12 +94,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 		setupToolbarAndNavigation();
 
-		setNavigationEnabled(false);
-
 		coordinatorLayout = findViewById(R.id.coordinator_layout);
 
-		String userEmail = new SecurePreferences(this).getString(Constant.USER_EMAIL_KEY, null);
-		String userPassword = new SecurePreferences(this).getString(Constant.USER_PASSWORD_KEY, null);
+		float screenDensity = getResources().getDisplayMetrics().density;
+		BlurTransformation.screenDensity = screenDensity;
+        RoundedCornersTransformation.screenDensity = screenDensity;
+
+		String userEmail = new SecurePreferences(this)
+                .getString(Constant.USER_EMAIL_KEY, null);
+		String userPassword = new SecurePreferences(this)
+                .getString(Constant.USER_PASSWORD_KEY, null);
+
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
 		if (userEmail != null && userPassword != null) {
 			application.login(userEmail, userPassword);
@@ -99,6 +114,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             setViewEnabled(R.id.login_password, false);
             setViewEnabled(R.id.login_button, false);
             setViewEnabled(R.id.login_signup_button, false);
+
+            setToolbarVisible(true);
+
+            // Add 3 empty tabs to flesh out the empty/not loaded feed fragment screen
+            tabLayout.addTab(tabLayout.newTab());
+            tabLayout.addTab(tabLayout.newTab());
+            tabLayout.addTab(tabLayout.newTab());
+            tabLayout.setVisibility(View.VISIBLE);
 
 		} else {
 			showLogin();
@@ -147,8 +170,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 		    //Build a simple map of channel names (Strings) to their importance level (Integer)
 			HashMap<String, Integer> channels = new HashMap<>();
-			channels.put(Constant.NOTIFICATION_CHANNEL_FRIENDS, NotificationManager.IMPORTANCE_DEFAULT);
-			channels.put(Constant.NOTIFICATION_CHANNEL_VOTE_REMINDERS, NotificationManager.IMPORTANCE_DEFAULT);
+			channels.put(Constant.NOTIFICATION_CHANNEL_FRIENDS,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+			channels.put(Constant.NOTIFICATION_CHANNEL_VOTE_REMINDERS,
+                    NotificationManager.IMPORTANCE_DEFAULT);
 
 			NotificationManager notificationManager =
 					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -163,7 +188,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 					String channelId = Utils.notificationChannelIDFromName(channelName);
 					int importance = entry.getValue();
 
-					NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
+					NotificationChannel notificationChannel =
+                            new NotificationChannel(channelId, channelName, importance);
 					notificationChannel.setShowBadge(true);
 					notificationManager.createNotificationChannel(notificationChannel);
 				}
@@ -175,13 +201,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
 
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-		Typeface titleFont = Typeface.createFromAsset(getAssets(),
-				"MuseoSansRounded-500.otf");
-		toolbarTitleTextView = toolbar.findViewById(R.id.toolbar_title);
-		toolbarTitleTextView.setTypeface(titleFont);
-
 		navigationView = findViewById(R.id.navigation);
 		if (navigationView != null) {
 		    navigationView.setOnNavigationItemSelectedListener(this);
@@ -190,19 +209,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             navigationView.setTextVisibility(false);
 		}
 
-		tabLayout = findViewById(R.id.tabLayout);
+		tabLayout = findViewById(R.id.tab_layout);
+
+		tabFragments = new ArrayDeque<>(4);
 	}
 
 	public void setToolbarShowsTitle(boolean visible) {
-		toolbarTitleTextView.setVisibility(visible? View.VISIBLE : View.GONE);
+        if (getSupportActionBar() != null)
+	        getSupportActionBar().setDisplayShowTitleEnabled(visible);
 	}
 
 	public void setToolbarTitle(String title) {
-		toolbarTitleTextView.setText(title);
+	    if (getSupportActionBar() != null)
+	        getSupportActionBar().setTitle(title);
 	}
 
 	public void setToolbarVisible(boolean visible) {
-		if (getSupportActionBar() == null) return;
+		if (getSupportActionBar() == null)
+		    return;
 
 		if (visible) {
 			getSupportActionBar().show();
@@ -211,64 +235,79 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 		}
 	}
 
-	@Override
+    @Override
+    public void onBackPressed() {
+        if (tabFragments.size() > 1) {
+            // Only pop if more than 1 fragment on stack (i.e. always leave a root fragment)
+
+            tabFragments.pop();
+            getSupportFragmentManager().popBackStack();
+
+        } else if (tabFragments.size() == 1) {
+            // Return to launcher
+            Intent launcherAction = new Intent(Intent.ACTION_MAIN);
+            launcherAction.addCategory(Intent.CATEGORY_HOME);
+            launcherAction.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(launcherAction);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        boolean canGoBack = (getSupportFragmentManager().getBackStackEntryCount() > 0);
+
+        if (getSupportActionBar() != null) {
+            /* When a fragment is added to the stack, show the back button in the app bar,
+               as the user can navigate back to a previous fragment. */
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canGoBack);
+            getSupportActionBar().setDisplayShowHomeEnabled(canGoBack);
+        }
+
+        updateAppBarState();
+    }
+
+    @Override
 	public boolean onSupportNavigateUp() {
-		onBackPressed();
+	    if (tabFragments.size() > 0)
+            tabFragments.pop();
+
+		getSupportFragmentManager().popBackStack();
+
 		return true;
-	}
-
-	public void setShowNavigationBackButton(boolean show) {
-		getSupportActionBar().setDisplayHomeAsUpEnabled(show);
-		getSupportActionBar().setDisplayShowHomeEnabled(show);
-	}
-
-	private void setNavigationEnabled(boolean enabled) {
-        navigationView.setVisibility(enabled? View.VISIBLE : View.GONE);
 	}
 
 	public TabLayout getTabLayout() {
 		return tabLayout;
 	}
 
+	private @Nullable Fragment getCurrentFragment() {
+	    return tabFragments.size() == 0? null : tabFragments.peekFirst();
+    }
+
 	private void showElection() {
 	    runOnUiThread(() -> {
-            ElectionMasterFragment electionFragment = new ElectionMasterFragment();
-            electionFragment.setTabLayout(tabLayout);
+            presentRootContent(new ElectionMasterFragment());
 
-            switchContent(electionFragment);
+            @IdRes int id = R.id.navigation_election;
 
-            @IdRes int navigationId = R.id.navigation_election;
-            currentNavigationId = navigationId;
-            navigationView.setSelectedItemId(navigationId);
+            if (navigationView.getSelectedItemId() != id)
+                navigationView.setSelectedItemId(id);
         });
     }
 
     public void showFriends() {
-	    runOnUiThread(() -> {
-            FindAddContactFragment friendsFragment = new FindAddContactFragment();
-            friendsFragment.setTabLayout(tabLayout);
-
-            mContent = friendsFragment;
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, friendsFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit();
-
-            @IdRes int navigationId = R.id.navigation_profile;
-            currentNavigationId = navigationId;
-            navigationView.setSelectedItemId(navigationId);
-        });
+        presentContent(new FriendsFragment());
     }
 
 	public void showLogin() {
-		LoginFragment loginFragment = new LoginFragment();
-        loginFragment.setTabLayout(tabLayout);
-        switchContent(loginFragment);
-
-        setNavigationEnabled(false);
+	    navigationView.setVisibility(View.GONE);
+        presentRootContent(new LoginFragment());
 	}
+
+	public void setVerification() {
+	    hideDialog();
+	    presentRootContent(new EmailVerificationFragment());
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
@@ -282,46 +321,36 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 		final int newNavigationId = item.getItemId();
 
-		if (currentNavigationId != newNavigationId) {
+        Fragment fragment;
 
-			switch(newNavigationId) {
-                case R.id.navigation_election:
-                    showElection();
-                    break;
+        switch(newNavigationId) {
+            case R.id.navigation_feed:
+                fragment = new FeedFragment();
+                break;
 
-				case R.id.navigation_feed:
-					FeedFragment feedFragment = new FeedFragment();
-					feedFragment.setTabLayout(tabLayout);
+            case R.id.navigation_poll:
+                fragment = new PollsFragment();
+                break;
 
-					switchContent(feedFragment);
-					break;
+            case R.id.navigation_vote:
+                fragment = new VoteViewPagerFragment();
+                break;
 
+            case R.id.navigation_profile:
+                fragment = new ProfileViewPagerFragment();
+                break;
 
+            case R.id.navigation_election:
+                showElection();
+                // Fall through to return
+            default:
+                return true;
+        }
 
-				case R.id.navigation_poll:
-					PollFragment pollFragment = new PollFragment();
-					pollFragment.setTabLayout(tabLayout);
+        Fragment currentFragment = getCurrentFragment();
 
-					switchContent(pollFragment);
-					break;
-
-				case R.id.navigation_vote:
-					final VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
-					voteFragment.setTabLayout(tabLayout);
-
-					switchContent(voteFragment);
-					break;
-
-				case R.id.navigation_profile:
-					ProfileViewPagerFragment profileFragment = new ProfileViewPagerFragment();
-					profileFragment.setTabLayout(tabLayout);
-
-					switchContent(profileFragment);
-					break;
-			}
-
-			currentNavigationId = newNavigationId;
-		}
+        if (currentFragment == null || !fragment.getClass().equals(currentFragment.getClass()))
+            presentRootContent(fragment);
 
 		return true;
 	}
@@ -332,12 +361,23 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 	// When the Sign Up button in the launch screen is tapped
 	public void onSignUpClicked() {
-		setShowNavigationBackButton(true);
+        SignUpFragment signUpFragment = new SignUpFragment();
+        signUpFragment.setListener(this);
 
-		SignUpFragment signUpFragment = new SignUpFragment();
-		signUpFragment.setListener(this);
+        // Following code is same as `presentContent()`, but with a simple open transition
+        tabFragments.push(signUpFragment);
 
-		switchContent(signUpFragment, false);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentManager
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.container, signUpFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+
+        fragmentManager.executePendingTransactions();
 	}
 
 	private void setViewEnabled(@IdRes int viewId, boolean enabled) {
@@ -348,22 +388,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	public void onLoginSuccess(User loggedInUser) {
         hideDialog();
 
-        setNavigationEnabled(true);
         setToolbarVisible(true);
+        navigationView.setVisibility(View.VISIBLE);
+        navigationView.setEnabled(true);
 
-        if (!handleAppShortcutIntent()) {
-            FeedFragment feedFragment = new FeedFragment();
-            feedFragment.setTabLayout(tabLayout);
-
+        if (!handleAppShortcutIntent())
             navigationView.setSelectedItemId(R.id.navigation_feed);
-        }
 
-        if (!loggedInUser.hasPersonality) {
+        if (!loggedInUser.hasPersonality)
             startActivity(new Intent(this, PersonalityQuestionsActivity.class));
-        }
     }
 	
-	public void hideDialog() {
+	private void hideDialog() {
 		if (dialog != null) dialog.dismiss();
 	}
 	
@@ -376,13 +412,21 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             hideDialog();
 
-            if (mContent.getClass() != LoginFragment.class) {
-                //Tried to login user based on stored email/password, but they since deleted account
-                //or the login otherwise failed. Not currently showing the Login fragment so we need to.
-                switchContent(new LoginFragment());
+            Fragment currentFragment = getCurrentFragment();
+
+            if (currentFragment == null || currentFragment.getClass() != LoginFragment.class) {
+                /* Tried to login user based on stored email/password, but they since deleted
+                account or the login otherwise failed. Not currently showing the Login fragment,
+                so we need to. */
+
+				navigationView.setVisibility(View.GONE);
+                setToolbarVisible(false);
+
+                presentRootContent(new LoginFragment());
             }
 
-            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
+            Snackbar.make(findViewById(R.id.coordinator_layout),
+                    getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
                     .setDuration(Constant.SNACKBAR_LENGTH_EXTENDED)
                     .show();
         });
@@ -401,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	    this.signUpUser = user;
 
         ConsentAgreementFragment consentAgreementFragment = new ConsentAgreementFragment();
-        switchContent(consentAgreementFragment);
+        presentContent(consentAgreementFragment);
 	}
 	
 	public void userConsentNext() {
@@ -427,44 +471,56 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 }
             }
         });
-		
-		switchContent(new LoginFragment());
+
+        presentRootContent(new LoginFragment());
 	}
 
-	public void switchContent(TitledFragment fragment) {
-		switchContent(fragment, true);
+	public void presentContent(@NonNull Fragment fragment) {
+        tabFragments.push(fragment);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        fragmentManager.executePendingTransactions();
+    }
+
+	private void presentRootContent(@NonNull Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
+
+        tabFragments.clear();
+        tabFragments.push(fragment);
+
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .commitNow(); // commit() + executePendingTransactions()
+
+        updateAppBarState();
 	}
 
-	private void switchContent(TitledFragment fragment, boolean popBackStack) {
-        WeakReference<MainActivity> wrSelf = new WeakReference<>(this);
+	private void updateAppBarState() {
+        final Fragment currentFragment = getCurrentFragment();
 
-	    runOnUiThread(() -> {
-	        if (wrSelf.get() == null || wrSelf.get().isFinishing()) return;
+        if (currentFragment != null) {
+            runOnUiThread(() -> {
+                if (currentFragment instanceof TitledFragment) {
+                    String fragmentTitle = ((TitledFragment) currentFragment).getTitle(MainActivity.this);
 
-            mContent = fragment;
+                    if (!TextUtils.isEmpty(fragmentTitle))
+                        setToolbarTitle(fragmentTitle);
+                }
 
-            if (popBackStack) {
-                getSupportFragmentManager().popBackStackImmediate();
-            }
-
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, (Fragment)fragment, fragment.getClass().toString());
-
-            if (!popBackStack) {
-                transaction.addToBackStack(null).commitAllowingStateLoss();
-
-                getSupportFragmentManager().executePendingTransactions();
-
-                postFragmentCommit(fragment.getTitle(this));
-
-            } else {
-                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle(this))).commitAllowingStateLoss();
-            }
-        });
-	}
-
-	private void postFragmentCommit(String fragmentTitle) {
-        if (!TextUtils.isEmpty(fragmentTitle)) setToolbarTitle(fragmentTitle);
+                if (currentFragment instanceof TabbedFragment) {
+                    tabLayout.clearOnTabSelectedListeners();
+                    ((TabbedFragment) currentFragment).setupTabLayout(tabLayout);
+                }
+            });
+        }
     }
 }

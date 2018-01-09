@@ -1,77 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/photo_detail_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:background="@drawable/tumblr_static_aphc"/>
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/photo_detail_details_container"
         android:layout_width="match_parent"
-        android:layout_height="84dp"
+        android:layout_height="192dp"
         android:layout_gravity="bottom"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingVertical="@dimen/activity_vertical_margin"
-        android:background="@color/photo_details_background">
+        android:background="@drawable/scrim_photo">
 
         <TextView
             android:id="@+id/photo_detail_title_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/photo_detail_date_text_view"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:textSize="16sp" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/museo_sans_rounded_300"
+            android:gravity="bottom"
+            android:textColor="@color/white"
+            android:textSize="21sp"
+            app:layout_constraintBottom_toTopOf="@+id/photo_detail_date_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Photo Title" />
 
         <TextView
-            android:id="@id/photo_detail_date_text_view"
+            android:id="@+id/photo_detail_date_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/photo_details_small"
+            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/photo_detail_star_image_view"
+            tools:text="OCTOBER 12, 2017" />
+
+        <!-- 75% opacity #CCCCCC vertical divider -->
+        <View
+            android:id="@+id/photo_detail_divider_vertical"
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:background="#BFCCCCCC"
+            app:layout_constraintStart_toEndOf="@id/photo_detail_date_text_view"
+            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"/>
 
         <TextView
             android:id="@+id/photo_detail_likes_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_toLeftOf="@+id/photo_detail_star_image_view"
             android:layout_toStartOf="@+id/photo_detail_star_image_view"
-            android:layout_centerVertical="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="@dimen/newsPointsSize" />
+            android:textColor="@color/photo_details_small"
+            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintStart_toEndOf="@+id/photo_detail_divider_vertical"
+            app:layout_constraintTop_toTopOf="@+id/photo_detail_star_image_view"
+            tools:text="1" />
 
         <ImageView
-            android:contentDescription="@string/photo_detail_view_star"
             android:id="@id/photo_detail_star_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
             android:layout_toLeftOf="@+id/photo_detail_flag_image_view"
             android:layout_toStartOf="@+id/photo_detail_flag_image_view"
-            android:layout_centerVertical="true"
-            android:src="@drawable/stardefault" />
+            android:contentDescription="@string/photo_detail_view_star"
+            app:srcCompat="@drawable/star_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/photo_detail_likes_text_view" />
 
         <ImageView
-            android:contentDescription="@string/photo_detail_view_flag"
             android:id="@id/photo_detail_flag_image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:src="@drawable/flagdefault" />
-    </RelativeLayout>
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/photo_detail_view_flag"
+            android:src="@drawable/flagdefault"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/photo_detail_star_image_view" />
+    </android.support.constraint.ConstraintLayout>
 
 </merge>

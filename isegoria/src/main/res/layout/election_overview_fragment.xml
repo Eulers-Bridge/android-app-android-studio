@@ -1,59 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/election_overview_content_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:animateLayoutChanges="true">
 
         <TextView
-            android:id="@+id/electionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
-
-        <TextView
-            android:id="@+id/electionDate"
-            android:layout_width="match_parent"
+            android:id="@+id/election_overview_title"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"/>
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:fontFamily="@font/museo_sans_rounded_500"
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Election Title"/>
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:text="@string/election_overview_subheading" />
-
-        <TextView
-            android:id="@+id/electionIntroduction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-        <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/election_overview_date"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:text="@string/election_overview_process_subheading" />
+            android:textStyle="normal"
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/election_overview_title"
+            tools:text="August 10, 2017"/>
 
         <TextView
-            android:id="@+id/electionProcess"
-            android:layout_width="match_parent"
+            android:id="@+id/election_overview_introduction_heading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/election_overview_subheading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/blue_grey"
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/election_overview_date" />
+
+        <TextView
+            android:id="@+id/election_overview_introduction"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:lineSpacingMultiplier="1.1" />
-    </LinearLayout>
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
+            app:layout_constraintTop_toBottomOf="@+id/election_overview_introduction_heading"
+            tools:text="Lorem Ipsum"/>
 
+        <TextView
+            android:id="@+id/election_overview_process_heading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/election_overview_process_subheading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@color/blue_grey"
+            app:layout_constraintTop_toBottomOf="@+id/election_overview_introduction"
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"/>
+
+        <TextView
+            android:id="@+id/election_overview_process"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:lineSpacingMultiplier="1.1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintTop_toBottomOf="@+id/election_overview_process_heading"
+            app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
+            android:paddingBottom="16dp"
+            tools:text="Lorem Ipsum"/>
+
+        <android.support.constraint.Guideline
+            android:id="@+id/election_overview_guideline_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="16dp" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/election_overview_guideline_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="16dp" />
+
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>

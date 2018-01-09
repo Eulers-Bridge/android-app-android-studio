@@ -1,47 +1,55 @@
 package com.eulersbridge.isegoria.profile;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.models.Badge;
 import com.eulersbridge.isegoria.network.PhotosResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
 
 class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
-    private final Fragment fragment;
+    private final WeakReference<Fragment> weakFragment;
 
     final private List<Badge> completedItems = new ArrayList<>();
     final private List<Badge> remainingItems = new ArrayList<>();
 
-
-    BadgeAdapter(Fragment fragment) {
-        this.fragment = fragment;
+    BadgeAdapter(@NonNull Fragment fragment) {
+        weakFragment = new WeakReference<>(fragment);
     }
 
     void replaceCompletedItems(@NonNull List<Badge> newItems) {
         completedItems.clear();
         completedItems.addAll(newItems);
+        notifyItemRangeChanged(0, newItems.size());
     }
 
     void replaceRemainingItems(@NonNull List<Badge> newItems) {
         remainingItems.clear();
         remainingItems.addAll(newItems);
+
+        int remainingItemsStartIndex = remainingItems.size() - 1;
+
+        // remainingItemsStartIndex < 0 if remainingItems.size() == 0
+        if (remainingItemsStartIndex < 0)
+                remainingItemsStartIndex = 0;
+
+        // Remaining items show after completed items
+        notifyItemRangeChanged(remainingItemsStartIndex, newItems.size());
     }
 
     @Override
@@ -49,20 +57,22 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
         return completedItems.size() + remainingItems.size();
     }
 
-    private int getImageIndex() {
+    private int getImageIndex(@NonNull Fragment fragment) {
         DisplayMetrics dm = fragment.getResources().getDisplayMetrics();
 
         int dpi = dm.densityDpi;
         if (dpi == DisplayMetrics.DENSITY_LOW) {
             return 5;
+
         } else if (dpi == DisplayMetrics.DENSITY_MEDIUM) {
             return 4;
+
         } else {
             return 3;
         }
     }
 
-    private boolean isValidFragment() {
+    private boolean isValidFragment(@Nullable Fragment fragment) {
         return (fragment != null
                 && fragment.getActivity() != null
                 && !fragment.isDetached()
@@ -83,55 +93,44 @@ class BadgeAdapter extends RecyclerView.Adapter<BadgeViewHolder> {
             item = remainingItems.get(index);
 
         } else {
-            viewHolder.nameTextView.setText(null);
-            viewHolder.descriptionTextView.setText(null);
-            viewHolder.imageView.setImageDrawable(null);
-            viewHolder.imageView.setContentDescription(null);
+            viewHolder.setItem(null, false);
             return;
         }
 
-        if (!completed) {
-            viewHolder.imageView.setColorFilter(Color.argb(125, 35, 35, 35));
-        } else {
-            viewHolder.imageView.clearColorFilter();
-        }
+        viewHolder.setItem(item, completed);
 
-        viewHolder.nameTextView.setText(item.name);
-        viewHolder.descriptionTextView.setText(item.description);
+        Fragment fragment = weakFragment.get();
 
-        CharSequence oldContentDescription = viewHolder.imageView.getContentDescription();
-
-        boolean newImageRequired = (oldContentDescription != null  && !oldContentDescription.toString().equals(item.name)
-                || oldContentDescription == null);
-
-        if (isValidFragment() && newImageRequired) {
+        if (isValidFragment(fragment)) {
             Isegoria isegoria = (Isegoria)fragment.getActivity().getApplication();
 
             if (isegoria != null) {
-                viewHolder.imageView.setImageDrawable(null);
+                int imageIndex = getImageIndex(fragment);
 
-                int imageIndex = getImageIndex();
+                final long itemId = item.id;
+
+                WeakReference<BadgeViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
 
                 isegoria.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
                     @Override
                     protected void handleResponse(Response<PhotosResponse> response) {
                         PhotosResponse body = response.body();
-                        if (body != null && body.totalPhotos > (imageIndex + 1) && isValidFragment()) {
 
-                            String url = body.photos.get(imageIndex).thumbnailUrl;
+                        if (body != null
+                                && body.totalPhotos > (imageIndex + 1)) {
+                            BadgeViewHolder innerViewHolder = weakViewHolder.get();
 
-                            GlideApp.with(fragment)
-                                    .load(url)
-                                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                                    .transition(DrawableTransitionOptions.withCrossFade())
-                                    .into(viewHolder.imageView);
+                            if (innerViewHolder != null) {
+                                String imageUrl = body.photos.get(imageIndex).thumbnailUrl;
+
+                                if (!TextUtils.isEmpty(imageUrl))
+                                    innerViewHolder.loadItemImage(itemId, imageUrl);
+                            }
                         }
                     }
                 });
             }
         }
-
-        viewHolder.imageView.setContentDescription(item.name);
     }
 
     @Override

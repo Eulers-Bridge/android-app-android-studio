@@ -12,93 +12,80 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import com.eulersbridge.isegoria.common.Constant;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
 public class Signature extends View {
-    private static final float STROKE_WIDTH = 5f;
-    private static final float HALF_STROKE_WIDTH = STROKE_WIDTH / 2;
-    private final Paint paint = new Paint();
-    private final Path path = new Path();
+    private static final float STROKE_WIDTH_PX = 5f;
+    private static final float HALF_STROKE_WIDTH_PX = STROKE_WIDTH_PX / 2;
+    private final Paint paint;
+    private final Path path;
 
     private float lastTouchX;
     private float lastTouchY;
-    private final RectF dirtyRect = new RectF();
+    private final RectF dirtyRect;
 
     private LinearLayout mContent;
-    Signature mSignature;
-    Button mClear, mGetSign, mCancel;
-    public static String tempDir;
-    public int count = 1;
-    public String current = null;
     private Bitmap mBitmap;
-    View mView;
     private File mypath;
-
-    private String uniqueId;
-    private EditText yourName;
 
     public Signature(Context context, AttributeSet attrs) {
         super(context, attrs);
-        paint.setAntiAlias(true);
+
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.BLACK);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeWidth(STROKE_WIDTH);
+        paint.setStrokeWidth(STROKE_WIDTH_PX);
+
+        path = new Path();
+
+        dirtyRect = new RectF();
     }
 
     public void save(View v) {
         Log.v("log_tag", "Width: " + v.getWidth());
         Log.v("log_tag", "Height: " + v.getHeight());
-        if(mBitmap == null)
-        {
+
+        if (mBitmap == null)
             mBitmap =  Bitmap.createBitmap(mContent.getWidth(), mContent.getHeight(), Bitmap.Config.RGB_565);
-        }
+
         Canvas canvas = new Canvas(mBitmap);
-        try
-        {
+        try {
             FileOutputStream mFileOutStream = new FileOutputStream(mypath);
 
             v.draw(canvas);
             mBitmap.compress(Bitmap.CompressFormat.PNG, 90, mFileOutStream);
             mFileOutStream.flush();
             mFileOutStream.close();
+
             //String url = Images.Media.insertImage(getContentResolver(), mBitmap, "title", null);
             //Log.v("log_tag","url: " + url);
-        }
-        catch(Exception e)
-        {
+
+        } catch(Exception e) {
             Log.v("log_tag", e.toString());
         }
     }
 
-    public void clear()
-    {
+    public void clear() {
         path.reset();
         invalidate();
     }
 
     @Override
-    protected void onDraw(Canvas canvas)
-    {
+    protected void onDraw(Canvas canvas) {
         canvas.drawPath(path, paint);
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    public boolean onTouchEvent(MotionEvent event)
-    {
+    public boolean onTouchEvent(MotionEvent event) {
         float eventX = event.getX();
         float eventY = event.getY();
 
-        switch (event.getAction())
-        {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 path.moveTo(eventX, eventY);
                 lastTouchX = eventX;
@@ -106,30 +93,30 @@ public class Signature extends View {
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-
             case MotionEvent.ACTION_UP:
 
                 resetDirtyRect(eventX, eventY);
                 int historySize = event.getHistorySize();
-                for (int i = 0; i < historySize; i++)
-                {
+                for (int i = 0; i < historySize; i++) {
                     float historicalX = event.getHistoricalX(i);
                     float historicalY = event.getHistoricalY(i);
                     expandDirtyRect(historicalX, historicalY);
                     path.lineTo(historicalX, historicalY);
                 }
+
                 path.lineTo(eventX, eventY);
+
                 break;
 
             default:
-                Log.v(Constant.TAG, "Ignored touch event: " + event.toString());
+                Log.v(getClass().getSimpleName(), "Ignored touch event: " + event.toString());
                 return false;
         }
 
-        invalidate((int) (dirtyRect.left - HALF_STROKE_WIDTH),
-                (int) (dirtyRect.top - HALF_STROKE_WIDTH),
-                (int) (dirtyRect.right + HALF_STROKE_WIDTH),
-                (int) (dirtyRect.bottom + HALF_STROKE_WIDTH));
+        invalidate((int) (dirtyRect.left - HALF_STROKE_WIDTH_PX),
+                (int) (dirtyRect.top - HALF_STROKE_WIDTH_PX),
+                (int) (dirtyRect.right + HALF_STROKE_WIDTH_PX),
+                (int) (dirtyRect.bottom + HALF_STROKE_WIDTH_PX));
 
         lastTouchX = eventX;
         lastTouchY = eventY;
@@ -137,29 +124,21 @@ public class Signature extends View {
         return true;
     }
 
-    private void expandDirtyRect(float historicalX, float historicalY)
-    {
-        if (historicalX < dirtyRect.left)
-        {
+    private void expandDirtyRect(float historicalX, float historicalY) {
+        if (historicalX < dirtyRect.left) {
             dirtyRect.left = historicalX;
-        }
-        else if (historicalX > dirtyRect.right)
-        {
+        } else if (historicalX > dirtyRect.right) {
             dirtyRect.right = historicalX;
         }
 
-        if (historicalY < dirtyRect.top)
-        {
+        if (historicalY < dirtyRect.top) {
             dirtyRect.top = historicalY;
-        }
-        else if (historicalY > dirtyRect.bottom)
-        {
+        } else if (historicalY > dirtyRect.bottom) {
             dirtyRect.bottom = historicalY;
         }
     }
 
-    private void resetDirtyRect(float eventX, float eventY)
-    {
+    private void resetDirtyRect(float eventX, float eventY) {
         dirtyRect.left = Math.min(lastTouchX, eventX);
         dirtyRect.right = Math.max(lastTouchX, eventX);
         dirtyRect.top = Math.min(lastTouchY, eventY);

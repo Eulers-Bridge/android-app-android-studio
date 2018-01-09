@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.auth;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -13,18 +14,26 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.SignUpUser;
-import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.BlurTransformation;
+import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.common.Utils;
 import com.eulersbridge.isegoria.models.Country;
 import com.eulersbridge.isegoria.models.Institution;
+import com.eulersbridge.isegoria.models.SignUpUser;
+import com.eulersbridge.isegoria.network.GeneralInfoResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.common.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,17 +68,38 @@ public class SignUpFragment extends Fragment implements OnItemSelectedListener, 
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.user_sign_up_fragment, container, false);
 
-        countries = new ArrayList<>();
+        final ScrollView scrollContainer = rootView.findViewById(R.id.sign_up_container);
+
+        GlideApp.with(this)
+                .load(R.drawable.tumblr_static_aphc)
+                //DiskCacheStrategy.RESOURCE causes the image to be blurred multiple times
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .transforms(new CenterCrop(), new BlurTransformation(getContext(),5))
+                .priority(Priority.HIGH)
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                        if (isAdded() && !isDetached())
+                            scrollContainer.post(() -> scrollContainer.setBackground(resource));
+                    }
+                });
+
+        rootView.findViewById(R.id.sign_up_back_button).setOnClickListener(view -> {
+            if (getActivity() != null)
+                getActivity().onBackPressed();
+        });
 
         rootView.findViewById(R.id.sign_up_next_button).setOnClickListener(view -> continueSignUp());
 
-        AppCompatActivity activity = (AppCompatActivity)getActivity();
+        countries = new ArrayList<>();
 
         givenNameField = rootView.findViewById(R.id.sign_up_given_name);
         familyNameField = rootView.findViewById(R.id.sign_up_family_name);
         emailField = rootView.findViewById(R.id.sign_up_email);
         newPasswordField = rootView.findViewById(R.id.sign_up_new_password);
         confirmNewPasswordField = rootView.findViewById(R.id.sign_up_confirm_new_password);
+
+        AppCompatActivity activity = (AppCompatActivity)getActivity();
 
         countrySpinner = rootView.findViewById(R.id.sign_up_country);
         countrySpinner.setOnItemSelectedListener(this);
@@ -139,7 +169,7 @@ public class SignUpFragment extends Fragment implements OnItemSelectedListener, 
         // Make sure passwords are not empty, and are at least 8 characters long
         boolean passwordValid = !TextUtils.isEmpty(password) && password.length() >= 8;
 
-        String confirmPassword = newPasswordField.getText().toString();
+        String confirmPassword = confirmNewPasswordField.getText().toString();
         boolean passwordsMatch = password.equals(confirmPassword);
 
         Object selectedCountryItem = countrySpinner.getSelectedItem();

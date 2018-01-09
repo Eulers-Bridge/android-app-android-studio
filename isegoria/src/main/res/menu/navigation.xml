@@ -1,29 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="AlwaysShowAction">
+
+    <!-- Use `tools` namespace to tint and show icons on toolbar,
+    for easier previewing. -->
 
     <item
         android:id="@+id/navigation_feed"
         android:title="@string/navigation_feed"
-        android:icon="@drawable/feed" />
+        android:icon="@drawable/feed"
+        tools:showAsAction="always"
+        tools:iconTint="@color/white" />
 
     <item
         android:id="@+id/navigation_election"
         android:title="@string/navigation_election"
-        android:icon="@drawable/electionblue" />
+        android:icon="@drawable/electionblue"
+        tools:showAsAction="always"
+        tools:iconTint="@color/white"/>
 
     <item
         android:id="@+id/navigation_poll"
         android:title="@string/navigation_poll"
-        android:icon="@drawable/poll" />
+        android:icon="@drawable/poll_24dp"
+        tools:showAsAction="always"
+        tools:iconTint="@color/white"/>
 
     <item
         android:id="@+id/navigation_vote"
         android:title="@string/navigation_vote"
-        android:icon="@drawable/election"/>
+        android:icon="@drawable/election"
+        tools:showAsAction="always"
+        tools:iconTint="@color/white"/>
 
     <item
         android:id="@+id/navigation_profile"
         android:title="@string/navigation_profile"
-        android:icon="@drawable/profile"/>
+        android:icon="@drawable/account_circle_24dp"
+        tools:showAsAction="always"
+        tools:iconTint="@color/white"/>
 
 </menu>

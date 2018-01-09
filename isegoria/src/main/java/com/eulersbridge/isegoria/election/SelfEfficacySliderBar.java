@@ -60,13 +60,13 @@ public class SelfEfficacySliderBar extends BaseSliderBar {
         paints = new ArrayList<>();
 
         for (int i = 0; i < 4; i ++) {
-            Paint paint = new Paint();
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setColor(lineColours[i]);
             paint.setStrokeWidth(4);
             paints.add(paint);
         }
 
-        notchPaint = new Paint();
+        notchPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         notchPaint.setColor(ContextCompat.getColor(context, R.color.barBackground));
         notchPaint.setStrokeWidth(4);
     }

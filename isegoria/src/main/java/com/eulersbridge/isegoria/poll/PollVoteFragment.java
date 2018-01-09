@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria.poll;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,14 +12,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.common.Constant;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.models.Contact;
-import com.eulersbridge.isegoria.models.PollResult;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.models.Contact;
 import com.eulersbridge.isegoria.models.Poll;
 import com.eulersbridge.isegoria.models.PollOption;
+import com.eulersbridge.isegoria.models.PollResult;
 import com.eulersbridge.isegoria.network.API;
 import com.eulersbridge.isegoria.network.PollResultsResponse;
 import com.eulersbridge.isegoria.network.SimpleCallback;
@@ -65,8 +64,6 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
         adapter = new PollOptionAdapter(this);
 
         RecyclerView listView = rootView.findViewById(R.id.poll_fragment_list_view);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-        listView.setLayoutManager(layoutManager);
         listView.setAdapter(adapter);
 
         poll = Parcels.unwrap(getArguments().getParcelable(Constant.ACTIVITY_EXTRA_POLL));
@@ -106,7 +103,7 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
 	    if (creator != null) {
 	        GlideApp.with(this)
                     .load(creator.profilePhotoURL)
-                    .placeholder(R.color.grey)
+                    .placeholder(R.color.lightGrey)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(creatorImageView);
 
@@ -117,8 +114,8 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
 
     private void populatePollOptions() {
         if (poll != null && pollOptions != null) {
+            adapter.setLoading(false);
             adapter.replaceItems(pollOptions);
-            adapter.notifyDataSetChanged();
 
             adapter.setPollVotingEnabled(!poll.closed);
         }
