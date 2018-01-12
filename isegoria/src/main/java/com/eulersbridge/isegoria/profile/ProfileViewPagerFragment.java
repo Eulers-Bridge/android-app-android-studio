@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment;
+import com.eulersbridge.isegoria.profile.settings.SettingsActivity;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.common.TitledFragment;
 
 import java.util.ArrayList;
 
@@ -32,6 +35,8 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
         setHasOptionsMenu(true);
+
+        ProfileViewModel viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
 
         setupViewPager(rootView);
 
@@ -59,7 +64,7 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
 
             case R.id.profile_logout:
                 if (getActivity() != null) {
-                    ((Isegoria)getActivity().getApplication()).logOut();
+                    ((IsegoriaApp)getActivity().getApplication()).logOut();
                 }
                 return true;
 
@@ -75,7 +80,6 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
             final ArrayList<Fragment> fragmentList = new ArrayList<>();
 
             ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
-            profileOverviewFragment.setViewPager(viewPager);
 
             fragmentList.add(profileOverviewFragment);
             fragmentList.add(new ProfileTaskProgressFragment());

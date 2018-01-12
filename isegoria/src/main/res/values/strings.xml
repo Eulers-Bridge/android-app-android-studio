@@ -24,6 +24,7 @@
 
     <string name="user_login_button">Login</string>
     <string name="user_sign_up_button">Sign Up</string>
+    <string name="user_sign_up_title">Sign Up</string>
 
     <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
 

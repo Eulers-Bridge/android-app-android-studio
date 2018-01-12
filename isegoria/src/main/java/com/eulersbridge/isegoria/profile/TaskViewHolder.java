@@ -10,8 +10,8 @@ import android.widget.TextView;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.network.api.models.Task;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Task;
 
 class TaskViewHolder extends RecyclerView.ViewHolder {
 

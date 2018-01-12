@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
+import com.eulersbridge.isegoria.feed.events.EventsFragment;
+import com.eulersbridge.isegoria.feed.news.NewsFragment;
+import com.eulersbridge.isegoria.feed.photos.PhotosFragment;
 
 import java.util.ArrayList;
 

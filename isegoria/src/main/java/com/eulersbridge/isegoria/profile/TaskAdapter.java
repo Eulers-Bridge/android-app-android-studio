@@ -10,11 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.network.api.models.Task;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Task;
-import com.eulersbridge.isegoria.network.PhotosResponse;
-import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -70,16 +70,17 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         Fragment fragment = weakFragment.get();
 
         if (isValidFragment(fragment)) {
-            Isegoria isegoria = (Isegoria)fragment.getActivity().getApplication();
+            //noinspection ConstantConditions
+            IsegoriaApp isegoriaApp = (IsegoriaApp)fragment.getActivity().getApplication();
 
-            if (isegoria != null) {
+            if (isegoriaApp != null) {
                 int imageIndex = getImageIndex(fragment);
 
                 final long itemId = item.id;
 
                 WeakReference<TaskViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
 
-                isegoria.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
+                isegoriaApp.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
                     @Override
                     protected void handleResponse(Response<PhotosResponse> response) {
                         PhotosResponse body = response.body();

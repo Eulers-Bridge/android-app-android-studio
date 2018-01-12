@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.election;
 
 
 import android.animation.LayoutTransition;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,15 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Election;
-import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.common.Utils;
-
-import java.util.List;
-
-import retrofit2.Response;
+import com.eulersbridge.isegoria.network.api.models.Election;
+import com.eulersbridge.isegoria.util.Strings;
 
 public class ElectionOverviewFragment extends Fragment {
 
@@ -50,53 +45,37 @@ public class ElectionOverviewFragment extends Fragment {
                 .getLayoutTransition()
                 .enableTransitionType(LayoutTransition.CHANGING);
 
-        if (getActivity() != null) {
-            Isegoria isegoria = (Isegoria)getActivity().getApplication();
-
-            Long institutionId = isegoria.getLoggedInUser().institutionId;
-
-            if (institutionId != null) {
-                isegoria.getAPI().getElections(institutionId).enqueue(new SimpleCallback<List<Election>>() {
-                    @Override
-                    public void handleResponse(Response<List<Election>> response) {
-                        List<Election> elections = response.body();
-
-                        if (elections != null && elections.size() > 0)
-                            populateElectionText(elections.get(0));
-                    }
-                });
-            }
-        }
+        ElectionViewModel viewModel = ViewModelProviders.of(this).get(ElectionViewModel.class);
+        viewModel.getElection().observe(this, election -> {
+            if (election != null)
+                populateElectionText(election);
+        });
 
 		return rootView;
 	}
 
-    private void populateElectionText(Election election) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                electionTitle.setText(election.title);
-                electionDate.setText(Utils.convertTimestampToString(getContext(), election.startTimestamp));
+    private void populateElectionText(@NonNull Election election) {
+        electionTitle.setText(election.title);
+        electionDate.setText(Strings.fromTimestamp(getContext(), election.startTimestamp));
 
-                if (!TextUtils.isEmpty(election.introduction)) {
-                    electionIntroductionHeading.setVisibility(View.VISIBLE);
-                    electionIntroduction.setVisibility(View.VISIBLE);
-                    electionIntroduction.setText(election.introduction);
+        if (!TextUtils.isEmpty(election.introduction)) {
+            electionIntroductionHeading.setVisibility(View.VISIBLE);
+            electionIntroduction.setVisibility(View.VISIBLE);
+            electionIntroduction.setText(election.introduction);
 
-                } else {
-                    electionIntroductionHeading.setVisibility(View.GONE);
-                    electionIntroduction.setVisibility(View.GONE);
-                }
+        } else {
+            electionIntroductionHeading.setVisibility(View.GONE);
+            electionIntroduction.setVisibility(View.GONE);
+        }
 
-                if (!TextUtils.isEmpty(election.process)) {
-                    electionProcessHeading.setVisibility(View.VISIBLE);
-                    electionProcess.setVisibility(View.VISIBLE);
-                    electionProcess.setText(election.process);
+        if (!TextUtils.isEmpty(election.process)) {
+            electionProcessHeading.setVisibility(View.VISIBLE);
+            electionProcess.setVisibility(View.VISIBLE);
+            electionProcess.setText(election.process);
 
-                } else {
-                    electionProcessHeading.setVisibility(View.GONE);
-                    electionProcess.setVisibility(View.GONE);
-                }
-            });
+        } else {
+            electionProcessHeading.setVisibility(View.GONE);
+            electionProcess.setVisibility(View.GONE);
         }
     }
 }

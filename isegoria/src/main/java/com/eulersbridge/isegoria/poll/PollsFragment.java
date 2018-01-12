@@ -11,16 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.network.api.responses.PollsResponse;
+import com.eulersbridge.isegoria.network.api.models.Poll;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.Poll;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.network.PollsResponse;
-import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import org.parceler.Parcels;
 
@@ -47,8 +47,8 @@ public class PollsFragment extends Fragment implements TitledFragment, MainActiv
             // Ensure options menu from another fragment is not carried over
             getActivity().invalidateOptionsMenu();
 
-            Isegoria isegoria = (Isegoria)getActivity().getApplication();
-            getPolls(isegoria);
+            IsegoriaApp isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+            getPolls(isegoriaApp);
         }
 
         setupViewPager(rootView);
@@ -57,13 +57,13 @@ public class PollsFragment extends Fragment implements TitledFragment, MainActiv
 		return rootView;
 	}
 
-	private void getPolls(Isegoria isegoria) {
-        User user = isegoria.getLoggedInUser();
+	private void getPolls(IsegoriaApp isegoriaApp) {
+        User user = isegoriaApp.getLoggedInUser();
         if (user != null) {
-            Long institutionId = isegoria.getLoggedInUser().institutionId;
+            Long institutionId = isegoriaApp.getLoggedInUser().institutionId;
 
             if (institutionId != null) {
-                isegoria.getAPI().getPolls(institutionId).enqueue(new SimpleCallback<PollsResponse>() {
+                isegoriaApp.getAPI().getPolls(institutionId).enqueue(new SimpleCallback<PollsResponse>() {
                     @Override
                     protected void handleResponse(Response<PollsResponse> response) {
                         PollsResponse body = response.body();
@@ -148,7 +148,7 @@ public class PollsFragment extends Fragment implements TitledFragment, MainActiv
                     PollVoteFragment pollVoteFragment = new PollVoteFragment();
 
                     Bundle args = new Bundle();
-                    args.putParcelable(Constant.ACTIVITY_EXTRA_POLL, Parcels.wrap(poll));
+                    args.putParcelable(Constants.ACTIVITY_EXTRA_POLL, Parcels.wrap(poll));
 
                     pollVoteFragment.setArguments(args);
 

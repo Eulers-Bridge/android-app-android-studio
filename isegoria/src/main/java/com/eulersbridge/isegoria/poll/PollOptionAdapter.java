@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.LoadingAdapter;
-import com.eulersbridge.isegoria.models.PollOption;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
+import com.eulersbridge.isegoria.network.api.models.PollOption;
 
 public class PollOptionAdapter extends LoadingAdapter<PollOption, PollOptionViewHolder> implements PollOptionViewHolder.ClickListener {
 

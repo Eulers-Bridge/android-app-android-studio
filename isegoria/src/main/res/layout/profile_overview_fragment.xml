@@ -222,7 +222,7 @@
             app:layout_constraintTop_toBottomOf="@id/profile_friends_label" />
 
         <!-- Progress Circle 1 -->
-        <com.eulersbridge.isegoria.views.CircleProgressBar
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
             android:id="@+id/profile_experience_progress_circle"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -256,7 +256,7 @@
             app:layout_constraintTop_toBottomOf="@id/profile_experience_progress_circle" />
 
         <!-- Progress Circle 2 -->
-        <com.eulersbridge.isegoria.views.CircleProgressBar
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
             android:id="@+id/profile_badges_progress_circle"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -288,7 +288,7 @@
             app:layout_constraintTop_toBottomOf="@id/profile_badges_progress_circle" />
 
         <!-- Progress Circle 3 -->
-        <com.eulersbridge.isegoria.views.CircleProgressBar
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
             android:id="@+id/profile_tasks_progress_circle"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -320,7 +320,7 @@
             app:layout_constraintTop_toBottomOf="@id/profile_tasks_progress_circle" />
 
         <!-- Progress Circle 4 -->
-        <com.eulersbridge.isegoria.views.CircleProgressBar
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
             android:id="@+id/circularSeekBar4"
             android:layout_width="0dp"
             android:layout_height="0dp"

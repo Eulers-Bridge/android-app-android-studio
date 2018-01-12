@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.network;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
@@ -10,12 +11,19 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
-import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.Utils;
-import com.eulersbridge.isegoria.models.Institution;
-import com.eulersbridge.isegoria.models.SignUpUser;
-import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.auth.signup.SignUpUser;
+import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter;
+import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter;
+import com.eulersbridge.isegoria.network.adapters.TimestampAdapter;
+import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.ClientInstitution;
+import com.eulersbridge.isegoria.network.api.models.Institution;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
@@ -39,9 +47,14 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkService {
 
-    private String apiBaseURL = Constant.SERVER_URL;
+    private static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/";
 
-    private final Isegoria application;
+    private static final String S3_PICTURES_BUCKET_NAME = "isegoriauserpics";
+    private static final String S3_PICTURES_PATH = "https://s3.amazonaws.com/isegoriauserpics/";
+
+    private String apiBaseURL = SERVER_URL;
+
+    private final IsegoriaApp application;
 
     private final File cacheDirectory;
     private OkHttpClient httpClient;
@@ -53,7 +66,7 @@ public class NetworkService {
 
     private boolean needsSetup;
 
-    public NetworkService(Isegoria application) {
+    public NetworkService(@NonNull IsegoriaApp application) {
         this.application = application;
 
         cacheDirectory = new File(application.getCacheDir(), "network");
@@ -116,7 +129,7 @@ public class NetworkService {
                     Request.Builder request = chain.request().newBuilder()
                             .addHeader("Accept", "application/json")
                             .addHeader("Content-Type", "application/json")
-                            .addHeader("User-Agent", "Isegoria Android");
+                            .addHeader("User-Agent", "IsegoriaApp Android");
 
                     return chain.proceed(request.build());
                 })
@@ -158,7 +171,7 @@ public class NetworkService {
     }
 
     // Updates the base URL of the API by fetching the API root for the user's institution
-    private void updateAPIBaseURL(final User user) {
+    private void updateAPIBaseURL(@NonNull final User user) {
         if (user.institutionId == null) {
             finishedLogin(user);
             return;
@@ -203,19 +216,19 @@ public class NetworkService {
     }
 
     // Allow the rest of the first-launch actions to take place
-    private void finishedLogin(User user) {
+    private void finishedLogin(@NonNull User user) {
         application.setLoggedInUser(user, password);
 
         if (user.accountVerified) application.onLoginSuccess();
     }
 
-	public void login(String email, String password) {
+	public void login(@NonNull String email, @NonNull String password) {
         setEmail(email);
         setPassword(password);
 
         setup();
 
-        String snsPlatformArn = Constant.SNS_PLATFORM_APPLICATION_ARN;
+        String snsPlatformArn = Constants.SNS_PLATFORM_APPLICATION_ARN;
         String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
         api.attemptLogin(snsPlatformArn, deviceToken).enqueue(new Callback<LoginResponse>() {
@@ -235,7 +248,8 @@ public class NetworkService {
 
                         userAccountVerified = user.accountVerified;
 
-                        if (userAccountVerified) updateAPIBaseURL(user);
+                        if (userAccountVerified)
+                            updateAPIBaseURL(user);
                     }
                 }
 
@@ -243,7 +257,7 @@ public class NetworkService {
                     application.onLoginFailure();
 
                 } else if (!userAccountVerified) {
-                    application.setVerification();
+                    application.showVerification();
                 }
             }
 
@@ -256,7 +270,7 @@ public class NetworkService {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean signUp(SignUpUser user) {
+    public boolean signUp(@NonNull SignUpUser user) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)
@@ -272,11 +286,11 @@ public class NetworkService {
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(Constant.SERVER_URL + "signUp")
+                .url(SERVER_URL + "signUp")
                 .method("POST", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
-                .addHeader("User-Agent", "Isegoria Android")
+                .addHeader("User-Agent", "IsegoriaApp Android")
                 .post(requestBody)
                 .build();
 
@@ -289,6 +303,7 @@ public class NetworkService {
             Response response = httpClient.newCall(request).execute();
 
             if (response.isSuccessful() && response.body() != null) {
+                //noinspection ConstantConditions
                 String bodyString = response.body().toString();
                 success = (bodyString != null && bodyString.contains(email));
             }
@@ -301,7 +316,7 @@ public class NetworkService {
         return success;
     }
 
-    public void s3Upload(File imageFile) {
+    public void s3Upload(@NonNull File imageFile) {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 application.getApplicationContext(), // Context,
                 "715927704730",
@@ -318,8 +333,7 @@ public class NetworkService {
                 .context(application.getApplicationContext())
                 .build();
 
-        String path = imageFile.getPath();
-        int dotIndex = path.lastIndexOf('.');
+        int dotIndex = imageFile.getPath().lastIndexOf('.');
 
         String imageFileExtension = null;
 
@@ -331,12 +345,12 @@ public class NetworkService {
 
         String key = String.format("%s.%s", UUID.randomUUID().toString(), imageFileExtension);
 
-        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, key, imageFile);
+        TransferObserver observer = transferUtility.upload(S3_PICTURES_BUCKET_NAME, key, imageFile);
         observer.setTransferListener(new TransferListener() {
             @Override
             public void onStateChanged(int id, TransferState state) {
                 if (state == TransferState.COMPLETED)
-                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + key);
+                    updateDisplayPicturePhoto(S3_PICTURES_PATH + key);
             }
 
             @Override
@@ -349,11 +363,10 @@ public class NetworkService {
         });
     }
 
-    private void updateDisplayPicturePhoto(String pictureURL) {
+    private void updateDisplayPicturePhoto(@NonNull String pictureURL) {
         setup();
 
         long timestamp = System.currentTimeMillis() / 1000L;
-
         User loggedInUser = application.getLoggedInUser();
 
         RequestBody requestBody = new MultipartBody.Builder()
@@ -372,7 +385,7 @@ public class NetworkService {
                 .method("PUT", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
-                .addHeader("User-Agent", "Isegoria Android")
+                .addHeader("User-Agent", "IsegoriaApp Android")
                 .post(requestBody)
                 .build();
 

@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -17,20 +18,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.Task;
-import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.network.api.models.Task;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-import retrofit2.Response;
-
 public class ProfileTaskProgressFragment extends Fragment implements TitledFragment {
-
-    private Isegoria isegoria;
 
     private View rootView;
 
@@ -39,13 +34,16 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
     private RecyclerView remainingListView;
 
+    private ProfileViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.profile_task_progress_fragment, container, false);
 
+        //noinspection ConstantConditions
+        viewModel = ViewModelProviders.of(getParentFragment()).get(ProfileViewModel.class);
+
         ProgressBar progressBar = rootView.findViewById(R.id.profile_tasks_progress_bar);
-        progressBar.setProgress(50);
-        progressBar.setMax(1000);
         progressBar.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
         RecyclerView completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
@@ -54,32 +52,20 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
         remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
         remainingListView.setAdapter(remainingAdapter);
 
-        if (getActivity() != null) {
-            isegoria = (Isegoria) getActivity().getApplication();
-
-            fetchTasks();
-        }
+        fetchTasks();
 
         return rootView;
     }
 
     private void fetchTasks() {
-        long userId = isegoria.getLoggedInUser().getId();
-
-        isegoria.getAPI().getRemainingTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
-            @Override
-            protected void handleResponse(Response<List<Task>> response) {
-                List<Task> tasks = response.body();
-                if (tasks != null) setRemainingTasks(tasks);
-            }
+        viewModel.getRemainingTasks().observe(this, remainingTasks -> {
+            if (remainingTasks != null)
+                setRemainingTasks(remainingTasks);
         });
 
-        isegoria.getAPI().getCompletedTasks(userId).enqueue(new SimpleCallback<List<Task>>() {
-            @Override
-            protected void handleResponse(Response<List<Task>> response) {
-                List<Task> tasks = response.body();
-                if (tasks != null) setCompletedTasks(tasks);
-            }
+        viewModel.getCompletedTasks().observe(this, completedTasks -> {
+            if (completedTasks != null)
+                setCompletedTasks(completedTasks);
         });
     }
 
@@ -109,30 +95,29 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
                 int level = ((int)totalXp / 1000) + 1;
 
+                taskLevelField.setText(getString(R.string.profile_tasks_progress_level, level));
+
                 int nextLevelPoints = (int) totalXp + 500;
                 nextLevelPoints = nextLevelPoints / 1000;
                 nextLevelPoints = nextLevelPoints * 1000;
 
                 if (nextLevelPoints == 0) nextLevelPoints = 1000;
 
-                taskLevelField.setText(getString(R.string.profile_tasks_progress_level, level));
                 taskLevelDesc.setText(getString(R.string.profile_tasks_progress_description, totalXp, nextLevelPoints));
             });
         }
     }
 
     private void setCompletedTasks(@NonNull List<Task> completedTasks) {
-        if (getActivity() != null) {
-            completedAdapter.replaceItems(completedTasks);
+        completedAdapter.replaceItems(completedTasks);
 
-            long totalXp = 0;
+        long totalXp = 0;
 
-            for (Task task : completedTasks) {
-                totalXp += task.xpValue;
-            }
-
-            setLevel(totalXp);
+        for (Task task : completedTasks) {
+            totalXp += task.xpValue;
         }
+
+        setLevel(totalXp);
     }
 
     private void setRemainingTasks(@NonNull List<Task> remainingTasks) {

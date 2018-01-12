@@ -12,12 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.eulersbridge.isegoria.Isegoria;
+import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.models.VoteReminder;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.models.VoteReminder;
-import com.eulersbridge.isegoria.network.SimpleCallback;
 
 import java.util.List;
 
@@ -44,13 +44,13 @@ public class VoteDoneFragment extends Fragment implements TitledFragment {
     private void fetchReminders() {
         if (getActivity() == null) return;
 
-        Isegoria isegoria = (Isegoria)getActivity().getApplication();
+        IsegoriaApp isegoriaApp = (IsegoriaApp)getActivity().getApplication();
 
-        if (isegoria != null) {
-            User user = isegoria.getLoggedInUser();
+        if (isegoriaApp != null) {
+            User user = isegoriaApp.getLoggedInUser();
 
             if (user != null && !TextUtils.isEmpty(user.email)) {
-                isegoria.getAPI().getVoteReminders(user.email).enqueue(new SimpleCallback<List<VoteReminder>>() {
+                isegoriaApp.getAPI().getVoteReminders(user.email).enqueue(new SimpleCallback<List<VoteReminder>>() {
                     @Override
                     protected void handleResponse(Response<List<VoteReminder>> response) {
                         List<VoteReminder> reminders = response.body();

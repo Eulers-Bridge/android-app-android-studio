@@ -4,7 +4,6 @@ package com.eulersbridge.isegoria;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutManager;
@@ -27,27 +26,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.eulersbridge.isegoria.auth.ConsentAgreementFragment;
-import com.eulersbridge.isegoria.auth.EmailVerificationFragment;
-import com.eulersbridge.isegoria.auth.LoginFragment;
-import com.eulersbridge.isegoria.auth.PersonalityQuestionsActivity;
-import com.eulersbridge.isegoria.auth.SignUpFragment;
-import com.eulersbridge.isegoria.common.BlurTransformation;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.RoundedCornersTransformation;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.Utils;
+import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment;
+import com.eulersbridge.isegoria.auth.login.LoginFragment;
+import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment;
+import com.eulersbridge.isegoria.auth.signup.SignUpFragment;
+import com.eulersbridge.isegoria.auth.signup.SignUpUser;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
-import com.eulersbridge.isegoria.models.Country;
-import com.eulersbridge.isegoria.models.Institution;
-import com.eulersbridge.isegoria.models.SignUpUser;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.network.GeneralInfoResponse;
-import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.network.api.models.Country;
+import com.eulersbridge.isegoria.network.api.models.Institution;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse;
+import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.poll.PollsFragment;
-import com.eulersbridge.isegoria.profile.FriendsFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
+import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
+import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.google.firebase.FirebaseApp;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
@@ -68,8 +66,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 	private Deque<Fragment> tabFragments;
-	private Isegoria application;
-	public ProgressDialog dialog;
+	private IsegoriaApp application;
 
 	private CoordinatorLayout coordinatorLayout;
 
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
 
 		setContentView(R.layout.main_activity);
 
-		application = (Isegoria) getApplicationContext();
+		application = (IsegoriaApp) getApplicationContext();
 		application.setMainActivity(this);
 
 		setupNotificationChannels();
@@ -101,9 +98,9 @@ public class MainActivity extends AppCompatActivity implements
         RoundedCornersTransformation.screenDensity = screenDensity;
 
 		String userEmail = new SecurePreferences(this)
-                .getString(Constant.USER_EMAIL_KEY, null);
+                .getString(Constants.USER_EMAIL_KEY, null);
 		String userPassword = new SecurePreferences(this)
-                .getString(Constant.USER_PASSWORD_KEY, null);
+                .getString(Constants.USER_PASSWORD_KEY, null);
 
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
@@ -142,12 +139,12 @@ public class MainActivity extends AppCompatActivity implements
                 String action = getIntent().getAction();
                 if (action != null) {
                     switch (action) {
-                        case Constant.SHORTCUT_ACTION_ELECTION:
+                        case Constants.SHORTCUT_ACTION_ELECTION:
                             showElection();
                             handledShortcut = true;
                             break;
 
-                        case Constant.SHORTCUT_ACTION_FRIENDS:
+                        case Constants.SHORTCUT_ACTION_FRIENDS:
                             showFriends();
                             handledShortcut = true;
                             break;
@@ -170,9 +167,9 @@ public class MainActivity extends AppCompatActivity implements
 
 		    //Build a simple map of channel names (Strings) to their importance level (Integer)
 			HashMap<String, Integer> channels = new HashMap<>();
-			channels.put(Constant.NOTIFICATION_CHANNEL_FRIENDS,
+			channels.put(Constants.NOTIFICATION_CHANNEL_FRIENDS,
                     NotificationManager.IMPORTANCE_DEFAULT);
-			channels.put(Constant.NOTIFICATION_CHANNEL_VOTE_REMINDERS,
+			channels.put(Constants.NOTIFICATION_CHANNEL_VOTE_REMINDERS,
                     NotificationManager.IMPORTANCE_DEFAULT);
 
 			NotificationManager notificationManager =
@@ -185,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements
 			     */
 				for (Map.Entry<String, Integer> entry : channels.entrySet()) {
 					String channelName = entry.getKey();
-					String channelId = Utils.notificationChannelIDFromName(channelName);
+					String channelId = Strings.notificationChannelIDFromName(channelName);
 					int importance = entry.getValue();
 
 					NotificationChannel notificationChannel =
@@ -219,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements
 	        getSupportActionBar().setDisplayShowTitleEnabled(visible);
 	}
 
-	public void setToolbarTitle(String title) {
+	private void setToolbarTitle(String title) {
 	    if (getSupportActionBar() != null)
 	        getSupportActionBar().setTitle(title);
 	}
@@ -276,11 +273,7 @@ public class MainActivity extends AppCompatActivity implements
 		return true;
 	}
 
-	public TabLayout getTabLayout() {
-		return tabLayout;
-	}
-
-	private @Nullable Fragment getCurrentFragment() {
+    private @Nullable Fragment getCurrentFragment() {
 	    return tabFragments.size() == 0? null : tabFragments.peekFirst();
     }
 
@@ -304,8 +297,7 @@ public class MainActivity extends AppCompatActivity implements
         presentRootContent(new LoginFragment());
 	}
 
-	public void setVerification() {
-	    hideDialog();
+	public void showVerification() {
 	    presentRootContent(new EmailVerificationFragment());
     }
 
@@ -354,10 +346,6 @@ public class MainActivity extends AppCompatActivity implements
 
 		return true;
 	}
-	
-	public Isegoria getIsegoriaApplication() {
-		return application;
-	}
 
 	// When the Sign Up button in the launch screen is tapped
 	public void onSignUpClicked() {
@@ -386,8 +374,6 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	public void onLoginSuccess(User loggedInUser) {
-        hideDialog();
-
         setToolbarVisible(true);
         navigationView.setVisibility(View.VISIBLE);
         navigationView.setEnabled(true);
@@ -399,18 +385,12 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(new Intent(this, PersonalityQuestionsActivity.class));
     }
 	
-	private void hideDialog() {
-		if (dialog != null) dialog.dismiss();
-	}
-	
 	public void onLoginFailure() {
 	    runOnUiThread(() -> {
             setViewEnabled(R.id.login_email, true);
             setViewEnabled(R.id.login_password, true);
             setViewEnabled(R.id.login_button, true);
             setViewEnabled(R.id.login_signup_button, true);
-
-            hideDialog();
 
             Fragment currentFragment = getCurrentFragment();
 
@@ -427,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements
 
             Snackbar.make(findViewById(R.id.coordinator_layout),
                     getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
-                    .setDuration(Constant.SNACKBAR_LENGTH_EXTENDED)
+                    .setDuration(6500) // Longer duration than Snackbar's default LENGTH_LONG
                     .show();
         });
     }
