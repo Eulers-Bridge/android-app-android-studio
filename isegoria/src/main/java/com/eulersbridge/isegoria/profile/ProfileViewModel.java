@@ -19,28 +19,48 @@ import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileViewModel extends AndroidViewModel {
 
+    final MutableLiveData<Integer> currentSectionIndex = new MutableLiveData<>();
+
     final MutableLiveData<GenericUser> user = new MutableLiveData<>();
+    private final MutableLiveData<Integer> targetBadgeLevel = new MutableLiveData<>();
 
     private LiveData<List<Badge>> remainingBadges;
     private LiveData<List<Badge>> completedBadges;
 
-    private LiveData<Institution> institution;
+    private LiveData<String> institutionName;
 
     private LiveData<List<Task>> tasks;
     private LiveData<List<Task>> remainingTasks;
     private LiveData<List<Task>> completedTasks;
+    final MutableLiveData<Long> totalXp = new MutableLiveData<>();
 
     private LiveData<Photo> userPhoto;
 
     public ProfileViewModel(@NonNull Application application) {
         super(application);
 
+        currentSectionIndex.setValue(0);
+        targetBadgeLevel.setValue(0);
+
         IsegoriaApp isegoriaApp = (IsegoriaApp)application;
         user.setValue(isegoriaApp.getLoggedInUser());
+    }
+
+    public void setTargetBadgeLevel(int targetBadgeLevel) {
+        this.targetBadgeLevel.setValue(targetBadgeLevel);
+    }
+
+    void onSectionIndexChanged(int newIndex) {
+        currentSectionIndex.setValue(newIndex);
+    }
+
+    void showTasksProgress() {
+        currentSectionIndex.setValue(1);
     }
 
     void logOut() {
@@ -61,49 +81,99 @@ public class ProfileViewModel extends AndroidViewModel {
         }
     }
 
-    public LiveData<List<Badge>> getRemainingBadges() {
+    /**
+     * @return A list of the badges the user has yet to complete, regardless of the badges'
+     * or the user's level.
+     */
+    LiveData<List<Badge>> getRemainingBadges() {
+        return getRemainingBadges(false);
+    }
+
+    /**
+     * @param limitToLevel Whether to only include badges matching the user's target level.
+     * @return A list of the badges the user has yet to complete, optionally filtered
+     * by the user's target level.
+     */
+    public LiveData<List<Badge>> getRemainingBadges(boolean limitToLevel) {
         if (remainingBadges == null) {
             IsegoriaApp isegoriaApp = getApplication();
 
             User user = getUser();
-            if (user != null) {
+            if (user != null)
                 remainingBadges = new RetrofitLiveData<>(isegoriaApp.getAPI().getRemainingBadges(user.getId()));
-            } else {
-                return new FixedData<>(null);
-            }
         }
 
-        return remainingBadges;
+        if (limitToLevel)
+            return Transformations.switchMap(remainingBadges, badges -> {
+                if (badges != null) {
+                    List<Badge> filteredBadges = new ArrayList<>();
+
+                    for (Badge badge : badges) {
+                        // Target badge level initialised in constructor.
+                        //noinspection ConstantConditions
+                        if (badge.level == targetBadgeLevel.getValue())
+                            filteredBadges.add(badge);
+                    }
+
+                    return new FixedData<>(filteredBadges);
+                }
+
+                return new FixedData<>(null);
+            });
+
+        return new FixedData<>(null);
     }
 
+    /**
+     * @return A list of the user's completed badges, *filtered by those matching their target
+     * badge level*.
+     */
     public LiveData<List<Badge>> getCompletedBadges() {
         if (completedBadges == null) {
             IsegoriaApp isegoriaApp = getApplication();
 
             User user = getUser();
-            if (user != null) {
+            if (user != null)
                 completedBadges = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedBadges(user.getId()));
-            } else {
-                return new FixedData<>(null);
-            }
         }
 
-        return completedBadges;
+        return Transformations.switchMap(completedBadges, badges -> {
+            if (badges != null) {
+                List<Badge> filteredBadges = new ArrayList<>();
+
+                for (Badge badge : badges) {
+                    // Target badge level initialised in constructor.
+                    //noinspection ConstantConditions
+                    if (badge.level == targetBadgeLevel.getValue())
+                        filteredBadges.add(badge);
+                }
+
+                return new FixedData<>(filteredBadges);
+            }
+
+            return new FixedData<>(null);
+        });
     }
 
-    LiveData<Institution> getInstitution() {
-        if (institution == null) {
+    LiveData<String> getInstitutionName() {
+        if (institutionName == null) {
             IsegoriaApp isegoriaApp = getApplication();
 
             User user = getUser();
             if (user != null && user.institutionId != null) {
-                institution = new RetrofitLiveData<>(isegoriaApp.getAPI().getInstitution(user.institutionId));
+
+                LiveData<Institution> institutionRequest
+                        = new RetrofitLiveData<>(isegoriaApp.getAPI().getInstitution(user.institutionId));
+
+                institutionName = Transformations.switchMap(institutionRequest, institution ->
+                        new FixedData<>(institution == null? null : institution.getName()));
+
             } else {
                 return new FixedData<>(null);
             }
         }
 
-        return institution;
+        return institutionName;
     }
 
     LiveData<List<Task>> getTasks() {
@@ -126,10 +196,25 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     LiveData<List<Task>> getCompletedTasks() {
-        if (completedTasks == null) {
+        if (completedTasks == null || completedTasks.getValue() == null) {
             IsegoriaApp isegoriaApp = getApplication();
             User user = isegoriaApp.getLoggedInUser();
-            completedTasks = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedTasks(user.getId()));
+
+            LiveData<List<Task>> tasksRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedTasks(user.getId()));
+
+            completedTasks = Transformations.switchMap(tasksRequest, tasksList -> {
+                if (tasksList != null) {
+                    long newTotalXp = 0;
+
+                    for (Task task : tasksList) {
+                        newTotalXp += task.xpValue;
+                    }
+
+                    totalXp.setValue(newTotalXp);
+                }
+
+                return new FixedData<>(tasksList);
+            });
         }
 
         return completedTasks;
@@ -164,7 +249,7 @@ public class ProfileViewModel extends AndroidViewModel {
     protected void onCleared() {
         cancelIfPossible(remainingBadges);
         cancelIfPossible(completedBadges);
-        cancelIfPossible(institution);
+        cancelIfPossible(institutionName);
         cancelIfPossible(tasks);
         cancelIfPossible(remainingTasks);
         cancelIfPossible(completedTasks);

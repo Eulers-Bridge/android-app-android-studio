@@ -59,17 +59,17 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_overview_fragment, container, false);
 
-        View.OnClickListener friendsClickListener = view -> {
-            if (getActivity() != null)
-                ((MainActivity)getActivity()).showFriends();
-        };
-
         photoImageView = rootView.findViewById(R.id.profile_image_small);
         backgroundImageView = rootView.findViewById(R.id.profile_image_background);
 
         nameTextView = rootView.findViewById(R.id.profile_name);
         institutionTextView = rootView.findViewById(R.id.profile_institution);
         personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
+
+        View.OnClickListener friendsClickListener = view -> {
+            if (getActivity() != null)
+                ((MainActivity)getActivity()).showFriends();
+        };
 
         friendsNumTextView = rootView.findViewById(R.id.profile_friends_num);
         friendsNumTextView.setOnClickListener(friendsClickListener);
@@ -80,6 +80,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         rewardsNumTextView = rootView.findViewById(R.id.profile_rewards_num);
 
         TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
+        showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
 
         experienceProgressCircle = rootView.findViewById(R.id.profile_experience_progress_circle);
         badgesProgressCircle = rootView.findViewById(R.id.profile_badges_progress_circle);
@@ -129,9 +130,9 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
                             .into(backgroundImageView);
             });
 
-            viewModel.getInstitution().observe(this, institution -> {
-                if (institution != null)
-                    institutionTextView.setText(institution.getName());
+            viewModel.getInstitutionName().observe(this, institutionName -> {
+                if (institutionName != null)
+                    institutionTextView.setText(institutionName);
             });
 
             viewModel.getRemainingBadges().observe(this, remainingBadges -> {

@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
@@ -32,6 +33,8 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
     private final TaskAdapter completedAdapter = new TaskAdapter(this);
     private final TaskAdapter remainingAdapter = new TaskAdapter(this);
 
+    private ProgressBar progressBar;
+
     private RecyclerView remainingListView;
 
     private ProfileViewModel viewModel;
@@ -43,7 +46,13 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
         //noinspection ConstantConditions
         viewModel = ViewModelProviders.of(getParentFragment()).get(ProfileViewModel.class);
 
-        ProgressBar progressBar = rootView.findViewById(R.id.profile_tasks_progress_bar);
+        viewModel.totalXp.observe(this, totalXp -> {
+            if (totalXp != null) {
+                setLevel(totalXp);
+            }
+        });
+
+        progressBar = rootView.findViewById(R.id.profile_tasks_progress_bar);
         progressBar.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
         RecyclerView completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
@@ -65,7 +74,7 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
         viewModel.getCompletedTasks().observe(this, completedTasks -> {
             if (completedTasks != null)
-                setCompletedTasks(completedTasks);
+                completedAdapter.replaceItems(completedTasks);
         });
     }
 
@@ -103,21 +112,17 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
                 if (nextLevelPoints == 0) nextLevelPoints = 1000;
 
+                progressBar.setMax(nextLevelPoints);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    progressBar.setProgress((int)totalXp, true);
+                } else {
+                    progressBar.setProgress((int)totalXp);
+                }
+
                 taskLevelDesc.setText(getString(R.string.profile_tasks_progress_description, totalXp, nextLevelPoints));
             });
         }
-    }
-
-    private void setCompletedTasks(@NonNull List<Task> completedTasks) {
-        completedAdapter.replaceItems(completedTasks);
-
-        long totalXp = 0;
-
-        for (Task task : completedTasks) {
-            totalXp += task.xpValue;
-        }
-
-        setLevel(totalXp);
     }
 
     private void setRemainingTasks(@NonNull List<Task> remainingTasks) {

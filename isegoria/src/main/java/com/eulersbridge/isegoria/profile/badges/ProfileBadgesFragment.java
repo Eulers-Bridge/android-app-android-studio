@@ -13,18 +13,12 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.network.api.models.Badge;
 import com.eulersbridge.isegoria.profile.ProfileViewModel;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ProfileBadgesFragment extends Fragment implements TitledFragment {
 
-    private ProfileViewModel profileViewModel;
-
-    private int targetBadgeLevel = 0;
+    private ProfileViewModel viewModel;
 
     private final BadgeAdapter badgeAdapter = new BadgeAdapter(this);
 
@@ -33,12 +27,13 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
         View rootView = inflater.inflate(R.layout.profile_badges_fragment, container, false);
 
         //noinspection ConstantConditions
-        profileViewModel = ViewModelProviders.of(getParentFragment()).get(ProfileViewModel.class);
+        viewModel = ViewModelProviders.of(getParentFragment()).get(ProfileViewModel.class);
 
         Bundle bundle = getArguments();
         if (bundle != null)
-            targetBadgeLevel = bundle.getInt("level");
+            viewModel.setTargetBadgeLevel(bundle.getInt("level"));
 
+        //noinspection ConstantConditions
         Glide.get(getContext()).setMemoryCategory(MemoryCategory.HIGH);
 
         RecyclerView badgesGridView = rootView.findViewById(R.id.profile_badges_grid_view);
@@ -53,14 +48,14 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     }
 
     private void getBadges() {
-        profileViewModel.getRemainingBadges().observe(this, remainingBadges -> {
+        viewModel.getRemainingBadges(true).observe(this, remainingBadges -> {
             if (remainingBadges != null)
-                addRemainingBadges(remainingBadges);
+                badgeAdapter.replaceRemainingItems(remainingBadges);
         });
 
-        profileViewModel.getCompletedBadges().observe(this, completedBadges -> {
+        viewModel.getCompletedBadges().observe(this, completedBadges -> {
             if (completedBadges != null)
-                addCompletedBadges(completedBadges);
+                badgeAdapter.replaceCompletedItems(completedBadges);
         });
     }
 
@@ -68,31 +63,8 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     public void onDetach() {
         super.onDetach();
 
-        Glide.get(getContext()).setMemoryCategory(MemoryCategory.NORMAL);
-    }
-
-    private void addRemainingBadges(@NonNull List<Badge> badges) {
-        List<Badge> remainingBadges = new ArrayList<>();
-
-        for (Badge badge : badges) {
-            if (badge.level == targetBadgeLevel) {
-                remainingBadges.add(badge);
-            }
-        }
-
-        badgeAdapter.replaceRemainingItems(remainingBadges);
-    }
-
-    private void addCompletedBadges(@NonNull List<Badge> badges) {
-        List<Badge> completedBadges = new ArrayList<>();
-
-        for (Badge badge : badges) {
-            if (badge.level == targetBadgeLevel) {
-                completedBadges.add(badge);
-            }
-        }
-
-        badgeAdapter.replaceCompletedItems(completedBadges);
+        if (getContext() != null)
+            Glide.get(getContext()).setMemoryCategory(MemoryCategory.NORMAL);
     }
 
     @Override

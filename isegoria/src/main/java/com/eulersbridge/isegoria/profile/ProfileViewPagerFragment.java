@@ -38,11 +38,57 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
 
         setHasOptionsMenu(true);
 
-        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-
         setupViewPager(rootView);
 
+        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        viewModel.currentSectionIndex.observe(this, index -> {
+            if (index != null && viewPager.getCurrentItem() != index)
+                viewPager.setCurrentItem(index);
+        });
+
         return rootView;
+    }
+
+    private void setupViewPager(@NonNull View rootView) {
+        if (viewPager == null) {
+            viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
+
+            final ArrayList<Fragment> fragmentList = new ArrayList<>();
+            fragmentList.add(new ProfileOverviewFragment());
+            fragmentList.add(new ProfileTaskProgressFragment());
+            fragmentList.add(new ProfileBadgesFragment());
+
+            final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
+                @Override
+                public CharSequence getPageTitle(int position) {
+                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
+                    if (fragment != null) {
+                        return fragment.getTitle(getContext());
+
+                    } else {
+                        return null;
+                    }
+                }
+            };
+
+            viewPager.setAdapter(pagerAdapter);
+            viewPager.setOffscreenPageLimit(3);
+            viewPager.setCurrentItem(0);
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    viewModel.onSectionIndexChanged(position);
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                }
+            });
+        }
     }
 
     @Override
@@ -77,37 +123,6 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void setupViewPager(@NonNull View rootView) {
-        if (viewPager == null) {
-            viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
-
-            final ArrayList<Fragment> fragmentList = new ArrayList<>();
-
-            ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
-
-            fragmentList.add(profileOverviewFragment);
-            fragmentList.add(new ProfileTaskProgressFragment());
-            fragmentList.add(new ProfileBadgesFragment());
-
-            final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
-                @Override
-                public CharSequence getPageTitle(int position) {
-                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
-                    if (fragment != null) {
-                        return fragment.getTitle(getContext());
-
-                    } else {
-                        return null;
-                    }
-                }
-            };
-
-            viewPager.setAdapter(pagerAdapter);
-            viewPager.setOffscreenPageLimit(3);
-            viewPager.setCurrentItem(0);
         }
     }
 

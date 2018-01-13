@@ -211,5 +211,6 @@
     <string name="image_crop_title">Crop Image</string>
 
     <string name="log_out_confirmation_title">Are you sure?</string>
+    <string name="login_forgot_password_hint">Forgot password?</string>
 
 </resources>
