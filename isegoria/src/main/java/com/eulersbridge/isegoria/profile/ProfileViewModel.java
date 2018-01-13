@@ -43,6 +43,11 @@ public class ProfileViewModel extends AndroidViewModel {
         user.setValue(isegoriaApp.getLoggedInUser());
     }
 
+    void logOut() {
+        IsegoriaApp isegoriaApp = getApplication();
+        isegoriaApp.logOut();
+    }
+
     void setUser(GenericUser user) {
         this.user.setValue(user);
     }

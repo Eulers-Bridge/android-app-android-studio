@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,13 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment;
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity;
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
-import com.eulersbridge.isegoria.R;
 
 import java.util.ArrayList;
 
@@ -30,13 +30,15 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private ProfileViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
         setHasOptionsMenu(true);
 
-        ProfileViewModel viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
 
         setupViewPager(rootView);
 
@@ -63,9 +65,14 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
                 return true;
 
             case R.id.profile_logout:
-                if (getActivity() != null) {
-                    ((IsegoriaApp)getActivity().getApplication()).logOut();
-                }
+                if (getContext() != null)
+                     new AlertDialog.Builder(getContext())
+                             .setTitle(R.string.log_out_confirmation_title)
+                             .setPositiveButton(android.R.string.yes,
+                                     (dialogInterface, choice) -> viewModel.logOut())
+                             .setNegativeButton(android.R.string.no, null)
+                             .show();
+
                 return true;
 
             default:

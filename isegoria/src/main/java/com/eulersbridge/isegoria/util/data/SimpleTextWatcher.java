@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.auth.signup;
+package com.eulersbridge.isegoria.util.data;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -7,11 +7,11 @@ import android.text.TextWatcher;
  * Convenience wrapper for TextWatcher, to avoid having to define an anonymous class
  * overriding all three methods (before../on../after..) when only one is used.
  */
-class SimpleTextWatcher implements TextWatcher {
+public class SimpleTextWatcher implements TextWatcher {
 
     private final Consumer<CharSequence> callbackConsumer;
 
-    SimpleTextWatcher(Consumer<CharSequence> callbackConsumer) {
+    public SimpleTextWatcher(Consumer<CharSequence> callbackConsumer) {
         this.callbackConsumer = callbackConsumer;
     }
 

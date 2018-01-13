@@ -7,17 +7,19 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -28,6 +30,7 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.util.data.SimpleTextWatcher;
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
@@ -76,37 +79,15 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
                 });
 
         emailField = rootView.findViewById(R.id.login_email);
-        emailField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                viewModel.setEmail(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        emailField.addTextChangedListener(new SimpleTextWatcher(value ->
+            viewModel.setEmail(value.toString())
+        ));
         emailLayout = rootView.findViewById(R.id.login_email_layout);
 
         passwordField = rootView.findViewById(R.id.login_password);
-        passwordField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                viewModel.setPassword(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
+        passwordField.addTextChangedListener(new SimpleTextWatcher(value ->
+            viewModel.setPassword(value.toString())
+        ));
         passwordLayout = rootView.findViewById(R.id.login_password_layout);
 
         loginButton = rootView.findViewById(R.id.login_button);
@@ -114,11 +95,46 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
 
         signUpButton = rootView.findViewById(R.id.login_signup_button);
 
+        TextView forgotPasswordView = rootView.findViewById(R.id.login_forgot_password);
+        forgotPasswordView.setOnClickListener(view -> showForgotPasswordDialog());
+
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         setupViewModelObservers();
 		
 		return rootView;
 	}
+
+	private void showForgotPasswordDialog() {
+	    Boolean canContinue = viewModel.canShowPasswordResetDialog.getValue();
+	    if (canContinue != null && !canContinue) return;
+
+	    View alertView = getLayoutInflater().inflate(R.layout.alert_dialog_input_forgot_password, null);
+        final EditText alertEmailInput = alertView.findViewById(R.id.alert_dialog_email_address_input);
+
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.forgot_password_title)
+                .setMessage(R.string.forgot_password_message)
+                .setView(R.layout.alert_dialog_input_forgot_password)
+                .setPositiveButton(android.R.string.ok,
+                        (dialog, choice) -> resetPassword(alertEmailInput.getText()))
+                .setNegativeButton(android.R.string.cancel, (dialog, __) -> dialog.cancel())
+                .show();
+    }
+
+    private void resetPassword(Editable editable) {
+        String forgottenAccountEmail = editable.toString();
+
+        boolean validEmail = viewModel.requestPasswordRecoveryEmail(forgottenAccountEmail);
+
+        if (validEmail) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            if (mainActivity != null) {
+                CoordinatorLayout coordinatorLayout = mainActivity.getCoordinatorLayout();
+                String message = getString(R.string.forgot_password_email_sent, forgottenAccountEmail);
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
+            }
+        }
+    }
 
 	private void setupViewModelObservers() {
         String email = viewModel.email.getValue();

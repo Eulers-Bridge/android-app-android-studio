@@ -1,13 +1,17 @@
 package com.eulersbridge.isegoria.util.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Outline;
 import android.graphics.Paint;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewOutlineProvider;
 
 import com.eulersbridge.isegoria.R;
 
@@ -39,6 +43,22 @@ public class BaseSliderBar extends View {
         super(context, attrs);
 
         setupPaints();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setOutlineProvider(new ViewOutlineProvider() {
+                @SuppressLint("NewApi")
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    final int x = getCircleX();
+                    outline.setOval(
+                            x - circleRadius,
+                            y - circleRadius,
+                            x + circleRadius,
+                            y + circleRadius
+                    );
+                }
+            });
+        }
     }
 
     @Override
@@ -91,6 +111,14 @@ public class BaseSliderBar extends View {
         textPaint.setTextSize(pixelSize);
     }
 
+    private int getCircleX() {
+        if (dragX >= 0) {
+            return dragX;
+        } else {
+            return currentPoint.getX();
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (currentPoint == null)
@@ -98,13 +126,7 @@ public class BaseSliderBar extends View {
 
         int lineY = parentHeight / 2;
 
-        // Circle
-        int circleX;
-        if (dragX >= 0) {
-            circleX = dragX;
-        } else {
-            circleX = currentPoint.getX();
-        }
+        final int circleX = getCircleX();
 
         canvas.drawCircle(circleX, y, circleRadius + 8, circleFillPaint);
         canvas.drawCircle(circleX, y, circleRadius, circleStrokePaint);

@@ -22,11 +22,19 @@
     <string name="user_login_email_hint">Email</string>
     <string name="user_login_password_hint">Password</string>
 
+    <string name="user_login_password_error_required">A password is required</string>
+    <string name="user_login_email_error_required">An email address is required</string>
+
     <string name="user_login_button">Login</string>
     <string name="user_sign_up_button">Sign Up</string>
-    <string name="user_sign_up_title">Sign Up</string>
-
     <string name="login_small_print">By continuing you agree to our Terms and Privacy Policy</string>
+
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="forgot_password_message">Please provide your email address to receive a password reset link.</string>
+    <string name="forgot_password_input_hint">email@address.com</string>
+    <string name="forgot_password_email_sent">If a matching account was found, an email was sent to %s to allow you to reset your password.</string>
+
+    <string name="user_sign_up_title">Sign Up</string>
 
     <string name="user_login_error_message">Couldn\'t login. Check your email and password, and make sure you have an internet connection.</string>
     <string name="connection_error_message">No connection</string>
@@ -199,8 +207,9 @@
 
     <string name="checkbox_checked">Checked checkbox</string>
     <string name="checkbox_unchecked">Unchecked checkbox</string>
-    <string name="user_login_password_error_required">A password is required</string>
-    <string name="user_login_email_error_required">An email address is required</string>
+
     <string name="image_crop_title">Crop Image</string>
+
+    <string name="log_out_confirmation_title">Are you sure?</string>
 
 </resources>

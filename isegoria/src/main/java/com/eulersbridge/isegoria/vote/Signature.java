@@ -63,6 +63,7 @@ public class Signature extends View {
         }
     }*/
 
+    @SuppressWarnings("unused")
     public void clear() {
         path.reset();
         invalidate();

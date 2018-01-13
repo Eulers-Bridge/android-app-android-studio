@@ -152,7 +152,8 @@ public class MainActivity extends AppCompatActivity implements
 
                     if (handledShortcut) {
                         ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
-                        if (shortcutManager != null) shortcutManager.reportShortcutUsed(action);
+                        if (shortcutManager != null)
+                            shortcutManager.reportShortcutUsed(action);
                     }
                 }
             }

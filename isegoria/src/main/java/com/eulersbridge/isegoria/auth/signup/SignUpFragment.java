@@ -27,6 +27,7 @@ import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Country;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.util.data.SimpleTextWatcher;
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
