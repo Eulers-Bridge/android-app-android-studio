@@ -78,9 +78,8 @@ public class IsegoriaApp extends Application {
     }
 	
 	public @NonNull NetworkService getNetworkService() {
-        if (network == null) {
+        if (network == null)
             network = new NetworkService(this);
-        }
 
 		return network;
 	}

@@ -74,7 +74,7 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
         viewModel.getCompletedTasks().observe(this, completedTasks -> {
             if (completedTasks != null)
-                completedAdapter.replaceItems(completedTasks);
+                completedAdapter.setItems(completedTasks);
         });
     }
 
@@ -127,7 +127,7 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
     private void setRemainingTasks(@NonNull List<Task> remainingTasks) {
         if (getActivity() != null) {
-            remainingAdapter.replaceItems(remainingTasks);
+            remainingAdapter.setItems(remainingTasks);
 
             // Calculate rough new list view size to 'autosize' it
             getActivity().runOnUiThread(() -> {

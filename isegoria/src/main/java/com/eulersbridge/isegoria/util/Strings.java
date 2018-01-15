@@ -3,7 +3,10 @@ package com.eulersbridge.isegoria.util;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Patterns;
 
 import java.util.Date;
 
@@ -11,6 +14,14 @@ public final class Strings {
 
     private Strings() {
         // Hide implicit public constructor
+    }
+
+    public static boolean equal(@Nullable String str1, @Nullable String str2) {
+        return str1 == null ? str2 == null : str1.equals(str2);
+    }
+
+    public static boolean isValidEmail(@Nullable String email) {
+        return TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     public static String notificationChannelIDFromName(@NonNull String name) {

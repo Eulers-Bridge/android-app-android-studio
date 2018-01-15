@@ -30,7 +30,7 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         weakFragment = new WeakReference<>(fragment);
     }
 
-    public void replaceItems(@NonNull List<Task> newItems) {
+    public void setItems(@NonNull List<Task> newItems) {
         items.clear();
         items.addAll(newItems);
         notifyItemRangeChanged(0, newItems.size());

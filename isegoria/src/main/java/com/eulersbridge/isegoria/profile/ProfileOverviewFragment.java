@@ -21,6 +21,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
@@ -67,7 +68,10 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
 
         View.OnClickListener friendsClickListener = view -> {
-            if (getActivity() != null)
+            boolean isAnotherUser = viewModel.user.getValue() != null
+                    && viewModel.user.getValue() instanceof Contact;
+
+            if (getActivity() != null && !isAnotherUser)
                 ((MainActivity)getActivity()).showFriends();
         };
 
@@ -95,7 +99,12 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         tasksListView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
 
         //noinspection ConstantConditions
-        viewModel = ViewModelProviders.of(getParentFragment()).get(ProfileViewModel.class);
+        Fragment lifecycleOwner = getParentFragment();
+        if (lifecycleOwner == null)
+            lifecycleOwner = this;
+
+        viewModel = ViewModelProviders.of(lifecycleOwner).get(ProfileViewModel.class);
+
         setupViewModelObservers();
 
         GenericUser user = null;
@@ -142,7 +151,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
             viewModel.getTasks().observe(this, tasks -> {
                 if (tasks != null)
-                    taskAdapter.replaceItems(tasks);
+                    taskAdapter.setItems(tasks);
             });
 
             GlideApp.with(this)
@@ -153,7 +162,9 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
             nameTextView.setText(user.getFullName());
 
-            if (user instanceof User && ((User)user).hasPersonality) {
+            boolean loggedInUserWithPersonality = user instanceof User && ((User)user).hasPersonality;
+            boolean externalUser = user instanceof Contact;
+            if (externalUser || loggedInUserWithPersonality) {
                 personalityTestButton.setVisibility(View.GONE);
 
             } else {

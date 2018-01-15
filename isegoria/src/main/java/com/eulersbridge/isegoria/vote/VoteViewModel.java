@@ -45,12 +45,12 @@ public class VoteViewModel extends AndroidViewModel {
         selectedVoteLocationIndex.setValue(0);
 
         locationAndDateComplete.addSource(selectedVoteLocation, location -> {
-            final boolean complete = (location != null && dateTime.getValue() != null);
+            final boolean complete = location != null && dateTime.getValue() != null;
             locationAndDateComplete.setValue(complete);
         });
 
         locationAndDateComplete.addSource(dateTime, newDateTime -> {
-            final boolean complete = (newDateTime != null && selectedVoteLocation.getValue() != null);
+            final boolean complete = newDateTime != null && selectedVoteLocation.getValue() != null;
             locationAndDateComplete.setValue(complete);
         });
     }

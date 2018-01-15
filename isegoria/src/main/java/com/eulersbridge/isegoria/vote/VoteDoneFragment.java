@@ -79,9 +79,8 @@ public class VoteDoneFragment extends Fragment implements TitledFragment {
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, reminder.location)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        if (getActivity() != null && intent.resolveActivity(getActivity().getPackageManager()) != null) {
+        if (getActivity() != null && intent.resolveActivity(getActivity().getPackageManager()) != null)
             getActivity().startActivity(intent);
-        }
     }
 
     @Override

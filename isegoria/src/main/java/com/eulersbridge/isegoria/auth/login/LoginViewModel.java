@@ -8,10 +8,10 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Patterns;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.util.Utils;
 import com.eulersbridge.isegoria.util.data.FixedData;
 import com.eulersbridge.isegoria.util.network.IgnoredCallback;
@@ -22,7 +22,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     final MutableLiveData<String> email = new MutableLiveData<>();
     final LiveData<Boolean> emailError = Transformations.switchMap(email, emailStr ->
-            new FixedData<>(isValidEmail(emailStr)));
+            new FixedData<>(Strings.isValidEmail(emailStr)));
 
     final MutableLiveData<String> password = new MutableLiveData<>();
 
@@ -50,10 +50,6 @@ public class LoginViewModel extends AndroidViewModel {
         String storedPassword = securePreferences.getString(Constants.USER_PASSWORD_KEY, null);
         if (storedPassword != null)
             password.setValue(storedPassword);
-    }
-
-    private boolean isValidEmail(@Nullable String email) {
-        return TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     public void setEmail(String email) {
@@ -95,7 +91,7 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     boolean requestPasswordRecoveryEmail(@Nullable String email) {
-        if (isValidEmail(email)) {
+        if (Strings.isValidEmail(email)) {
             IsegoriaApp isegoriaApp = getApplication();
 
             canShowPasswordResetDialog.setValue(false);

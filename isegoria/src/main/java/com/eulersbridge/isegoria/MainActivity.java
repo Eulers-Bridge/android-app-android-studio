@@ -33,6 +33,7 @@ import com.eulersbridge.isegoria.auth.signup.SignUpFragment;
 import com.eulersbridge.isegoria.auth.signup.SignUpUser;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
+import com.eulersbridge.isegoria.friends.FriendsFragment;
 import com.eulersbridge.isegoria.network.api.models.Country;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.models.User;
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements
 
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-		if (userEmail != null && userPassword != null) {
+		boolean haveStoredCredentials = userEmail != null && userPassword != null;
+		if (haveStoredCredentials) {
 			application.login(userEmail, userPassword);
 
             setViewEnabled(R.id.login_email, false);
