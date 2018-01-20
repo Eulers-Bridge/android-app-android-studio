@@ -10,10 +10,9 @@ import android.support.annotation.NonNull;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Like;
 import com.eulersbridge.isegoria.network.api.models.NewsArticle;
-import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.LikeResponse;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
 
@@ -25,6 +24,7 @@ public class NewsDetailViewModel extends AndroidViewModel {
     final LiveData<List<Like>> articleLikes = Transformations.switchMap(newsArticle, article -> {
         if (article == null) {
             return new FixedData<>(null);
+
         } else {
             IsegoriaApp isegoriaApp = getApplication();
             return new RetrofitLiveData<>(isegoriaApp.getAPI().getNewsArticleLikes(article.id));
@@ -34,15 +34,15 @@ public class NewsDetailViewModel extends AndroidViewModel {
     final LiveData<Boolean> articleLikedByUser = Transformations.switchMap(articleLikes, likes -> {
         if (likes != null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
 
-            if (user != null) {
-                for (Like like : likes) {
-                    if (like.email.equals(isegoriaApp.getLoggedInUser().email)) {
-                        return new FixedData<>(true);
-                    }
-                }
-            }
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user != null)
+                    for (Like like : likes)
+                        if (like.email.equals(user.email))
+                            return new FixedData<>(true);
+
+                return new FixedData<>(null);
+            });
         }
 
         return new FixedData<>(false);
@@ -64,18 +64,17 @@ public class NewsDetailViewModel extends AndroidViewModel {
     LiveData<Boolean> likeArticle() {
         final IsegoriaApp isegoriaApp = getApplication();
 
-        final User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null)
+                return Transformations.switchMap(newsArticle, article -> {
+                    LiveData<LikeResponse> like = new RetrofitLiveData<>(isegoriaApp.getAPI().likeArticle(article.id, user.email));
 
-        if (user != null) {
-            return Transformations.switchMap(newsArticle, article -> {
-                LiveData<LikeResponse> like = new RetrofitLiveData<>(isegoriaApp.getAPI().likeArticle(article.id, user.email));
+                    return Transformations.switchMap(like,
+                            likeResponse -> new FixedData<>(likeResponse != null && likeResponse.success));
+                });
 
-                return Transformations.switchMap(like,
-                        likeResponse -> new FixedData<>(likeResponse != null && likeResponse.success));
-            });
-        }
-
-        return new FixedData<>(false);
+            return new FixedData<>(false);
+        });
     }
 
     /**
@@ -84,18 +83,16 @@ public class NewsDetailViewModel extends AndroidViewModel {
     LiveData<Boolean> unlikeArticle() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null)
+                return Transformations.switchMap(newsArticle,
+                        article -> {
+                            LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikeArticle(article.id, user.email));
 
-        if (user != null) {
+                            return Transformations.switchMap(unlike, __ -> new FixedData<>(true));
+                        });
 
-            return Transformations.switchMap(newsArticle,
-                    article -> {
-                        LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikeArticle(article.id, user.email));
-
-                        return Transformations.switchMap(unlike, __ -> new FixedData<>(true));
-                    });
-        }
-
-        return new FixedData<>(false);
+            return new FixedData<>(false);
+        });
     }
 }

@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/sign_up_container"
-    android:background="@color/black"
     tools:background="@drawable/tumblr_static_aphc">
 
     <android.support.constraint.ConstraintLayout

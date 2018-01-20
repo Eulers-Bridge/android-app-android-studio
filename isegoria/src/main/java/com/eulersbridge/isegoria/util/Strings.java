@@ -21,7 +21,7 @@ public final class Strings {
     }
 
     public static boolean isValidEmail(@Nullable String email) {
-        return TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     public static String notificationChannelIDFromName(@NonNull String name) {

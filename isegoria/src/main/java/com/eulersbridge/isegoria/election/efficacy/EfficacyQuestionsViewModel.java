@@ -34,7 +34,8 @@ public class EfficacyQuestionsViewModel extends AndroidViewModel {
 
         IsegoriaApp isegoriaApp = getApplication();
 
-        String userEmail = isegoriaApp.getLoggedInUser().email;
+        //noinspection ConstantConditions
+        String userEmail = isegoriaApp.loggedInUser.getValue().email;
 
         UserSelfEfficacy answers = new UserSelfEfficacy(
                 score1.getValue(), score2.getValue(), score3.getValue(), score4.getValue()

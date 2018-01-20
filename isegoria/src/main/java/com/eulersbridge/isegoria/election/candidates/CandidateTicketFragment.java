@@ -63,11 +63,12 @@ public class CandidateTicketFragment extends Fragment {
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
 		isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+		if (isegoriaApp != null) {
+            User loggedInUser = isegoriaApp.loggedInUser.getValue();
 
-        User loggedInUser = isegoriaApp.getLoggedInUser();
-
-        if (loggedInUser != null && loggedInUser.institutionId != null)
-            isegoriaApp.getAPI().getElections(loggedInUser.institutionId).enqueue(electionsCallback);
+            if (loggedInUser != null && loggedInUser.institutionId != null)
+                isegoriaApp.getAPI().getElections(loggedInUser.institutionId).enqueue(electionsCallback);
+        }
         
 		return rootView;
 	}
@@ -179,12 +180,12 @@ public class CandidateTicketFragment extends Fragment {
 	        textViewTitle.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 	        textViewTitle.setGravity(Gravity.CENTER);
 	        
-	        TextView textViewTitleSuport1 = new TextView(getActivity());
-	        textViewTitleSuport1.setTextColor(Color.parseColor(colour1));
-	        textViewTitleSuport1.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-	        textViewTitleSuport1.setText(supporters1);
-	        textViewTitleSuport1.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-	        textViewTitleSuport1.setGravity(Gravity.CENTER);
+	        TextView textViewTitleSupport1 = new TextView(getActivity());
+            textViewTitleSupport1.setTextColor(Color.parseColor(colour1));
+            textViewTitleSupport1.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+            textViewTitleSupport1.setText(supporters1);
+            textViewTitleSupport1.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+            textViewTitleSupport1.setGravity(Gravity.CENTER);
 	        
 	        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
 	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
@@ -219,9 +220,8 @@ public class CandidateTicketFragment extends Fragment {
 
 	        LinearLayout linLayout = new LinearLayout(getActivity());
 	        linLayout.setOrientation(LinearLayout.VERTICAL);
-	        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
 	        linLayout.addView(textViewTitle);
-	        linLayout.addView(textViewTitleSuport1);
+	        linLayout.addView(textViewTitleSupport1);
 			
 	        relativeLayout.addView(view);
 	        relativeLayout.addView(linLayout, params1);
@@ -241,12 +241,12 @@ public class CandidateTicketFragment extends Fragment {
 	        textViewTitle.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 	        textViewTitle.setGravity(Gravity.CENTER);
 	        
-	        TextView textViewTitleSuport2 = new TextView(getActivity());
-	        textViewTitleSuport2.setTextColor(Color.parseColor(colour2));
-	        textViewTitleSuport2.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-	        textViewTitleSuport2.setText(supporters1);
-	        textViewTitleSuport2.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-	        textViewTitleSuport2.setGravity(Gravity.CENTER);
+	        TextView textViewTitleSupport2 = new TextView(getActivity());
+			textViewTitleSupport2.setTextColor(Color.parseColor(colour2));
+			textViewTitleSupport2.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+			textViewTitleSupport2.setText(supporters1);
+			textViewTitleSupport2.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+			textViewTitleSupport2.setGravity(Gravity.CENTER);
 	        
 	        params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
 	        params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
@@ -262,7 +262,7 @@ public class CandidateTicketFragment extends Fragment {
 	        linLayout = new LinearLayout(getActivity());
 	        linLayout.setOrientation(LinearLayout.VERTICAL);
 	        linLayout.addView(textViewTitle);
-	        linLayout.addView(textViewTitleSuport2);
+	        linLayout.addView(textViewTitleSupport2);
 	        
 			view = new View(getActivity());
 			view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
@@ -342,70 +342,69 @@ public class CandidateTicketFragment extends Fragment {
         int imageHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 (float) 170, getResources().getDisplayMetrics());
 
-            tr = new TableRow(getActivity());
-            TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
-            tr.setLayoutParams(rowParams);
+		tr = new TableRow(getActivity());
+		TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT);
+		tr.setLayoutParams(rowParams);
 
-            RelativeLayout relativeLayout = new RelativeLayout(getActivity());
-            relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
-            ((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
+		RelativeLayout relativeLayout = new RelativeLayout(getActivity());
+		relativeLayout.setLayoutParams(new TableRow.LayoutParams((int)(dpWidth / 2), imageHeight));
+		((ViewGroup.MarginLayoutParams) relativeLayout.getLayoutParams()).setMargins(paddingMargin, paddingMargin, paddingMargin, 0);
 
-            TextView textViewTitle = new TextView(getActivity());
-            textViewTitle.setTextColor(Color.parseColor("#3A3F43"));
-            textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-            textViewTitle.setText(title1);
-            textViewTitle.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-            textViewTitle.setGravity(Gravity.CENTER);
+		TextView textViewTitle = new TextView(getActivity());
+		textViewTitle.setTextColor(Color.parseColor("#3A3F43"));
+		textViewTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+		textViewTitle.setText(title1);
+		textViewTitle.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+		textViewTitle.setGravity(Gravity.CENTER);
 
-            TextView textViewTitleSuport1 = new TextView(getActivity());
-            textViewTitleSuport1.setTextColor(Color.parseColor(colour1));
-            textViewTitleSuport1.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
-            textViewTitleSuport1.setText(supporters1);
-            textViewTitleSuport1.setPadding(paddingMargin3, 0, paddingMargin3, 0);
-            textViewTitleSuport1.setGravity(Gravity.CENTER);
+		TextView textViewTitleSupport1 = new TextView(getActivity());
+		textViewTitleSupport1.setTextColor(Color.parseColor(colour1));
+		textViewTitleSupport1.setTextSize(TypedValue.COMPLEX_UNIT_DIP,16.0f);
+		textViewTitleSupport1.setText(supporters1);
+		textViewTitleSupport1.setPadding(paddingMargin3, 0, paddingMargin3, 0);
+		textViewTitleSupport1.setGravity(Gravity.CENTER);
 
-            RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
-            params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
+		RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		params1.addRule(RelativeLayout.CENTER_HORIZONTAL, textViewTitle.getId());
+		params1.addRule(RelativeLayout.CENTER_VERTICAL, textViewTitle.getId());
 
-            RectShape rect = new RectShape();
-            ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
-            Paint paint = rectShapeDrawable.getPaint();
-            paint.setColor(Color.parseColor(colour1));
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(paddingMargin);
+		RectShape rect = new RectShape();
+		ShapeDrawable rectShapeDrawable = new ShapeDrawable(rect);
+		Paint paint = rectShapeDrawable.getPaint();
+		paint.setColor(Color.parseColor(colour1));
+		paint.setStyle(Style.STROKE);
+		paint.setStrokeWidth(paddingMargin);
 
-            View view = new View(getActivity());
-            view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
-			view.setBackground(rectShapeDrawable);
+		View view = new View(getActivity());
+		view.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+		view.setBackground(rectShapeDrawable);
 
-            view.setOnClickListener(view1 -> {
-                FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-                CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
-                Bundle args = new Bundle();
-                args.putLong("TicketId", lastTicketId);
-                args.putString("TicketName", title1);
-                args.putString("Colour", colour1);
-                args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
-                args.putString("Logo", logo1);
+		view.setOnClickListener(view1 -> {
+			FragmentManager fragmentManager2 = getActivity().getSupportFragmentManager();
+			FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
+			CandidateTicketDetailFragment fragment2 = new CandidateTicketDetailFragment();
+			Bundle args = new Bundle();
+			args.putLong("TicketId", lastTicketId);
+			args.putString("TicketName", title1);
+			args.putString("Colour", colour1);
+			args.putInt("NoOfSupporters", Integer.parseInt(supporters1));
+			args.putString("Logo", logo1);
 
-                fragment2.setArguments(args);
-                fragmentTransaction2.addToBackStack(null);
-                fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
-                fragmentTransaction2.commit();
-            });
+			fragment2.setArguments(args);
+			fragmentTransaction2.addToBackStack(null);
+			fragmentTransaction2.add(R.id.election_candidate_frame, fragment2);
+			fragmentTransaction2.commit();
+		});
 
-            LinearLayout linLayout = new LinearLayout(getActivity());
-            linLayout.setOrientation(LinearLayout.VERTICAL);
-            LayoutParams linLayoutParam = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            linLayout.addView(textViewTitle);
-            linLayout.addView(textViewTitleSuport1);
+		LinearLayout linLayout = new LinearLayout(getActivity());
+		linLayout.setOrientation(LinearLayout.VERTICAL);
+		linLayout.addView(textViewTitle);
+		linLayout.addView(textViewTitleSupport1);
 
-            relativeLayout.addView(view);
-            relativeLayout.addView(linLayout, params1);
-            tr.addView(relativeLayout);
+		relativeLayout.addView(view);
+		relativeLayout.addView(linLayout, params1);
+		tr.addView(relativeLayout);
 
-            positionsTableLayout.addView(tr);
+		positionsTableLayout.addView(tr);
     }
 }

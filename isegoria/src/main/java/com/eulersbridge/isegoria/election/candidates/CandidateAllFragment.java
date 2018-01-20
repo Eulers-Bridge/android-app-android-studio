@@ -27,13 +27,14 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Candidate;
 import com.eulersbridge.isegoria.network.api.models.Election;
 import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.models.Ticket;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
-import com.eulersbridge.isegoria.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class CandidateAllFragment extends Fragment {
 	private View rootView;
 	private TableLayout candidateAllTableLayout;
     private final ArrayList<String> firstNames = new ArrayList<>();
-    private final ArrayList<String> lastnNmes = new ArrayList<>();
+    private final ArrayList<String> lastNames = new ArrayList<>();
     private final ArrayList<TableRow> rows = new ArrayList<>();
 	
 	private float dpWidth;
@@ -70,10 +71,12 @@ public class CandidateAllFragment extends Fragment {
         candidateAllTableLayout.addView(dividerView);
 
         isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+        if (isegoriaApp != null) {
+            User user = isegoriaApp.loggedInUser.getValue();
 
-        long institutionId = isegoriaApp.getLoggedInUser().institutionId;
-
-        isegoriaApp.getAPI().getElections(institutionId).enqueue(electionsCallback);
+            if (user != null && user.institutionId != null)
+                isegoriaApp.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
+        }
 
         SearchView searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
         searchViewCandidatesAll.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -101,7 +104,7 @@ public class CandidateAllFragment extends Fragment {
                     try {
                         TableRow row = (TableRow) view;
                         String firstName = firstNames.get(i);
-                        String lastName = lastnNmes.get(i);
+                        String lastName = lastNames.get(i);
 
                         if(!firstName.toLowerCase().contains(query.toLowerCase()) && !lastName.toLowerCase().contains(query.toLowerCase())) {
                             candidateAllTableLayout.removeView(row);
@@ -293,9 +296,9 @@ public class CandidateAllFragment extends Fragment {
             }
         });
 
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
         TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT);
@@ -329,9 +332,9 @@ public class CandidateAllFragment extends Fragment {
         tr.addView(relLayoutMaster);
 
         candidateAllTableLayout.addView(tr);
-        candidateAllTableLayout.addView(dividierView);
+        candidateAllTableLayout.addView(dividerView);
         firstNames.add(candidate.givenName);
-        lastnNmes.add(candidate.familyName);
+        lastNames.add(candidate.familyName);
         rows.add(tr);
     }
 }

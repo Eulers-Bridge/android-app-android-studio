@@ -81,8 +81,8 @@ public class PhotosFragment extends Fragment implements TitledFragment {
     private void refresh() {
         fetchedPhotos = true;
 
-        User user = isegoriaApp.getLoggedInUser();
-        if (user != null) {
+        User user = isegoriaApp.loggedInUser.getValue();
+        if (user != null && user.institutionId != null) {
 
             long newsFeedId = user.getNewsFeedId();
             if (newsFeedId == 0) {

@@ -3,13 +3,13 @@ package com.eulersbridge.isegoria.feed.news;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.NewsArticle;
-import com.eulersbridge.isegoria.network.api.models.User;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
 
@@ -25,16 +25,14 @@ public class NewsViewModel extends AndroidViewModel {
     LiveData<List<NewsArticle>> getNewsArticles() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null && user.institutionId != null) {
+                newsArticlesList = new RetrofitLiveData<>(isegoriaApp.getAPI().getNewsArticles(user.institutionId));
+                return newsArticlesList;
+            }
 
-        if (user != null && user.institutionId != null) {
-            newsArticlesList = new RetrofitLiveData<>(isegoriaApp.getAPI().getNewsArticles(user.institutionId));
-
-        } else {
-            newsArticlesList = new FixedData<>(null);
-        }
-
-        return newsArticlesList;
+            return new FixedData<>(null);
+        });
     }
 
     @Override

@@ -3,13 +3,13 @@ package com.eulersbridge.isegoria.feed.photos;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
-import com.eulersbridge.isegoria.network.api.models.User;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
 
@@ -25,15 +25,14 @@ public class PhotoAlbumsViewModel extends AndroidViewModel {
     LiveData<List<PhotoAlbum>> getPhotoAlbums() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null) {
+                photoAlbumsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotoAlbums(user.getNewsFeedId()));
+                return photoAlbumsList;
+            }
 
-        if (user != null) {
-            photoAlbumsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotoAlbums(user.getNewsFeedId()));
-        } else {
-            photoAlbumsList = new FixedData<>(null);
-        }
-
-        return photoAlbumsList;
+            return new FixedData<>(null);
+        });
     }
 
     @Override

@@ -1,15 +1,13 @@
 package com.eulersbridge.isegoria.auth.login;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -21,20 +19,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.auth.AuthViewModel;
 import com.eulersbridge.isegoria.util.data.SimpleTextWatcher;
-import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
-import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
-public class LoginFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
+public class LoginFragment extends Fragment {
+
+    private CoordinatorLayout coordinatorLayout;
 
     private TextInputLayout emailLayout;
     private EditText emailField;
@@ -46,37 +38,28 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
     private Button signUpButton;
 
     private LoginViewModel viewModel;
+    private AuthViewModel authViewModel;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.user_login_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.login_fragment, container, false);
 
-        final MainActivity mainActivity = (MainActivity) getActivity();
-        if (mainActivity != null) {
-            Utils.setStatusBarColour(mainActivity, Color.BLACK);
-            mainActivity.setToolbarVisible(false);
+        //noinspection ConstantConditions
+        authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
+
+        rootView.findViewById(R.id.login_signup_button).setOnClickListener(view ->
+            authViewModel.signUpVisible.setValue(true)
+        );
+
+        boolean hasTranslucentStatusBar = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        if (hasTranslucentStatusBar) {
+            View logo = rootView.findViewById(R.id.login_image_logo);
+
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) logo.getLayoutParams();
+            params.topMargin += Math.round(22.0f * getResources().getDisplayMetrics().density);
         }
 
-        rootView.findViewById(R.id.login_signup_button).setOnClickListener(view -> {
-            if (getActivity() != null)
-                ((MainActivity)getActivity()).onSignUpClicked();
-        });
-
-        final ConstraintLayout loginContainer = rootView.findViewById(R.id.loginContainer);
-
-        GlideApp.with(this)
-                .load(R.drawable.tumblr_static_aphc)
-                //DiskCacheStrategy.RESOURCE causes the image to be blurred multiple times
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .transforms(new CenterCrop(), new BlurTransformation(getContext(),5))
-                .priority(Priority.HIGH)
-                .into(new SimpleTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
-                        if (isAdded() && !isDetached())
-                            loginContainer.post(() -> loginContainer.setBackground(resource));
-                    }
-                });
+        coordinatorLayout = rootView.findViewById(R.id.login_container);
 
         emailField = rootView.findViewById(R.id.login_email);
         emailField.addTextChangedListener(new SimpleTextWatcher(value ->
@@ -104,13 +87,15 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
 		return rootView;
 	}
 
-	private void showForgotPasswordDialog() {
+    private void showForgotPasswordDialog() {
 	    Boolean canContinue = viewModel.canShowPasswordResetDialog.getValue();
 	    if (canContinue != null && !canContinue) return;
 
+        @SuppressLint("InflateParams")
 	    View alertView = getLayoutInflater().inflate(R.layout.alert_dialog_input_forgot_password, null);
         final EditText alertEmailInput = alertView.findViewById(R.id.alert_dialog_email_address_input);
 
+        //noinspection ConstantConditions
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.forgot_password_title)
                 .setMessage(R.string.forgot_password_message)
@@ -128,6 +113,7 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
 
         if (validEmail) {
             MainActivity mainActivity = (MainActivity) getActivity();
+
             if (mainActivity != null) {
                 CoordinatorLayout coordinatorLayout = mainActivity.getCoordinatorLayout();
                 String message = getString(R.string.forgot_password_email_sent, forgottenAccountEmail);
@@ -168,14 +154,10 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
 
         viewModel.networkError.observe(this, hasError -> {
                 if (hasError != null && hasError) {
-                    MainActivity mainActivity = getActivity() == null? null : (MainActivity)getActivity();
-
-                    if (mainActivity != null)
-                        mainActivity.runOnUiThread(() ->
-                                Snackbar.make(mainActivity.getCoordinatorLayout(), getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
-                                        .setAction(getString(R.string.connection_error_action), view -> onLoginClicked())
-                                        .setActionTextColor(getResources().getColor(R.color.white))
-                                        .show());
+                    Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
+                            .setAction(getString(R.string.connection_error_action), view -> onLoginClicked())
+                            .setActionTextColor(getResources().getColor(R.color.white))
+                            .show();
 
                     viewModel.setNetworkErrorShown();
                 }
@@ -192,17 +174,10 @@ public class LoginFragment extends Fragment implements TitledFragment, MainActiv
     }
 
 	private void onLoginClicked() {
-        viewModel.login();
-    }
-
-    @Override
-    public String getTitle(Context context) {
-        return null;
-    }
-
-    @Override
-    public void setupTabLayout(TabLayout tabLayout) {
-        tabLayout.setVisibility(View.GONE);
+        viewModel.login().observe(this, success -> {
+            if (success != null && success)
+                authViewModel.userLoggedIn.setValue(true);
+        });
     }
 
 }

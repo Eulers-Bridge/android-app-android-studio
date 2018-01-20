@@ -49,7 +49,7 @@ import java.util.List;
 import retrofit2.Response;
 
 public class CandidateTicketDetailFragment extends Fragment {
-    private TableLayout candidateTicketDetialTableLayout;
+    private TableLayout candidateTicketDetailTableLayout;
     private Button ticketSupportButton;
 	
 	private float dpWidth;
@@ -75,7 +75,7 @@ public class CandidateTicketDetailFragment extends Fragment {
         partyColour = bundle.getString("Colour");
         partyLogo = bundle.getString("Logo");
 
-		candidateTicketDetialTableLayout = rootView.findViewById(R.id.candidateTicketDetailTable);
+        candidateTicketDetailTableLayout = rootView.findViewById(R.id.candidateTicketDetailTable);
         TextView partyDetailSupporters = rootView.findViewById(R.id.partyDetailSupporters);
 
 		DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
@@ -126,23 +126,21 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        isegoriaApp.getAPI().getUserSupportedTickets(isegoriaApp.getLoggedInUser().email).enqueue(new SimpleCallback<List<Ticket>>() {
+        isegoriaApp.getAPI().getUserSupportedTickets(isegoriaApp.loggedInUser.getValue().email).enqueue(new SimpleCallback<List<Ticket>>() {
             @Override
             public void handleResponse(Response<List<Ticket>> response) {
                 List<Ticket> tickets = response.body();
-                if (tickets != null && tickets.size() > 0) {
-                    for (Ticket ticket : tickets) {
-                        if (ticket.id == ticketId) {
+
+                if (tickets != null && tickets.size() > 0)
+                    for (Ticket ticket : tickets)
+                        if (ticket.id == ticketId)
                             getActivity().runOnUiThread(() -> ticketSupportButton.setText("Unsupport"));
-                        }
-                    }
-                }
             }
         });
 
         ticketSupportButton.setOnClickListener(view -> {
 
-            String userEmail = isegoriaApp.getLoggedInUser().email;
+            String userEmail = isegoriaApp.loggedInUser.getValue().email;
 
             if(ticketSupportButton.getText().equals("Support")) {
 
@@ -321,8 +319,8 @@ public class CandidateTicketDetailFragment extends Fragment {
 		relLayoutMaster.addView(linLayout2);
         
         tr.addView(relLayoutMaster);
-        
-        candidateTicketDetialTableLayout.addView(tr);
-        candidateTicketDetialTableLayout.addView(dividerView);
+
+        candidateTicketDetailTableLayout.addView(tr);
+        candidateTicketDetailTableLayout.addView(dividerView);
 	}
 }

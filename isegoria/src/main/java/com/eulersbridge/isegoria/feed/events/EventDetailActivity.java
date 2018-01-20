@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.feed.events;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,7 +8,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -24,30 +24,23 @@ import android.widget.TextView;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
-import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Event;
-import com.eulersbridge.isegoria.network.api.models.Position;
-import com.eulersbridge.isegoria.network.api.models.Ticket;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
-import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.util.transformation.TintTransformation;
-import com.eulersbridge.isegoria.R;
 
 import org.parceler.Parcels;
-
-import retrofit2.Response;
 
 public class EventDetailActivity extends AppCompatActivity {
 
     private float dpWidth;
-    private IsegoriaApp isegoriaApp;
 
     private TableLayout eventContactTableLayout;
 
-    private Event event;
+    private EventDetailViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +50,8 @@ public class EventDetailActivity extends AppCompatActivity {
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
+        viewModel = ViewModelProviders.of(this).get(EventDetailViewModel.class);
 
         findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
 
@@ -68,9 +63,8 @@ public class EventDetailActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-        event = Parcels.unwrap(getIntent().getParcelableExtra(Constants.ACTIVITY_EXTRA_EVENT));
-
-        isegoriaApp = (IsegoriaApp)getApplication();
+        Event event = Parcels.unwrap(getIntent().getParcelableExtra(Constants.ACTIVITY_EXTRA_EVENT));
+        viewModel.setEvent(event);
 
         if (event != null) {
             populateContent(event);
@@ -106,22 +100,10 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void addToCalendar() {
-        Intent intent = new Intent(Intent.ACTION_INSERT)
-                .setData(CalendarContract.Events.CONTENT_URI)
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.date)
+        Intent intent = viewModel.getAddToCalendarIntent();
 
-                // Make event 1 hour long (add an hour in in milliseconds to event start)
-                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.date + 60 * 60 * 1000)
-                .putExtra(CalendarContract.Events.ALL_DAY, false)
-
-                .putExtra(CalendarContract.Events.TITLE, event.name)
-                .putExtra(CalendarContract.Events.DESCRIPTION, event.description)
-                .putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            isegoriaApp.getMainActivity().startActivity(intent);
-        }
+        if (intent != null && intent.resolveActivity(getPackageManager()) != null)
+            startActivity(intent);
     }
 
     private void addCandidate(String email) {
@@ -200,14 +182,10 @@ public class EventDetailActivity extends AppCompatActivity {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoriaApp.getAPI().getTicket(ticketId).enqueue(new SimpleCallback<Ticket>() {
-            @Override
-            public void handleResponse(Response<Ticket> response) {
-                Ticket ticket = response.body();
-                if (ticket != null) {
-                    textViewParty.setText(ticket.code);
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
-                }
+        viewModel.getTicket(ticketId).observe(this, ticket -> {
+            if (ticket != null) {
+                textViewParty.setText(ticket.code);
+                textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()));
             }
         });
 
@@ -241,12 +219,9 @@ public class EventDetailActivity extends AppCompatActivity {
         textViewPosition.setPadding(10, 0, 10, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoriaApp.getAPI().getPosition(positionId).enqueue(new SimpleCallback<Position>() {
-            @Override
-            public void handleResponse(Response<Position> response) {
-                Position position = response.body();
-                if (position != null) textViewPosition.setText(position.name);
-            }
+        viewModel.getPosition(positionId).observe(this, position -> {
+            if (position != null)
+                textViewPosition.setText(position.name);
         });
 
         View dividerView = new View(this);

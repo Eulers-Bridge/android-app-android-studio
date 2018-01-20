@@ -1,6 +1,11 @@
 package com.eulersbridge.isegoria;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -13,24 +18,70 @@ import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.network.api.API;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
+import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
+import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation;
 import com.securepreferences.SecurePreferences;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IsegoriaApp extends Application {
 
-	private MainActivity mainActivity;
+	private WeakReference<MainActivity> weakMainActivity;
 	private NetworkService network;
 
-	private User loggedInUser;
+	public final MutableLiveData<User> loggedInUser =  new MutableLiveData<>();
 
-    public MainActivity getMainActivity() {
-		return mainActivity;
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        float screenDensity = getResources().getDisplayMetrics().density;
+        BlurTransformation.screenDensity = screenDensity;
+        RoundedCornersTransformation.screenDensity = screenDensity;
+
+        createNotificationChannels();
+    }
 	
 	public void setMainActivity(MainActivity mainActivity) {
-		this.mainActivity = mainActivity;
+        weakMainActivity = new WeakReference<>(mainActivity);
 	}
+
+    private void createNotificationChannels() {
+        // Notification channels are only supported on Android O+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+            //Build a simple map of channel names (Strings) to their importance level (Integer)
+            HashMap<String, Integer> channels = new HashMap<>();
+            channels.put(Constants.NOTIFICATION_CHANNEL_FRIENDS,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            channels.put(Constants.NOTIFICATION_CHANNEL_VOTE_REMINDERS,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (notificationManager != null) {
+			    /* Loop through the map, creating notification channels based on the names/importances
+			        in the map. `createNotificationChannel` is no-op if the channels have already
+			        been created from a previous launch.
+			     */
+                for (Map.Entry<String, Integer> entry : channels.entrySet()) {
+                    String channelName = entry.getKey();
+                    String channelId = Strings.notificationChannelIDFromName(channelName);
+                    int importance = entry.getValue();
+
+                    NotificationChannel notificationChannel =
+                            new NotificationChannel(channelId, channelName, importance);
+                    notificationChannel.setShowBadge(true);
+                    notificationManager.createNotificationChannel(notificationChannel);
+                }
+            }
+        }
+    }
 
 	private void setupAppShortcuts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -65,16 +116,11 @@ public class IsegoriaApp extends Application {
         }
     }
 
-    public void onLoginSuccess() {
-        mainActivity.onLoginSuccess(loggedInUser);
-    }
-
-    public void onLoginFailure() {
-        mainActivity.onLoginFailure();
-    }
-
     public void showVerification() {
-        mainActivity.showVerification();
+        MainActivity mainActivity = weakMainActivity.get();
+
+        if (mainActivity != null)
+            mainActivity.showVerification();
     }
 	
 	public @NonNull NetworkService getNetworkService() {
@@ -88,33 +134,29 @@ public class IsegoriaApp extends Application {
 	    return getNetworkService().getAPI();
     }
 
-	public User getLoggedInUser() {
-		return loggedInUser;
-	}
-
 	public void updateLoggedInUser(@NonNull User updatedUser) {
-        loggedInUser = updatedUser;
+        loggedInUser.setValue(updatedUser);
     }
 
 	public void setLoggedInUser(@NonNull User user, @NonNull String password) {
 
-		loggedInUser = user;
+        loggedInUser.setValue(user);
 
         new SecurePreferences(getApplicationContext())
                 .edit()
-                .putString(Constants.USER_EMAIL_KEY, loggedInUser.email)
+                .putString(Constants.USER_EMAIL_KEY, user.email)
                 .putString(Constants.USER_PASSWORD_KEY, password)
                 .apply();
 
         setupAppShortcuts();
 	}
 
-	public void login(@NonNull String email, @NonNull String password) {
-        getNetworkService().login(email, password);
+	public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
+        return getNetworkService().login(email, password);
     }
 
 	public void logOut() {
-		loggedInUser = null;
+		loggedInUser.setValue(null);
 
         network.setEmail(null);
         network.setPassword(null);
@@ -136,18 +178,33 @@ public class IsegoriaApp extends Application {
                 shortcutManager.removeAllDynamicShortcuts();
         }
 
-		getMainActivity().showLogin();
+        MainActivity mainActivity = weakMainActivity.get();
+
+        if (mainActivity != null)
+            mainActivity.showLogin();
 	}
 
 	public void setTrackingOff(boolean trackingOff) {
-		loggedInUser.setTrackingOff(trackingOff);
+        User user = loggedInUser.getValue();
+        if (user != null) {
+            user.setTrackingOff(trackingOff);
+            loggedInUser.setValue(user);
+        }
 	}
 
 	public void setOptedOutOfDataCollection(boolean optedOutOfDataCollection) {
-		loggedInUser.setOptedOutOfDataCollection(optedOutOfDataCollection);
+        User user = loggedInUser.getValue();
+        if (user != null) {
+            user.setOptedOutOfDataCollection(optedOutOfDataCollection);
+            loggedInUser.setValue(user);
+        }
 	}
 
 	public void onUserSelfEfficacyCompleted() {
-        loggedInUser.setPPSEQuestionsCompleted();
+        User user = loggedInUser.getValue();
+        if (user != null) {
+            user.setPPSEQuestionsCompleted();
+            loggedInUser.setValue(user);
+        }
 	}
 }

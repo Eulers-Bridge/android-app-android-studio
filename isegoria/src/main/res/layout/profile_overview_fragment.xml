@@ -239,7 +239,9 @@
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
-            app:progress_color="#2C9F47" />
+            app:progress_color="#2C9F47"
+            app:top_line_text="0"
+            app:bottom_line_text="NEED " />
 
         <TextView
             android:id="@+id/profile_experience_progress_label"
@@ -271,7 +273,9 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/profile_experience_progress_circle"
             app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
-            app:progress_color="#FFB400" />
+            app:progress_color="#FFB400"
+            app:top_line_text="0"
+            app:bottom_line_text="/0"/>
 
         <TextView
             android:id="@+id/profile_badges_progress_label"
@@ -303,7 +307,9 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/profile_badges_progress_circle"
             app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
-            app:progress_color="#B61B1B" />
+            app:progress_color="#B61B1B"
+            app:top_line_text="0"
+            app:bottom_line_text="PER DAY"/>
 
         <TextView
             android:id="@+id/profile_tasks_progress_label"
@@ -335,7 +341,9 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/profile_tasks_progress_circle"
             app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
-            app:progress_color="#00FF00" />
+            app:progress_color="#00FF00"
+            app:top_line_text="0"
+            app:bottom_line_text="ATTENDED" />
 
         <TextView
             android:id="@+id/profile_circle_progress_4_label"

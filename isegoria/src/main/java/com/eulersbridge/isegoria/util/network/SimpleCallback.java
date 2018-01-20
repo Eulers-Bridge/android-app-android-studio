@@ -15,8 +15,7 @@ public class SimpleCallback<T> extends IgnoredCallback<T> {
 
     @Override
     public void onResponse(Call<T> call, Response<T> response) {
-        if (response.isSuccessful()) {
+        if (response.isSuccessful())
             handleResponse(response);
-        }
     }
 }

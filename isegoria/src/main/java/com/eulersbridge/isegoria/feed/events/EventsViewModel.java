@@ -3,13 +3,13 @@ package com.eulersbridge.isegoria.feed.events;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Event;
-import com.eulersbridge.isegoria.network.api.models.User;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
 
@@ -25,15 +25,14 @@ public class EventsViewModel extends AndroidViewModel {
     LiveData<List<Event>> getEvents() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null && user.institutionId != null) {
+                eventsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getEvents(user.institutionId));
+                return eventsList;
+            }
 
-        if (user != null && user.institutionId != null) {
-            eventsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getEvents(user.institutionId));
-        } else {
-            eventsList = new FixedData<>(null);
-        }
-
-        return eventsList;
+            return new FixedData<>(null);
+        });
     }
 
     @Override

@@ -24,6 +24,7 @@ public class FriendRequest {
     @Json(name = "requestReceiverProfile")
     public User requestReceiver;
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o)

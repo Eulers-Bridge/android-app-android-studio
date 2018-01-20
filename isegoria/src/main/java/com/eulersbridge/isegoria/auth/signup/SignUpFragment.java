@@ -1,8 +1,7 @@
 package com.eulersbridge.isegoria.auth.signup;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -17,26 +16,17 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.auth.AuthViewModel;
 import com.eulersbridge.isegoria.network.api.models.Country;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.util.Utils;
 import com.eulersbridge.isegoria.util.data.SimpleTextWatcher;
-import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
-import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.util.Calendar;
 import java.util.List;
 
-public class SignUpFragment extends Fragment implements TitledFragment {
-
-    private SignUpListener listener;
+public class SignUpFragment extends Fragment {
 
     private Button signUpButton;
     private ImageView backButton;
@@ -56,32 +46,29 @@ public class SignUpFragment extends Fragment implements TitledFragment {
 	private ArrayAdapter<Institution> institutionAdapter;
 
 	private SignUpViewModel viewModel;
-
-	public interface SignUpListener {
-	    void onSignUpNextClick(SignUpUser user);
-    }
+	private AuthViewModel authViewModel;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.user_sign_up_fragment, container, false);
+		View rootView = inflater.inflate(R.layout.sign_up_fragment, container, false);
+
+		if (getActivity() != null)
+		    authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
 
 		viewModel = ViewModelProviders.of(this).get(SignUpViewModel.class);
 
         final ScrollView scrollContainer = rootView.findViewById(R.id.sign_up_container);
 
-        GlideApp.with(this)
-                .load(R.drawable.tumblr_static_aphc)
-                //DiskCacheStrategy.RESOURCE causes the image to be blurred multiple times
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .transforms(new CenterCrop(), new BlurTransformation(getContext(),5))
-                .priority(Priority.HIGH)
-                .into(new SimpleTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, Transition<? super Drawable> transition) {
-                        if (isAdded() && !isDetached())
-                            scrollContainer.post(() -> scrollContainer.setBackground(resource));
-                    }
-                });
+        boolean hasTranslucentStatusBar = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        if (hasTranslucentStatusBar) {
+            int additionalTopPadding = Math.round(22 * getResources().getDisplayMetrics().density);
+
+            scrollContainer.setPadding(
+                    scrollContainer.getPaddingLeft(),
+                    scrollContainer.getPaddingTop() + additionalTopPadding,
+                    scrollContainer.getPaddingRight(),
+                    scrollContainer.getPaddingBottom());
+        }
 
         backButton = rootView.findViewById(R.id.sign_up_back_button);
 
@@ -137,27 +124,25 @@ public class SignUpFragment extends Fragment implements TitledFragment {
 		return rootView;
 	}
 
-	public void setListener(SignUpListener listener) {
-	    this.listener = listener;
-    }
-
     private void setupViewListeners() {
         backButton.setOnClickListener(view -> {
-            if (getActivity() != null)
+            if (getActivity() != null) {
+                authViewModel.onSignUpBackPressed();
                 getActivity().onBackPressed();
+            }
         });
 
         signUpButton.setOnClickListener(view -> {
             backButton.setEnabled(false);
             signUpButton.setEnabled(false);
 
-            SignUpUser signUpUser = viewModel.getSignUpUser();
-            if (signUpUser == null) {
+            SignUpUser newUser = viewModel.getSignUpUser();
+            if (newUser == null) {
                 backButton.setEnabled(true);
                 signUpButton.setEnabled(true);
 
             } else {
-                listener.onSignUpNextClick(signUpUser);
+                authViewModel.signUpUser.setValue(newUser);
             }
         });
 
@@ -214,11 +199,6 @@ public class SignUpFragment extends Fragment implements TitledFragment {
                 viewModel.onGenderSelected(gender);
             }
         });
-    }
-
-    @Override
-    public String getTitle(Context context) {
-        return null;
     }
 
     private void setCountries(List<Country> newCountries) {

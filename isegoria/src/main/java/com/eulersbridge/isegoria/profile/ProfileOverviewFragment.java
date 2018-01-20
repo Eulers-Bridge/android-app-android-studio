@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Contact;
@@ -44,13 +44,10 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     private TextView personalityTestButton;
 
     private TextView friendsNumTextView;
-    private TextView groupNumTextView;
-    private TextView rewardsNumTextView;
 
     private CircleProgressBar experienceProgressCircle;
     private CircleProgressBar badgesProgressCircle;
     private CircleProgressBar tasksProgressCircle;
-    private CircleProgressBar circleProgressBar4;
 
     private final TaskAdapter taskAdapter = new TaskAdapter(this);
 
@@ -80,16 +77,12 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         rootView.findViewById(R.id.profile_friends_label).setOnClickListener(friendsClickListener);
 
-        groupNumTextView = rootView.findViewById(R.id.profile_group_num);
-        rewardsNumTextView = rootView.findViewById(R.id.profile_rewards_num);
-
         TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
         showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
 
         experienceProgressCircle = rootView.findViewById(R.id.profile_experience_progress_circle);
         badgesProgressCircle = rootView.findViewById(R.id.profile_badges_progress_circle);
         tasksProgressCircle = rootView.findViewById(R.id.profile_tasks_progress_circle);
-        circleProgressBar4 = rootView.findViewById(R.id.circularSeekBar4);
 
         RecyclerView tasksListView = rootView.findViewById(R.id.profile_tasks_list_view);
         tasksListView.setAdapter(taskAdapter);
@@ -105,14 +98,26 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         viewModel = ViewModelProviders.of(lifecycleOwner).get(ProfileViewModel.class);
 
+        IsegoriaApp isegoriaApp = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
+        if (isegoriaApp != null)
+            isegoriaApp.loggedInUser.observe(this, user -> {
+                if (user != null && viewModel.user.getValue() == null)
+                    viewModel.setUser(user);
+            });
+
         setupViewModelObservers();
 
         GenericUser user = null;
 
         if (getArguments() != null) {
             @Nullable Parcelable userParcelable = getArguments().getParcelable(Constants.FRAGMENT_EXTRA_CONTACT);
-            if (userParcelable != null)
+
+            if (userParcelable != null) {
                 user = Parcels.unwrap(userParcelable);
+
+            } else {
+                long userId = getArguments().getLong(Constants.FRAGMENT_EXTRA_PROFILE_ID);
+            }
         }
 
         if (user != null)
@@ -154,6 +159,8 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
                     taskAdapter.setItems(tasks);
             });
 
+            viewModel.fetchUserStats();
+
             GlideApp.with(this)
                     .load(user.profilePhotoURL)
                     .priority(Priority.HIGH)
@@ -175,9 +182,18 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
             updateCompletedTasksCount(user.completedTasksCount);
             updateExperience(user.level, user.experience);
         });
+
+        viewModel.contactsCount.observe(this, contactsCount -> {
+            if (contactsCount != null)
+                updateContactsCount(contactsCount);
+        });
+
+        viewModel.totalTasksCount.observe(this, totalTasksCount -> {
+            if (totalTasksCount != null)
+                updateTotalTasksCount(totalTasksCount);
+        });
     }
 
-    @UiThread
     private void updateBadgesCount(long completedCount, long remainingCount) {
         badgesProgressCircle.post(() -> {
             badgesProgressCircle.setTopLine(String.valueOf(completedCount));
@@ -194,7 +210,6 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         });
     }
 
-    @UiThread
     private void updateExperience(long level, long experience) {
         experienceProgressCircle.post(() -> {
             experienceProgressCircle.setTopLine(String.valueOf(level));
@@ -208,19 +223,12 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         });
     }
 
-    @UiThread
-    private void updateStats(long numOfContacts, long totalTasks) {
-        friendsNumTextView.setText(String.valueOf(numOfContacts));
-        groupNumTextView.setText(String.valueOf("0"));
-        rewardsNumTextView.setText(String.valueOf("0"));
+    private void updateContactsCount(long contactsCount) {
+        friendsNumTextView.setText(String.valueOf(contactsCount));
+    }
 
-        tasksProgressCircle.setBottomLine("PER DAY");
-        circleProgressBar4.setTopLine(String.valueOf("0"));
-        circleProgressBar4.setBottomLine("ATTENDED");
-
-        tasksProgressCircle.setMaximumValue((int)totalTasks);
-
-        circleProgressBar4.setValue(30, true);
+    private void updateTotalTasksCount(long totalTasksCount) {
+        tasksProgressCircle.post(() -> tasksProgressCircle.setMaximumValue((int)totalTasksCount));
     }
 
     @Override

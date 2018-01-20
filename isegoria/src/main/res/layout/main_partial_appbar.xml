@@ -23,8 +23,7 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            style="@style/AppTabLayout"
-            android:visibility="gone"/>
+            style="@style/AppTabLayout"/>
 
     </android.support.design.widget.AppBarLayout>
 </merge>

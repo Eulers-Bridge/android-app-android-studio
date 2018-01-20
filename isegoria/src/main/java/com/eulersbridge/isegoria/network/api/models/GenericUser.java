@@ -68,6 +68,7 @@ public class GenericUser {
 
     // Android Studio auto-generated equals & hashCode
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o)

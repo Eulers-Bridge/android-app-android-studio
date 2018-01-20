@@ -12,7 +12,7 @@ public class AboutActivity extends AppCompatActivity  {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.about_activity);
+        setContentView(R.layout.activity_about);
 
         findViewById(R.id.back_button).setOnClickListener(view -> onBackPressed());
     }

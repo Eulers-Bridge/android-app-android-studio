@@ -95,24 +95,25 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment, 
                     .replace(R.id.election_frame, fragment)
                     .commitAllowingStateLoss();
 
-        if (!viewModel.userCompletedEfficacyQuestions()) {
+        viewModel.userCompletedEfficacyQuestions().observe(this, completed -> {
+            if (completed != null && !completed) {
+                View overlay = rootView.findViewById(R.id.election_efficacy_overlay);
+                overlay.setVisibility(View.VISIBLE);
 
-            View overlay = rootView.findViewById(R.id.election_efficacy_overlay);
-            overlay.setVisibility(View.VISIBLE);
+                Button efficacyStartButton = overlay.findViewById(R.id.election_efficacy_overlay_start);
+                efficacyStartButton.setOnClickListener(view -> {
 
-            Button efficacyStartButton = overlay.findViewById(R.id.election_efficacy_overlay_start);
-            efficacyStartButton.setOnClickListener(view -> {
+                    AppCompatActivity innerActivity = weakActivity.get();
 
-                AppCompatActivity innerActivity = weakActivity.get();
-
-                if (innerActivity != null)
-                    innerActivity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, new SelfEfficacyQuestionsFragment())
-                        .commit();
-            });
-        }
+                    if (innerActivity != null)
+                        innerActivity.getSupportFragmentManager()
+                                .beginTransaction()
+                                .addToBackStack(null)
+                                .add(R.id.container, new SelfEfficacyQuestionsFragment())
+                                .commit();
+                });
+            }
+        });
 	}
 
 	private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {

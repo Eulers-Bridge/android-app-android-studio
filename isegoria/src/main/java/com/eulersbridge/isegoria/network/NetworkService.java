@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.network;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -23,7 +25,8 @@ import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Utils;
-import com.eulersbridge.isegoria.util.network.SimpleCallback;
+import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
@@ -40,8 +43,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
@@ -171,58 +172,53 @@ public class NetworkService {
     }
 
     // Updates the base URL of the API by fetching the API root for the user's institution
-    private void updateAPIBaseURL(@NonNull final User user) {
+    private LiveData<Boolean> updateAPIBaseURL(@NonNull final User user) {
         if (user.institutionId == null) {
             finishedLogin(user);
-            return;
+            return new FixedData<>(false);
         }
 
-        api.getInstitution(user.institutionId).enqueue(new SimpleCallback<Institution>() {
-            @Override
-            protected void handleResponse(retrofit2.Response<Institution> response) {
-                Institution institution = response.body();
-                if (institution != null) {
+        LiveData<Institution> institutionRequest = new RetrofitLiveData<>(api.getInstitution(user.institutionId));
+        return Transformations.switchMap(institutionRequest, institution -> {
+            if (institution != null) {
 
-                    final String institutionName = institution.getName();
-                    if (!TextUtils.isEmpty(institutionName)) {
+                final String institutionName = institution.getName();
+                if (!TextUtils.isEmpty(institutionName)) {
 
-                        final SimpleCallback<List<ClientInstitution>> URLsCallback = new SimpleCallback<List<ClientInstitution>>() {
-                            @Override
-                            protected void handleResponse(retrofit2.Response<List<ClientInstitution>> response) {
-                                List<ClientInstitution> institutions = response.body();
-                                if (institutions != null) {
-                                    for (ClientInstitution institution : institutions) {
-                                        if (institution.name.equals(institutionName)
-                                                && !TextUtils.isEmpty(institution.apiRoot)) {
+                    LiveData<List<ClientInstitution>> clientsRequest = new RetrofitLiveData<>(api.getInstitutionURLs());
+                    return Transformations.switchMap(clientsRequest, institutions -> {
+                        if (institutions != null) {
+                            for (ClientInstitution clientInstitution : institutions) {
+                                if (clientInstitution.name.equals(institutionName)
+                                        && !TextUtils.isEmpty(clientInstitution.apiRoot)) {
 
-                                            apiBaseURL = institution.apiRoot + "api/";
+                                    apiBaseURL = clientInstitution.apiRoot + "api/";
 
-                                            // Recreate the API with the new base URL
-                                            //createAPI(institution.apiRoot);
-                                            createAPI();
+                                    // Recreate the API with the new base URL
+                                    //createAPI(institution.apiRoot);
+                                    createAPI();
 
-                                            finishedLogin(user);
-                                        }
-                                    }
+                                    finishedLogin(user);
+
+                                    return new FixedData<>(true);
                                 }
                             }
-                        };
-
-                        api.getInstitutionURLs().enqueue(URLsCallback);
-                    }
+                        }
+                        return new FixedData<>(false);
+                    });
                 }
             }
+
+            return new FixedData<>(false);
         });
     }
 
     // Allow the rest of the first-launch actions to take place
     private void finishedLogin(@NonNull User user) {
         application.setLoggedInUser(user, password);
-
-        if (user.accountVerified) application.onLoginSuccess();
     }
 
-	public void login(@NonNull String email, @NonNull String password) {
+	public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
         setEmail(email);
         setPassword(password);
 
@@ -231,41 +227,28 @@ public class NetworkService {
         String snsPlatformArn = Constants.SNS_PLATFORM_APPLICATION_ARN;
         String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
-        api.attemptLogin(snsPlatformArn, deviceToken).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, retrofit2.Response<LoginResponse> response) {
-                boolean userAccountVerified = false;
-                boolean success = false;
+        LiveData<LoginResponse> loginAttempt = new RetrofitLiveData<>(api.attemptLogin(snsPlatformArn, deviceToken));
+        return Transformations.switchMap(loginAttempt, response -> {
+            boolean success;
 
-                if (response.isSuccessful()) {
-                    LoginResponse loginResponse = response.body();
+            if (response == null) {
+                success = false;
 
-                    if (loginResponse != null) {
-                        success = true;
+            } else {
+                success = true;
 
-                        User user = loginResponse.user;
-                        user.setId(loginResponse.userId);
+                User user = response.user;
+                user.setId(response.userId);
 
-                        userAccountVerified = user.accountVerified;
+                if (user.accountVerified) {
+                    return updateAPIBaseURL(user);
 
-                        if (userAccountVerified)
-                            updateAPIBaseURL(user);
-                    }
-                }
-
-                if (!success) {
-                    application.onLoginFailure();
-
-                } else if (!userAccountVerified) {
+                } else {
                     application.showVerification();
                 }
             }
 
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                t.printStackTrace();
-                application.onLoginFailure();
-            }
+            return new FixedData<>(success);
         });
     }
 
@@ -334,7 +317,6 @@ public class NetworkService {
                 .build();
 
         int dotIndex = imageFile.getPath().lastIndexOf('.');
-
         String imageFileExtension = null;
 
         if (dotIndex > -1)
@@ -367,7 +349,10 @@ public class NetworkService {
         setup();
 
         long timestamp = System.currentTimeMillis() / 1000L;
-        User loggedInUser = application.getLoggedInUser();
+        User loggedInUser = application.loggedInUser.getValue();
+
+        if (loggedInUser == null)
+            return;
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)

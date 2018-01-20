@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.auth.signup;
 
+import android.support.annotation.NonNull;
+
 import org.parceler.Parcel;
 
 @Parcel
@@ -34,6 +36,22 @@ public class SignUpUser {
         this.password = password;
 
         this.institutionName = institutionName;
+    }
+
+    // Copy Constructor
+    public SignUpUser(@NonNull SignUpUser user) {
+        this.givenName = user.givenName;
+        this.familyName = user.familyName;
+        this.gender = user.gender;
+        this.nationality = user.nationality;
+        this.yearOfBirth = user.yearOfBirth;
+        this.email = user.email;
+        this.password = user.password;
+        this.institutionName = user.institutionName;
+        this.institutionId = user.institutionId;
+        this.accountVerified = user.accountVerified;
+        this.hasPersonality = user.hasPersonality;
+
     }
 
 }

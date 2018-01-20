@@ -50,6 +50,12 @@
         </activity>
 
         <activity
+            android:name=".auth.AuthActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AuthTheme" />
+
+        <activity
             android:name=".personality.PersonalityQuestionsActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"

@@ -8,9 +8,10 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.UserPersonality;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 @SuppressWarnings("WeakerAccess")
 public class PersonalityViewModel extends AndroidViewModel {
@@ -35,17 +36,21 @@ public class PersonalityViewModel extends AndroidViewModel {
 
         IsegoriaApp isegoriaApp = getApplication();
 
-        String userEmail = isegoriaApp.getLoggedInUser().email;
+        User user = isegoriaApp.loggedInUser.getValue();
 
-        LiveData<Void> request = new RetrofitLiveData<>(isegoriaApp.getAPI().addUserPersonality(userEmail, userPersonality));
+        if (user != null) {
+            LiveData<Void> request = new RetrofitLiveData<>(isegoriaApp.getAPI().addUserPersonality(user.email, userPersonality));
 
-        return Transformations.switchMap(request, success -> {
-           if (success != null) {
-               userCompletedQuestions.postValue(true);
-               return new FixedData<>(true);
-           }
+            return Transformations.switchMap(request, success -> {
+                if (success != null) {
+                    userCompletedQuestions.postValue(true);
+                    return new FixedData<>(true);
+                }
 
-           return new FixedData<>(false);
-        });
+                return new FixedData<>(false);
+            });
+        }
+
+        return new FixedData<>(false);
     }
 }

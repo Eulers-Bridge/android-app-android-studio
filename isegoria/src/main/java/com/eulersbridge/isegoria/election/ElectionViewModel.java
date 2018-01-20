@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Election;
-import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.util.data.FixedData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
@@ -23,9 +22,11 @@ public class ElectionViewModel extends AndroidViewModel {
         super(application);
     }
 
-    boolean userCompletedEfficacyQuestions() {
+    LiveData<Boolean> userCompletedEfficacyQuestions() {
         IsegoriaApp isegoriaApp = getApplication();
-        return isegoriaApp.getLoggedInUser().hasPPSEQuestions;
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
+                new FixedData<>(user != null && user.hasPPSEQuestions)
+        );
     }
 
     LiveData<Election> getElection() {
@@ -33,23 +34,23 @@ public class ElectionViewModel extends AndroidViewModel {
             return election;
 
         IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.getLoggedInUser();
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            if (user != null && user.institutionId != null) {
+                LiveData<List<Election>> electionsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getElections(user.institutionId));
 
-        if (user != null && user.institutionId != null) {
-            LiveData<List<Election>> electionsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getElections(user.institutionId));
+                election = Transformations.switchMap(electionsList, elections -> {
+                    if (elections != null && elections.size() > 0) {
+                        return new FixedData<>(elections.get(0));
 
-            election = Transformations.switchMap(electionsList, elections -> {
-                if (elections != null && elections.size() > 0) {
-                    return new FixedData<>(elections.get(0));
+                    } else {
+                        return new FixedData<>(null);
+                    }
+                });
 
-                } else {
-                    return new FixedData<>(null);
-                }
-            });
+                return election;
+            }
 
-            return election;
-        }
-
-        return new FixedData<>(null);
+            return new FixedData<>(null);
+        });
     }
 }

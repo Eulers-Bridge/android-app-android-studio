@@ -191,9 +191,9 @@ public class CandidatePositionFragment extends Fragment {
             }
         });
         
-        View dividierView = new View(getActivity());
-        dividierView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
-        dividierView.setBackgroundColor(Color.parseColor("#676475"));
+        View dividerView = new View(getActivity());
+        dividerView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1));
+        dividerView.setBackgroundColor(Color.parseColor("#676475"));
 
         RelativeLayout relLayoutMaster = new RelativeLayout(getActivity());
         TableRow.LayoutParams relLayoutMasterParam = new TableRow.LayoutParams((int)dpWidth, TableRow.LayoutParams.WRAP_CONTENT); 
@@ -229,6 +229,6 @@ public class CandidatePositionFragment extends Fragment {
         tr.addView(relLayoutMaster);
         
         positionsTableLayout.addView(tr);
-        positionsTableLayout.addView(dividierView);
+        positionsTableLayout.addView(dividerView);
 	}
 }

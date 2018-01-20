@@ -48,8 +48,10 @@ public class PollVoteFragment extends Fragment implements PollOptionAdapter.Poll
         RecyclerView listView = rootView.findViewById(R.id.poll_fragment_list_view);
         listView.setAdapter(adapter);
 
-        Poll poll = Parcels.unwrap(getArguments().getParcelable(Constants.ACTIVITY_EXTRA_POLL));
-        viewModel.setPoll(poll);
+        if (getArguments() != null) {
+            Poll poll = Parcels.unwrap(getArguments().getParcelable(Constants.ACTIVITY_EXTRA_POLL));
+            viewModel.setPoll(poll);
+        }
 
 		return rootView;
 	}

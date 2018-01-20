@@ -164,7 +164,7 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
 
     @Override
     public void performFriendRequestAction(int type, FriendRequest friendRequest) {
-        if (type == RECEIVED) {
+        if (type == RECEIVED && getContext() != null) {
             // Show accept or reject dialog
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.friend_request_action_dialog_title)+friendRequest.requester.getFullName())
@@ -201,7 +201,6 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
         args.putParcelable(Constants.FRAGMENT_EXTRA_USER, Parcels.wrap(user));
         profileOverviewFragment.setArguments(args);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null)
             mainActivity.presentContent(profileOverviewFragment);
     }
@@ -220,7 +219,6 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
         args.putParcelable(Constants.FRAGMENT_EXTRA_CONTACT, Parcels.wrap(contact));
         profileOverviewFragment.setArguments(args);
 
-        MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity != null)
             mainActivity.presentContent(profileOverviewFragment);
     }

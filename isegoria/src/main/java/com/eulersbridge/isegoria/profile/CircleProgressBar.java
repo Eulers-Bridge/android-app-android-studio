@@ -154,6 +154,8 @@ public class CircleProgressBar extends View {
             try {
                 baseColor = attrArray.getColor(R.styleable.CircleProgressBar_base_color, 0);
                 filledColor = attrArray.getColor(R.styleable.CircleProgressBar_progress_color, 0);
+                topText = attrArray.getString(R.styleable.CircleProgressBar_top_line_text);
+                bottomText = attrArray.getString(R.styleable.CircleProgressBar_bottom_line_text);
 
             } catch (Exception e) {
                 e.printStackTrace();

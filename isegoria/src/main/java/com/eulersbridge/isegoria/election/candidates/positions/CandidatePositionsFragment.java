@@ -41,14 +41,10 @@ public class CandidatePositionsFragment extends Fragment {
         positionsGridView.setAdapter(adapter);
 
         if (isegoriaApp != null) {
-            User user = isegoriaApp.getLoggedInUser();
+            User user = isegoriaApp.loggedInUser.getValue();
 
-            if (user != null) {
-                Long institutionId = user.institutionId;
-
-                if (institutionId != null)
-                    isegoriaApp.getAPI().getElections(institutionId).enqueue(electionsCallback);
-            }
+            if (user != null && user.institutionId != null)
+                isegoriaApp.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
         }
         
 		return rootView;

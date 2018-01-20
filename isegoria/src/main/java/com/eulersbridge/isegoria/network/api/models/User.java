@@ -81,43 +81,40 @@ public class User extends GenericUser {
         this.hasPPSEQuestions = true;
     }
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        if (!super.equals(o))
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         User user = (User) o;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             return Objects.equals(this, user);
 
-        if (newsFeedId != user.newsFeedId) return false;
+        if (getNewsFeedId() != user.getNewsFeedId()) return false;
         if (accountVerified != user.accountVerified) return false;
         if (hasPPSEQuestions != user.hasPPSEQuestions) return false;
         if (hasPersonality != user.hasPersonality) return false;
         if (trackingOff != user.trackingOff) return false;
         if (isOptedOutOfDataCollection != user.isOptedOutOfDataCollection) return false;
-        return yearOfBirth.equals(user.yearOfBirth) && (id != null ? id.equals(user.id) : user.id == null);
+        if (yearOfBirth != null ? !yearOfBirth.equals(user.yearOfBirth) : user.yearOfBirth != null)
+            return false;
+        return getId() == user.getId();
     }
 
     @Override
     public int hashCode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            return Objects.hashCode(this);
-
         int result = super.hashCode();
-        result = 31 * result + (int) (newsFeedId ^ (newsFeedId >>> 32));
+        result = 31 * result + (int) (getNewsFeedId() ^ (getNewsFeedId() >>> 32));
         result = 31 * result + (accountVerified ? 1 : 0);
         result = 31 * result + (hasPPSEQuestions ? 1 : 0);
         result = 31 * result + (hasPersonality ? 1 : 0);
         result = 31 * result + (trackingOff ? 1 : 0);
         result = 31 * result + (isOptedOutOfDataCollection ? 1 : 0);
-        result = 31 * result + yearOfBirth.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (yearOfBirth != null ? yearOfBirth.hashCode() : 0);
+        result = 31 * result + (int) (getId() ^ (getId() >>> 32));
         return result;
     }
 }

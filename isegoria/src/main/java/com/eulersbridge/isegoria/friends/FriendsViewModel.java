@@ -109,13 +109,20 @@ public class FriendsViewModel extends AndroidViewModel {
         if (sentFriendRequests == null) {
             IsegoriaApp isegoriaApp = getApplication();
 
-            long userId = isegoriaApp.getLoggedInUser().getId();
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user != null) {
 
-            LiveData<List<FriendRequest>> requests = new RetrofitLiveData<>(isegoriaApp.getAPI().getFriendRequestsSent(userId));
-            sentFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
-                sentRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
+                    LiveData<List<FriendRequest>> requests = new RetrofitLiveData<>(isegoriaApp.getAPI().getFriendRequestsSent(user.getId()));
+                    sentFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
+                        sentRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
 
-                return new FixedData<>(sentFriendRequests);
+                        return new FixedData<>(sentFriendRequests);
+                    });
+
+                    return sentFriendRequests;
+                }
+
+                return new FixedData<>(null);
             });
         }
 
@@ -126,13 +133,20 @@ public class FriendsViewModel extends AndroidViewModel {
         if (receivedFriendRequests == null) {
             IsegoriaApp isegoriaApp = getApplication();
 
-            long userId = isegoriaApp.getLoggedInUser().getId();
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user != null) {
 
-            LiveData<List<FriendRequest>> requests = new RetrofitLiveData<>(isegoriaApp.getAPI().getFriendRequestsReceived(userId));
-            receivedFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
-                receivedRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
+                    LiveData<List<FriendRequest>> requests = new RetrofitLiveData<>(isegoriaApp.getAPI().getFriendRequestsReceived(user.getId()));
+                    receivedFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
+                        receivedRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
 
-                return new FixedData<>(sentFriendRequests);
+                        return new FixedData<>(sentFriendRequests);
+                    });
+
+                    return receivedFriendRequests;
+                }
+
+                return new FixedData<>(null);
             });
         }
 
@@ -144,10 +158,10 @@ public class FriendsViewModel extends AndroidViewModel {
 
             IsegoriaApp isegoriaApp = getApplication();
 
-            User user = isegoriaApp.getLoggedInUser();
-
-            LiveData<Void> friendRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addFriend(user.email, newFriendEmail));
-            return Transformations.switchMap(friendRequest, __ -> new FixedData<>(true));
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                LiveData<Void> friendRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addFriend(user.email, newFriendEmail));
+                return Transformations.switchMap(friendRequest, __ -> new FixedData<>(true));
+            });
         }
 
         return new FixedData<>(false);

@@ -52,15 +52,12 @@ public class PhotoDetailViewModel extends AndroidViewModel {
     final LiveData<Boolean> photoLikedByUser = Transformations.switchMap(photoLikes, likes -> {
         if (likes != null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
+            User user = isegoriaApp.loggedInUser.getValue();
 
-            if (user != null) {
-                for (Like like : likes) {
-                    if (like.email.equals(isegoriaApp.getLoggedInUser().email)) {
+            if (user != null)
+                for (Like like : likes)
+                    if (like.email.equals(user.email))
                         return new FixedData<>(true);
-                    }
-                }
-            }
         }
 
         return new FixedData<>(false);
@@ -102,7 +99,7 @@ public class PhotoDetailViewModel extends AndroidViewModel {
     LiveData<Boolean> likePhoto() {
         final IsegoriaApp isegoriaApp = getApplication();
 
-        final User user = isegoriaApp.getLoggedInUser();
+        final User user = isegoriaApp.loggedInUser.getValue();
 
         if (user != null) {
             return Transformations.switchMap(currentPhoto, article -> {
@@ -122,7 +119,7 @@ public class PhotoDetailViewModel extends AndroidViewModel {
     LiveData<Boolean> unlikePhoto() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        User user = isegoriaApp.getLoggedInUser();
+        User user = isegoriaApp.loggedInUser.getValue();
 
         if (user != null) {
             return Transformations.switchMap(currentPhoto,

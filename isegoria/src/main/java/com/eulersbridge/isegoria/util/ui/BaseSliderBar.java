@@ -137,7 +137,7 @@ public class BaseSliderBar extends View {
     }
 
     /**
-     * Snap to the closest notch/point once the user has released the slider / finished draggin
+     * Snap to the closest notch/point once the user has released the slider / finished dragging
      */
     private void snapToPoint(int x) {
         int currentDistance = parentWidth;

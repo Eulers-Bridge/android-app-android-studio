@@ -6,15 +6,18 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
+import android.content.Intent;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Election;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.VoteLocation;
 import com.eulersbridge.isegoria.network.api.models.VoteReminder;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.Calendar;
 import java.util.List;
@@ -26,18 +29,22 @@ public class VoteViewModel extends AndroidViewModel {
     private LiveData<Election> election;
 
     private final MutableLiveData<Integer> selectedVoteLocationIndex = new MutableLiveData<>();
-    private final LiveData<VoteLocation> selectedVoteLocation = Transformations.switchMap(selectedVoteLocationIndex,
-            index -> {
-            if (voteLocations != null && voteLocations.getValue() != null && index >= 0) {
-                return new FixedData<>(voteLocations.getValue().get(index));
-            }
+
+    private final LiveData<VoteLocation> selectedVoteLocation =
+            Transformations.switchMap(selectedVoteLocationIndex, index -> {
+
+                if (voteLocations != null && voteLocations.getValue() != null && index >= 0)
+                    return new FixedData<>(voteLocations.getValue().get(index));
 
             return new FixedData<>(null);
         });
+
     final MutableLiveData<Calendar> dateTime = new MutableLiveData<>();
 
     final MediatorLiveData<Boolean> locationAndDateComplete = new MediatorLiveData<>();
     final MutableLiveData<Boolean> pledgeComplete = new MutableLiveData<>();
+
+    private final MutableLiveData<VoteReminder> latestVoteReminder = new MutableLiveData<>();
 
     public VoteViewModel(@NonNull Application application) {
         super(application);
@@ -64,7 +71,7 @@ public class VoteViewModel extends AndroidViewModel {
             return election;
 
         IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.getLoggedInUser();
+        User user = isegoriaApp.loggedInUser.getValue();
 
         if (user != null && user.institutionId != null) {
             LiveData<List<Election>> electionsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getElections(user.institutionId));
@@ -95,7 +102,7 @@ public class VoteViewModel extends AndroidViewModel {
             return voteLocations;
 
         IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.getLoggedInUser();
+        User user = isegoriaApp.loggedInUser.getValue();
 
         if (user != null && user.institutionId != null) {
             voteLocations = new RetrofitLiveData<>(isegoriaApp.getAPI().getVoteLocations(user.institutionId));
@@ -106,31 +113,73 @@ public class VoteViewModel extends AndroidViewModel {
     }
 
     LiveData<Boolean> setPledgeComplete() {
-        if (pledgeComplete.getValue() != null && pledgeComplete.getValue()) {
+        if (pledgeComplete.getValue() != null && pledgeComplete.getValue())
             return pledgeComplete;
-        }
 
         IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.getLoggedInUser();
+        User user = isegoriaApp.loggedInUser.getValue();
 
-        final Election election = this.election.getValue();
-        final VoteLocation voteLocation = selectedVoteLocation.getValue();
-        final Calendar dateTimeCalendar = dateTime.getValue();
+        if (user != null) {
+            final Election election = this.election.getValue();
+            final VoteLocation voteLocation = selectedVoteLocation.getValue();
+            final Calendar dateTimeCalendar = dateTime.getValue();
 
-        if (election != null && voteLocation != null && dateTimeCalendar != null) {
-            // Create a reminder
-            VoteReminder reminder = new VoteReminder(user.email, election.id, voteLocation.name,
-                    dateTimeCalendar.getTimeInMillis());
+            if (election != null && voteLocation != null && dateTimeCalendar != null) {
+                // Create a reminder
+                VoteReminder reminder = new VoteReminder(user.email, election.id, voteLocation.name,
+                        dateTimeCalendar.getTimeInMillis());
 
-            // Add the vote reminder
-            LiveData<Void> reminderRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addVoteReminder(user.email, reminder));
+                // Add the vote reminder
+                LiveData<Void> reminderRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addVoteReminder(user.email, reminder));
 
-            return Transformations.switchMap(reminderRequest, __ -> {
-                pledgeComplete.setValue(true);
-                return new FixedData<>(true);
+                return Transformations.switchMap(reminderRequest, __ -> {
+                    pledgeComplete.setValue(true);
+                    return new FixedData<>(true);
+                });
+            }
+        }
+
+        return new FixedData<>(false);
+    }
+
+    LiveData<Boolean> getLatestVoteReminder() {
+        IsegoriaApp isegoriaApp = getApplication();
+        User user = isegoriaApp.loggedInUser.getValue();
+
+        if (user != null) {
+
+            LiveData<List<VoteReminder>> remindersRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getVoteReminders(user.email));
+
+            return Transformations.switchMap(remindersRequest, reminders -> {
+                if (reminders != null && reminders.size() > 0) {
+                    latestVoteReminder.setValue(reminders.get(0));
+
+                    return new FixedData<>(true);
+                }
+
+                return new FixedData<>(false);
             });
         }
 
         return new FixedData<>(false);
+    }
+
+    @Nullable Intent getAddVoteReminderToCalendarIntent() {
+        VoteReminder voteReminder = latestVoteReminder.getValue();
+        if (voteReminder == null)
+            return null;
+
+        return new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, voteReminder.date)
+
+                // Make event 1 hour long (add an hour in in milliseconds to start)
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, voteReminder.date + 60 * 60 * 1000)
+                .putExtra(CalendarContract.Events.ALL_DAY, false)
+
+                .putExtra(CalendarContract.Events.TITLE, "Voting for Candidate")
+                .putExtra(CalendarContract.Events.DESCRIPTION, voteReminder.location)
+                .putExtra(CalendarContract.Events.EVENT_LOCATION, voteReminder.location)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 }

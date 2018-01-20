@@ -10,17 +10,21 @@ import android.support.annotation.Nullable;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Badge;
+import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.Task;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Response;
 
 public class ProfileViewModel extends AndroidViewModel {
 
@@ -39,6 +43,9 @@ public class ProfileViewModel extends AndroidViewModel {
     private LiveData<List<Task>> completedTasks;
     final MutableLiveData<Long> totalXp = new MutableLiveData<>();
 
+    final MutableLiveData<Long> contactsCount = new MutableLiveData<>();
+    final MutableLiveData<Long> totalTasksCount = new MutableLiveData<>();
+
     private LiveData<Photo> userPhoto;
 
     public ProfileViewModel(@NonNull Application application) {
@@ -46,9 +53,6 @@ public class ProfileViewModel extends AndroidViewModel {
 
         currentSectionIndex.setValue(0);
         targetBadgeLevel.setValue(0);
-
-        IsegoriaApp isegoriaApp = (IsegoriaApp)application;
-        user.setValue(isegoriaApp.getLoggedInUser());
     }
 
     public void setTargetBadgeLevel(int targetBadgeLevel) {
@@ -70,6 +74,26 @@ public class ProfileViewModel extends AndroidViewModel {
 
     void setUser(GenericUser user) {
         this.user.setValue(user);
+    }
+
+    void fetchUserStats() {
+        User user = getUser();
+
+        if (user == null)
+            return;
+
+        IsegoriaApp isegoriaApp = getApplication();
+
+        isegoriaApp.getAPI().getContact(user.email).enqueue(new SimpleCallback<Contact>() {
+            @Override
+            protected void handleResponse(Response<Contact> response) {
+                Contact contact = response.body();
+                if (contact != null) {
+                    contactsCount.setValue(contact.contactsCount);
+                    totalTasksCount.setValue(contact.totalTasksCount);
+                }
+            }
+        });
     }
 
     private @Nullable User getUser() {
@@ -103,7 +127,7 @@ public class ProfileViewModel extends AndroidViewModel {
                 remainingBadges = new RetrofitLiveData<>(isegoriaApp.getAPI().getRemainingBadges(user.getId()));
         }
 
-        if (limitToLevel)
+        if (limitToLevel) {
             return Transformations.switchMap(remainingBadges, badges -> {
                 if (badges != null) {
                     List<Badge> filteredBadges = new ArrayList<>();
@@ -121,7 +145,9 @@ public class ProfileViewModel extends AndroidViewModel {
                 return new FixedData<>(null);
             });
 
-        return new FixedData<>(null);
+        } else {
+            return remainingBadges;
+        }
     }
 
     /**
@@ -186,10 +212,17 @@ public class ProfileViewModel extends AndroidViewModel {
     }
 
     LiveData<List<Task>> getRemainingTasks() {
-        if (remainingTasks == null) {
+        if (remainingTasks == null || remainingTasks.getValue() == null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
-            remainingTasks = new RetrofitLiveData<>(isegoriaApp.getAPI().getRemainingTasks(user.getId()));
+
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user != null) {
+                    remainingTasks = new RetrofitLiveData<>(isegoriaApp.getAPI().getRemainingTasks(user.getId()));
+                    return remainingTasks;
+                }
+
+                return new FixedData<>(null);
+            });
         }
 
         return remainingTasks;
@@ -198,22 +231,27 @@ public class ProfileViewModel extends AndroidViewModel {
     LiveData<List<Task>> getCompletedTasks() {
         if (completedTasks == null || completedTasks.getValue() == null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
 
-            LiveData<List<Task>> tasksRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedTasks(user.getId()));
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user == null)
+                    return new FixedData<>(null);
 
-            completedTasks = Transformations.switchMap(tasksRequest, tasksList -> {
-                if (tasksList != null) {
-                    long newTotalXp = 0;
+                LiveData<List<Task>> tasksRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedTasks(user.getId()));
 
-                    for (Task task : tasksList) {
-                        newTotalXp += task.xpValue;
+                completedTasks = Transformations.switchMap(tasksRequest, tasksList -> {
+                    if (tasksList != null) {
+                        long newTotalXp = 0;
+
+                        for (Task task : tasksList)
+                            newTotalXp += task.xpValue;
+
+                        totalXp.setValue(newTotalXp);
                     }
 
-                    totalXp.setValue(newTotalXp);
-                }
+                    return new FixedData<>(tasksList);
+                });
 
-                return new FixedData<>(tasksList);
+                return completedTasks;
             });
         }
 
@@ -223,14 +261,21 @@ public class ProfileViewModel extends AndroidViewModel {
     LiveData<Photo> getUserPhoto() {
         if (userPhoto == null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
-            LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
 
-            userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
-                if (photosResponse != null && photosResponse.totalPhotos > 0)
-                    return new FixedData<>(photosResponse.photos.get(0));
+            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+                if (user == null)
+                    return new FixedData<>(null);
 
-                return new FixedData<>(null);
+                LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
+
+                userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
+                    if (photosResponse != null && photosResponse.totalPhotos > 0)
+                        return new FixedData<>(photosResponse.photos.get(0));
+
+                    return new FixedData<>(null);
+                });
+
+                return userPhoto;
             });
         }
 

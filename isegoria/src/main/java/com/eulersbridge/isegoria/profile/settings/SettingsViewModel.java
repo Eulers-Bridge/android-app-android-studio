@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.profile.settings;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -12,63 +13,129 @@ import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.UserSettings;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.io.File;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 @SuppressWarnings("WeakerAccess")
 public class SettingsViewModel extends AndroidViewModel {
 
     private LiveData<Photo> userPhoto;
 
+    final MutableLiveData<Boolean> optOutDataCollectionSwitchChecked = new MutableLiveData<>();
+    final MutableLiveData<Boolean> optOutDataCollectionSwitchEnabled = new MutableLiveData<>();
+
+    final MutableLiveData<Boolean> doNotTrackSwitchChecked = new MutableLiveData<>();
+    final MutableLiveData<Boolean> doNotTrackSwitchEnabled = new MutableLiveData<>();
+
     public SettingsViewModel(@NonNull Application application) {
         super(application);
+
+        optOutDataCollectionSwitchEnabled.setValue(false);
+        doNotTrackSwitchEnabled.setValue(false);
+
+        IsegoriaApp isegoriaApp = (IsegoriaApp) application;
+        User user = isegoriaApp.loggedInUser.getValue();
+        if (user != null) {
+            optOutDataCollectionSwitchChecked.setValue(user.isOptedOutOfDataCollection);
+            optOutDataCollectionSwitchEnabled.setValue(true);
+
+            doNotTrackSwitchChecked.setValue(user.trackingOff);
+            doNotTrackSwitchEnabled.setValue(true);
+        }
     }
 
-    User getUser() {
+    void onOptOutDataCollectionChange(boolean isChecked) {
+        optOutDataCollectionSwitchEnabled.setValue(false);
+
         IsegoriaApp isegoriaApp = getApplication();
-        return isegoriaApp.getLoggedInUser();
+        User user = isegoriaApp.loggedInUser.getValue();
+
+        if (user != null) {
+            UserSettings userSettings = new UserSettings(user.trackingOff, isChecked);
+
+            isegoriaApp.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        optOutDataCollectionSwitchChecked.setValue(isChecked);
+                        optOutDataCollectionSwitchEnabled.setValue(true);
+
+                        isegoriaApp.setOptedOutOfDataCollection(isChecked);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    optOutDataCollectionSwitchChecked.setValue(!isChecked);
+                    optOutDataCollectionSwitchEnabled.setValue(true);
+                }
+            });
+        }
     }
 
-    LiveData<Boolean> setTrackingOff(boolean trackingOff) {
+    void onTrackingChange(boolean isChecked) {
+        doNotTrackSwitchEnabled.setValue(false);
+
         IsegoriaApp isegoriaApp = getApplication();
+        User user = isegoriaApp.loggedInUser.getValue();
 
-        isegoriaApp.setTrackingOff(trackingOff);
+        if (user != null) {
+            UserSettings userSettings = new UserSettings(isChecked, user.isOptedOutOfDataCollection);
 
-        User user = isegoriaApp.getLoggedInUser();
-        UserSettings userSettings = new UserSettings(trackingOff, user.isOptedOutOfDataCollection);
+            isegoriaApp.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        doNotTrackSwitchChecked.setValue(isChecked);
 
-        LiveData<Void> updateUserDetails = new RetrofitLiveData<>(isegoriaApp.getAPI().updateUserDetails(user.email, userSettings));
-        return Transformations.switchMap(updateUserDetails,
-                success -> new FixedData<>(success != null));
+                        isegoriaApp.setTrackingOff(isChecked);
+
+                    } else {
+                        doNotTrackSwitchChecked.setValue(!isChecked);
+                    }
+
+                    doNotTrackSwitchEnabled.setValue(true);
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    // Restore to previous checked state
+                    doNotTrackSwitchChecked.setValue(!isChecked);
+                    doNotTrackSwitchEnabled.setValue(true);
+                }
+            });
+        }
     }
 
-    LiveData<Boolean> setOptedOutOfDataCollection(boolean optOutDataCollection) {
+    LiveData<String> getUserProfilePhotoURL() {
         IsegoriaApp isegoriaApp = getApplication();
 
-        isegoriaApp.setOptedOutOfDataCollection(optOutDataCollection);
-
-        User user = isegoriaApp.getLoggedInUser();
-        UserSettings userSettings = new UserSettings(user.trackingOff, optOutDataCollection);
-
-        LiveData<Void> updateUserDetails = new RetrofitLiveData<>(isegoriaApp.getAPI().updateUserDetails(user.email, userSettings));
-        return Transformations.switchMap(updateUserDetails,
-                success -> new FixedData<>(success != null));
+        return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
+            new FixedData<>(user == null? null : user.profilePhotoURL)
+        );
     }
 
     LiveData<Photo> getUserPhoto() {
         if (userPhoto == null) {
             IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.getLoggedInUser();
-            LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
+            User user = isegoriaApp.loggedInUser.getValue();
 
-            userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
-                if (photosResponse != null && photosResponse.totalPhotos > 0)
-                    return new FixedData<>(photosResponse.photos.get(0));
+            if (user != null) {
+                LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
 
-                return new FixedData<>(null);
-            });
+                userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
+                    if (photosResponse != null && photosResponse.totalPhotos > 0)
+                        return new FixedData<>(photosResponse.photos.get(0));
+
+                    return new FixedData<>(null);
+                });
+            }
         }
 
         return userPhoto;

@@ -28,6 +28,7 @@ public class Contact extends GenericUser {
     @Nullable
     public Long id;
 
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o)

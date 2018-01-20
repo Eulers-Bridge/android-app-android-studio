@@ -22,7 +22,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     final MutableLiveData<String> email = new MutableLiveData<>();
     final LiveData<Boolean> emailError = Transformations.switchMap(email, emailStr ->
-            new FixedData<>(Strings.isValidEmail(emailStr)));
+            new FixedData<>(!Strings.isValidEmail(emailStr)));
 
     final MutableLiveData<String> password = new MutableLiveData<>();
 
@@ -60,30 +60,40 @@ public class LoginViewModel extends AndroidViewModel {
         this.password.setValue(password);
     }
 
-    void login() {
+    LiveData<Boolean> login() {
         formEnabled.setValue(false);
 
-        if ((emailError.getValue() != null && emailError.getValue())
-                || (passwordError.getValue() != null && passwordError.getValue()))
-            return;
+        if (emailError.getValue() != null && !emailError.getValue()
+                && passwordError.getValue() != null && !passwordError.getValue()) {
 
-        IsegoriaApp isegoriaApp = getApplication();
+            IsegoriaApp isegoriaApp = getApplication();
 
-        if (!Utils.isNetworkAvailable(isegoriaApp)) {
-            networkError.setValue(true);
+            if (!Utils.isNetworkAvailable(isegoriaApp)) {
+                networkError.setValue(true);
+                formEnabled.setValue(true);
 
-        } else {
-            networkError.setValue(false);
+            } else {
+                networkError.setValue(false);
 
-            String email = this.email.getValue();
-            String password = this.password.getValue();
+                String email = this.email.getValue();
+                String password = this.password.getValue();
 
-            // Not null as email & password validation checks test for null
-            //noinspection ConstantConditions
-            isegoriaApp.login(email, password);
+                // Not null as email & password validation checks test for null
+                //noinspection ConstantConditions
+                LiveData<Boolean> loginRequest = isegoriaApp.login(email, password);
+
+                return Transformations.switchMap(loginRequest, success -> {
+                    if (success != null && success)
+                        return new FixedData<>(true);
+
+                    formEnabled.setValue(true);
+                    return new FixedData<>(false);
+                });
+            }
         }
 
         formEnabled.setValue(true);
+        return new FixedData<>(false);
     }
 
     void setNetworkErrorShown() {
