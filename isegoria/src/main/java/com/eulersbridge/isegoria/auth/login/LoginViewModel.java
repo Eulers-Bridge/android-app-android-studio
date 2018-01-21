@@ -13,7 +13,7 @@ import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.util.Utils;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.network.IgnoredCallback;
 import com.securepreferences.SecurePreferences;
 
@@ -22,12 +22,12 @@ public class LoginViewModel extends AndroidViewModel {
 
     final MutableLiveData<String> email = new MutableLiveData<>();
     final LiveData<Boolean> emailError = Transformations.switchMap(email, emailStr ->
-            new FixedData<>(!Strings.isValidEmail(emailStr)));
+            new SingleLiveData<>(!Strings.isValidEmail(emailStr)));
 
     final MutableLiveData<String> password = new MutableLiveData<>();
 
     final LiveData<Boolean> passwordError = Transformations.switchMap(password, passwordStr ->
-            new FixedData<>(TextUtils.isEmpty(passwordStr)));
+            new SingleLiveData<>(TextUtils.isEmpty(passwordStr)));
 
     final MutableLiveData<Boolean> formEnabled = new MutableLiveData<>();
     final MutableLiveData<Boolean> networkError = new MutableLiveData<>();
@@ -84,16 +84,16 @@ public class LoginViewModel extends AndroidViewModel {
 
                 return Transformations.switchMap(loginRequest, success -> {
                     if (success != null && success)
-                        return new FixedData<>(true);
+                        return new SingleLiveData<>(true);
 
                     formEnabled.setValue(true);
-                    return new FixedData<>(false);
+                    return new SingleLiveData<>(false);
                 });
             }
         }
 
         formEnabled.setValue(true);
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 
     void setNetworkErrorShown() {

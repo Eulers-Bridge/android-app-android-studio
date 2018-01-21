@@ -17,7 +17,7 @@ import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.Task;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
@@ -139,10 +139,10 @@ public class ProfileViewModel extends AndroidViewModel {
                             filteredBadges.add(badge);
                     }
 
-                    return new FixedData<>(filteredBadges);
+                    return new SingleLiveData<>(filteredBadges);
                 }
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
 
         } else {
@@ -174,10 +174,10 @@ public class ProfileViewModel extends AndroidViewModel {
                         filteredBadges.add(badge);
                 }
 
-                return new FixedData<>(filteredBadges);
+                return new SingleLiveData<>(filteredBadges);
             }
 
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
         });
     }
 
@@ -192,10 +192,10 @@ public class ProfileViewModel extends AndroidViewModel {
                         = new RetrofitLiveData<>(isegoriaApp.getAPI().getInstitution(user.institutionId));
 
                 institutionName = Transformations.switchMap(institutionRequest, institution ->
-                        new FixedData<>(institution == null? null : institution.getName()));
+                        new SingleLiveData<>(institution == null? null : institution.getName()));
 
             } else {
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             }
         }
 
@@ -221,7 +221,7 @@ public class ProfileViewModel extends AndroidViewModel {
                     return remainingTasks;
                 }
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
         }
 
@@ -234,7 +234,7 @@ public class ProfileViewModel extends AndroidViewModel {
 
             return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
                 if (user == null)
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
 
                 LiveData<List<Task>> tasksRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getCompletedTasks(user.getId()));
 
@@ -248,7 +248,7 @@ public class ProfileViewModel extends AndroidViewModel {
                         totalXp.setValue(newTotalXp);
                     }
 
-                    return new FixedData<>(tasksList);
+                    return new SingleLiveData<>(tasksList);
                 });
 
                 return completedTasks;
@@ -264,15 +264,15 @@ public class ProfileViewModel extends AndroidViewModel {
 
             return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
                 if (user == null)
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
 
                 LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
 
                 userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
                     if (photosResponse != null && photosResponse.totalPhotos > 0)
-                        return new FixedData<>(photosResponse.photos.get(0));
+                        return new SingleLiveData<>(photosResponse.photos.get(0));
 
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
                 });
 
                 return userPhoto;

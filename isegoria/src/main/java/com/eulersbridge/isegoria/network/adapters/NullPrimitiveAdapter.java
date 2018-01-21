@@ -10,33 +10,21 @@ public class NullPrimitiveAdapter {
 
     @FromJson
     public int intFromJson(@Nullable Integer value) {
-        if (value == null) {
-            return 0;
-        }
-        return value;
+        return value == null? 0 : value;
     }
 
     @FromJson
     public boolean booleanFromJson(@Nullable Boolean value) {
-        if (value == null) {
-            return false;
-        }
-        return value;
+        return value == null? false : value;
     }
 
     @FromJson
     public double doubleFromJson(@Nullable Double value) {
-        if (value == null) {
-            return 0;
-        }
-        return value;
+        return value == null? 0 : value;
     }
 
     @FromJson
     public long longFromJson(@Nullable Long value) {
-        if (value == null) {
-            return 0;
-        }
-        return value;
+        return value == null? 0 : value;
     }
 }

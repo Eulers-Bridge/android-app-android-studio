@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Event;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class EventsViewModel extends AndroidViewModel {
                 return eventsList;
             }
 
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
         });
     }
 

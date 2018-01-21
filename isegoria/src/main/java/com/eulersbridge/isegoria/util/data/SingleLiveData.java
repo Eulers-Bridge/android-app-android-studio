@@ -2,9 +2,9 @@ package com.eulersbridge.isegoria.util.data;
 
 import android.arch.lifecycle.LiveData;
 
-public class FixedData<T> extends LiveData<T> {
+public class SingleLiveData<T> extends LiveData<T> {
 
-    public FixedData(T value) {
+    public SingleLiveData(T value) {
         setValue(value);
     }
 

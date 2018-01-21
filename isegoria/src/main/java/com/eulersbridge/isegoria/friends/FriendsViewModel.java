@@ -15,7 +15,7 @@ import com.eulersbridge.isegoria.network.api.models.FriendRequest;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.util.Strings;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
@@ -90,7 +90,7 @@ public class FriendsViewModel extends AndroidViewModel {
             searchResults = new RetrofitLiveData<>(isegoriaApp.getAPI().searchForUsers(query));
 
         } else {
-            searchResults = new FixedData<>(null);
+            searchResults = new SingleLiveData<>(null);
         }
 
         return searchResults;
@@ -116,13 +116,13 @@ public class FriendsViewModel extends AndroidViewModel {
                     sentFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
                         sentRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
 
-                        return new FixedData<>(sentFriendRequests);
+                        return new SingleLiveData<>(sentFriendRequests);
                     });
 
                     return sentFriendRequests;
                 }
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
         }
 
@@ -140,13 +140,13 @@ public class FriendsViewModel extends AndroidViewModel {
                     receivedFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
                         receivedRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
 
-                        return new FixedData<>(sentFriendRequests);
+                        return new SingleLiveData<>(sentFriendRequests);
                     });
 
                     return receivedFriendRequests;
                 }
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
         }
 
@@ -160,11 +160,11 @@ public class FriendsViewModel extends AndroidViewModel {
 
             return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
                 LiveData<Void> friendRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addFriend(user.email, newFriendEmail));
-                return Transformations.switchMap(friendRequest, __ -> new FixedData<>(true));
+                return Transformations.switchMap(friendRequest, __ -> new SingleLiveData<>(true));
             });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 
     LiveData<Boolean> acceptFriendRequest(long requestId) {
@@ -175,7 +175,7 @@ public class FriendsViewModel extends AndroidViewModel {
             getReceivedFriendRequests();
             getFriends();
 
-            return new FixedData<>(true);
+            return new SingleLiveData<>(true);
         });
     }
 
@@ -187,7 +187,7 @@ public class FriendsViewModel extends AndroidViewModel {
             getReceivedFriendRequests();
             getFriends();
 
-            return new FixedData<>(true);
+            return new SingleLiveData<>(true);
         });
     }
 

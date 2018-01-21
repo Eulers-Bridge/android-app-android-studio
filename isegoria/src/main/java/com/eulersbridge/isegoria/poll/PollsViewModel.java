@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Poll;
 import com.eulersbridge.isegoria.network.api.responses.PollsResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
@@ -30,14 +30,14 @@ public class PollsViewModel extends AndroidViewModel {
             return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
 
                 if (user == null || user.institutionId == null)
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
 
                 LiveData<PollsResponse> pollsResponse = new RetrofitLiveData<>(isegoriaApp.getAPI().getPolls(user.institutionId));
                 return Transformations.switchMap(pollsResponse, response -> {
                     if (response != null && response.totalPolls > 0) {
-                        polls = new FixedData<>(response.polls);
+                        polls = new SingleLiveData<>(response.polls);
                     } else {
-                        polls = new FixedData<>(null);
+                        polls = new SingleLiveData<>(null);
                     }
 
                     return polls;

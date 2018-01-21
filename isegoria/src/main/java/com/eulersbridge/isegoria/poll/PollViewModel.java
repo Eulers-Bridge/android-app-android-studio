@@ -15,7 +15,7 @@ import com.eulersbridge.isegoria.network.api.models.Poll;
 import com.eulersbridge.isegoria.network.api.models.PollOption;
 import com.eulersbridge.isegoria.network.api.models.PollResult;
 import com.eulersbridge.isegoria.network.api.responses.PollResultsResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
@@ -38,11 +38,11 @@ public class PollViewModel extends AndroidViewModel {
                 return new RetrofitLiveData<>(isegoriaApp.getAPI().getContact(thePoll.creatorEmail));
 
             } else if (thePoll.creator != null) {
-                return new FixedData<>(thePoll.creator);
+                return new SingleLiveData<>(thePoll.creator);
             }
         }
 
-        return new FixedData<>(null);
+        return new SingleLiveData<>(null);
     });
 
     public PollViewModel(@NonNull Application application) {

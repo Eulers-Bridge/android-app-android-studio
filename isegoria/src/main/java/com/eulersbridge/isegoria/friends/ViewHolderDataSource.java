@@ -9,5 +9,6 @@ import java.lang.ref.WeakReference;
 
 interface ViewHolderDataSource {
     void getFriendRequestInstitution(@Nullable Long institutionId, WeakReference<RecyclerView.ViewHolder> weakViewHolder);
+    void onClick(FriendRequest friendRequest);
     void onActionClick(FriendRequest friendRequest);
 }

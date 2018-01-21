@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.UserPersonality;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 @SuppressWarnings("WeakerAccess")
@@ -44,13 +44,13 @@ public class PersonalityViewModel extends AndroidViewModel {
             return Transformations.switchMap(request, success -> {
                 if (success != null) {
                     userCompletedQuestions.postValue(true);
-                    return new FixedData<>(true);
+                    return new SingleLiveData<>(true);
                 }
 
-                return new FixedData<>(false);
+                return new SingleLiveData<>(false);
             });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 }

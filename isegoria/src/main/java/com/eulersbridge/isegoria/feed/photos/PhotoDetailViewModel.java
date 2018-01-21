@@ -14,7 +14,7 @@ import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.LikeResponse;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 
 import java.util.List;
 
@@ -26,9 +26,9 @@ public class PhotoDetailViewModel extends AndroidViewModel {
 
     final LiveData<Photo> currentPhoto = Transformations.switchMap(visibleIndex, index -> {
         if (photos != null && index >= 0 && index < photos.size()) {
-            return new FixedData<>(photos.get(index));
+            return new SingleLiveData<>(photos.get(index));
         } else {
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
         }
     });
 
@@ -41,10 +41,10 @@ public class PhotoDetailViewModel extends AndroidViewModel {
 
         return Transformations.switchMap(photoLikes, likes -> {
             if (currentPhoto.getValue() != null && photoId == currentPhoto.getValue().id) {
-                return new FixedData<>(likes);
+                return new SingleLiveData<>(likes);
 
             } else {
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             }
         });
     });
@@ -57,10 +57,10 @@ public class PhotoDetailViewModel extends AndroidViewModel {
             if (user != null)
                 for (Like like : likes)
                     if (like.email.equals(user.email))
-                        return new FixedData<>(true);
+                        return new SingleLiveData<>(true);
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     });
 
     public PhotoDetailViewModel(@NonNull Application application) {
@@ -106,11 +106,11 @@ public class PhotoDetailViewModel extends AndroidViewModel {
                 LiveData<LikeResponse> newsArticleLike = new RetrofitLiveData<>(isegoriaApp.getAPI().likePhoto(article.id, user.email));
 
                 return Transformations.switchMap(newsArticleLike,
-                        likeResponse -> new FixedData<>(likeResponse != null && likeResponse.success));
+                        likeResponse -> new SingleLiveData<>(likeResponse != null && likeResponse.success));
             });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 
     /**
@@ -126,10 +126,10 @@ public class PhotoDetailViewModel extends AndroidViewModel {
                     photo -> {
                         LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikePhoto(photo.id, user.email));
 
-                        return Transformations.switchMap(unlike, __ -> new FixedData<>(true));
+                        return Transformations.switchMap(unlike, __ -> new SingleLiveData<>(true));
                     });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 }

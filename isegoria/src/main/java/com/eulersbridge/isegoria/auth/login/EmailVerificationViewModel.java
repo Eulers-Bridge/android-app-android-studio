@@ -7,7 +7,7 @@ import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 @SuppressWarnings("WeakerAccess")
@@ -29,10 +29,10 @@ public class EmailVerificationViewModel extends AndroidViewModel {
         return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
             if (user != null) {
                 LiveData<Void> verificationRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().sendVerificationEmail(user.email));
-                return Transformations.switchMap(verificationRequest, __ -> new FixedData<>(true));
+                return Transformations.switchMap(verificationRequest, __ -> new SingleLiveData<>(true));
             }
 
-            return new FixedData<>(false);
+            return new SingleLiveData<>(false);
         });
 
     }

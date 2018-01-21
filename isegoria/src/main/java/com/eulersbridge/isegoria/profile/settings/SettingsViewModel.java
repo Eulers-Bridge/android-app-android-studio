@@ -13,7 +13,7 @@ import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.UserSettings;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.io.File;
@@ -117,7 +117,7 @@ public class SettingsViewModel extends AndroidViewModel {
         IsegoriaApp isegoriaApp = getApplication();
 
         return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
-            new FixedData<>(user == null? null : user.profilePhotoURL)
+            new SingleLiveData<>(user == null? null : user.profilePhotoURL)
         );
     }
 
@@ -131,9 +131,9 @@ public class SettingsViewModel extends AndroidViewModel {
 
                 userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
                     if (photosResponse != null && photosResponse.totalPhotos > 0)
-                        return new FixedData<>(photosResponse.photos.get(0));
+                        return new SingleLiveData<>(photosResponse.photos.get(0));
 
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
                 });
             }
         }
@@ -141,11 +141,10 @@ public class SettingsViewModel extends AndroidViewModel {
         return userPhoto;
     }
 
-    void updateUserPhoto(Uri imageUri) {
+    LiveData<Boolean> updateUserPhoto(Uri imageUri) {
         File file =  new File(imageUri.getPath());
 
-        IsegoriaApp isegoriaApp = getApplication();
-        isegoriaApp.getNetworkService().s3Upload(file);
+        return IsegoriaApp.networkService.uploadNewUserPhoto(file);
     }
 
     @Override

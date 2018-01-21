@@ -31,7 +31,7 @@ import java.util.Map;
 public class IsegoriaApp extends Application {
 
 	private WeakReference<MainActivity> weakMainActivity;
-	private NetworkService network;
+	public static NetworkService networkService;
 
 	public final MutableLiveData<User> loggedInUser =  new MutableLiveData<>();
 
@@ -44,6 +44,8 @@ public class IsegoriaApp extends Application {
         RoundedCornersTransformation.screenDensity = screenDensity;
 
         createNotificationChannels();
+
+        networkService = new NetworkService(this);
     }
 	
 	public void setMainActivity(MainActivity mainActivity) {
@@ -122,16 +124,9 @@ public class IsegoriaApp extends Application {
         if (mainActivity != null)
             mainActivity.showVerification();
     }
-	
-	public @NonNull NetworkService getNetworkService() {
-        if (network == null)
-            network = new NetworkService(this);
-
-		return network;
-	}
 
 	public API getAPI() {
-	    return getNetworkService().getAPI();
+	    return networkService.getAPI();
     }
 
 	public void updateLoggedInUser(@NonNull User updatedUser) {
@@ -152,14 +147,14 @@ public class IsegoriaApp extends Application {
 	}
 
 	public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
-        return getNetworkService().login(email, password);
+        return networkService.login(email, password);
     }
 
 	public void logOut() {
 		loggedInUser.setValue(null);
 
-        network.setEmail(null);
-        network.setPassword(null);
+        networkService.setEmail(null);
+        networkService.setPassword(null);
 
 		new SecurePreferences(getApplicationContext())
 				.edit()

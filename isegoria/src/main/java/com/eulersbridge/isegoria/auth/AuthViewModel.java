@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.auth;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
@@ -10,6 +11,7 @@ import com.eulersbridge.isegoria.auth.signup.SignUpUser;
 import com.eulersbridge.isegoria.network.api.models.Country;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import java.util.List;
@@ -24,7 +26,6 @@ public class AuthViewModel extends AndroidViewModel {
     final public MutableLiveData<Boolean> signUpVisible = new MutableLiveData<>();
     final public MutableLiveData<SignUpUser> signUpUser = new MutableLiveData<>();
     final MutableLiveData<Boolean> signUpConsentGiven =  new MutableLiveData<>();
-    final MutableLiveData<Boolean> signUpComplete = new MutableLiveData<>();
 
     final public MutableLiveData<Boolean> userLoggedIn = new MutableLiveData<>();
 
@@ -53,10 +54,10 @@ public class AuthViewModel extends AndroidViewModel {
         signUpConsentGiven.setValue(true);
     }
 
-    void signUp() {
+    LiveData<Boolean> signUp() {
         List<Country> countries = countriesData.getValue();
         if (countries == null)
-            return;
+            return new SingleLiveData<>(false);
 
         // Not possible for signUpUser's value to be null,
         // as sign-up process is linear and gated.
@@ -75,10 +76,7 @@ public class AuthViewModel extends AndroidViewModel {
             signUpUser.setValue(updatedUser);
         }
 
-        IsegoriaApp isegoriaApp = getApplication();
-
-        if (isegoriaApp.getNetworkService().signUp(updatedUser))
-            signUpComplete.setValue(true);
+        return IsegoriaApp.networkService.signUp(updatedUser);
     }
 
 }

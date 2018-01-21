@@ -59,12 +59,10 @@ public class AuthActivity extends AppCompatActivity {
 
         viewModel.signUpConsentGiven.observe(this, consent -> {
             if (consent != null && consent)
-                viewModel.signUp();
-        });
-
-        viewModel.signUpComplete.observe(this, signUpComplete -> {
-            if (signUpComplete != null && signUpComplete)
-                presentRootContent(new LoginFragment());
+                viewModel.signUp().observe(this, signUpComplete -> {
+                    if (signUpComplete != null && signUpComplete)
+                        presentRootContent(new LoginFragment());
+                });
         });
 
         viewModel.userLoggedIn.observe(this, loggedIn -> {

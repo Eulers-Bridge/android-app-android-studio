@@ -11,7 +11,7 @@ import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Like;
 import com.eulersbridge.isegoria.network.api.models.NewsArticle;
 import com.eulersbridge.isegoria.network.api.responses.LikeResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class NewsDetailViewModel extends AndroidViewModel {
 
     final LiveData<List<Like>> articleLikes = Transformations.switchMap(newsArticle, article -> {
         if (article == null) {
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
 
         } else {
             IsegoriaApp isegoriaApp = getApplication();
@@ -39,13 +39,13 @@ public class NewsDetailViewModel extends AndroidViewModel {
                 if (user != null)
                     for (Like like : likes)
                         if (like.email.equals(user.email))
-                            return new FixedData<>(true);
+                            return new SingleLiveData<>(true);
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     });
 
     public NewsDetailViewModel(@NonNull Application application) {
@@ -70,10 +70,10 @@ public class NewsDetailViewModel extends AndroidViewModel {
                     LiveData<LikeResponse> like = new RetrofitLiveData<>(isegoriaApp.getAPI().likeArticle(article.id, user.email));
 
                     return Transformations.switchMap(like,
-                            likeResponse -> new FixedData<>(likeResponse != null && likeResponse.success));
+                            likeResponse -> new SingleLiveData<>(likeResponse != null && likeResponse.success));
                 });
 
-            return new FixedData<>(false);
+            return new SingleLiveData<>(false);
         });
     }
 
@@ -89,10 +89,10 @@ public class NewsDetailViewModel extends AndroidViewModel {
                         article -> {
                             LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikeArticle(article.id, user.email));
 
-                            return Transformations.switchMap(unlike, __ -> new FixedData<>(true));
+                            return Transformations.switchMap(unlike, __ -> new SingleLiveData<>(true));
                         });
 
-            return new FixedData<>(false);
+            return new SingleLiveData<>(false);
         });
     }
 }

@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Election;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class ElectionViewModel extends AndroidViewModel {
     LiveData<Boolean> userCompletedEfficacyQuestions() {
         IsegoriaApp isegoriaApp = getApplication();
         return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
-                new FixedData<>(user != null && user.hasPPSEQuestions)
+                new SingleLiveData<>(user != null && user.hasPPSEQuestions)
         );
     }
 
@@ -40,17 +40,17 @@ public class ElectionViewModel extends AndroidViewModel {
 
                 election = Transformations.switchMap(electionsList, elections -> {
                     if (elections != null && elections.size() > 0) {
-                        return new FixedData<>(elections.get(0));
+                        return new SingleLiveData<>(elections.get(0));
 
                     } else {
-                        return new FixedData<>(null);
+                        return new SingleLiveData<>(null);
                     }
                 });
 
                 return election;
             }
 
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
         });
     }
 }

@@ -19,9 +19,7 @@ import java.lang.ref.WeakReference;
 class SentFriendRequestViewHolder extends RecyclerView.ViewHolder {
 
     private FriendRequest item;
-    private @NonNull
-    final
-    ViewHolderDataSource dataSource;
+    private @NonNull final ViewHolderDataSource dataSource;
 
     final private ImageView imageView;
     final private TextView nameTextView;
@@ -32,14 +30,14 @@ class SentFriendRequestViewHolder extends RecyclerView.ViewHolder {
 
         this.dataSource = dataSource;
 
-        // TODO: On click listener to view profile
-
         imageView = itemView.findViewById(R.id.friends_list_image_view);
         nameTextView = itemView.findViewById(R.id.friends_list_name_text_view);
         institutionTextView = itemView.findViewById(R.id.friends_list_institution_text_view);
 
         ImageView actionImageView = itemView.findViewById(R.id.friends_list_action_image_view);
         actionImageView.setVisibility(View.GONE);
+
+        itemView.setOnClickListener(view -> dataSource.onClick(item));
     }
 
     void setItem(@Nullable FriendRequest item) {

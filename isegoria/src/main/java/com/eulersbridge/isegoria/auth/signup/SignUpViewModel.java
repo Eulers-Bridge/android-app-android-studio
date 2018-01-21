@@ -13,7 +13,7 @@ import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.Country;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.ArrayList;
@@ -65,9 +65,9 @@ public class SignUpViewModel extends AndroidViewModel {
 
             countries = Transformations.switchMap(generalInfo, info -> {
                 if (info != null && info.countries.size() > 0)
-                    return new FixedData<>(info.countries);
+                    return new SingleLiveData<>(info.countries);
 
-                return new FixedData<>(null);
+                return new SingleLiveData<>(null);
             });
         }
 

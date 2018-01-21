@@ -104,6 +104,12 @@ class FriendRequestAdapter extends RecyclerView.Adapter implements ViewHolderDat
     }
 
     @Override
+    public void onClick(@Nullable FriendRequest friendRequest) {
+        if (friendRequest != null)
+            delegate.performFriendRequestAction(itemType, friendRequest);
+    }
+
+    @Override
     public void onActionClick(@Nullable FriendRequest friendRequest) {
         if (friendRequest != null)
             delegate.performFriendRequestAction(itemType, friendRequest);

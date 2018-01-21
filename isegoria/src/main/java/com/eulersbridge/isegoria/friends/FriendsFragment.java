@@ -164,18 +164,31 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
 
     @Override
     public void performFriendRequestAction(int type, FriendRequest friendRequest) {
-        if (type == RECEIVED && getContext() != null) {
+        if (type == RECEIVED) {
+
             // Show accept or reject dialog
-            new AlertDialog.Builder(getContext())
-                    .setTitle(getString(R.string.friend_request_action_dialog_title)+friendRequest.requester.getFullName())
-                    .setPositiveButton(R.string.friend_request_action_dialog_positive, (dialogInterface, choice) ->
-                        acceptFriendRequest(friendRequest)
-                    )
-                    .setNegativeButton(R.string.friend_request_action_dialog_negative, (dialogInterface, choice) ->
-                        rejectFriendRequest(friendRequest)
-                    )
-                    .setNeutralButton(R.string.friend_request_action_dialog_neutral, null)
-                    .show();
+            if (getContext() != null)
+                new AlertDialog.Builder(getContext())
+                        .setTitle(getString(R.string.friend_request_action_dialog_title)+friendRequest.requester.getFullName())
+                        .setPositiveButton(R.string.friend_request_action_dialog_positive, (dialogInterface, choice) ->
+                            acceptFriendRequest(friendRequest)
+                        )
+                        .setNegativeButton(R.string.friend_request_action_dialog_negative, (dialogInterface, choice) ->
+                            rejectFriendRequest(friendRequest)
+                        )
+                        .setNeutralButton(R.string.friend_request_action_dialog_neutral, null)
+                        .show();
+
+        } else if (type == SENT && mainActivity != null) {
+            User user = friendRequest.requestReceiver;
+
+            Bundle args = new Bundle();
+            args.putParcelable(Constants.FRAGMENT_EXTRA_USER, Parcels.wrap(user));
+
+            ProfileOverviewFragment profileFragment = new ProfileOverviewFragment();
+            profileFragment.setArguments(args);
+
+            mainActivity.presentContent(profileFragment);
         }
     }
 

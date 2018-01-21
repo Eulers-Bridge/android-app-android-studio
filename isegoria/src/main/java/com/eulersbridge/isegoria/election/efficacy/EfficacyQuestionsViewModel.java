@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.models.UserSelfEfficacy;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 @SuppressWarnings("WeakerAccess")
@@ -29,7 +29,7 @@ public class EfficacyQuestionsViewModel extends AndroidViewModel {
                 || score2.getValue() == null
                 || score3.getValue() == null
                 || score4.getValue() == null) {
-            return new FixedData<>(false);
+            return new SingleLiveData<>(false);
         }
 
         IsegoriaApp isegoriaApp = getApplication();
@@ -45,7 +45,7 @@ public class EfficacyQuestionsViewModel extends AndroidViewModel {
         return Transformations.switchMap(efficacyRequest, __ -> {
             isegoriaApp.onUserSelfEfficacyCompleted();
 
-            return new FixedData<>(true);
+            return new SingleLiveData<>(true);
         });
     }
 

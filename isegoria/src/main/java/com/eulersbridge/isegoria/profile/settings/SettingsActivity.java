@@ -160,9 +160,10 @@ public class SettingsActivity extends AppCompatActivity {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(backgroundImageView);
 
-        viewModel.updateUserPhoto(imageUri);
-
-        changePhotoButton.setEnabled(true);
+        viewModel.updateUserPhoto(imageUri).observe(this, success -> {
+            if (success != null)
+                changePhotoButton.setEnabled(true);
+        });
     }
 
     @Override

@@ -16,7 +16,7 @@ import com.eulersbridge.isegoria.network.api.models.Election;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.models.VoteLocation;
 import com.eulersbridge.isegoria.network.api.models.VoteReminder;
-import com.eulersbridge.isegoria.util.data.FixedData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 
 import java.util.Calendar;
@@ -34,9 +34,9 @@ public class VoteViewModel extends AndroidViewModel {
             Transformations.switchMap(selectedVoteLocationIndex, index -> {
 
                 if (voteLocations != null && voteLocations.getValue() != null && index >= 0)
-                    return new FixedData<>(voteLocations.getValue().get(index));
+                    return new SingleLiveData<>(voteLocations.getValue().get(index));
 
-            return new FixedData<>(null);
+            return new SingleLiveData<>(null);
         });
 
     final MutableLiveData<Calendar> dateTime = new MutableLiveData<>();
@@ -84,17 +84,17 @@ public class VoteViewModel extends AndroidViewModel {
                     calendar.setTimeInMillis(election.startVotingTimestamp);
                     dateTime.setValue(calendar);
 
-                    return new FixedData<>(election);
+                    return new SingleLiveData<>(election);
 
                 } else {
-                    return new FixedData<>(null);
+                    return new SingleLiveData<>(null);
                 }
             });
 
             return election;
         }
 
-        return new FixedData<>(null);
+        return new SingleLiveData<>(null);
     }
 
     LiveData<List<VoteLocation>> getVoteLocations() {
@@ -109,7 +109,7 @@ public class VoteViewModel extends AndroidViewModel {
             return voteLocations;
         }
 
-        return new FixedData<>(null);
+        return new SingleLiveData<>(null);
     }
 
     LiveData<Boolean> setPledgeComplete() {
@@ -134,12 +134,12 @@ public class VoteViewModel extends AndroidViewModel {
 
                 return Transformations.switchMap(reminderRequest, __ -> {
                     pledgeComplete.setValue(true);
-                    return new FixedData<>(true);
+                    return new SingleLiveData<>(true);
                 });
             }
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 
     LiveData<Boolean> getLatestVoteReminder() {
@@ -154,14 +154,14 @@ public class VoteViewModel extends AndroidViewModel {
                 if (reminders != null && reminders.size() > 0) {
                     latestVoteReminder.setValue(reminders.get(0));
 
-                    return new FixedData<>(true);
+                    return new SingleLiveData<>(true);
                 }
 
-                return new FixedData<>(false);
+                return new SingleLiveData<>(false);
             });
         }
 
-        return new FixedData<>(false);
+        return new SingleLiveData<>(false);
     }
 
     @Nullable Intent getAddVoteReminderToCalendarIntent() {

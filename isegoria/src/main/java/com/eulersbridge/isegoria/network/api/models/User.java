@@ -34,10 +34,6 @@ public class User extends GenericUser {
         // Required empty constructor for @Parcel
     }
 
-    public User(Contact contact) {
-        super(contact);
-    }
-
     public User(User user) {
         super(user);
 
