@@ -3,8 +3,11 @@ package com.eulersbridge.isegoria.util.ui;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.eulersbridge.isegoria.BuildConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +68,9 @@ public class LoadingAdapter<I, VH extends LoadingAdapter.ItemViewHolder<I>> exte
             items.addAll(newItems);
             notifyItemRangeChanged(0, newItems.size());
         }
+
+        if (loading && BuildConfig.DEBUG)
+            Log.w(getClass().getSimpleName(), "replaceItems() called whilst still in loading state.");
     }
 
     protected List<I> getItems() {

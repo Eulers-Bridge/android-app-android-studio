@@ -73,9 +73,8 @@ public class PhotosFragment extends Fragment implements TitledFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (getView() != null && isegoriaApp != null && !fetchedPhotos) {
+        if (getView() != null && isegoriaApp != null && !fetchedPhotos)
             refresh();
-        }
     }
 
     private void refresh() {
@@ -109,8 +108,10 @@ public class PhotosFragment extends Fragment implements TitledFragment {
 
 	private void fetchPhotoAlbums() {
         viewModel.getPhotoAlbums().observe(this, albums -> {
-            if (albums != null)
+            if (albums != null) {
+                adapter.setLoading(false);
                 adapter.replaceItems(albums);
+            }
         });
     }
 }

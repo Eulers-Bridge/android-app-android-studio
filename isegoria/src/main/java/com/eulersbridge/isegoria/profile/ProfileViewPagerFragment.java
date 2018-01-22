@@ -38,7 +38,8 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
 
         setHasOptionsMenu(true);
 
-        setupViewPager(rootView);
+        viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
+        setupViewPager();
 
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         viewModel.currentSectionIndex.observe(this, index -> {
@@ -49,46 +50,42 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
         return rootView;
     }
 
-    private void setupViewPager(@NonNull View rootView) {
-        if (viewPager == null) {
-            viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
+    private void setupViewPager() {
+        final ArrayList<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(new ProfileOverviewFragment());
+        fragmentList.add(new ProfileTaskProgressFragment());
+        fragmentList.add(new ProfileBadgesFragment());
 
-            final ArrayList<Fragment> fragmentList = new ArrayList<>();
-            fragmentList.add(new ProfileOverviewFragment());
-            fragmentList.add(new ProfileTaskProgressFragment());
-            fragmentList.add(new ProfileBadgesFragment());
+        final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
+            @Override
+            public CharSequence getPageTitle(int position) {
+                TitledFragment fragment = (TitledFragment)fragmentList.get(position);
+                if (fragment != null) {
+                    return fragment.getTitle(getContext());
 
-            final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
-                @Override
-                public CharSequence getPageTitle(int position) {
-                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
-                    if (fragment != null) {
-                        return fragment.getTitle(getContext());
-
-                    } else {
-                        return null;
-                    }
+                } else {
+                    return null;
                 }
-            };
+            }
+        };
 
-            viewPager.setAdapter(pagerAdapter);
-            viewPager.setOffscreenPageLimit(3);
-            viewPager.setCurrentItem(0);
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                }
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setCurrentItem(0);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
-                @Override
-                public void onPageSelected(int position) {
-                    viewModel.onSectionIndexChanged(position);
-                }
+            @Override
+            public void onPageSelected(int position) {
+                viewModel.onSectionIndexChanged(position);
+            }
 
-                @Override
-                public void onPageScrollStateChanged(int state) {
-                }
-            });
-        }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     @Override

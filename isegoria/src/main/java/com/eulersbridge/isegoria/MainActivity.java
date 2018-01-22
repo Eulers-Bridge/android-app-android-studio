@@ -47,12 +47,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 	private Deque<Fragment> tabFragments;
-
+    private TabLayout tabLayout;
     private CoordinatorLayout coordinatorLayout;
-
     private BottomNavigationViewEx navigationView;
-
-	private TabLayout tabLayout;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -70,15 +67,12 @@ public class MainActivity extends AppCompatActivity implements
 
 		coordinatorLayout = findViewById(R.id.coordinator_layout);
 
-		String userEmail = new SecurePreferences(this)
-                .getString(Constants.USER_EMAIL_KEY, null);
-		String userPassword = new SecurePreferences(this)
-                .getString(Constants.USER_PASSWORD_KEY, null);
-
 		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         application.loggedInUser.observe(this, user -> {
-            if (user == null) {
+            final boolean userLoggedOut = user == null;
+
+            if (userLoggedOut) {
                 finish();
 
             } else {
@@ -86,10 +80,20 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        if (application.loggedInUser.getValue() == null) {
-            boolean haveStoredCredentials = userEmail != null && userPassword != null;
+        attemptUserLogin(application);
+	}
+
+	private void attemptUserLogin(IsegoriaApp app) {
+        if (app.loggedInUser.getValue() == null) {
+            String userEmail = new SecurePreferences(this)
+                    .getString(Constants.USER_EMAIL_KEY, null);
+            String userPassword = new SecurePreferences(this)
+                    .getString(Constants.USER_PASSWORD_KEY, null);
+
+            final boolean haveStoredCredentials = userEmail != null && userPassword != null;
+
             if (haveStoredCredentials) {
-                application.login(userEmail, userPassword).observe(this, success -> {
+                app.login(userEmail, userPassword).observe(this, success -> {
                     if (success == null || !success) {
                         showLogin();
                     }
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
                 showLogin();
             }
         }
-	}
+    }
 
     public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
@@ -217,14 +221,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 	private void showElection() {
-	    runOnUiThread(() -> {
-            presentRootContent(new ElectionMasterFragment());
+        final @IdRes int id = R.id.navigation_election;
 
-            @IdRes int id = R.id.navigation_election;
-
-            if (navigationView.getSelectedItemId() != id)
-                navigationView.setSelectedItemId(id);
-        });
+        if (navigationView.getSelectedItemId() != id)
+            navigationView.setSelectedItemId(id);
     }
 
     public void showFriends() {
@@ -247,14 +247,9 @@ public class MainActivity extends AppCompatActivity implements
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-		if (item.isCheckable())
-            item.setChecked(true);
-
-		final int newNavigationId = item.getItemId();
-
         Fragment fragment;
 
-        switch(newNavigationId) {
+        switch(item.getItemId()) {
             case R.id.navigation_feed:
                 fragment = new FeedFragment();
                 break;
@@ -272,8 +267,9 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case R.id.navigation_election:
-                showElection();
-                // Fall through to return
+                fragment = new ElectionMasterFragment();
+                break;
+
             default:
                 return true;
         }
@@ -287,8 +283,6 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
 	private void onLoginSuccess(User loggedInUser) {
-        navigationView.setEnabled(true);
-
         if (!handleAppShortcutIntent())
             navigationView.setSelectedItemId(R.id.navigation_feed);
 

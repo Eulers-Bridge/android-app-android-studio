@@ -63,8 +63,6 @@
     <string name="email_verification_resend_button">Resend Verification Email</string>
 
     <!-- Personality Questions -->
-    <string name="section_title_personality_questions">Personality Questions</string>
-
     <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science!\n\nAll you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
     <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
     <string name="personality_screen_skip_button">Skip</string>
@@ -219,8 +217,5 @@
     <string name="friend_request_action_dialog_positive">Accept</string>
     <string name="friend_request_action_dialog_negative">Reject</string>
     <string name="friend_request_action_dialog_neutral">Ignore</string>
-    <string name="news_section_title">News</string>
-    <string name="events_section_title">Events</string>
-    <string name="photos_section_title">Photos</string>
 
 </resources>

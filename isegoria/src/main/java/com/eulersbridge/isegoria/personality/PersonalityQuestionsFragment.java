@@ -18,6 +18,7 @@ public class PersonalityQuestionsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.personality_screen2_fragment, container, false);
 
+        //noinspection ConstantConditions
         PersonalityViewModel viewModel = ViewModelProviders.of(getActivity()).get(PersonalityViewModel.class);
 
         PersonalitySliderBar personalitySliderBar1 = rootView.findViewById(R.id.personalitySliderBar1);

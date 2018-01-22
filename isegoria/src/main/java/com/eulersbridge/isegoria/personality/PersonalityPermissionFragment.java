@@ -17,6 +17,7 @@ public class PersonalityPermissionFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.personality_screen1_fragment, container, false);
 
+        //noinspection ConstantConditions
         PersonalityViewModel viewModel = ViewModelProviders.of(getActivity()).get(PersonalityViewModel.class);
 
         final Button takePersonalityButton = rootView.findViewById(R.id.takePersonalityButton);

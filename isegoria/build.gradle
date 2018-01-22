@@ -91,15 +91,15 @@ dependencies {
     // Used in Candidate fragment for bottom tabs
     implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.13'
-    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.13'
-    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.13'
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.14'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.14'
+    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.14'
 
     // Required for push notifications
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
 
-    // Secures user email/password storage for auto-login
-    implementation 'com.scottyab:secure-preferences-lib:0.1.4'
+    // Secures/obfuscates user email/password storage for auto-login
+    implementation 'com.github.scottyab:secure-preferences:v0.1.6'
 }
 
 apply plugin: 'com.google.gms.google-services'
