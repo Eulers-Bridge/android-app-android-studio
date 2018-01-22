@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.vote;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,15 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.util.ArrayList;
 
-public class VoteViewPagerFragment extends Fragment implements TitledFragment {
+public class VoteViewPagerFragment extends Fragment
+        implements TitledFragment, MainActivity.TabbedFragment {
+
     private TabLayout tabLayout;
+
+    private SimpleFragmentPagerAdapter viewPagerAdapter;
     private NonSwipeableViewPager viewPager;
 
     @Override
@@ -25,10 +31,22 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
         // Ensure options menu from another fragment is not carried over
-        getActivity().invalidateOptionsMenu();
+        if (getActivity() != null)
+            getActivity().invalidateOptionsMenu();
+
+        VoteViewModel viewModel = ViewModelProviders.of(this).get(VoteViewModel.class);
+
+        viewModel.locationAndDateComplete.observe(this, complete -> {
+            if (complete != null && complete)
+                viewPager.setCurrentItem(1);
+        });
+
+        viewModel.pledgeComplete.observe(this, complete -> {
+            if (complete != null && complete)
+                viewPager.setCurrentItem(2);
+        });
 
         setupViewPager(rootView);
-        setupTabLayout();
 
         return rootView;
     }
@@ -42,45 +60,43 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         if (rootView == null) rootView = getView();
 
         if (viewPager == null && rootView != null) {
-            viewPager = rootView.findViewById(R.id.voteViewPagerFragment);
+            viewPager = rootView.findViewById(R.id.vote_view_pager_fragment);
 
             ArrayList<Fragment> fragments = new ArrayList<>();
+            fragments.add(new VoteFragment());
+            fragments.add(new VotePledgeFragment());
+            fragments.add(new VoteDoneFragment());
 
-            VoteFragment voteFragment = new VoteFragment();
-            VoteFragmentPledge voteFragmentPledge = new VoteFragmentPledge();
-            VoteFragmentDone voteFragmentDone = new VoteFragmentDone();
-
-            voteFragment.setViewPager(viewPager);
-            voteFragmentPledge.setViewPager(viewPager);
-
-            fragments.add(voteFragment);
-            fragments.add(voteFragmentPledge);
-            fragments.add(voteFragmentDone);
-
-            voteFragmentPledge.setVoteFragment(voteFragment);
-
-            SimpleFragmentPagerAdapter viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
+            viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
                 @Override
                 public CharSequence getPageTitle(int position) {
-                    switch (position) {
-                        case 0:
-                            return "Vote";
-                        case 1:
-                            return "Pledge";
-                        case 2:
-                            return "Done";
+
+                    Fragment fragment = viewPagerAdapter.getItem(position);
+                    if (fragment instanceof TitledFragment) {
+                        return ((TitledFragment) fragment).getTitle(getContext());
+
+                    } else {
+                        return null;
                     }
-                    return null;
                 }
             };
+
             viewPager.setAdapter(viewPagerAdapter);
 
             viewPager.setCurrentItem(0);
         }
     }
 
-    public void setTabLayout(TabLayout tabLayout) {
+    @Override
+    public void setupTabLayout(TabLayout tabLayout) {
         this.tabLayout = tabLayout;
+
+        tabLayout.removeAllTabs();
+        tabLayout.setVisibility(View.VISIBLE);
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
+        tabLayout.setEnabled(false);
     }
 
     @Override
@@ -92,9 +108,7 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
 
     private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
         @Override
-        public void onTabSelected(TabLayout.Tab tab) {
-            viewPager.setCurrentItem(tab.getPosition());
-        }
+        public void onTabSelected(TabLayout.Tab tab) { }
 
         @Override
         public void onTabUnselected(TabLayout.Tab tab) { }
@@ -102,13 +116,4 @@ public class VoteViewPagerFragment extends Fragment implements TitledFragment {
         @Override
         public void onTabReselected(TabLayout.Tab tab) { }
     };
-
-    private void setupTabLayout() {
-        if (tabLayout == null) return;
-
-        tabLayout.removeAllTabs();
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-        tabLayout.setVisibility(View.VISIBLE);
-    }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.eulersbridge.isegoria.common.SquareFrameLayout
+<com.eulersbridge.isegoria.util.ui.SquareFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="2dp">
@@ -9,7 +10,9 @@
         android:id="@+id/election_position_grid_item_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@null"/>
+        android:scaleType="centerCrop"
+        android:contentDescription="@null"
+        tools:background="@color/grey"/>
 
     <TextView
         android:id="@+id/election_position_grid_item_title_text_view"
@@ -18,6 +21,8 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        tools:text="President"
+        android:fontFamily="@font/museo_sans_rounded_500"/>
 
-</com.eulersbridge.isegoria.common.SquareFrameLayout>
+</com.eulersbridge.isegoria.util.ui.SquareFrameLayout>

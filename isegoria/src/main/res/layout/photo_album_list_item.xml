@@ -1,43 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/photo_album_list_item_image_view"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_gravity="start|center_vertical"
-        tools:ignore="ContentDescription" />
-    
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical"
+        android:layout_width="@dimen/photo_album_list_item_thumbnail_size"
+        android:layout_height="@dimen/photo_album_list_item_thumbnail_size"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin">
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription"
+        tools:background="@color/grey" />
 
-        <TextView
-            android:id="@+id/photo_album_list_item_title_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@color/black" />
+    <TextView
+        android:id="@+id/photo_album_list_item_title_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:textColor="@color/photo_album_list_item_name"
+        android:textSize="@dimen/photo_album_list_item_name_size"
+        android:fontFamily="@font/museo_sans_rounded_500"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/photo_album_list_item_image_view"
+        app:layout_constraintTop_toTopOf="@id/photo_album_list_item_image_view"
+        tools:text="Album Title" />
 
-        <TextView
-            android:id="@+id/photo_album_list_item_description_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxHeight="38dp"
-            android:layout_marginTop="8dp"
-            android:textSize="14sp"
-            android:textColor="@color/black"
-            android:lineSpacingMultiplier="1.1"
-            android:ellipsize="end"/>
-    </LinearLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/photo_album_list_item_description_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:lineSpacingMultiplier="1.1"
+        android:maxHeight="38dp"
+        android:textColor="@color/blue_grey"
+        android:textSize="@dimen/photo_album_list_item_description_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/photo_album_list_item_image_view"
+        app:layout_constraintBottom_toBottomOf="@id/photo_album_list_item_image_view"
+        tools:text="Album Description" />
+
+</android.support.constraint.ConstraintLayout>

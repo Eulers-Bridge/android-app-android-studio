@@ -1,51 +1,65 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
+import com.eulersbridge.isegoria.feed.events.EventsFragment;
+import com.eulersbridge.isegoria.feed.news.NewsFragment;
+import com.eulersbridge.isegoria.feed.photos.PhotosFragment;
+
+import java.util.ArrayList;
+
 class FeedViewPagerAdapter extends FragmentPagerAdapter {
 
-    private final NewsFragment newsFragment;
-    private final PhotosFragment photosFragment;
-    private final EventsFragment eventsFragment;
+    final private ArrayList<Fragment> fragments;
+    final private int fragmentCount = 3;
 
-    FeedViewPagerAdapter(FragmentManager fm) {
-        super(fm);
+    FeedViewPagerAdapter(FragmentManager fragmentManager) {
+        super(fragmentManager);
 
-        newsFragment = new NewsFragment();
-        photosFragment = new PhotosFragment();
-        eventsFragment = new EventsFragment();
+        fragments = new ArrayList<>(fragmentCount);
     }
 
     @Override
-    public Fragment getItem(int arg0) {
-        switch (arg0) {
-            case 0:
-                return newsFragment;
-            case 1:
-                return photosFragment;
-            case 2:
-                return eventsFragment;
+    public Fragment getItem(int position) {
+        Fragment fragment;
+
+        try {
+            fragment = fragments.get(position);
+
+        } catch (Exception e) {
+            if (position == 1) {
+                fragment = new PhotosFragment();
+            } else if (position == 2) {
+                fragment = new EventsFragment();
+            } else {
+                // 0, etc.
+                fragment = new NewsFragment();
+            }
+
+            fragments.add(position, fragment);
         }
-        return null;
+
+        return fragment;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return fragmentCount;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position) {
-            case 0:
-                return "News";
-            case 1:
-                return "Photos";
-            case 2:
-                return "Events";
+
+        Fragment fragment = getItem(position);
+        if (fragment instanceof TitledFragment) {
+            Context context = fragment.getContext();
+            return ((TitledFragment) fragment).getTitle(context);
         }
+
         return null;
     }
 }

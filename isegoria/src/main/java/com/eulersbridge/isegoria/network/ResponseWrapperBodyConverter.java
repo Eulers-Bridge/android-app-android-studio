@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.network;
 
+import com.eulersbridge.isegoria.network.api.responses.GenericPaginatedResponse;
+
 import java.io.IOException;
 
 import okhttp3.ResponseBody;

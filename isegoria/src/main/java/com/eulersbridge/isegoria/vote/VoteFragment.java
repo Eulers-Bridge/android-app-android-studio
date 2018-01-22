@@ -1,149 +1,200 @@
 package com.eulersbridge.isegoria.vote;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.TimePicker;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.models.Election;
-import com.eulersbridge.isegoria.models.VoteLocation;
-import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.network.api.models.Election;
+import com.eulersbridge.isegoria.network.api.models.VoteLocation;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-import retrofit2.Response;
+public class VoteFragment extends Fragment implements TitledFragment {
 
-public class VoteFragment extends Fragment implements OnItemSelectedListener {
-    private ArrayAdapter<String> voteLocationArrayAdapter;
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private ArrayList<VoteLocation> voteLocationArray;
+    private ArrayAdapter<VoteLocation> voteLocationArrayAdapter;
 
-    private Spinner spinnerLocation;
-    private TextView voteFragmentTitle1;
-    private View voteDivider1;
-    private View voteDivider2;
-    private TextView voteText;
-    private DatePicker datePicker;
-    private TimePicker timePicker;
+    private EditText timeField;
+    private EditText dateField;
 
-    private ViewPager mPager;
+    private Dialog openDialog;
+
+    private VoteViewModel viewModel;
 
     @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_fragment, container, false);
-		
-        spinnerLocation = rootView.findViewById(R.id.voteLocation);
-        spinnerLocation.setOnItemSelectedListener(this);
-        voteLocationArrayAdapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_layout);
+
+        //noinspection ConstantConditions
+        viewModel = ViewModelProviders.of(getParentFragment()).get(VoteViewModel.class);
+        setupModelObservers();
+
+        Spinner spinnerLocation = rootView.findViewById(R.id.vote_location);
+
+        voteLocationArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_layout);
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
+
         spinnerLocation.setAdapter(voteLocationArrayAdapter);
-        voteLocationArray = new ArrayList<>();
-
-        datePicker = rootView.findViewById(R.id.datePicker1);
-        timePicker = rootView.findViewById(R.id.timePicker1);
-        voteDivider1 = rootView.findViewById(R.id.voteDivider1);
-        voteDivider2 = rootView.findViewById(R.id.voteDivider2);
-        voteFragmentTitle1 = rootView.findViewById(R.id.voteFragmentTitle1);
-        voteText = rootView.findViewById(R.id.voteText);
-
-        Button voteOkButton = rootView.findViewById(R.id.voteOkButton);
-        voteOkButton.setOnClickListener(view -> mPager.setCurrentItem(1));
-
-        Isegoria isegoria = (Isegoria) getActivity().getApplication();
-
-        long institutionId = isegoria.getLoggedInUser().institutionId;
-
-        isegoria.getAPI().getVoteLocations(institutionId).enqueue(new SimpleCallback<List<VoteLocation>>() {
+        spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            protected void handleResponse(Response<List<VoteLocation>> response) {
-                List<VoteLocation> locations = response.body();
-                if (locations != null) {
-                    for (VoteLocation voteLocation : locations) {
-                        voteLocationArray.add(voteLocation);
-                        voteLocationArrayAdapter.add(voteLocation.name);
-                    }
+            public void onItemSelected(AdapterView<?> adapterView, View view, int index, long id) {
+                viewModel.onVoteLocationChanged(index);
+            }
 
-                    showAll();
-                }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
 
-        isegoria.getAPI().getElections(institutionId).enqueue(new SimpleCallback<List<Election>>() {
-            @Override
-            protected void handleResponse(Response<List<Election>> response) {
-                List<Election> elections = response.body();
-                if (elections != null && elections.size() > 0) {
-                    Election election = elections.get(0);
-                    updateDatePicker(election);
-                }
-            }
+        timeField = rootView.findViewById(R.id.vote_time);
+        timeField.setEnabled(false);
+
+        timeField.setOnClickListener(view -> {
+            if (!view.isEnabled()) return;
+
+            Calendar calendar = viewModel.dateTime.getValue();
+            if (calendar == null) return;
+
+            openDialog = new TimePickerDialog(getContext(),
+                    (view1, hourOfDay, minute) -> {
+
+                        Calendar updatedCalendar = viewModel.dateTime.getValue();
+
+                        updatedCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        updatedCalendar.set(Calendar.MINUTE, minute);
+
+                        viewModel.dateTime.setValue(updatedCalendar);
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    DateFormat.is24HourFormat(getContext()));
+            openDialog.show();
         });
 
-        // TODO: Fix
-        /*if (isegoria.getNetwork().isReminderSet()) {
-            mPager.setCurrentItem(2);
-        }*/
+        dateField = rootView.findViewById(R.id.vote_date);
+        dateField.setEnabled(false);
+
+        dateField.setOnClickListener(view -> {
+            if (!view.isEnabled()) return;
+
+            Calendar calendar = viewModel.dateTime.getValue();
+            if (calendar == null) return;
+
+            final DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                    (datePicker, year, monthOfYear, dayOfMonth) -> {
+
+                        Calendar updatedCalendar = viewModel.dateTime.getValue();
+
+                        updatedCalendar.set(Calendar.YEAR, year);
+                        updatedCalendar.set(Calendar.MONTH, monthOfYear);
+                        updatedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                        viewModel.dateTime.setValue(updatedCalendar);
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH));
+
+            Election election = viewModel.getElection().getValue();
+            if (election != null && election.startVotingTimestamp < election.endVotingTimestamp) {
+                datePickerDialog.getDatePicker().setMinDate(election.startVotingTimestamp);
+                datePickerDialog.getDatePicker().setMaxDate(election.endVotingTimestamp);
+            }
+
+            openDialog = datePickerDialog;
+            openDialog.show();
+        });
+
+        Button voteOkButton = rootView.findViewById(R.id.vote_ok_button);
+        voteOkButton.setOnClickListener(view -> viewModel.locationAndDateComplete.setValue(true));
 
 		return rootView;
 	}
 
-	private void updateDatePicker(Election election) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                if (election.startVotingTimestamp < election.endVotingTimestamp) {
-                    datePicker.setMinDate(election.startVotingTimestamp);
-                    datePicker.setMaxDate(election.endVotingTimestamp);
+    private void setupModelObservers() {
+        viewModel.dateTime.observe(this, calendar -> {
+            updateDateLabel(dateField, calendar);
+            updateTimeLabel(timeField, calendar);
+        });
+
+        viewModel.getVoteLocations().observe(this, locations -> {
+            if (locations != null)
+                voteLocationArrayAdapter.addAll(locations);
+        });
+
+        viewModel.getElection().observe(this, election -> {
+            dateField.setEnabled(true);
+            timeField.setEnabled(true);
+        });
+    }
+
+    @Nullable
+    @Override
+    public String getTitle(Context context) {
+        return context.getString(R.string.vote_tab_1);
+    }
+
+    private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
+
+	private void updateDateLabel(EditText label, Calendar calendar) {
+
+	    final long calMillis = calendar.getTimeInMillis();
+        String dateStr;
+
+        if (DateUtils.isToday(calMillis)) {
+            dateStr = "Today";
+
+        } else if (DateUtils.isToday(calMillis - MILLIS_PER_DAY)) {
+            dateStr = "Tomorrow";
+
+        } else {
+
+            final Calendar todayCal = Calendar.getInstance();
+
+            if (calendar.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR)) {
+
+                if (calendar.get(Calendar.WEEK_OF_YEAR) == todayCal.get(Calendar.WEEK_OF_YEAR)
+                        && calendar.get(Calendar.ERA) == todayCal.get(Calendar.ERA)) {
+
+                    //If this week, use name of day of week (eg. Friday)
+                    dateStr = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+
+                } else {
+                    final int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NO_YEAR;
+                    dateStr = DateUtils.formatDateTime(getContext(), calMillis, flags);
                 }
-            });
+
+            } else {
+                dateStr = DateUtils.formatDateTime(getContext(), calMillis, DateUtils.FORMAT_SHOW_DATE);
+            }
         }
+
+        label.setText(dateStr);
     }
 
-    public void setViewPager(ViewPager mPager) {
-        this.mPager = mPager;
-    }
-	
-    public void onItemSelected(AdapterView<?> parent, View view, 
-            int pos, long id) {
-       // VoteLocation voteLocation = voteLocationArray.get(pos);
-        //network.getVoteLocation(this, voteLocation.getVotingLocationId());
-    }
-    
-    public void onNothingSelected(AdapterView<?> parent) {
+    private void updateTimeLabel(EditText label, Calendar calendar) {
+        final java.text.DateFormat formatter = android.text.format.DateFormat.getTimeFormat(getContext());
+        final String timeStr = formatter.format(calendar.getTime());
 
-    }
-
-    public DatePicker getDatePicker() {
-        return datePicker;
-    }
-
-    public TimePicker getTimePicker() {
-        return timePicker;
-    }
-
-    public Spinner getSpinnerLocation() {
-        return spinnerLocation;
-    }
-
-    private void showAll() {
-        datePicker.setVisibility(ViewGroup.VISIBLE);
-        timePicker.setVisibility(ViewGroup.VISIBLE);
-        voteDivider1.setVisibility(ViewGroup.VISIBLE);
-        voteDivider2.setVisibility(ViewGroup.VISIBLE);
-        voteFragmentTitle1.setVisibility(ViewGroup.VISIBLE);
-        voteText.setVisibility(ViewGroup.VISIBLE);
+        label.setText(timeStr);
     }
 }

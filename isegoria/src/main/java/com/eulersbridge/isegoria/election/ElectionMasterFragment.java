@@ -1,38 +1,48 @@
 package com.eulersbridge.isegoria.election;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.election.candidates.CandidateFragment;
+import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
 
-public class ElectionMasterFragment extends Fragment implements TitledFragment {
+import java.lang.ref.WeakReference;
+
+public class ElectionMasterFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
 
 	private ElectionOverviewFragment overviewFragment;
 	private CandidateFragment candidateFragment;
 
-    private MainActivity mainActivity;
+    private WeakReference<AppCompatActivity> weakActivity;
     private View rootView;
 	private TabLayout tabLayout;
+
+	private ElectionViewModel viewModel;
 	
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.election_master_layout, container, false);
 
-		mainActivity = (MainActivity)getActivity();
+		viewModel = ViewModelProviders.of(this).get(ElectionViewModel.class);
 
-		// Ensure options menu from another fragment is not carried over
-		mainActivity.invalidateOptionsMenu();
+		AppCompatActivity activity = (AppCompatActivity) getActivity();
+        weakActivity = new WeakReference<>(activity);
 
-        setupTabLayout();
+		if (activity != null)
+            // Ensure options menu from another fragment is not carried over
+			activity.invalidateOptionsMenu();
 
 		overviewFragment = new ElectionOverviewFragment();
 		candidateFragment = new CandidateFragment();
@@ -47,8 +57,22 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 		return context.getString(R.string.section_title_election);
 	}
 
-	public void setTabLayout(TabLayout tabLayout) {
-		this.tabLayout = tabLayout;
+	@Override
+	public void setupTabLayout(TabLayout tabLayout) {
+	    this.tabLayout = tabLayout;
+
+		tabLayout.removeAllTabs();
+		tabLayout.setVisibility(View.VISIBLE);
+
+        final String[] tabNames = {
+                getString(R.string.election_section_title_overview),
+                getString(R.string.election_section_title_candidates)
+        };
+
+        for (String tabName : tabNames)
+            tabLayout.addTab(tabLayout.newTab().setText(tabName));
+
+        tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 	}
 
 	@Override
@@ -63,30 +87,33 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 	}
 
 	private void showTabFragment(@NonNull Fragment fragment) {
-        mainActivity.getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.election_frame, fragment)
-                .commitAllowingStateLoss();
+	    AppCompatActivity activity = weakActivity.get();
 
-        boolean userCompletedEfficacyQuestions = mainActivity.getIsegoriaApplication()
-                .getLoggedInUser().hasPPSEQuestions;
+	    if (activity != null)
+            activity.getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.election_frame, fragment)
+                    .commitAllowingStateLoss();
 
-        if (!userCompletedEfficacyQuestions) {
+        viewModel.userCompletedEfficacyQuestions().observe(this, completed -> {
+            if (completed != null && !completed) {
+                View overlay = rootView.findViewById(R.id.election_efficacy_overlay);
+                overlay.setVisibility(View.VISIBLE);
 
-            View overlay = rootView.findViewById(R.id.election_efficacy_overlay);
-            overlay.setVisibility(View.VISIBLE);
+                Button efficacyStartButton = overlay.findViewById(R.id.election_efficacy_overlay_start);
+                efficacyStartButton.setOnClickListener(view -> {
 
-            Button efficacyStartButton = overlay.findViewById(R.id.election_efficacy_overlay_start);
-            efficacyStartButton.setOnClickListener(view -> {
-                SelfEfficacyQuestionsFragment selfEfficacyQuestionsFragment = new SelfEfficacyQuestionsFragment();
+                    AppCompatActivity innerActivity = weakActivity.get();
 
-                mainActivity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .add(R.id.container, selfEfficacyQuestionsFragment)
-                        .commit();
-            });
-        }
+                    if (innerActivity != null)
+                        innerActivity.getSupportFragmentManager()
+                                .beginTransaction()
+                                .addToBackStack(null)
+                                .add(R.id.container, new SelfEfficacyQuestionsFragment())
+                                .commit();
+                });
+            }
+        });
 	}
 
 	private final TabLayout.OnTabSelectedListener onTabSelectedListener = new TabLayout.OnTabSelectedListener() {
@@ -111,19 +138,4 @@ public class ElectionMasterFragment extends Fragment implements TitledFragment {
 		@Override
 		public void onTabReselected(TabLayout.Tab tab) { }
 	};
-
-	private void setupTabLayout() {
-		if (tabLayout == null) return;
-
-		tabLayout.removeAllTabs();
-
-		final String[] tabNames = {"Overview", "Candidates"};
-
-		for (String tabName : tabNames) {
-			tabLayout.addTab(tabLayout.newTab().setText(tabName));
-		}
-
-		tabLayout.addOnTabSelectedListener(onTabSelectedListener);
-		tabLayout.setVisibility(View.VISIBLE);
-	}
 }

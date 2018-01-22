@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/profile_image_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/profileImageBackground"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/profile_image_small"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:contentDescription="@null"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@color/grey" />
+
+        <TextView
+            android:id="@+id/profile_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/museo_sans_rounded_500"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/profile_institution"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_small"
+            tools:text="Jane Doe" />
+
+        <TextView
+            android:id="@+id/profile_institution"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            app:layout_goneMarginBottom="@dimen/activity_vertical_margin"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/profile_personality_test_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="Institution Name" />
+
+        <TextView
+            android:id="@+id/profile_personality_test_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:text="@string/user_profile_personality_test_button"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="#059aff"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@id/profile_image_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/profile_friends_num"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:text="0"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/black"
+            android:textSize="@dimen/profileTextSize"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/profile_friends_label"
+            app:layout_constraintStart_toStartOf="@+id/profile_friends_label"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_background"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/profile_friends_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:paddingBottom="8dp"
+            android:text="@string/profile_section_friends"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/grey"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/profile_friends_divider"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_friends_num" />
+
+        <!-- Vertical Divider -->
+        <View
+            android:id="@+id/profile_friends_divider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:background="@color/divider"
+            app:layout_constraintBottom_toBottomOf="@id/profile_friends_label"
+            app:layout_constraintEnd_toStartOf="@+id/profile_group_label"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_friends_label"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_background" />
+
+        <TextView
+            android:id="@+id/profile_group_num"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:text="0"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/black"
+            android:textSize="@dimen/profileTextSize"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/profile_group_label"
+            app:layout_constraintStart_toStartOf="@+id/profile_group_label"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_background"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/profile_group_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/profile_section_groups"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/grey"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/profile_group_divider"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_friends_divider"
+            app:layout_constraintTop_toBottomOf="@id/profile_group_num" />
+
+        <!-- Vertical Divider -->
+        <View
+            android:id="@+id/profile_group_divider"
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:background="@color/divider"
+            app:layout_constraintBottom_toBottomOf="@id/profile_friends_label"
+            app:layout_constraintEnd_toStartOf="@+id/profile_rewards_label"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_group_label"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_background" />
+
+        <TextView
+            android:id="@+id/profile_rewards_num"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:text="0"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/black"
+            android:textSize="@dimen/profileTextSize"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/profile_rewards_label"
+            app:layout_constraintStart_toStartOf="@+id/profile_rewards_label"
+            app:layout_constraintTop_toBottomOf="@id/profile_image_background"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/profile_rewards_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/profile_section_rewards"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/grey"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_group_divider"
+            app:layout_constraintTop_toBottomOf="@id/profile_rewards_num" />
+
+        <!-- Horizontal Divider -->
+        <View
+            android:id="@+id/profile_divider_stats"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_friends_label" />
+
+        <!-- Progress Circle 1 -->
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
+            android:id="@+id/profile_experience_progress_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="12dp"
+            app:base_color="@color/profile_circle_ring_base"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/profile_badges_progress_circle"
+            app:layout_constraintHeight_min="80dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
+            app:progress_color="#2C9F47"
+            app:top_line_text="0"
+            app:bottom_line_text="NEED " />
+
+        <TextView
+            android:id="@+id/profile_experience_progress_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/profile_section_experience_level"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/grey"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/profile_experience_progress_circle"
+            app:layout_constraintStart_toStartOf="@id/profile_experience_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_experience_progress_circle" />
+
+        <!-- Progress Circle 2 -->
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
+            android:id="@+id/profile_badges_progress_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            app:base_color="@color/profile_circle_ring_base"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/profile_tasks_progress_circle"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_experience_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
+            app:progress_color="#FFB400"
+            app:top_line_text="0"
+            app:bottom_line_text="/0"/>
+
+        <TextView
+            android:id="@+id/profile_badges_progress_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/profile_section_badges"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/grey"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/profile_badges_progress_circle"
+            app:layout_constraintStart_toStartOf="@id/profile_badges_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_badges_progress_circle" />
+
+        <!-- Progress Circle 3 -->
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
+            android:id="@+id/profile_tasks_progress_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            app:base_color="@color/profile_circle_ring_base"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@+id/circularSeekBar4"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_badges_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
+            app:progress_color="#B61B1B"
+            app:top_line_text="0"
+            app:bottom_line_text="PER DAY"/>
+
+        <TextView
+            android:id="@+id/profile_tasks_progress_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/profile_section_tasks"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/grey"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/profile_tasks_progress_circle"
+            app:layout_constraintStart_toStartOf="@id/profile_tasks_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_tasks_progress_circle" />
+
+        <!-- Progress Circle 4 -->
+        <com.eulersbridge.isegoria.profile.CircleProgressBar
+            android:id="@+id/circularSeekBar4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
+            app:base_color="@color/profile_circle_ring_base"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profile_tasks_progress_circle"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_stats"
+            app:progress_color="#00FF00"
+            app:top_line_text="0"
+            app:bottom_line_text="ATTENDED" />
+
+        <TextView
+            android:id="@+id/profile_circle_progress_4_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/profile_section_events"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/grey"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@id/circularSeekBar4"
+            app:layout_constraintStart_toStartOf="@id/circularSeekBar4"
+            app:layout_constraintTop_toBottomOf="@id/circularSeekBar4" />
+
+        <!-- Horizontal Divider -->
+        <View
+            android:id="@+id/profile_divider_progress"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_experience_progress_label" />
+
+        <TextView
+            android:id="@+id/taskLevelField"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:text="@string/profile_section_tasks"
+            android:textColor="#575757"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_progress" />
+
+        <TextView
+            android:id="@+id/profile_show_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@string/profile_show_progress"
+            android:textColor="#0781ff"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/taskLevelField"
+            app:layout_constraintTop_toBottomOf="@id/profile_divider_progress" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/profile_tasks_list_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            android:minHeight="40dp"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/taskLevelField" />
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

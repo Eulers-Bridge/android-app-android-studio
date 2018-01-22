@@ -8,10 +8,15 @@
     <dimen name="profileTextSizeLabel">18sp</dimen>
     <dimen name="newsArticleSize">16sp</dimen>
     <dimen name="newsTimeSize">14sp</dimen>
-    <dimen name="newsArticleName">14sp</dimen>
     <dimen name="newsPointsSize">15sp</dimen>
     <dimen name="eventLocationSize">16sp</dimen>
 
     <dimen name="profile_circle_size">80dp</dimen>
+
+    <dimen name="feed_corner_radius">0dp</dimen>
+
+    <dimen name="photo_album_list_item_thumbnail_size">40dp</dimen>
+    <dimen name="photo_album_list_item_name_size">16sp</dimen>
+    <dimen name="photo_album_list_item_description_size">12sp</dimen>
 
 </resources>

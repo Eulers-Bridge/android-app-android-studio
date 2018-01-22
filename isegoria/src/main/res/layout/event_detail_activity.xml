@@ -1,145 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-		<RelativeLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:gravity="bottom"
-			android:orientation="vertical">
+        <ImageView
+            android:id="@+id/event_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@null"
+            android:scaleType="centerInside"
+            app:layout_constraintDimensionRatio="3:2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@color/grey" />
 
-			<ImageView
-				android:id="@+id/event_image"
-				android:layout_width="match_parent"
-				android:layout_height="240dp"
-				android:scaleType="centerInside"
-				android:contentDescription="@null"/>
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="40dp"
+            android:contentDescription="@string/event_detail_activity_back_button_content_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
 
-			<ImageView
-				android:id="@+id/back_button"
-                android:contentDescription="@string/event_detail_activity_back_button_content_description"
-				android:layout_width="24dp"
-				android:layout_height="24dp"
-				app:srcCompat="@drawable/ic_arrow_back_white_24dp"
-				android:layout_alignParentTop="true"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentStart="true"
-				android:layout_marginTop="40dp"
-				android:layout_marginLeft="@dimen/activity_horizontal_margin"
-				android:layout_marginStart="@dimen/activity_horizontal_margin" />
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:lineSpacingMultiplier="1.2"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/back_button"
+            tools:text="Title" />
 
-			<TextView
-				android:id="@+id/event_title"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_below="@id/back_button"
-				android:layout_marginTop="16dp"
-				android:layout_marginLeft="@dimen/activity_horizontal_margin"
-				android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="32dp"
-                android:layout_marginEnd="32dp"
-				android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-				android:lineSpacingMultiplier="1.2"
-				android:textColor="@color/white" />
+        <TextView
+            android:id="@+id/event_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/white"
+            android:textSize="@dimen/newsTimeSize"
+            app:layout_constraintBottom_toBottomOf="@+id/event_button_add_to_calendar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/event_button_add_to_calendar"
+            tools:text="12th June, 09:30AM" />
 
-			<RelativeLayout
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal"
-                android:gravity="bottom"
-				android:layout_alignParentLeft="true"
-				android:layout_alignParentStart="true"
-				android:layout_alignParentRight="true"
-				android:layout_alignParentEnd="true"
-				android:layout_alignParentBottom="true"
-				android:layout_marginTop="40dp"
-				android:paddingBottom="@dimen/activity_vertical_margin"
-				android:paddingLeft="@dimen/activity_horizontal_margin"
-				android:paddingStart="@dimen/activity_horizontal_margin"
-				android:paddingRight="@dimen/activity_horizontal_margin"
-				android:paddingEnd="@dimen/activity_horizontal_margin"
-				android:paddingHorizontal="16dp">
+        <Button
+            android:id="@+id/event_button_add_to_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:paddingEnd="16dp"
+            android:paddingHorizontal="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingStart="16dp"
+            android:text="@string/event_add_to_calendar"
+            android:theme="@style/BlueButton"
+            app:layout_constraintBottom_toBottomOf="@+id/event_image"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-				<TextView
-					android:id="@+id/event_time"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-					android:layout_marginTop="40dp"
-					android:paddingBottom="14dp"
-					android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-					android:textColor="@color/white"
-					android:textSize="@dimen/newsTimeSize" />
+        <TextView
+            android:id="@+id/event_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/black"
+            android:textSize="@dimen/eventLocationSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_image"
+            tools:text="Octagon Theatre" />
 
-				<Button
-					android:id="@+id/event_button_add_to_calendar"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-					android:paddingLeft="16dp"
-					android:paddingStart="16dp"
-					android:paddingRight="16dp"
-					android:paddingEnd="16dp"
-					android:paddingHorizontal="16dp"
-					android:text="@string/event_add_to_calendar"
-					android:theme="@style/AccentButton" />
+        <TextView
+            android:id="@+id/event_details"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:textSize="@dimen/newsArticleSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_location"
+            tools:text="Details" />
 
-			</RelativeLayout>
-		</RelativeLayout>
+        <TableLayout
+            android:id="@+id/event_details_table_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_details" />
 
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="16dp"
-			android:orientation="vertical"
-			android:paddingLeft="16dp"
-			android:paddingStart="16dp"
-			android:paddingRight="16dp"
-			android:paddingEnd="16dp"
-			android:paddingBottom="@dimen/activity_vertical_margin"
-			android:paddingHorizontal="16dp">
-
-			<TextView
-				android:id="@+id/event_location_1"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:textColor="@color/black"
-				android:textSize="@dimen/eventLocationSize" />
-
-			<TextView
-                android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_weight="1"
-				android:layout_marginTop="8dp"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:textColor="@color/black"
-				android:textSize="@dimen/newsTimeSize" />
-
-			<TextView
-				android:id="@+id/event_details"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginTop="16dp"
-				android:textSize="@dimen/newsArticleSize" />
-
-			<TableLayout
-				android:id="@+id/event_details_table_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
-		</LinearLayout>
-	</LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -6,13 +6,17 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.Utils;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 public class NotificationService extends FirebaseMessagingService {
+
+    public NotificationService() {
+        super();
+    }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -30,23 +34,24 @@ public class NotificationService extends FirebaseMessagingService {
             title = remoteMessage.getData().get("title");
             text = remoteMessage.getData().get("text");
 
-            if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) {
+            if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text))
                 title = remoteMessage.getData().get("default");
-            }
         }
 
-        if (TextUtils.isEmpty(title) && TextUtils.isEmpty(text)) return;
+        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(text))
+            createNotification(title, text);
 
         //TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
+    }
 
+    private void createNotification(String title, String text) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,
-                Utils.notificationChannelIDFromName(Constant.NOTIFICATION_CHANNEL_FRIENDS))
+                Strings.notificationChannelIDFromName(Constants.NOTIFICATION_CHANNEL_FRIENDS))
                 .setContentTitle(title)
-                .setSmallIcon(R.mipmap.notification_icon);
+                .setSmallIcon(R.drawable.notification_icon);
 
-        if (!TextUtils.isEmpty(text)) {
+        if (!TextUtils.isEmpty(text))
             notificationBuilder.setContentText(text);
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_SOCIAL);

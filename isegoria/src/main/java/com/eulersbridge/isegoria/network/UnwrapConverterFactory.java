@@ -2,6 +2,8 @@ package com.eulersbridge.isegoria.network;
 
 import android.support.annotation.Nullable;
 
+import com.eulersbridge.isegoria.network.api.responses.GenericPaginatedResponse;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

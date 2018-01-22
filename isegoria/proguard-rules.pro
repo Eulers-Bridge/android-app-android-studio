@@ -51,3 +51,9 @@
 -keep public class android.support.design.internal.BottomNavigationMenuView { *; }
 -keep public class android.support.design.internal.BottomNavigationPresenter { *; }
 -keep public class android.support.design.internal.BottomNavigationItemView { *; }
+
+# Required for Matisse, which supports both Glide and Picasso as image engines
+-dontwarn com.squareup.picasso.**
+
+## Android Support RenderScript ##
+-keep class android.support.v8.renderscript.** { *; }

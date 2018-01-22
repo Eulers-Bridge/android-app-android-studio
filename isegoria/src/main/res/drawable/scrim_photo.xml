@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dark gradient scrim as per Material Design guidelines.
+        Start: 80% opacity black; center: 40% black; end: 0% black.
+        Set center colour to half of start opacity, and centerY to 30% in.
+    -->
+    <gradient
+        android:angle="90"
+        android:centerY="0.3"
+        android:startColor="#CC000000"
+        android:centerColor="#66000000"
+        android:endColor="#00000000"
+        android:type="linear"/>
+</shape>

@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.eulersbridge.isegoria">
 
     <!-- For Amazon SDK and API server interaction -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Photo picker -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:name=".Isegoria"
+        android:name=".IsegoriaApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/app_icon"
@@ -22,7 +27,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/notification_icon" />
+            android:resource="@drawable/notification_icon" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/lightBlue" />
@@ -45,7 +50,13 @@
         </activity>
 
         <activity
-            android:name=".auth.PersonalityQuestionsActivity"
+            android:name=".auth.AuthActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AuthTheme" />
+
+        <activity
+            android:name=".personality.PersonalityQuestionsActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/PersonalityQuestionsTheme">
@@ -55,9 +66,7 @@
         </activity>
 
         <activity
-            android:name=".feed.NewsDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.news.NewsDetailActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -65,9 +74,7 @@
         </activity>
 
         <activity
-            android:name=".feed.PhotoDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.photos.PhotoDetailActivity"
             android:theme="@style/PhotoDetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -75,9 +82,7 @@
         </activity>
 
         <activity
-            android:name=".feed.EventDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.events.EventDetailActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -85,9 +90,7 @@
         </activity>
 
         <activity
-            android:name=".profile.SettingsActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".profile.settings.SettingsActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -95,14 +98,16 @@
         </activity>
 
         <activity
-            android:name=".profile.AboutActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".profile.settings.AboutActivity"
             android:theme="@style/AboutTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".profile.SettingsActivity" />
+                android:value=".profile.settings.SettingsActivity" />
         </activity>
+
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/ImagePickerTheme" />
 
         <service
             android:name=".notifications.FirebaseIDService"

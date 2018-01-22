@@ -1,111 +1,117 @@
 package com.eulersbridge.isegoria;
 
 
-import android.app.AlertDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutManager;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
-import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.auth.AuthActivity;
+import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
-import com.eulersbridge.isegoria.auth.LoginFragment;
-import com.eulersbridge.isegoria.auth.PersonalityQuestionsActivity;
-import com.eulersbridge.isegoria.auth.ConsentAgreementFragment;
-import com.eulersbridge.isegoria.auth.SignUpFragment;
-import com.eulersbridge.isegoria.models.Country;
-import com.eulersbridge.isegoria.models.Institution;
-import com.eulersbridge.isegoria.models.SignUpUser;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.network.GeneralInfoResponse;
-import com.eulersbridge.isegoria.network.SimpleCallback;
-import com.eulersbridge.isegoria.poll.PollFragment;
-import com.eulersbridge.isegoria.profile.FindAddContactFragment;
+import com.eulersbridge.isegoria.friends.FriendsFragment;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
+import com.eulersbridge.isegoria.poll.PollsFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.Utils;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
+import com.google.firebase.FirebaseApp;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.securepreferences.SecurePreferences;
 
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-import retrofit2.Response;
+public class MainActivity extends AppCompatActivity implements
+        BottomNavigationView.OnNavigationItemSelectedListener, FragmentManager.OnBackStackChangedListener {
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
-        SignUpFragment.SignUpListener {
+    public interface TabbedFragment {
+        void setupTabLayout(TabLayout tabLayout);
+    }
 
-	private TitledFragment mContent;
-	private Isegoria application;
-	public ProgressDialog dialog;
-
-	private CoordinatorLayout coordinatorLayout;
-
+	private Deque<Fragment> tabFragments;
+    private TabLayout tabLayout;
+    private CoordinatorLayout coordinatorLayout;
     private BottomNavigationViewEx navigationView;
-
-	private TextView toolbarTitleTextView;
-	private TabLayout tabLayout;
-	private @IdRes int currentNavigationId;
-	
-	private SignUpUser signUpUser;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.main_activity);
+		if (savedInstanceState == null)
+		    FirebaseApp.initializeApp(this);
 
-		application = (Isegoria) getApplicationContext();
+		setContentView(R.layout.activity_main);
+
+        IsegoriaApp application = (IsegoriaApp) getApplicationContext();
 		application.setMainActivity(this);
-
-		setupNotificationChannels();
 
 		setupToolbarAndNavigation();
 
-		setNavigationEnabled(false);
-
 		coordinatorLayout = findViewById(R.id.coordinator_layout);
 
-		String userEmail = new SecurePreferences(this).getString(Constant.USER_EMAIL_KEY, null);
-		String userPassword = new SecurePreferences(this).getString(Constant.USER_PASSWORD_KEY, null);
+		getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-		if (userEmail != null && userPassword != null) {
-			application.login(userEmail, userPassword);
+        application.loggedInUser.observe(this, user -> {
+            final boolean userLoggedOut = user == null;
 
-            setViewEnabled(R.id.login_email, false);
-            setViewEnabled(R.id.login_password, false);
-            setViewEnabled(R.id.login_button, false);
-            setViewEnabled(R.id.login_signup_button, false);
+            if (userLoggedOut) {
+                finish();
 
-		} else {
-			showLogin();
-		}
+            } else {
+                onLoginSuccess(user);
+            }
+        });
+
+        attemptUserLogin(application);
 	}
 
-	public CoordinatorLayout getCoordinatorLayout() {
+	private void attemptUserLogin(IsegoriaApp app) {
+        if (app.loggedInUser.getValue() == null) {
+            String userEmail = new SecurePreferences(this)
+                    .getString(Constants.USER_EMAIL_KEY, null);
+            String userPassword = new SecurePreferences(this)
+                    .getString(Constants.USER_PASSWORD_KEY, null);
+
+            final boolean haveStoredCredentials = userEmail != null && userPassword != null;
+
+            if (haveStoredCredentials) {
+                app.login(userEmail, userPassword).observe(this, success -> {
+                    if (success == null || !success) {
+                        showLogin();
+                    }
+                });
+
+                // Add 3 empty tabs to flesh out the empty/not loaded feed fragment screen
+                tabLayout.addTab(tabLayout.newTab());
+                tabLayout.addTab(tabLayout.newTab());
+                tabLayout.addTab(tabLayout.newTab());
+                tabLayout.setVisibility(View.VISIBLE);
+
+            } else {
+                showLogin();
+            }
+        }
+    }
+
+    public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
     }
 
@@ -119,12 +125,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 String action = getIntent().getAction();
                 if (action != null) {
                     switch (action) {
-                        case Constant.SHORTCUT_ACTION_ELECTION:
+                        case Constants.SHORTCUT_ACTION_ELECTION:
                             showElection();
                             handledShortcut = true;
                             break;
 
-                        case Constant.SHORTCUT_ACTION_FRIENDS:
+                        case Constants.SHORTCUT_ACTION_FRIENDS:
                             showFriends();
                             handledShortcut = true;
                             break;
@@ -132,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
                     if (handledShortcut) {
                         ShortcutManager shortcutManager = getSystemService(ShortcutManager.class);
-                        if (shortcutManager != null) shortcutManager.reportShortcutUsed(action);
+                        if (shortcutManager != null)
+                            shortcutManager.reportShortcutUsed(action);
                     }
                 }
             }
@@ -141,46 +148,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return handledShortcut;
     }
 
-	private void setupNotificationChannels() {
-	    // Notification channels are only supported on Android O+
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
-		    //Build a simple map of channel names (Strings) to their importance level (Integer)
-			HashMap<String, Integer> channels = new HashMap<>();
-			channels.put(Constant.NOTIFICATION_CHANNEL_FRIENDS, NotificationManager.IMPORTANCE_DEFAULT);
-			channels.put(Constant.NOTIFICATION_CHANNEL_VOTE_REMINDERS, NotificationManager.IMPORTANCE_DEFAULT);
-
-			NotificationManager notificationManager =
-					(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-			if (notificationManager != null) {
-			    /* Loop through the map, creating notification channels based on the names/importances
-			        in the map. `createNotificationChannel` is no-op if the channels have already
-			        been created from a previous launch.
-			     */
-				for (Map.Entry<String, Integer> entry : channels.entrySet()) {
-					String channelName = entry.getKey();
-					String channelId = Utils.notificationChannelIDFromName(channelName);
-					int importance = entry.getValue();
-
-					NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, importance);
-					notificationChannel.setShowBadge(true);
-					notificationManager.createNotificationChannel(notificationChannel);
-				}
-			}
-		}
-	}
-
 	private void setupToolbarAndNavigation() {
 		Toolbar toolbar = findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-		Typeface titleFont = Typeface.createFromAsset(getAssets(),
-				"MuseoSansRounded-500.otf");
-		toolbarTitleTextView = toolbar.findViewById(R.id.toolbar_title);
-		toolbarTitleTextView.setTypeface(titleFont);
 
 		navigationView = findViewById(R.id.navigation);
 		if (navigationView != null) {
@@ -190,85 +160,84 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             navigationView.setTextVisibility(false);
 		}
 
-		tabLayout = findViewById(R.id.tabLayout);
+		tabLayout = findViewById(R.id.tab_layout);
+
+		tabFragments = new ArrayDeque<>(4);
 	}
 
 	public void setToolbarShowsTitle(boolean visible) {
-		toolbarTitleTextView.setVisibility(visible? View.VISIBLE : View.GONE);
+        if (getSupportActionBar() != null)
+	        getSupportActionBar().setDisplayShowTitleEnabled(visible);
 	}
 
-	public void setToolbarTitle(String title) {
-		toolbarTitleTextView.setText(title);
+	private void setToolbarTitle(String title) {
+	    if (getSupportActionBar() != null)
+	        getSupportActionBar().setTitle(title);
 	}
 
-	public void setToolbarVisible(boolean visible) {
-		if (getSupportActionBar() == null) return;
+    @Override
+    public void onBackPressed() {
+        if (tabFragments.size() > 1) {
+            // Only pop if more than 1 fragment on stack (i.e. always leave a root fragment)
 
-		if (visible) {
-			getSupportActionBar().show();
-		} else {
-			getSupportActionBar().hide();
-		}
-	}
+            tabFragments.pop();
+            getSupportFragmentManager().popBackStack();
 
-	@Override
+        } else if (tabFragments.size() == 1) {
+            // Return to launcher
+            Intent launcherAction = new Intent(Intent.ACTION_MAIN);
+            launcherAction.addCategory(Intent.CATEGORY_HOME);
+            launcherAction.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(launcherAction);
+        }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        boolean canGoBack = (getSupportFragmentManager().getBackStackEntryCount() > 0);
+
+        if (getSupportActionBar() != null) {
+            /* When a fragment is added to the stack, show the back button in the app bar,
+               as the user can navigate back to a previous fragment. */
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canGoBack);
+            getSupportActionBar().setDisplayShowHomeEnabled(canGoBack);
+        }
+
+        updateAppBarState();
+    }
+
+    @Override
 	public boolean onSupportNavigateUp() {
-		onBackPressed();
+	    if (tabFragments.size() > 0)
+            tabFragments.pop();
+
+		getSupportFragmentManager().popBackStack();
+
 		return true;
 	}
 
-	public void setShowNavigationBackButton(boolean show) {
-		getSupportActionBar().setDisplayHomeAsUpEnabled(show);
-		getSupportActionBar().setDisplayShowHomeEnabled(show);
-	}
-
-	private void setNavigationEnabled(boolean enabled) {
-        navigationView.setVisibility(enabled? View.VISIBLE : View.GONE);
-	}
-
-	public TabLayout getTabLayout() {
-		return tabLayout;
-	}
+    private @Nullable Fragment getCurrentFragment() {
+	    return tabFragments.size() == 0? null : tabFragments.peekFirst();
+    }
 
 	private void showElection() {
-	    runOnUiThread(() -> {
-            ElectionMasterFragment electionFragment = new ElectionMasterFragment();
-            electionFragment.setTabLayout(tabLayout);
+        final @IdRes int id = R.id.navigation_election;
 
-            switchContent(electionFragment);
-
-            @IdRes int navigationId = R.id.navigation_election;
-            currentNavigationId = navigationId;
-            navigationView.setSelectedItemId(navigationId);
-        });
+        if (navigationView.getSelectedItemId() != id)
+            navigationView.setSelectedItemId(id);
     }
 
     public void showFriends() {
-	    runOnUiThread(() -> {
-            FindAddContactFragment friendsFragment = new FindAddContactFragment();
-            friendsFragment.setTabLayout(tabLayout);
-
-            mContent = friendsFragment;
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, friendsFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .addToBackStack(null)
-                    .commit();
-
-            @IdRes int navigationId = R.id.navigation_profile;
-            currentNavigationId = navigationId;
-            navigationView.setSelectedItemId(navigationId);
-        });
+        presentContent(new FriendsFragment());
     }
 
 	public void showLogin() {
-		LoginFragment loginFragment = new LoginFragment();
-        loginFragment.setTabLayout(tabLayout);
-        switchContent(loginFragment);
-
-        setNavigationEnabled(false);
+        startActivity(new Intent(this, AuthActivity.class));
 	}
+
+	public void showVerification() {
+	    presentRootContent(new EmailVerificationFragment());
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
@@ -278,193 +247,95 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-		if (item.isCheckable()) item.setChecked(true);
+        Fragment fragment;
 
-		final int newNavigationId = item.getItemId();
+        switch(item.getItemId()) {
+            case R.id.navigation_feed:
+                fragment = new FeedFragment();
+                break;
 
-		if (currentNavigationId != newNavigationId) {
+            case R.id.navigation_poll:
+                fragment = new PollsFragment();
+                break;
 
-			switch(newNavigationId) {
-                case R.id.navigation_election:
-                    showElection();
-                    break;
+            case R.id.navigation_vote:
+                fragment = new VoteViewPagerFragment();
+                break;
 
-				case R.id.navigation_feed:
-					FeedFragment feedFragment = new FeedFragment();
-					feedFragment.setTabLayout(tabLayout);
+            case R.id.navigation_profile:
+                fragment = new ProfileViewPagerFragment();
+                break;
 
-					switchContent(feedFragment);
-					break;
+            case R.id.navigation_election:
+                fragment = new ElectionMasterFragment();
+                break;
 
+            default:
+                return true;
+        }
 
+        Fragment currentFragment = getCurrentFragment();
 
-				case R.id.navigation_poll:
-					PollFragment pollFragment = new PollFragment();
-					pollFragment.setTabLayout(tabLayout);
-
-					switchContent(pollFragment);
-					break;
-
-				case R.id.navigation_vote:
-					final VoteViewPagerFragment voteFragment = new VoteViewPagerFragment();
-					voteFragment.setTabLayout(tabLayout);
-
-					switchContent(voteFragment);
-					break;
-
-				case R.id.navigation_profile:
-					ProfileViewPagerFragment profileFragment = new ProfileViewPagerFragment();
-					profileFragment.setTabLayout(tabLayout);
-
-					switchContent(profileFragment);
-					break;
-			}
-
-			currentNavigationId = newNavigationId;
-		}
+        if (currentFragment == null || !fragment.getClass().equals(currentFragment.getClass()))
+            presentRootContent(fragment);
 
 		return true;
 	}
-	
-	public Isegoria getIsegoriaApplication() {
-		return application;
-	}
 
-	// When the Sign Up button in the launch screen is tapped
-	public void onSignUpClicked() {
-		setShowNavigationBackButton(true);
-
-		SignUpFragment signUpFragment = new SignUpFragment();
-		signUpFragment.setListener(this);
-
-		switchContent(signUpFragment, false);
-	}
-
-	private void setViewEnabled(@IdRes int viewId, boolean enabled) {
-		View view = findViewById(viewId);
-		if (view != null) view.setEnabled(enabled);
-	}
-
-	public void onLoginSuccess(User loggedInUser) {
-        hideDialog();
-
-        setNavigationEnabled(true);
-        setToolbarVisible(true);
-
-        if (!handleAppShortcutIntent()) {
-            FeedFragment feedFragment = new FeedFragment();
-            feedFragment.setTabLayout(tabLayout);
-
+	private void onLoginSuccess(User loggedInUser) {
+        if (!handleAppShortcutIntent())
             navigationView.setSelectedItemId(R.id.navigation_feed);
-        }
 
-        if (!loggedInUser.hasPersonality) {
+        if (!loggedInUser.hasPersonality)
             startActivity(new Intent(this, PersonalityQuestionsActivity.class));
-        }
     }
-	
-	public void hideDialog() {
-		if (dialog != null) dialog.dismiss();
-	}
-	
-	public void onLoginFailure() {
-	    runOnUiThread(() -> {
-            setViewEnabled(R.id.login_email, true);
-            setViewEnabled(R.id.login_password, true);
-            setViewEnabled(R.id.login_button, true);
-            setViewEnabled(R.id.login_signup_button, true);
 
-            hideDialog();
+	public void presentContent(@NonNull Fragment fragment) {
+        tabFragments.push(fragment);
 
-            if (mContent.getClass() != LoginFragment.class) {
-                //Tried to login user based on stored email/password, but they since deleted account
-                //or the login otherwise failed. Not currently showing the Login fragment so we need to.
-                switchContent(new LoginFragment());
-            }
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
-                    .setDuration(Constant.SNACKBAR_LENGTH_EXTENDED)
-                    .show();
-        });
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        fragmentManager.executePendingTransactions();
     }
-	
-	private void onSignUpFailure() {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.user_sign_up_error_title))
-                .setMessage(getString(R.string.user_sign_up_error_message))
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
+
+	private void presentRootContent(@NonNull Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
+
+        tabFragments.clear();
+        tabFragments.push(fragment);
+
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .commitNow(); // commit() + executePendingTransactions()
+
+        updateAppBarState();
 	}
 
-	@Override
-	public void onSignUpNextClick(SignUpUser user) {
-	    this.signUpUser = user;
+	private void updateAppBarState() {
+        final Fragment currentFragment = getCurrentFragment();
 
-        ConsentAgreementFragment consentAgreementFragment = new ConsentAgreementFragment();
-        switchContent(consentAgreementFragment);
-	}
-	
-	public void userConsentNext() {
-        application.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
-            @Override
-            protected void handleResponse(Response<GeneralInfoResponse> response) {
-                GeneralInfoResponse body = response.body();
-                if (body != null && body.countries.size() > 0) {
+        if (currentFragment != null) {
+            runOnUiThread(() -> {
+                if (currentFragment instanceof TitledFragment) {
+                    String fragmentTitle = ((TitledFragment) currentFragment).getTitle(MainActivity.this);
 
-                    long institutionId = -1;
-
-                    for (Country country : body.countries) {
-                        for (Institution countryInstitution : country.institutions) {
-                            if (countryInstitution.getName().equals(signUpUser.institutionName)) {
-                                institutionId = countryInstitution.id;
-                            }
-                        }
-                    }
-
-                    signUpUser.institutionId = institutionId;
-
-                    if (!application.getNetworkService().signUp(signUpUser)) onSignUpFailure();
+                    if (!TextUtils.isEmpty(fragmentTitle))
+                        setToolbarTitle(fragmentTitle);
                 }
-            }
-        });
-		
-		switchContent(new LoginFragment());
-	}
 
-	public void switchContent(TitledFragment fragment) {
-		switchContent(fragment, true);
-	}
-
-	private void switchContent(TitledFragment fragment, boolean popBackStack) {
-        WeakReference<MainActivity> wrSelf = new WeakReference<>(this);
-
-	    runOnUiThread(() -> {
-	        if (wrSelf.get() == null || wrSelf.get().isFinishing()) return;
-
-            mContent = fragment;
-
-            if (popBackStack) {
-                getSupportFragmentManager().popBackStackImmediate();
-            }
-
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, (Fragment)fragment, fragment.getClass().toString());
-
-            if (!popBackStack) {
-                transaction.addToBackStack(null).commitAllowingStateLoss();
-
-                getSupportFragmentManager().executePendingTransactions();
-
-                postFragmentCommit(fragment.getTitle(this));
-
-            } else {
-                transaction.runOnCommit(() -> postFragmentCommit(fragment.getTitle(this))).commitAllowingStateLoss();
-            }
-        });
-	}
-
-	private void postFragmentCommit(String fragmentTitle) {
-        if (!TextUtils.isEmpty(fragmentTitle)) setToolbarTitle(fragmentTitle);
+                if (currentFragment instanceof TabbedFragment) {
+                    tabLayout.clearOnTabSelectedListeners();
+                    ((TabbedFragment) currentFragment).setupTabLayout(tabLayout);
+                }
+            });
+        }
     }
 }
