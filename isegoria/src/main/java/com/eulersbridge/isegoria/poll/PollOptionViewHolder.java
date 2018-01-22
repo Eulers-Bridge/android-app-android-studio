@@ -9,9 +9,9 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.LoadingAdapter;
-import com.eulersbridge.isegoria.models.PollOption;
-import com.eulersbridge.isegoria.models.PollResult;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
+import com.eulersbridge.isegoria.network.api.models.PollOption;
+import com.eulersbridge.isegoria.network.api.models.PollResult;
 
 class PollOptionViewHolder extends LoadingAdapter.ItemViewHolder<PollOption> {
 
@@ -53,7 +53,9 @@ class PollOptionViewHolder extends LoadingAdapter.ItemViewHolder<PollOption> {
         this.item = item;
 
         if (item == null) {
+            textTextView.setText(null);
             imageView.setVisibility(View.GONE);
+            checkBoxImageView.setImageResource(R.drawable.tickempty);
 
         } else {
             textTextView.setText(item.text);

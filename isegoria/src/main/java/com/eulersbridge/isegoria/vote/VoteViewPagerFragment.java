@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.vote;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,18 +12,14 @@ import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.NonSwipeableViewPager;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.VoteLocation;
-
-import org.parceler.Parcels;
+import com.eulersbridge.isegoria.util.ui.NonSwipeableViewPager;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class VoteViewPagerFragment extends Fragment
-        implements TitledFragment, MainActivity.TabbedFragment, VoteFragment.VoteFragmentListener, VotePledgeFragment.VotePledgeListener {
+        implements TitledFragment, MainActivity.TabbedFragment {
 
     private TabLayout tabLayout;
 
@@ -34,7 +31,20 @@ public class VoteViewPagerFragment extends Fragment
         View rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false);
 
         // Ensure options menu from another fragment is not carried over
-        getActivity().invalidateOptionsMenu();
+        if (getActivity() != null)
+            getActivity().invalidateOptionsMenu();
+
+        VoteViewModel viewModel = ViewModelProviders.of(this).get(VoteViewModel.class);
+
+        viewModel.locationAndDateComplete.observe(this, complete -> {
+            if (complete != null && complete)
+                viewPager.setCurrentItem(1);
+        });
+
+        viewModel.pledgeComplete.observe(this, complete -> {
+            if (complete != null && complete)
+                viewPager.setCurrentItem(2);
+        });
 
         setupViewPager(rootView);
 
@@ -53,15 +63,8 @@ public class VoteViewPagerFragment extends Fragment
             viewPager = rootView.findViewById(R.id.vote_view_pager_fragment);
 
             ArrayList<Fragment> fragments = new ArrayList<>();
-
-            VoteFragment voteFragment = new VoteFragment();
-            voteFragment.setListener(this);
-
-            VotePledgeFragment votePledgeFragment = new VotePledgeFragment();
-            votePledgeFragment.setListener(this);
-
-            fragments.add(voteFragment);
-            fragments.add(votePledgeFragment);
+            fragments.add(new VoteFragment());
+            fragments.add(new VotePledgeFragment());
             fragments.add(new VoteDoneFragment());
 
             viewPagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragments) {
@@ -82,22 +85,6 @@ public class VoteViewPagerFragment extends Fragment
 
             viewPager.setCurrentItem(0);
         }
-    }
-
-    @Override
-    public void onComplete(VoteLocation voteLocation, Calendar dateTime) {
-        viewPager.setCurrentItem(1);
-
-        Bundle arguments = new Bundle();
-        arguments.putParcelable("voteLocation", Parcels.wrap(voteLocation));
-        arguments.putLong("dateTimeMillis", dateTime.getTimeInMillis());
-
-        viewPagerAdapter.getItem(1).setArguments(arguments);
-    }
-
-    @Override
-    public void onComplete() {
-        viewPager.setCurrentItem(2);
     }
 
     @Override

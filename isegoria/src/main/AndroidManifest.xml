@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:name=".Isegoria"
+        android:name=".IsegoriaApp"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/app_icon"
@@ -50,7 +50,13 @@
         </activity>
 
         <activity
-            android:name=".auth.PersonalityQuestionsActivity"
+            android:name=".auth.AuthActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AuthTheme" />
+
+        <activity
+            android:name=".personality.PersonalityQuestionsActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/PersonalityQuestionsTheme">
@@ -60,9 +66,7 @@
         </activity>
 
         <activity
-            android:name=".feed.NewsDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.news.NewsDetailActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -70,9 +74,7 @@
         </activity>
 
         <activity
-            android:name=".feed.PhotoDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.photos.PhotoDetailActivity"
             android:theme="@style/PhotoDetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -80,9 +82,7 @@
         </activity>
 
         <activity
-            android:name=".feed.EventDetailActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".feed.events.EventDetailActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -90,9 +90,7 @@
         </activity>
 
         <activity
-            android:name=".profile.SettingsActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".profile.settings.SettingsActivity"
             android:theme="@style/DetailTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -100,13 +98,11 @@
         </activity>
 
         <activity
-            android:name=".profile.AboutActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
+            android:name=".profile.settings.AboutActivity"
             android:theme="@style/AboutTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".profile.SettingsActivity" />
+                android:value=".profile.settings.SettingsActivity" />
         </activity>
 
         <activity

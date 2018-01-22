@@ -3,5 +3,7 @@
     <declare-styleable name="CircleProgressBar">
         <attr name="base_color" format="color" />
         <attr name="progress_color" format="color" />
+        <attr name="bottom_line_text" format="string" />
+        <attr name="top_line_text" format="string" />
     </declare-styleable>
 </resources>

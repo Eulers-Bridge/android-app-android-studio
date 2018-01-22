@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,11 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.common.TitledFragment;
+import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment;
+import com.eulersbridge.isegoria.profile.settings.SettingsActivity;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.util.ArrayList;
 
@@ -27,15 +30,62 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    private ProfileViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false);
 
         setHasOptionsMenu(true);
 
-        setupViewPager(rootView);
+        viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
+        setupViewPager();
+
+        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        viewModel.currentSectionIndex.observe(this, index -> {
+            if (index != null && viewPager.getCurrentItem() != index)
+                viewPager.setCurrentItem(index);
+        });
 
         return rootView;
+    }
+
+    private void setupViewPager() {
+        final ArrayList<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(new ProfileOverviewFragment());
+        fragmentList.add(new ProfileTaskProgressFragment());
+        fragmentList.add(new ProfileBadgesFragment());
+
+        final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
+            @Override
+            public CharSequence getPageTitle(int position) {
+                TitledFragment fragment = (TitledFragment)fragmentList.get(position);
+                if (fragment != null) {
+                    return fragment.getTitle(getContext());
+
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setCurrentItem(0);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                viewModel.onSectionIndexChanged(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     @Override
@@ -58,45 +108,18 @@ public class ProfileViewPagerFragment extends Fragment implements TitledFragment
                 return true;
 
             case R.id.profile_logout:
-                if (getActivity() != null) {
-                    ((Isegoria)getActivity().getApplication()).logOut();
-                }
+                if (getContext() != null)
+                     new AlertDialog.Builder(getContext())
+                             .setTitle(R.string.log_out_confirmation_title)
+                             .setPositiveButton(android.R.string.yes,
+                                     (dialogInterface, choice) -> viewModel.logOut())
+                             .setNegativeButton(android.R.string.no, null)
+                             .show();
+
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void setupViewPager(@NonNull View rootView) {
-        if (viewPager == null) {
-            viewPager = rootView.findViewById(R.id.profileViewPagerFragment);
-
-            final ArrayList<Fragment> fragmentList = new ArrayList<>();
-
-            ProfileOverviewFragment profileOverviewFragment = new ProfileOverviewFragment();
-            profileOverviewFragment.setViewPager(viewPager);
-
-            fragmentList.add(profileOverviewFragment);
-            fragmentList.add(new ProfileTaskProgressFragment());
-            fragmentList.add(new ProfileBadgesFragment());
-
-            final SimpleFragmentPagerAdapter pagerAdapter = new SimpleFragmentPagerAdapter(getChildFragmentManager(), fragmentList) {
-                @Override
-                public CharSequence getPageTitle(int position) {
-                    TitledFragment fragment = (TitledFragment)fragmentList.get(position);
-                    if (fragment != null) {
-                        return fragment.getTitle(getContext());
-
-                    } else {
-                        return null;
-                    }
-                }
-            };
-
-            viewPager.setAdapter(pagerAdapter);
-            viewPager.setOffscreenPageLimit(3);
-            viewPager.setCurrentItem(0);
         }
     }
 

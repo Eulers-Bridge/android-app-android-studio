@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.vote;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,60 +14,56 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.Election;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.models.VoteLocation;
-import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.network.api.models.Election;
+import com.eulersbridge.isegoria.network.api.models.VoteLocation;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import retrofit2.Response;
-
 public class VoteFragment extends Fragment implements TitledFragment {
-
-    interface VoteFragmentListener {
-        /**
-         * Called once the user has selected a location and date/time,
-         * and clicked the button to proceed.
-         */
-        void onComplete(VoteLocation voteLocation, Calendar dateTime);
-    }
-
-    private VoteFragmentListener listener;
 
     private ArrayAdapter<VoteLocation> voteLocationArrayAdapter;
 
-    private Spinner spinnerLocation;
-
-    private final Calendar calendar = Calendar.getInstance();
     private EditText timeField;
     private EditText dateField;
 
     private Dialog openDialog;
 
-    private Election election;
+    private VoteViewModel viewModel;
 
     @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.vote_fragment, container, false);
-		
-        spinnerLocation = rootView.findViewById(R.id.vote_location);
+
+        //noinspection ConstantConditions
+        viewModel = ViewModelProviders.of(getParentFragment()).get(VoteViewModel.class);
+        setupModelObservers();
+
+        Spinner spinnerLocation = rootView.findViewById(R.id.vote_location);
 
         voteLocationArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_layout);
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout);
 
         spinnerLocation.setAdapter(voteLocationArrayAdapter);
+        spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int index, long id) {
+                viewModel.onVoteLocationChanged(index);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
 
         timeField = rootView.findViewById(R.id.vote_time);
         timeField.setEnabled(false);
@@ -74,11 +71,18 @@ public class VoteFragment extends Fragment implements TitledFragment {
         timeField.setOnClickListener(view -> {
             if (!view.isEnabled()) return;
 
+            Calendar calendar = viewModel.dateTime.getValue();
+            if (calendar == null) return;
+
             openDialog = new TimePickerDialog(getContext(),
                     (view1, hourOfDay, minute) -> {
-                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        calendar.set(Calendar.MINUTE, minute);
-                        updateTimeLabel(timeField, calendar);
+
+                        Calendar updatedCalendar = viewModel.dateTime.getValue();
+
+                        updatedCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        updatedCalendar.set(Calendar.MINUTE, minute);
+
+                        viewModel.dateTime.setValue(updatedCalendar);
                     },
                     calendar.get(Calendar.HOUR_OF_DAY),
                     calendar.get(Calendar.MINUTE),
@@ -92,17 +96,25 @@ public class VoteFragment extends Fragment implements TitledFragment {
         dateField.setOnClickListener(view -> {
             if (!view.isEnabled()) return;
 
+            Calendar calendar = viewModel.dateTime.getValue();
+            if (calendar == null) return;
+
             final DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
                     (datePicker, year, monthOfYear, dayOfMonth) -> {
-                        calendar.set(Calendar.YEAR, year);
-                        calendar.set(Calendar.MONTH, monthOfYear);
-                        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        updateDateLabel(dateField, calendar);
+
+                        Calendar updatedCalendar = viewModel.dateTime.getValue();
+
+                        updatedCalendar.set(Calendar.YEAR, year);
+                        updatedCalendar.set(Calendar.MONTH, monthOfYear);
+                        updatedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                        viewModel.dateTime.setValue(updatedCalendar);
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH));
 
+            Election election = viewModel.getElection().getValue();
             if (election != null && election.startVotingTimestamp < election.endVotingTimestamp) {
                 datePickerDialog.getDatePicker().setMinDate(election.startVotingTimestamp);
                 datePickerDialog.getDatePicker().setMaxDate(election.endVotingTimestamp);
@@ -113,56 +125,32 @@ public class VoteFragment extends Fragment implements TitledFragment {
         });
 
         Button voteOkButton = rootView.findViewById(R.id.vote_ok_button);
-        voteOkButton.setOnClickListener(view -> {
-            if (listener != null)
-                listener.onComplete((VoteLocation)spinnerLocation.getSelectedItem(), calendar);
-        });
-
-        Isegoria isegoria = (Isegoria) getActivity().getApplication();
-
-        if (isegoria != null) {
-            User user = isegoria.getLoggedInUser();
-
-            if (user != null && user.institutionId != null) {
-                isegoria.getAPI().getVoteLocations(user.institutionId).enqueue(new SimpleCallback<List<VoteLocation>>() {
-                    @Override
-                    protected void handleResponse(Response<List<VoteLocation>> response) {
-                        List<VoteLocation> locations = response.body();
-                        if (locations != null) {
-                            for (VoteLocation voteLocation : locations) {
-                                voteLocationArrayAdapter.add(voteLocation);
-                            }
-                        }
-                    }
-                });
-
-                isegoria.getAPI().getElections(user.institutionId).enqueue(new SimpleCallback<List<Election>>() {
-                    @Override
-                    protected void handleResponse(Response<List<Election>> response) {
-                        List<Election> elections = response.body();
-                        if (elections != null && elections.size() > 0)
-                            setElection(elections.get(0));
-                    }
-                });
-            }
-        }
+        voteOkButton.setOnClickListener(view -> viewModel.locationAndDateComplete.setValue(true));
 
 		return rootView;
 	}
+
+    private void setupModelObservers() {
+        viewModel.dateTime.observe(this, calendar -> {
+            updateDateLabel(dateField, calendar);
+            updateTimeLabel(timeField, calendar);
+        });
+
+        viewModel.getVoteLocations().observe(this, locations -> {
+            if (locations != null)
+                voteLocationArrayAdapter.addAll(locations);
+        });
+
+        viewModel.getElection().observe(this, election -> {
+            dateField.setEnabled(true);
+            timeField.setEnabled(true);
+        });
+    }
 
     @Nullable
     @Override
     public String getTitle(Context context) {
         return context.getString(R.string.vote_tab_1);
-    }
-
-	private void setElection(@NonNull Election election) {
-        this.election = election;
-
-        timeField.setEnabled(true);
-        dateField.setEnabled(true);
-
-        calendar.setTimeInMillis(election.startVotingTimestamp);
     }
 
     private static final long MILLIS_PER_DAY = TimeUnit.DAYS.toMillis(1);
@@ -208,9 +196,5 @@ public class VoteFragment extends Fragment implements TitledFragment {
         final String timeStr = formatter.format(calendar.getTime());
 
         label.setText(timeStr);
-    }
-
-    public void setListener(VoteFragmentListener listener) {
-        this.listener = listener;
     }
 }

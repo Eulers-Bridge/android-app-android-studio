@@ -20,9 +20,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.common.Utils;
 
 
 public class FeedFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {

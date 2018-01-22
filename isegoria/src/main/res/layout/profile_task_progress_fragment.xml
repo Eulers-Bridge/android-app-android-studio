@@ -24,7 +24,9 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/profile_tasks_progress_bar" />
+                android:id="@+id/profile_tasks_progress_bar"
+                android:progress="0"
+                android:max="1000"/>
 
             <TextView
                 android:id="@+id/profile_tasks_progress_level_text_view"

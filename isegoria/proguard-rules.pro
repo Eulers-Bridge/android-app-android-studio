@@ -54,3 +54,6 @@
 
 # Required for Matisse, which supports both Glide and Picasso as image engines
 -dontwarn com.squareup.picasso.**
+
+## Android Support RenderScript ##
+-keep class android.support.v8.renderscript.** { *; }

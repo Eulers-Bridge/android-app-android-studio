@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.poll;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,23 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.Isegoria;
 import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.SimpleFragmentPagerAdapter;
-import com.eulersbridge.isegoria.common.TitledFragment;
-import com.eulersbridge.isegoria.models.Poll;
-import com.eulersbridge.isegoria.models.User;
-import com.eulersbridge.isegoria.network.PollsResponse;
-import com.eulersbridge.isegoria.network.SimpleCallback;
+import com.eulersbridge.isegoria.network.api.models.Poll;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter;
+import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
 import org.parceler.Parcels;
 
 import java.util.List;
 import java.util.Vector;
-
-import retrofit2.Response;
 
 public class PollsFragment extends Fragment implements TitledFragment, MainActivity.TabbedFragment {
 
@@ -43,38 +38,21 @@ public class PollsFragment extends Fragment implements TitledFragment, MainActiv
 
         fragments = new Vector<>();
 
-		if (getActivity() != null) {
-            // Ensure options menu from another fragment is not carried over
+        // Ensure options menu from another fragment is not carried over
+		if (getActivity() != null)
             getActivity().invalidateOptionsMenu();
 
-            Isegoria isegoria = (Isegoria)getActivity().getApplication();
-            getPolls(isegoria);
-        }
+        PollsViewModel viewModel = ViewModelProviders.of(this).get(PollsViewModel.class);
+		viewModel.getPolls().observe(this, polls -> {
+		    if (polls != null)
+		        addPolls(polls);
+        });
 
         setupViewPager(rootView);
         setupTabLayout();
 		
 		return rootView;
 	}
-
-	private void getPolls(Isegoria isegoria) {
-        User user = isegoria.getLoggedInUser();
-        if (user != null) {
-            Long institutionId = isegoria.getLoggedInUser().institutionId;
-
-            if (institutionId != null) {
-                isegoria.getAPI().getPolls(institutionId).enqueue(new SimpleCallback<PollsResponse>() {
-                    @Override
-                    protected void handleResponse(Response<PollsResponse> response) {
-                        PollsResponse body = response.body();
-
-                        if (body != null && body.totalPolls > 0)
-                            addPolls(body.polls);
-                    }
-                });
-            }
-        }
-    }
 
     @Override
     public String getTitle(Context context) {
@@ -148,7 +126,7 @@ public class PollsFragment extends Fragment implements TitledFragment, MainActiv
                     PollVoteFragment pollVoteFragment = new PollVoteFragment();
 
                     Bundle args = new Bundle();
-                    args.putParcelable(Constant.ACTIVITY_EXTRA_POLL, Parcels.wrap(poll));
+                    args.putParcelable(Constants.ACTIVITY_EXTRA_POLL, Parcels.wrap(poll));
 
                     pollVoteFragment.setArguments(args);
 

@@ -1,26 +1,34 @@
 package com.eulersbridge.isegoria.network;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Transformations;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.eulersbridge.isegoria.BuildConfig;
-import com.eulersbridge.isegoria.Isegoria;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.Utils;
-import com.eulersbridge.isegoria.models.Institution;
-import com.eulersbridge.isegoria.models.SignUpUser;
-import com.eulersbridge.isegoria.models.User;
+import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.auth.signup.SignUpUser;
+import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter;
+import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter;
+import com.eulersbridge.isegoria.network.adapters.TimestampAdapter;
+import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.ClientInstitution;
+import com.eulersbridge.isegoria.network.api.models.Institution;
+import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Utils;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
+import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,16 +40,19 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NetworkService {
 
-    private String apiBaseURL = Constant.SERVER_URL;
+    private static final String SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/";
 
-    private final Isegoria application;
+    private static final String S3_PICTURES_BUCKET_NAME = "isegoriauserpics";
+    private static final String S3_PICTURES_PATH = "https://s3.amazonaws.com/isegoriauserpics/";
+
+    private String apiBaseURL = SERVER_URL;
+
+    private final IsegoriaApp application;
 
     private final File cacheDirectory;
     private OkHttpClient httpClient;
@@ -51,9 +62,12 @@ public class NetworkService {
     private String email;
     private String password;
 
+    /**
+     * Flag to indicate whether HTTP Client & API needed to be created (lazily).
+     */
     private boolean needsSetup;
 
-    public NetworkService(Isegoria application) {
+    public NetworkService(@NonNull IsegoriaApp application) {
         this.application = application;
 
         cacheDirectory = new File(application.getCacheDir(), "network");
@@ -103,12 +117,12 @@ public class NetworkService {
                         .removeHeader("Cache-Control")
                         .header("Cache-Control", cacheHeaderValue)
                         .build();
-            } else {
-                return response;
             }
+
+            return response;
         };
 
-        int cacheSize = 40 * 1024 * 1024; // Maximum cache size of 40 MiB
+        final int cacheSize = 40 * 1024 * 1024; // Maximum cache size of 40 MiB
         Cache cache = new Cache(cacheDirectory, cacheSize);
 
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder()
@@ -116,7 +130,7 @@ public class NetworkService {
                     Request.Builder request = chain.request().newBuilder()
                             .addHeader("Accept", "application/json")
                             .addHeader("Content-Type", "application/json")
-                            .addHeader("User-Agent", "Isegoria Android");
+                            .addHeader("User-Agent", "IsegoriaApp Android");
 
                     return chain.proceed(request.build());
                 })
@@ -158,105 +172,89 @@ public class NetworkService {
     }
 
     // Updates the base URL of the API by fetching the API root for the user's institution
-    private void updateAPIBaseURL(final User user) {
+    private LiveData<Boolean> updateAPIBaseURL(@NonNull final User user) {
         if (user.institutionId == null) {
             finishedLogin(user);
-            return;
+            return new SingleLiveData<>(false);
         }
 
-        api.getInstitution(user.institutionId).enqueue(new SimpleCallback<Institution>() {
-            @Override
-            protected void handleResponse(retrofit2.Response<Institution> response) {
-                Institution institution = response.body();
-                if (institution != null) {
+        final LiveData<Institution> institutionRequest = new RetrofitLiveData<>(api.getInstitution(user.institutionId));
+        return Transformations.switchMap(institutionRequest, institution -> {
+            if (institution != null) {
 
-                    final String institutionName = institution.getName();
-                    if (!TextUtils.isEmpty(institutionName)) {
+                final String institutionName = institution.getName();
+                if (!TextUtils.isEmpty(institutionName)) {
+                    final LiveData<List<ClientInstitution>> clientsRequest = new RetrofitLiveData<>(api.getInstitutionURLs());
 
-                        final SimpleCallback<List<ClientInstitution>> URLsCallback = new SimpleCallback<List<ClientInstitution>>() {
-                            @Override
-                            protected void handleResponse(retrofit2.Response<List<ClientInstitution>> response) {
-                                List<ClientInstitution> institutions = response.body();
-                                if (institutions != null) {
-                                    for (ClientInstitution institution : institutions) {
-                                        if (institution.name.equals(institutionName)
-                                                && !TextUtils.isEmpty(institution.apiRoot)) {
+                    return Transformations.switchMap(clientsRequest, institutions -> {
+                        if (institutions != null) {
+                            for (ClientInstitution clientInstitution : institutions) {
+                                if (clientInstitution.name.equals(institutionName)
+                                        && !TextUtils.isEmpty(clientInstitution.apiRoot)) {
 
-                                            apiBaseURL = institution.apiRoot + "api/";
+                                    apiBaseURL = clientInstitution.apiRoot + "api/";
 
-                                            // Recreate the API with the new base URL
-                                            //createAPI(institution.apiRoot);
-                                            createAPI();
+                                    // Recreate the API with the new base URL
+                                    //createAPI(institution.apiRoot);
+                                    createAPI();
 
-                                            finishedLogin(user);
-                                        }
-                                    }
+                                    finishedLogin(user);
+
+                                    return new SingleLiveData<>(true);
                                 }
                             }
-                        };
+                        }
 
-                        api.getInstitutionURLs().enqueue(URLsCallback);
-                    }
+                        return new SingleLiveData<>(false);
+                    });
                 }
             }
+
+            return new SingleLiveData<>(false);
         });
     }
 
     // Allow the rest of the first-launch actions to take place
-    private void finishedLogin(User user) {
+    private void finishedLogin(@NonNull User user) {
         application.setLoggedInUser(user, password);
-
-        if (user.accountVerified) application.onLoginSuccess();
     }
 
-	public void login(String email, String password) {
+	public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
         setEmail(email);
         setPassword(password);
 
         setup();
 
-        String snsPlatformArn = Constant.SNS_PLATFORM_APPLICATION_ARN;
-        String deviceToken = FirebaseInstanceId.getInstance().getToken();
+        final String snsPlatformArn = Constants.SNS_PLATFORM_APPLICATION_ARN;
+        final String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
-        api.attemptLogin(snsPlatformArn, deviceToken).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, retrofit2.Response<LoginResponse> response) {
-                boolean userAccountVerified = false;
-                boolean success = false;
+        final LiveData<LoginResponse> loginAttempt = new RetrofitLiveData<>(api.attemptLogin(snsPlatformArn, deviceToken));
+        return Transformations.switchMap(loginAttempt, response -> {
+            boolean success;
 
-                if (response.isSuccessful()) {
-                    LoginResponse loginResponse = response.body();
+            if (response == null) {
+                success = false;
 
-                    if (loginResponse != null) {
-                        success = true;
+            } else {
+                success = true;
 
-                        User user = loginResponse.user;
-                        user.setId(loginResponse.userId);
+                User user = response.user;
+                user.setId(response.userId);
 
-                        userAccountVerified = user.accountVerified;
+                if (user.accountVerified) {
+                    return updateAPIBaseURL(user);
 
-                        if (userAccountVerified) updateAPIBaseURL(user);
-                    }
-                }
-
-                if (!success) {
-                    application.onLoginFailure();
-
-                } else if (!userAccountVerified) {
-                    application.setVerification();
+                } else {
+                    application.showVerification();
                 }
             }
 
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                t.printStackTrace();
-                application.onLoginFailure();
-            }
+            return new SingleLiveData<>(success);
         });
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean signUp(SignUpUser user) {
+    public LiveData<Boolean> signUp(@NonNull SignUpUser user) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)
@@ -272,36 +270,24 @@ public class NetworkService {
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()
-                .url(Constant.SERVER_URL + "signUp")
+                .url(SERVER_URL + "signUp")
                 .method("POST", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
-                .addHeader("User-Agent", "Isegoria Android")
+                .addHeader("User-Agent", "IsegoriaApp Android")
                 .post(requestBody)
                 .build();
 
         // Create new HTTP client rather than using application's, as no auth is required
-        OkHttpClient httpClient = new OkHttpClient();
+        final OkHttpClient httpClient = new OkHttpClient();
 
-        boolean success = false;
-
-        try {
-            Response response = httpClient.newCall(request).execute();
-
-            if (response.isSuccessful() && response.body() != null) {
-                String bodyString = response.body().toString();
-                success = (bodyString != null && bodyString.contains(email));
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-
-        return success;
+        final LiveData<String> responseBody = new OkHttpLiveData(httpClient.newCall(request));
+        return Transformations.switchMap(responseBody, bodyString ->
+           new SingleLiveData<>(bodyString != null && bodyString.contains(email))
+        );
     }
 
-    public void s3Upload(File imageFile) {
+    public LiveData<Boolean> uploadNewUserPhoto(@NonNull File imageFile) {
         CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
                 application.getApplicationContext(), // Context,
                 "715927704730",
@@ -310,7 +296,6 @@ public class NetworkService {
                 "arn:aws:iam::715927704730:role/Cognito_isegoriaAuth_Role",
                 Regions.US_EAST_1 // Region
         );
-
         AmazonS3Client s3Client = new AmazonS3Client(credentialsProvider);
 
         TransferUtility transferUtility = TransferUtility.builder()
@@ -318,9 +303,7 @@ public class NetworkService {
                 .context(application.getApplicationContext())
                 .build();
 
-        String path = imageFile.getPath();
-        int dotIndex = path.lastIndexOf('.');
-
+        int dotIndex = imageFile.getPath().lastIndexOf('.');
         String imageFileExtension = null;
 
         if (dotIndex > -1)
@@ -331,30 +314,24 @@ public class NetworkService {
 
         String key = String.format("%s.%s", UUID.randomUUID().toString(), imageFileExtension);
 
-        TransferObserver observer = transferUtility.upload(Constant.S3_PICTURES_BUCKET_NAME, key, imageFile);
-        observer.setTransferListener(new TransferListener() {
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-                if (state == TransferState.COMPLETED)
-                    updateDisplayPicturePhoto(Constant.S3_PICTURES_PATH + key);
-            }
-
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) { }
-
-            @Override
-            public void onError(int id, Exception ex) {
-                ex.printStackTrace();
+        LiveData<TransferState> transfer = new AWSTransferLiveData(transferUtility.upload(S3_PICTURES_BUCKET_NAME, key, imageFile));
+        return Transformations.switchMap(transfer, state -> {
+            if (state == TransferState.COMPLETED) {
+                return updateDisplayPicturePhoto(S3_PICTURES_PATH + key);
+            } else {
+                return new SingleLiveData<>(null);
             }
         });
     }
 
-    private void updateDisplayPicturePhoto(String pictureURL) {
+    private LiveData<Boolean> updateDisplayPicturePhoto(@NonNull String pictureURL) {
         setup();
 
         long timestamp = System.currentTimeMillis() / 1000L;
+        User loggedInUser = application.loggedInUser.getValue();
 
-        User loggedInUser = application.getLoggedInUser();
+        if (loggedInUser == null)
+            return new SingleLiveData<>(false);
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -372,20 +349,13 @@ public class NetworkService {
                 .method("PUT", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
-                .addHeader("User-Agent", "Isegoria Android")
+                .addHeader("User-Agent", "IsegoriaApp Android")
                 .post(requestBody)
                 .build();
 
-        httpClient.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                // Ignored
-            }
-        });
+        final LiveData<String> updateRequest = new OkHttpLiveData(httpClient.newCall(request));
+        return Transformations.switchMap(updateRequest, bodyString ->
+            new SingleLiveData<>(bodyString != null)
+        );
     }
 }

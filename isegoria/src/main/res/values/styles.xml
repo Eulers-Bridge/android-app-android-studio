@@ -18,12 +18,17 @@
         <item name="colorAccent">@color/lightBlue</item>
     </style>
 
+    <style name="AuthTheme" parent="AppTheme">
+        <item name="android:windowBackground">@color/black</item>
+        <!-- Translucent status, overridden in v21 -->
+    </style>
+
     <style name="PersonalityQuestionsTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="DetailTheme" parent="AppTheme">
-
+        <!-- Translucent status, overridden in v21 -->
     </style>
 
     <style name="PhotoDetailTheme" parent="Theme.AppCompat.Light.NoActionBar">

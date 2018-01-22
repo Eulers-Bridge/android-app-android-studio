@@ -6,9 +6,9 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.common.Constant;
-import com.eulersbridge.isegoria.common.Utils;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -46,7 +46,7 @@ public class NotificationService extends FirebaseMessagingService {
 
     private void createNotification(String title, String text) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this,
-                Utils.notificationChannelIDFromName(Constant.NOTIFICATION_CHANNEL_FRIENDS))
+                Strings.notificationChannelIDFromName(Constants.NOTIFICATION_CHANNEL_FRIENDS))
                 .setContentTitle(title)
                 .setSmallIcon(R.drawable.notification_icon);
 

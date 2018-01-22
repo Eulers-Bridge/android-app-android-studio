@@ -6,7 +6,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
 import com.amazonaws.services.sns.model.CreatePlatformEndpointResult;
-import com.eulersbridge.isegoria.common.Constant;
+import com.eulersbridge.isegoria.util.Constants;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.securepreferences.SecurePreferences;
@@ -41,14 +41,13 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
         CreatePlatformEndpointRequest request = new CreatePlatformEndpointRequest();
 
         request.setToken(refreshedToken);
-        request.setPlatformApplicationArn(Constant.SNS_PLATFORM_APPLICATION_ARN);
+        request.setPlatformApplicationArn(Constants.SNS_PLATFORM_APPLICATION_ARN);
 
         CreatePlatformEndpointResult result = getSNSClient().createPlatformEndpoint(request);
-        if (result != null) {
+        if (result != null)
             new SecurePreferences(getApplicationContext())
                     .edit()
                     .putString("endpointArn", result.getEndpointArn())
                     .apply();
-        }
     }
 }
