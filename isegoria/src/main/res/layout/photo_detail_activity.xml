@@ -7,20 +7,20 @@
     android:layout_height="match_parent">
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/photo_detail_view_pager"
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:background="@drawable/tumblr_static_aphc"/>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/photo_detail_details_container"
+        android:id="@+id/detailsContainer"
         android:layout_width="match_parent"
         android:layout_height="192dp"
         android:layout_gravity="bottom"
         android:background="@drawable/scrim_photo">
 
         <TextView
-            android:id="@+id/photo_detail_title_text_view"
+            android:id="@+id/titleTextView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="16dp"
@@ -28,67 +28,67 @@
             android:gravity="bottom"
             android:textColor="@color/white"
             android:textSize="21sp"
-            app:layout_constraintBottom_toTopOf="@+id/photo_detail_date_text_view"
+            app:layout_constraintBottom_toTopOf="@+id/dateTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Photo Title" />
 
         <TextView
-            android:id="@+id/photo_detail_date_text_view"
+            android:id="@+id/dateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@color/photo_details_small"
-            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintBottom_toBottomOf="@+id/starImageView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintTop_toTopOf="@+id/starImageView"
             tools:text="OCTOBER 12, 2017" />
 
         <!-- 75% opacity #CCCCCC vertical divider -->
         <View
-            android:id="@+id/photo_detail_divider_vertical"
+            android:id="@+id/verticalDivider"
             android:layout_width="1dp"
             android:layout_height="24dp"
             android:background="#BFCCCCCC"
-            app:layout_constraintStart_toEndOf="@id/photo_detail_date_text_view"
-            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintStart_toEndOf="@id/dateTextView"
+            app:layout_constraintBottom_toBottomOf="@+id/starImageView"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"/>
 
         <TextView
-            android:id="@+id/photo_detail_likes_text_view"
+            android:id="@+id/likesTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:layout_toLeftOf="@+id/photo_detail_star_image_view"
-            android:layout_toStartOf="@+id/photo_detail_star_image_view"
+            android:layout_toLeftOf="@+id/starImageView"
+            android:layout_toStartOf="@+id/starImageView"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@color/photo_details_small"
-            app:layout_constraintBottom_toBottomOf="@+id/photo_detail_star_image_view"
-            app:layout_constraintStart_toEndOf="@+id/photo_detail_divider_vertical"
-            app:layout_constraintTop_toTopOf="@+id/photo_detail_star_image_view"
+            app:layout_constraintBottom_toBottomOf="@+id/starImageView"
+            app:layout_constraintStart_toEndOf="@+id/verticalDivider"
+            app:layout_constraintTop_toTopOf="@+id/starImageView"
             tools:text="1" />
 
         <ImageView
-            android:id="@id/photo_detail_star_image_view"
+            android:id="@id/starImageView"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginBottom="16dp"
             android:layout_marginLeft="4dp"
             android:layout_marginStart="4dp"
-            android:layout_toLeftOf="@+id/photo_detail_flag_image_view"
-            android:layout_toStartOf="@+id/photo_detail_flag_image_view"
+            android:layout_toLeftOf="@+id/flagImageView"
+            android:layout_toStartOf="@+id/flagImageView"
             android:contentDescription="@string/photo_detail_view_star"
             app:srcCompat="@drawable/star_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/photo_detail_likes_text_view" />
+            app:layout_constraintStart_toEndOf="@+id/likesTextView" />
 
         <ImageView
-            android:id="@id/photo_detail_flag_image_view"
+            android:id="@id/flagImageView"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginBottom="16dp"
@@ -97,7 +97,7 @@
             android:contentDescription="@string/photo_detail_view_flag"
             android:src="@drawable/flagdefault"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/photo_detail_star_image_view" />
+            app:layout_constraintStart_toEndOf="@+id/starImageView" />
     </android.support.constraint.ConstraintLayout>
 
 </merge>

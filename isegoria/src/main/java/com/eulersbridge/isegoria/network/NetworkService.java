@@ -109,7 +109,7 @@ public class NetworkService {
             Response response = chain.proceed(request);
 
             if (request.method().equals("GET")) {
-                String cacheHeaderValue = Utils.isNetworkAvailable(application)
+                String cacheHeaderValue = Utils.INSTANCE.isNetworkAvailable(application)
                         ? "public, max-age=60" // 60 seconds / 1 minute
                         : "public, only-if-cached, max-stale=300"; // 300 seconds / 5 minutes
 
@@ -231,15 +231,15 @@ public class NetworkService {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)
-                .addFormDataPart("givenName", user.givenName)
-                .addFormDataPart("familyName", user.familyName)
-                .addFormDataPart("gender", user.gender)
-                .addFormDataPart("nationality", user.nationality)
-                .addFormDataPart("yearOfBirth", user.yearOfBirth)
-                .addFormDataPart("accountVerified", String.valueOf(user.accountVerified))
+                .addFormDataPart("givenName", user.getGivenName())
+                .addFormDataPart("familyName", user.getFamilyName())
+                .addFormDataPart("gender", user.getGender())
+                .addFormDataPart("nationality", user.getNationality())
+                .addFormDataPart("yearOfBirth", user.getYearOfBirth())
+                .addFormDataPart("accountVerified", String.valueOf(user.getAccountVerified()))
                 .addFormDataPart("password", password)
-                .addFormDataPart("institutionId", String.valueOf(user.institutionId))
-                .addFormDataPart("hasPersonality", String.valueOf(user.hasPersonality))
+                .addFormDataPart("institutionId", String.valueOf(user.getInstitutionId()))
+                .addFormDataPart("hasPersonality", String.valueOf(user.getHasPersonality()))
                 .build();
 
         okhttp3.Request request = new okhttp3.Request.Builder()

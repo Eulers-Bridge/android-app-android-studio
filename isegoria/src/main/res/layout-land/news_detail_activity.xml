@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:fillViewport="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
     android:paddingBottom="16dp">
 
     <android.support.constraint.ConstraintLayout
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/article_image"
+            android:id="@+id/articleImageView"
             android:layout_width="0dp"
             android:layout_height="220dp"
             android:contentDescription="@null"
@@ -24,7 +24,7 @@
             tools:background="@color/grey" />
 
         <ImageView
-            android:id="@+id/back_button"
+            android:id="@+id/backButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="16dp"
@@ -36,7 +36,7 @@
             app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
 
         <TextView
-            android:id="@+id/article_likes"
+            android:id="@+id/likesTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -46,27 +46,27 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/white"
             android:textSize="@dimen/newsPointsSize"
-            app:layout_constraintBottom_toBottomOf="@+id/article_star"
-            app:layout_constraintEnd_toStartOf="@+id/article_star"
-            app:layout_constraintTop_toTopOf="@+id/article_star"
+            app:layout_constraintBottom_toBottomOf="@+id/starImageView"
+            app:layout_constraintEnd_toStartOf="@+id/starImageView"
+            app:layout_constraintTop_toTopOf="@+id/starImageView"
             tools:text="2" />
 
         <ImageView
-            android:id="@+id/article_star"
+            android:id="@+id/starImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="40dp"
-            android:layout_toLeftOf="@+id/article_flag"
-            android:layout_toStartOf="@+id/article_flag"
+            android:layout_toLeftOf="@+id/flagImageView"
+            android:layout_toStartOf="@+id/flagImageView"
             android:contentDescription="@string/news_article_star_content_description"
             app:srcCompat="@drawable/star_24dp"
-            app:layout_constraintEnd_toStartOf="@+id/article_flag"
+            app:layout_constraintEnd_toStartOf="@+id/flagImageView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/article_flag"
+            android:id="@+id/flagImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
@@ -78,7 +78,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/article_title"
+            android:id="@+id/titleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -90,15 +90,15 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/white"
             android:fontFamily="@font/museo_sans_rounded_300"
-            app:layout_constraintBottom_toTopOf="@+id/article_image_author"
+            app:layout_constraintBottom_toTopOf="@+id/authorImageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/back_button"
+            app:layout_constraintTop_toBottomOf="@+id/backButton"
             app:layout_constraintVertical_bias="0.0"
             tools:text="Article Title" />
 
         <ImageView
-            android:id="@+id/article_image_author"
+            android:id="@+id/authorImageView"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginLeft="16dp"
@@ -106,32 +106,32 @@
             android:background="@color/grey"
             android:contentDescription="@null"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/article_date"
+            app:layout_constraintBottom_toBottomOf="@+id/dateTextView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/article_author"/>
+            app:layout_constraintTop_toTopOf="@+id/authorNameTextView"/>
 
         <TextView
-            android:id="@+id/article_author"
+            android:id="@+id/authorNameTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/article_date"
+            android:layout_above="@+id/dateTextView"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginBottom="6dp"
-            android:layout_toEndOf="@id/article_image_author"
-            android:layout_toRightOf="@id/article_image_author"
+            android:layout_toEndOf="@id/authorImageView"
+            android:layout_toRightOf="@id/authorImageView"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/article_image_author"
-            app:layout_constraintBottom_toTopOf="@+id/article_date"
+            app:layout_constraintStart_toEndOf="@+id/authorImageView"
+            app:layout_constraintBottom_toTopOf="@+id/dateTextView"
             tools:text="Jane Doe" />
 
         <TextView
-            android:id="@+id/article_date"
+            android:id="@+id/dateTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -139,17 +139,17 @@
             android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_toEndOf="@id/article_image_author"
-            android:layout_toRightOf="@id/article_image_author"
+            android:layout_toEndOf="@id/authorImageView"
+            android:layout_toRightOf="@id/authorImageView"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/article_image"
+            app:layout_constraintBottom_toBottomOf="@+id/articleImageView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/article_image_author"
+            app:layout_constraintStart_toEndOf="@+id/authorImageView"
             tools:text="12th September 2017" />
 
         <TextView
-            android:id="@+id/article_content"
+            android:id="@+id/contentTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
@@ -161,7 +161,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/article_image"
+            app:layout_constraintTop_toBottomOf="@+id/articleImageView"
             tools:text="Lorem ipsum dolor sit amet" />
 
     </android.support.constraint.ConstraintLayout>
