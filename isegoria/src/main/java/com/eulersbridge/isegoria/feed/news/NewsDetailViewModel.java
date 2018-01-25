@@ -26,16 +26,16 @@ public class NewsDetailViewModel extends AndroidViewModel {
             return new SingleLiveData<>(null);
 
         } else {
-            IsegoriaApp isegoriaApp = getApplication();
-            return new RetrofitLiveData<>(isegoriaApp.getAPI().getNewsArticleLikes(article.id));
+            IsegoriaApp app = getApplication();
+            return new RetrofitLiveData<>(app.getAPI().getNewsArticleLikes(article.id));
         }
     });
 
     final LiveData<Boolean> articleLikedByUser = Transformations.switchMap(articleLikes, likes -> {
         if (likes != null) {
-            IsegoriaApp isegoriaApp = getApplication();
+            IsegoriaApp app = getApplication();
 
-            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            return Transformations.switchMap(app.loggedInUser, user -> {
                 if (user != null)
                     for (Like like : likes)
                         if (like.email.equals(user.email))
@@ -62,12 +62,12 @@ public class NewsDetailViewModel extends AndroidViewModel {
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     LiveData<Boolean> likeArticle() {
-        final IsegoriaApp isegoriaApp = getApplication();
+        final IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null)
                 return Transformations.switchMap(newsArticle, article -> {
-                    LiveData<LikeResponse> like = new RetrofitLiveData<>(isegoriaApp.getAPI().likeArticle(article.id, user.email));
+                    LiveData<LikeResponse> like = new RetrofitLiveData<>(app.getAPI().likeArticle(article.id, user.email));
 
                     return Transformations.switchMap(like,
                             likeResponse -> new SingleLiveData<>(likeResponse != null && likeResponse.success));
@@ -81,13 +81,13 @@ public class NewsDetailViewModel extends AndroidViewModel {
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     LiveData<Boolean> unlikeArticle() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null)
                 return Transformations.switchMap(newsArticle,
                         article -> {
-                            LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikeArticle(article.id, user.email));
+                            LiveData<Void> unlike = new RetrofitLiveData<>(app.getAPI().unlikeArticle(article.id, user.email));
 
                             return Transformations.switchMap(unlike, __ -> new SingleLiveData<>(true));
                         });

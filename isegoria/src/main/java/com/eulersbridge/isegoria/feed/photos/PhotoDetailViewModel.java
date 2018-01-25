@@ -33,11 +33,11 @@ public class PhotoDetailViewModel extends AndroidViewModel {
     });
 
     final LiveData<List<Like>> photoLikes = Transformations.switchMap(currentPhoto, photo -> {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
         final long photoId = photo.id;
 
-        LiveData<List<Like>> photoLikes = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotoLikes(photoId));
+        LiveData<List<Like>> photoLikes = new RetrofitLiveData<>(app.getAPI().getPhotoLikes(photoId));
 
         return Transformations.switchMap(photoLikes, likes -> {
             if (currentPhoto.getValue() != null && photoId == currentPhoto.getValue().id) {
@@ -51,8 +51,8 @@ public class PhotoDetailViewModel extends AndroidViewModel {
 
     final LiveData<Boolean> photoLikedByUser = Transformations.switchMap(photoLikes, likes -> {
         if (likes != null) {
-            IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.loggedInUser.getValue();
+            IsegoriaApp app = getApplication();
+            User user = app.loggedInUser.getValue();
 
             if (user != null)
                 for (Like like : likes)
@@ -97,13 +97,13 @@ public class PhotoDetailViewModel extends AndroidViewModel {
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     LiveData<Boolean> likePhoto() {
-        final IsegoriaApp isegoriaApp = getApplication();
+        final IsegoriaApp app = getApplication();
 
-        final User user = isegoriaApp.loggedInUser.getValue();
+        final User user = app.loggedInUser.getValue();
 
         if (user != null) {
             return Transformations.switchMap(currentPhoto, article -> {
-                LiveData<LikeResponse> newsArticleLike = new RetrofitLiveData<>(isegoriaApp.getAPI().likePhoto(article.id, user.email));
+                LiveData<LikeResponse> newsArticleLike = new RetrofitLiveData<>(app.getAPI().likePhoto(article.id, user.email));
 
                 return Transformations.switchMap(newsArticleLike,
                         likeResponse -> new SingleLiveData<>(likeResponse != null && likeResponse.success));
@@ -117,14 +117,14 @@ public class PhotoDetailViewModel extends AndroidViewModel {
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     LiveData<Boolean> unlikePhoto() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        User user = isegoriaApp.loggedInUser.getValue();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
             return Transformations.switchMap(currentPhoto,
                     photo -> {
-                        LiveData<Void> unlike = new RetrofitLiveData<>(isegoriaApp.getAPI().unlikePhoto(photo.id, user.email));
+                        LiveData<Void> unlike = new RetrofitLiveData<>(app.getAPI().unlikePhoto(photo.id, user.email));
 
                         return Transformations.switchMap(unlike, __ -> new SingleLiveData<>(true));
                     });

@@ -40,7 +40,7 @@ public class PhotoAlbumFragment extends Fragment {
         photosGridView.setAdapter(adapter);
 
         if (getActivity() != null && getArguments() != null) {
-            IsegoriaApp isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+            IsegoriaApp app = (IsegoriaApp)getActivity().getApplication();
 
             PhotoAlbum album = Parcels.unwrap(getArguments().getParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM));
 
@@ -57,7 +57,7 @@ public class PhotoAlbumFragment extends Fragment {
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(albumImageView);
 
-            isegoriaApp.getAPI().getAlbumPhotos(album.id).enqueue(new SimpleCallback<PhotosResponse>() {
+            app.getAPI().getAlbumPhotos(album.id).enqueue(new SimpleCallback<PhotosResponse>() {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();

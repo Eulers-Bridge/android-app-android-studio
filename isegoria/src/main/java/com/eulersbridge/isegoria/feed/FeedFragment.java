@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.feed;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -29,6 +30,7 @@ public class FeedFragment extends Fragment implements TitledFragment, MainActivi
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private FeedViewModel viewModel;
 
     @Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +52,8 @@ public class FeedFragment extends Fragment implements TitledFragment, MainActivi
 
             Utils.hideKeyboard(activity);
         }
+
+        viewModel = ViewModelProviders.of(this).get(FeedViewModel.class);
 
         setHasOptionsMenu(true);
 
@@ -79,9 +83,7 @@ public class FeedFragment extends Fragment implements TitledFragment, MainActivi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.feed_menu_item_friends:
-                if (getActivity() != null)
-                    ((MainActivity)getActivity()).showFriends();
-
+                viewModel.showFriends();
                 return true;
 
             default:

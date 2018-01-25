@@ -70,11 +70,11 @@ public class VoteViewModel extends AndroidViewModel {
         if (election != null)
             return election;
 
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null && user.institutionId != null) {
-            LiveData<List<Election>> electionsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getElections(user.institutionId));
+            LiveData<List<Election>> electionsList = new RetrofitLiveData<>(app.getAPI().getElections(user.institutionId));
 
             election = Transformations.switchMap(electionsList, elections -> {
                 if (elections != null && elections.size() > 0) {
@@ -101,11 +101,11 @@ public class VoteViewModel extends AndroidViewModel {
         if (voteLocations != null)
             return voteLocations;
 
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null && user.institutionId != null) {
-            voteLocations = new RetrofitLiveData<>(isegoriaApp.getAPI().getVoteLocations(user.institutionId));
+            voteLocations = new RetrofitLiveData<>(app.getAPI().getVoteLocations(user.institutionId));
             return voteLocations;
         }
 
@@ -116,8 +116,8 @@ public class VoteViewModel extends AndroidViewModel {
         if (pledgeComplete.getValue() != null && pledgeComplete.getValue())
             return pledgeComplete;
 
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
             final Election election = this.election.getValue();
@@ -130,7 +130,7 @@ public class VoteViewModel extends AndroidViewModel {
                         dateTimeCalendar.getTimeInMillis());
 
                 // Add the vote reminder
-                LiveData<Void> reminderRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addVoteReminder(user.email, reminder));
+                LiveData<Void> reminderRequest = new RetrofitLiveData<>(app.getAPI().addVoteReminder(user.email, reminder));
 
                 return Transformations.switchMap(reminderRequest, __ -> {
                     pledgeComplete.setValue(true);
@@ -143,12 +143,12 @@ public class VoteViewModel extends AndroidViewModel {
     }
 
     LiveData<Boolean> getLatestVoteReminder() {
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
 
-            LiveData<List<VoteReminder>> remindersRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getVoteReminders(user.email));
+            LiveData<List<VoteReminder>> remindersRequest = new RetrofitLiveData<>(app.getAPI().getVoteReminders(user.email));
 
             return Transformations.switchMap(remindersRequest, reminders -> {
                 if (reminders != null && reminders.size() > 0) {

@@ -71,16 +71,16 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
         if (isValidFragment(fragment)) {
             //noinspection ConstantConditions
-            IsegoriaApp isegoriaApp = (IsegoriaApp)fragment.getActivity().getApplication();
+            IsegoriaApp app = (IsegoriaApp)fragment.getActivity().getApplication();
 
-            if (isegoriaApp != null) {
+            if (app != null) {
                 int imageIndex = getImageIndex(fragment);
 
                 final long itemId = item.id;
 
                 WeakReference<TaskViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
 
-                isegoriaApp.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
+                app.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
                     @Override
                     protected void handleResponse(Response<PhotosResponse> response) {
                         PhotosResponse body = response.body();

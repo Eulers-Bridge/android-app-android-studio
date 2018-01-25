@@ -32,9 +32,9 @@ public class AuthViewModel extends AndroidViewModel {
     public AuthViewModel(@NonNull Application application) {
         super(application);
 
-        IsegoriaApp isegoriaApp = (IsegoriaApp) application;
+        IsegoriaApp app = (IsegoriaApp) application;
 
-        isegoriaApp.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
+        app.getAPI().getGeneralInfo().enqueue(new SimpleCallback<GeneralInfoResponse>() {
             @Override
             protected void handleResponse(Response<GeneralInfoResponse> response) {
                 GeneralInfoResponse body = response.body();

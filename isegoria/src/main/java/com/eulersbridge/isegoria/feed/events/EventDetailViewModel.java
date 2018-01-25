@@ -48,15 +48,15 @@ public class EventDetailViewModel extends AndroidViewModel {
     }
 
     LiveData<Ticket> getTicket(long ticketId) {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return new RetrofitLiveData<>(isegoriaApp.getAPI().getTicket(ticketId));
+        return new RetrofitLiveData<>(app.getAPI().getTicket(ticketId));
     }
 
     LiveData<Position> getPosition(long positionId) {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return new RetrofitLiveData<>(isegoriaApp.getAPI().getPosition(positionId));
+        return new RetrofitLiveData<>(app.getAPI().getPosition(positionId));
     }
 
 }

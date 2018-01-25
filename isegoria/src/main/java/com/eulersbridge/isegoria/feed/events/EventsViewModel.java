@@ -23,11 +23,11 @@ public class EventsViewModel extends AndroidViewModel {
     }
 
     LiveData<List<Event>> getEvents() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null && user.institutionId != null) {
-                eventsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getEvents(user.institutionId));
+                eventsList = new RetrofitLiveData<>(app.getAPI().getEvents(user.institutionId));
                 return eventsList;
             }
 

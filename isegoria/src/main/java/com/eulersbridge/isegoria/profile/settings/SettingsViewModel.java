@@ -39,8 +39,8 @@ public class SettingsViewModel extends AndroidViewModel {
         optOutDataCollectionSwitchEnabled.setValue(false);
         doNotTrackSwitchEnabled.setValue(false);
 
-        IsegoriaApp isegoriaApp = (IsegoriaApp) application;
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = (IsegoriaApp) application;
+        User user = app.loggedInUser.getValue();
         if (user != null) {
             optOutDataCollectionSwitchChecked.setValue(user.isOptedOutOfDataCollection);
             optOutDataCollectionSwitchEnabled.setValue(true);
@@ -53,20 +53,20 @@ public class SettingsViewModel extends AndroidViewModel {
     void onOptOutDataCollectionChange(boolean isChecked) {
         optOutDataCollectionSwitchEnabled.setValue(false);
 
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
             UserSettings userSettings = new UserSettings(user.trackingOff, isChecked);
 
-            isegoriaApp.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
+            app.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         optOutDataCollectionSwitchChecked.setValue(isChecked);
                         optOutDataCollectionSwitchEnabled.setValue(true);
 
-                        isegoriaApp.setOptedOutOfDataCollection(isChecked);
+                        app.setOptedOutOfDataCollection(isChecked);
                     }
                 }
 
@@ -82,19 +82,19 @@ public class SettingsViewModel extends AndroidViewModel {
     void onTrackingChange(boolean isChecked) {
         doNotTrackSwitchEnabled.setValue(false);
 
-        IsegoriaApp isegoriaApp = getApplication();
-        User user = isegoriaApp.loggedInUser.getValue();
+        IsegoriaApp app = getApplication();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
             UserSettings userSettings = new UserSettings(isChecked, user.isOptedOutOfDataCollection);
 
-            isegoriaApp.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
+            app.getAPI().updateUserDetails(user.email, userSettings).enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
                         doNotTrackSwitchChecked.setValue(isChecked);
 
-                        isegoriaApp.setTrackingOff(isChecked);
+                        app.setTrackingOff(isChecked);
 
                     } else {
                         doNotTrackSwitchChecked.setValue(!isChecked);
@@ -114,20 +114,20 @@ public class SettingsViewModel extends AndroidViewModel {
     }
 
     LiveData<String> getUserProfilePhotoURL() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
+        return Transformations.switchMap(app.loggedInUser, user ->
             new SingleLiveData<>(user == null? null : user.profilePhotoURL)
         );
     }
 
     LiveData<Photo> getUserPhoto() {
         if (userPhoto == null) {
-            IsegoriaApp isegoriaApp = getApplication();
-            User user = isegoriaApp.loggedInUser.getValue();
+            IsegoriaApp app = getApplication();
+            User user = app.loggedInUser.getValue();
 
             if (user != null) {
-                LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotos(user.email));
+                LiveData<PhotosResponse> photosRequest = new RetrofitLiveData<>(app.getAPI().getPhotos(user.email));
 
                 userPhoto = Transformations.switchMap(photosRequest, photosResponse -> {
                     if (photosResponse != null && photosResponse.totalPhotos > 0)

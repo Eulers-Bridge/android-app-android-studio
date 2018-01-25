@@ -34,12 +34,12 @@ public class PersonalityViewModel extends AndroidViewModel {
 
     LiveData<Boolean> setUserCompletedQuestions(@NonNull UserPersonality userPersonality) {
 
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        User user = isegoriaApp.loggedInUser.getValue();
+        User user = app.loggedInUser.getValue();
 
         if (user != null) {
-            LiveData<Void> request = new RetrofitLiveData<>(isegoriaApp.getAPI().addUserPersonality(user.email, userPersonality));
+            LiveData<Void> request = new RetrofitLiveData<>(app.getAPI().addUserPersonality(user.email, userPersonality));
 
             return Transformations.switchMap(request, success -> {
                 if (success != null) {

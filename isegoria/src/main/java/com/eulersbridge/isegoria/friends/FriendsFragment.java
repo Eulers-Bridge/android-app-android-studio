@@ -58,6 +58,7 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
 
     // FriendRequestType IntDef
     public static final int RECEIVED = 0;
+    @SuppressWarnings("WeakerAccess")
     public static final int SENT = 1;
 
     @IntDef({RECEIVED,SENT})
@@ -94,8 +95,6 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
         friendsList.setAdapter(friendsAdapter);
         friendsContainer = rootView.findViewById(R.id.friends);
 
-
-
         viewModel.searchSectionVisible.observe(this, visibleValue -> {
             boolean visible = visibleValue != null && visibleValue;
             searchContainer.setVisibility(visible? View.VISIBLE : View.GONE);
@@ -129,6 +128,13 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
         getReceivedFriendRequests();
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        viewModel.onExit();
     }
 
     private void getReceivedFriendRequests() {
@@ -296,8 +302,7 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
     }
 
     private void showMessage(@NonNull String message) {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show());
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     private void showAddedMessage() {
