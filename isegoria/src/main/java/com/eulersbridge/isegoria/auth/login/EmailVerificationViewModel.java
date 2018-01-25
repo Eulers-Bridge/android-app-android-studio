@@ -17,18 +17,22 @@ public class EmailVerificationViewModel extends AndroidViewModel {
         super(application);
     }
 
-    void userVerified() {
-        IsegoriaApp isegoriaApp = getApplication();
+    void onExit() {
+        IsegoriaApp app = getApplication();
+        app.userVerificationVisible.setValue(false);
+    }
 
-        isegoriaApp.login(null, null);
+    LiveData<Boolean> userVerified() {
+        IsegoriaApp app = getApplication();
+        return app.login();
     }
 
     LiveData<Boolean> resendVerification() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null) {
-                LiveData<Void> verificationRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().sendVerificationEmail(user.email));
+                LiveData<Void> verificationRequest = new RetrofitLiveData<>(app.getAPI().sendVerificationEmail(user.email));
                 return Transformations.switchMap(verificationRequest, __ -> new SingleLiveData<>(true));
             }
 

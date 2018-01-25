@@ -30,21 +30,21 @@ public class CandidatePositionsFragment extends Fragment {
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.election_positions_fragment, container, false);
 
-        IsegoriaApp isegoriaApp = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
+        IsegoriaApp app = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
 
-        if (isegoriaApp != null)
-            api = isegoriaApp.getAPI();
+        if (app != null)
+            api = app.getAPI();
 
         adapter = new PositionAdapter(this, api);
 
         RecyclerView positionsGridView = rootView.findViewById(R.id.election_positions_grid_view);
         positionsGridView.setAdapter(adapter);
 
-        if (isegoriaApp != null) {
-            User user = isegoriaApp.loggedInUser.getValue();
+        if (app != null) {
+            User user = app.loggedInUser.getValue();
 
             if (user != null && user.institutionId != null)
-                isegoriaApp.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
+                app.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
         }
         
 		return rootView;

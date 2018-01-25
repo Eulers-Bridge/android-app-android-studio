@@ -37,7 +37,7 @@ import retrofit2.Response;
 
 public class CandidateTicketFragment extends Fragment {
 
-	private IsegoriaApp isegoriaApp;
+	private IsegoriaApp app;
 
 	private TableLayout positionsTableLayout;
 	
@@ -62,12 +62,12 @@ public class CandidateTicketFragment extends Fragment {
 
 		dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-		isegoriaApp = (IsegoriaApp)getActivity().getApplication();
-		if (isegoriaApp != null) {
-            User loggedInUser = isegoriaApp.loggedInUser.getValue();
+		app = (IsegoriaApp)getActivity().getApplication();
+		if (app != null) {
+            User loggedInUser = app.loggedInUser.getValue();
 
             if (loggedInUser != null && loggedInUser.institutionId != null)
-                isegoriaApp.getAPI().getElections(loggedInUser.institutionId).enqueue(electionsCallback);
+                app.getAPI().getElections(loggedInUser.institutionId).enqueue(electionsCallback);
         }
         
 		return rootView;
@@ -80,7 +80,7 @@ public class CandidateTicketFragment extends Fragment {
 			if (elections != null && elections.size() > 0) {
 				Election election = elections.get(0);
 
-				isegoriaApp.getAPI().getTickets(election.id).enqueue(ticketsCallback);
+				app.getAPI().getTickets(election.id).enqueue(ticketsCallback);
 			}
 		}
 

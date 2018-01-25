@@ -60,7 +60,7 @@ public class CandidateTicketDetailFragment extends Fragment {
     private String partyColour = "";
     private String partyLogo = "";
 
-    private IsegoriaApp isegoriaApp;
+    private IsegoriaApp app;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -96,8 +96,8 @@ public class CandidateTicketDetailFragment extends Fragment {
                     }
                 });
 
-        isegoriaApp = (IsegoriaApp)getActivity().getApplication();
-        isegoriaApp.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
+        app = (IsegoriaApp)getActivity().getApplication();
+        app.getAPI().getTicketCandidates(ticketId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
             public void handleResponse(Response<List<Candidate>> response) {
                 List<Candidate> candidates = response.body();
@@ -109,7 +109,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ImageView partyLogoImageView = rootView.findViewById(R.id.partyDetailLogo);
 
-        isegoriaApp.getAPI().getPhotos(ticketId).enqueue(new SimpleCallback<PhotosResponse>() {
+        app.getAPI().getPhotos(ticketId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse photosResponse = response.body();
@@ -126,7 +126,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton = rootView.findViewById(R.id.supportButton);
 
-        isegoriaApp.getAPI().getUserSupportedTickets(isegoriaApp.loggedInUser.getValue().email).enqueue(new SimpleCallback<List<Ticket>>() {
+        app.getAPI().getUserSupportedTickets(app.loggedInUser.getValue().email).enqueue(new SimpleCallback<List<Ticket>>() {
             @Override
             public void handleResponse(Response<List<Ticket>> response) {
                 List<Ticket> tickets = response.body();
@@ -140,11 +140,11 @@ public class CandidateTicketDetailFragment extends Fragment {
 
         ticketSupportButton.setOnClickListener(view -> {
 
-            String userEmail = isegoriaApp.loggedInUser.getValue().email;
+            String userEmail = app.loggedInUser.getValue().email;
 
             if(ticketSupportButton.getText().equals("Support")) {
 
-                isegoriaApp.getAPI().supportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
+                app.getAPI().supportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
 
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) + 1));
@@ -152,7 +152,7 @@ public class CandidateTicketDetailFragment extends Fragment {
             }
             else if(ticketSupportButton.getText().equals("Unsupport")) {
 
-                isegoriaApp.getAPI().unsupportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
+                app.getAPI().unsupportTicket(ticketId, userEmail).enqueue(new IgnoredCallback<>());
 
                 String value = String.valueOf(partyDetailSupporters.getText());
                 partyDetailSupporters.setText(String.valueOf(Integer.parseInt(value) - 1));
@@ -201,7 +201,7 @@ public class CandidateTicketDetailFragment extends Fragment {
 		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), candidate.userId, imageHeight, imageHeight));
 		candidateProfileView.setPadding(paddingMargin3, 0, paddingMargin3, 0);
 
-		isegoriaApp.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
+		app.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
@@ -275,7 +275,7 @@ public class CandidateTicketDetailFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin3, 0, paddingMargin3, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoriaApp.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
+        app.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
             public void handleResponse(Response<Position> response) {
                 Position position = response.body();

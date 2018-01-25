@@ -20,14 +20,23 @@ public class NewsViewModel extends AndroidViewModel {
 
     public NewsViewModel(@NonNull Application application) {
         super(application);
+
+        IsegoriaApp app = (IsegoriaApp) application;
+        List<NewsArticle> cachedLoginArticles = app.cachedLoginArticles;
+
+        if (cachedLoginArticles != null)
+            newsArticlesList = new SingleLiveData<>(cachedLoginArticles);
     }
 
     LiveData<List<NewsArticle>> getNewsArticles() {
-        IsegoriaApp isegoriaApp = getApplication();
+        if (newsArticlesList != null && newsArticlesList.getValue() != null)
+            return newsArticlesList;
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        IsegoriaApp app = getApplication();
+
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null && user.institutionId != null) {
-                newsArticlesList = new RetrofitLiveData<>(isegoriaApp.getAPI().getNewsArticles(user.institutionId));
+                newsArticlesList = new RetrofitLiveData<>(app.getAPI().getNewsArticles(user.institutionId));
                 return newsArticlesList;
             }
 

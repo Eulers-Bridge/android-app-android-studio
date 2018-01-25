@@ -9,7 +9,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,15 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.eulersbridge.isegoria.auth.AuthActivity;
 import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.friends.FriendsFragment;
-import com.eulersbridge.isegoria.network.api.models.User;
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.poll.PollsFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.util.Constants;
@@ -34,7 +30,6 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment;
 import com.google.firebase.FirebaseApp;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
-import com.securepreferences.SecurePreferences;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -46,9 +41,8 @@ public class MainActivity extends AppCompatActivity implements
         void setupTabLayout(TabLayout tabLayout);
     }
 
-	private Deque<Fragment> tabFragments;
+	private Deque<Fragment> tabFragmentsStack;
     private TabLayout tabLayout;
-    private CoordinatorLayout coordinatorLayout;
     private BottomNavigationViewEx navigationView;
 	
 	@Override
@@ -60,59 +54,65 @@ public class MainActivity extends AppCompatActivity implements
 
 		setContentView(R.layout.activity_main);
 
+		setupNavigation();
+
         IsegoriaApp application = (IsegoriaApp) getApplicationContext();
-		application.setMainActivity(this);
+        setupApplicationObservers(application);
 
-		setupToolbarAndNavigation();
+        application.login().observe(this, success -> {
+            if (success != null && success)
+                onLoginSuccess();
+        });
+	}
 
-		coordinatorLayout = findViewById(R.id.coordinator_layout);
+    private void setupNavigation() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-		getSupportFragmentManager().addOnBackStackChangedListener(this);
+        navigationView = findViewById(R.id.navigation);
+        if (navigationView != null) {
+            navigationView.setEnabled(false);
+            navigationView.setOnNavigationItemSelectedListener(this);
+            navigationView.enableShiftingMode(false);
+            navigationView.setTextVisibility(false);
+        }
 
+        tabLayout = findViewById(R.id.tab_layout);
+
+        tabFragmentsStack = new ArrayDeque<>(4);
+
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+    }
+
+	private void setupApplicationObservers(IsegoriaApp application) {
         application.loggedInUser.observe(this, user -> {
             final boolean userLoggedOut = user == null;
 
-            if (userLoggedOut) {
+            if (userLoggedOut)
                 finish();
-
-            } else {
-                onLoginSuccess(user);
-            }
         });
 
-        attemptUserLogin(application);
-	}
+        application.loginVisible.observe(this, loginVisible -> {
+            if (loginVisible != null && loginVisible)
+                startActivity(new Intent(this, AuthActivity.class));
+        });
 
-	private void attemptUserLogin(IsegoriaApp app) {
-        if (app.loggedInUser.getValue() == null) {
-            String userEmail = new SecurePreferences(this)
-                    .getString(Constants.USER_EMAIL_KEY, null);
-            String userPassword = new SecurePreferences(this)
-                    .getString(Constants.USER_PASSWORD_KEY, null);
+        application.userVerificationVisible.observe(this, verificationVisible -> {
+            if (verificationVisible != null && verificationVisible)
+                presentRootContent(new EmailVerificationFragment());
+        });
 
-            final boolean haveStoredCredentials = userEmail != null && userPassword != null;
-
-            if (haveStoredCredentials) {
-                app.login(userEmail, userPassword).observe(this, success -> {
-                    if (success == null || !success) {
-                        showLogin();
-                    }
-                });
-
-                // Add 3 empty tabs to flesh out the empty/not loaded feed fragment screen
-                tabLayout.addTab(tabLayout.newTab());
-                tabLayout.addTab(tabLayout.newTab());
-                tabLayout.addTab(tabLayout.newTab());
-                tabLayout.setVisibility(View.VISIBLE);
-
-            } else {
-                showLogin();
-            }
-        }
+        application.friendsVisible.observe(this, friendsVisible -> {
+            if (friendsVisible != null && friendsVisible)
+                showFriends();
+        });
     }
 
-    public CoordinatorLayout getCoordinatorLayout() {
-        return coordinatorLayout;
+    private void onLoginSuccess() {
+	    navigationView.setEnabled(true);
+
+        if (!handleAppShortcutIntent())
+            navigationView.setSelectedItemId(R.id.navigation_feed);
     }
 
     private boolean handleAppShortcutIntent() {
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = getIntent();
             if (intent != null) {
 
-                String action = getIntent().getAction();
+                String action = intent.getAction();
                 if (action != null) {
                     switch (action) {
                         case Constants.SHORTCUT_ACTION_ELECTION:
@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity implements
                             break;
 
                         case Constants.SHORTCUT_ACTION_FRIENDS:
-                            showFriends();
+                            IsegoriaApp app = (IsegoriaApp) getApplication();
+                            app.friendsVisible.setValue(true);
                             handledShortcut = true;
                             break;
                     }
@@ -148,23 +149,6 @@ public class MainActivity extends AppCompatActivity implements
         return handledShortcut;
     }
 
-	private void setupToolbarAndNavigation() {
-		Toolbar toolbar = findViewById(R.id.toolbar);
-		setSupportActionBar(toolbar);
-
-		navigationView = findViewById(R.id.navigation);
-		if (navigationView != null) {
-		    navigationView.setOnNavigationItemSelectedListener(this);
-
-            navigationView.enableShiftingMode(false);
-            navigationView.setTextVisibility(false);
-		}
-
-		tabLayout = findViewById(R.id.tab_layout);
-
-		tabFragments = new ArrayDeque<>(4);
-	}
-
 	public void setToolbarShowsTitle(boolean visible) {
         if (getSupportActionBar() != null)
 	        getSupportActionBar().setDisplayShowTitleEnabled(visible);
@@ -177,13 +161,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if (tabFragments.size() > 1) {
+        if (tabFragmentsStack.size() > 1) {
             // Only pop if more than 1 fragment on stack (i.e. always leave a root fragment)
 
-            tabFragments.pop();
+            tabFragmentsStack.pop();
             getSupportFragmentManager().popBackStack();
 
-        } else if (tabFragments.size() == 1) {
+        } else if (tabFragmentsStack.size() == 1) {
             // Return to launcher
             Intent launcherAction = new Intent(Intent.ACTION_MAIN);
             launcherAction.addCategory(Intent.CATEGORY_HOME);
@@ -208,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
 	public boolean onSupportNavigateUp() {
-	    if (tabFragments.size() > 0)
-            tabFragments.pop();
+	    if (tabFragmentsStack.size() > 0)
+            tabFragmentsStack.pop();
 
 		getSupportFragmentManager().popBackStack();
 
@@ -217,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements
 	}
 
     private @Nullable Fragment getCurrentFragment() {
-	    return tabFragments.size() == 0? null : tabFragments.peekFirst();
+	    return tabFragmentsStack.size() == 0? null : tabFragmentsStack.peekFirst();
     }
 
 	private void showElection() {
@@ -227,16 +211,8 @@ public class MainActivity extends AppCompatActivity implements
             navigationView.setSelectedItemId(id);
     }
 
-    public void showFriends() {
+    private void showFriends() {
         presentContent(new FriendsFragment());
-    }
-
-	public void showLogin() {
-        startActivity(new Intent(this, AuthActivity.class));
-	}
-
-	public void showVerification() {
-	    presentRootContent(new EmailVerificationFragment());
     }
 
 	@Override
@@ -276,22 +252,25 @@ public class MainActivity extends AppCompatActivity implements
 
         Fragment currentFragment = getCurrentFragment();
 
-        if (currentFragment == null || !fragment.getClass().equals(currentFragment.getClass()))
+        if (currentFragment == null || !fragment.getClass().equals(currentFragment.getClass())) {
+
+            IsegoriaApp app = (IsegoriaApp) getApplication();
+            //noinspection ConstantConditions
+            if (app.friendsVisible.getValue()) {
+                getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                tabFragmentsStack.clear();
+
+                app.friendsVisible.setValue(false);
+            }
+
             presentRootContent(fragment);
+        }
 
 		return true;
 	}
 
-	private void onLoginSuccess(User loggedInUser) {
-        if (!handleAppShortcutIntent())
-            navigationView.setSelectedItemId(R.id.navigation_feed);
-
-        if (!loggedInUser.hasPersonality)
-            startActivity(new Intent(this, PersonalityQuestionsActivity.class));
-    }
-
 	public void presentContent(@NonNull Fragment fragment) {
-        tabFragments.push(fragment);
+        tabFragmentsStack.push(fragment);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -308,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.popBackStack();
 
-        tabFragments.clear();
-        tabFragments.push(fragment);
+        tabFragmentsStack.clear();
+        tabFragmentsStack.push(fragment);
 
         fragmentManager
                 .beginTransaction()

@@ -23,11 +23,11 @@ public class PhotoAlbumsViewModel extends AndroidViewModel {
     }
 
     LiveData<List<PhotoAlbum>> getPhotoAlbums() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null) {
-                photoAlbumsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getPhotoAlbums(user.getNewsFeedId()));
+                photoAlbumsList = new RetrofitLiveData<>(app.getAPI().getPhotoAlbums(user.getNewsFeedId()));
                 return photoAlbumsList;
             }
 

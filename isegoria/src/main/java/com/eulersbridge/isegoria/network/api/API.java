@@ -49,7 +49,10 @@ public interface API {
 
 
     @GET("login")
-    Call<LoginResponse> attemptLogin(@Query("topicArn") String snsTopicArn, @Query("deviceToken") String deviceToken);
+    Call<LoginResponse> login(@Query("topicArn") String snsTopicArn, @Query("deviceToken") String deviceToken);
+
+    @GET("logout")
+    Call<Void> logout();
 
 
     // Note: Specifying a full absolute path ignores Retrofit's base API URL

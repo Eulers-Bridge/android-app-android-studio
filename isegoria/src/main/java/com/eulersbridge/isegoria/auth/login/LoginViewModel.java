@@ -10,12 +10,10 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.util.Utils;
 import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.network.IgnoredCallback;
-import com.securepreferences.SecurePreferences;
 
 @SuppressWarnings("WeakerAccess")
 public class LoginViewModel extends AndroidViewModel {
@@ -41,22 +39,27 @@ public class LoginViewModel extends AndroidViewModel {
         networkError.setValue(false);
         canShowPasswordResetDialog.setValue(true);
 
-        SecurePreferences securePreferences = new SecurePreferences(getApplication());
+        IsegoriaApp app = (IsegoriaApp) application;
 
-        String storedEmail = securePreferences.getString(Constants.USER_EMAIL_KEY, null);
-        if (storedEmail != null)
-            email.setValue(storedEmail);
+        String savedUserEmail = app.getSavedUserEmail();
+        if (savedUserEmail != null)
+            email.setValue(savedUserEmail);
 
-        String storedPassword = securePreferences.getString(Constants.USER_PASSWORD_KEY, null);
-        if (storedPassword != null)
-            password.setValue(storedPassword);
+        String savedUserPassword = app.getSavedUserPassword();
+        if (savedUserPassword != null)
+            password.setValue(savedUserPassword);
     }
 
-    public void setEmail(String email) {
+    void onExit() {
+        IsegoriaApp app = getApplication();
+        app.loginVisible.setValue(false);
+    }
+
+    void setEmail(String email) {
         this.email.setValue(email);
     }
 
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password.setValue(password);
     }
 
@@ -66,9 +69,9 @@ public class LoginViewModel extends AndroidViewModel {
         if (emailError.getValue() != null && !emailError.getValue()
                 && passwordError.getValue() != null && !passwordError.getValue()) {
 
-            IsegoriaApp isegoriaApp = getApplication();
+            IsegoriaApp app = getApplication();
 
-            if (!Utils.isNetworkAvailable(isegoriaApp)) {
+            if (!Utils.isNetworkAvailable(app)) {
                 networkError.setValue(true);
                 formEnabled.setValue(true);
 
@@ -80,7 +83,7 @@ public class LoginViewModel extends AndroidViewModel {
 
                 // Not null as email & password validation checks test for null
                 //noinspection ConstantConditions
-                LiveData<Boolean> loginRequest = isegoriaApp.login(email, password);
+                LiveData<Boolean> loginRequest = app.login(email, password);
 
                 return Transformations.switchMap(loginRequest, success -> {
                     if (success != null && success)
@@ -102,11 +105,11 @@ public class LoginViewModel extends AndroidViewModel {
 
     boolean requestPasswordRecoveryEmail(@Nullable String email) {
         if (Strings.isValidEmail(email)) {
-            IsegoriaApp isegoriaApp = getApplication();
+            IsegoriaApp app = getApplication();
 
             canShowPasswordResetDialog.setValue(false);
 
-            isegoriaApp.getAPI().requestPasswordReset(email).enqueue(new IgnoredCallback<>());
+            app.getAPI().requestPasswordReset(email).enqueue(new IgnoredCallback<>());
 
             canShowPasswordResetDialog.setValue(true);
 
