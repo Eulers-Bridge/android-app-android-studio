@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.auth.AuthViewModel;
@@ -20,9 +21,12 @@ public class ConsentAgreementFragment extends Fragment {
 		//noinspection ConstantConditions
 		AuthViewModel authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
 
-        rootView.findViewById(R.id.user_consent_next_button).setOnClickListener(view ->
-            authViewModel.setSignUpConsentGiven()
-        );
+		final Button agreeButton = rootView.findViewById(R.id.user_consent_next_button);
+		agreeButton.setOnClickListener(view -> {
+			agreeButton.setEnabled(false);
+
+            authViewModel.setSignUpConsentGiven();
+		});
 
 		return rootView;
 	}
