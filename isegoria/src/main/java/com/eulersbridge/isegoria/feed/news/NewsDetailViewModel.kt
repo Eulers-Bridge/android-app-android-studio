@@ -16,17 +16,21 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
 
     internal val newsArticle = MutableLiveData<NewsArticle>()
 
-    val app: IsegoriaApp by lazy {
+    private val app: IsegoriaApp by lazy {
         getApplication<IsegoriaApp>()
     }
 
-    internal val articleLikes = Transformations.switchMap<NewsArticle, List<Like>>(newsArticle) { article ->
+    private val articleLikes = Transformations.switchMap<NewsArticle, List<Like>>(newsArticle) { article ->
         if (article == null) {
             SingleLiveData(null)
 
         } else {
-            RetrofitLiveData <List<Like>>(app.api.getNewsArticleLikes(article.id))
+            RetrofitLiveData(app.api.getNewsArticleLikes(article.id))
         }
+    }
+
+    internal val articleLikeCount = Transformations.switchMap(articleLikes) { likes ->
+        SingleLiveData(likes?.size ?: 0)
     }
 
     internal val articleLikedByUser = Transformations.switchMap(articleLikes) { likes ->

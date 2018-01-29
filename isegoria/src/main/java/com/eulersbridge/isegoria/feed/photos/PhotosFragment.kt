@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.responses.NewsFeedResponse
 import com.eulersbridge.isegoria.util.network.SimpleCallback
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -23,13 +22,15 @@ class PhotosFragment : Fragment(), TitledFragment {
 
     private var app: IsegoriaApp? = null
     private val adapter = PhotoAlbumAdapter(this)
-    private lateinit var viewModel: PhotoAlbumsViewModel
+
+    private val viewModel: PhotoAlbumsViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(PhotoAlbumsViewModel::class.java)
+    }
+
     private var fetchedPhotos = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.photos_fragment, container, false)
-
-        viewModel = ViewModelProviders.of(this).get(PhotoAlbumsViewModel::class.java)
 
         app = activity?.application as IsegoriaApp
 
@@ -39,23 +40,17 @@ class PhotosFragment : Fragment(), TitledFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         refreshLayout.setOnRefreshListener {
             refreshLayout.isRefreshing = true
-
             refresh()
-
             refreshLayout.postDelayed({ refreshLayout.isRefreshing = false }, 6000)
         }
 
-        val dividerItemDecoration = DividerItemDecoration(albumsListView.context, LinearLayoutManager.VERTICAL)
-        albumsListView.addItemDecoration(dividerItemDecoration)
-
-        albumsListView.adapter = adapter
+        albumsListView.addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+        albumsListView.adapter = this.adapter
 
         refresh()
     }
 
-    override fun getTitle(context: Context): String? {
-        return "Photos"
-    }
+    override fun getTitle(context: Context?) = "Photos"
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
@@ -76,7 +71,7 @@ class PhotosFragment : Fragment(), TitledFragment {
                         val body = response.body()
 
                         if (body != null) {
-                            val updatedUser = User(user)
+                            val updatedUser = user.copy()
                             updatedUser.newsFeedId = body.newsFeedId
                             app!!.updateLoggedInUser(updatedUser)
 
@@ -93,7 +88,8 @@ class PhotosFragment : Fragment(), TitledFragment {
 
     private fun fetchPhotoAlbums() {
         viewModel.photoAlbums.observe(this, Observer { albums ->
-            adapter.setLoading(false)
+            refreshLayout?.isRefreshing = false
+            adapter.isLoading = false
 
             if (albums != null)
                 adapter.replaceItems(albums)

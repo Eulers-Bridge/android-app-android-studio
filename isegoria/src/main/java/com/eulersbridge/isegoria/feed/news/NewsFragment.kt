@@ -16,16 +16,17 @@ import kotlinx.android.synthetic.main.news_fragment.*
 
 class NewsFragment : Fragment(), TitledFragment {
 
-    private lateinit var viewModel: NewsViewModel
+    private val viewModel: NewsViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(NewsViewModel::class.java)
+    }
+
     private lateinit var newsAdapter: NewsAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.news_fragment, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(NewsViewModel::class.java)
-
         newsAdapter = NewsAdapter()
-        newsAdapter.setLoading(true)
+        newsAdapter.isLoading = true
 
         refresh()
 
@@ -33,11 +34,13 @@ class NewsFragment : Fragment(), TitledFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        refreshLayout.setColorSchemeResources(R.color.lightBlue)
-        refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = true
-            refresh()
-            refreshLayout.postDelayed({ refreshLayout!!.isRefreshing = false }, 6000)
+        refreshLayout.apply {
+            setColorSchemeResources(R.color.lightBlue)
+            setOnRefreshListener {
+                isRefreshing = true
+                refresh()
+                postDelayed({ isRefreshing = false }, 6000)
+            }
         }
 
         val layoutManager = gridView.layoutManager as GridLayoutManager
@@ -50,9 +53,7 @@ class NewsFragment : Fragment(), TitledFragment {
         gridView.adapter = newsAdapter
     }
 
-    override fun getTitle(context: Context): String? {
-        return "News"
-    }
+    override fun getTitle(context: Context?) = "News"
 
     private fun refresh() {
         viewModel.newsArticles.observe(this, Observer {
@@ -61,7 +62,7 @@ class NewsFragment : Fragment(), TitledFragment {
     }
 
     private fun setNewsArticles(articles: List<NewsArticle>?) {
-        newsAdapter.setLoading(false)
+        newsAdapter.isLoading = false
 
         refreshLayout?.post({ refreshLayout.isRefreshing = false })
 

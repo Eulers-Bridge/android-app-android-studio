@@ -14,7 +14,5 @@ open class IgnoredCallback<T> : Callback<T> {
         // Ignored
     }
 
-    override fun onFailure(call: Call<T>, t: Throwable) {
-        t.printStackTrace()
-    }
+    override fun onFailure(call: Call<T>, t: Throwable) = t.printStackTrace()
 }

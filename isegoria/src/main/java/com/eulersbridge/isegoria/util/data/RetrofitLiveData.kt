@@ -14,11 +14,11 @@ class RetrofitLiveData<T>(private val call: Call<T>) : LiveData<T>(), Callback<T
     }
 
     override fun onResponse(call: Call<T>, response: Response<T>) {
-        if (response.isSuccessful) {
-            setValue(response.body())
+        value = if (response.isSuccessful) {
+            response.body()
 
         } else {
-            setValue(null)
+            null
         }
     }
 

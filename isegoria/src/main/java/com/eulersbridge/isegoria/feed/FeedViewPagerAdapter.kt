@@ -35,13 +35,14 @@ internal class FeedViewPagerAdapter(fragmentManager: FragmentManager) : Fragment
         }
     }
 
-    override fun getCount(): Int {
-        return FRAGMENT_COUNT
-    }
+    override fun getCount() = FRAGMENT_COUNT
 
     override fun getPageTitle(position: Int): CharSequence? {
         getItem(position).let {
-            return if (it is TitledFragment) it.getTitle(it.context) else null
+            return if (it is TitledFragment)
+                it.getTitle(it.context)
+            else
+                null
         }
     }
 }

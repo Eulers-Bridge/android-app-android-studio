@@ -5,7 +5,7 @@ import android.arch.lifecycle.LiveData
 class SingleLiveData<T>(value: T) : LiveData<T>() {
 
     init {
-        setValue(value)
+        this.value = value
     }
 
 }

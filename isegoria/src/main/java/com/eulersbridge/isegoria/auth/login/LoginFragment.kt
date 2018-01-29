@@ -36,7 +36,7 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         signUpButton.setOnClickListener {
-            authViewModel.signUpVisible.setValue(true)
+            authViewModel.signUpVisible.value = true
         }
 
         val hasTranslucentStatusBar = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
@@ -51,7 +51,7 @@ class LoginFragment : Fragment() {
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
 
-        setupViewModelObservers()
+        createViewModelObservers()
     }
 
     override fun onDestroy() {
@@ -87,55 +87,54 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun setupViewModelObservers() {
-        viewModel.email.value?.let {
-            emailField.setText(it)
-        }
-
-        viewModel.password.value?.let {
-            passwordField.setText(it)
-        }
-
-        viewModel.emailError.observe(this, Observer {
-            if (it == true) {
-                emailLayout.error = getString(R.string.user_login_email_error_required)
-                emailLayout.isErrorEnabled = true
-                emailField.requestFocus()
-
-            } else {
-                emailLayout.isErrorEnabled = false
+    private fun createViewModelObservers() {
+        viewModel.apply {
+            email.value?.let {
+                emailField.setText(it)
             }
-        })
 
-        viewModel.passwordError.observe(this, Observer {
-            if (it == true) {
-                passwordLayout.error = getString(R.string.user_login_password_error_required)
-                passwordLayout.isErrorEnabled = true
-
-            } else {
-                passwordLayout.isErrorEnabled = false
+            password.value?.let {
+                passwordField.setText(it)
             }
-        })
 
-        viewModel.networkError.observe(this, Observer {
-            if (it == true) {
-                Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
+            emailError.observe(this@LoginFragment, Observer {
+                if (it == true) {
+                    emailLayout.error = getString(R.string.user_login_email_error_required)
+                    emailLayout.isErrorEnabled = true
+                    emailField.requestFocus()
+
+                } else {
+                    emailLayout.isErrorEnabled = false
+                }
+            })
+
+            passwordError.observe(this@LoginFragment, Observer {
+                if (it == true) {
+                    passwordLayout.error = getString(R.string.user_login_password_error_required)
+                    passwordLayout.isErrorEnabled = true
+
+                } else {
+                    passwordLayout.isErrorEnabled = false
+                }
+            })
+
+            networkError.observe(this@LoginFragment, Observer {
+                if (it == true) {
+                    Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
                         .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
                         .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
                         .show()
 
-                viewModel.setNetworkErrorShown()
-            }
-        })
+                    setNetworkErrorShown()
+                }
+            })
 
-        viewModel.formEnabled.observe(this, Observer {
-            val fieldsEnabled = it == true
-
-            emailLayout.isEnabled = fieldsEnabled
-            passwordLayout.isEnabled = fieldsEnabled
-            loginButton.isEnabled = fieldsEnabled
-            signUpButton.isEnabled = fieldsEnabled
-        })
+            formEnabled.observe(this@LoginFragment, Observer { enabled ->
+                arrayOf(emailLayout, passwordLayout, loginButton, signUpButton).forEach {
+                    it.isEnabled = enabled == true
+                }
+            })
+        }
     }
 
     private fun onLoginClicked() {

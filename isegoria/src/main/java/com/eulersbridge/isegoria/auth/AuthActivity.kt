@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.auth
 
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -38,7 +39,7 @@ class AuthActivity : AppCompatActivity() {
 
         presentRootContent(LoginFragment())
 
-        val viewModel = AuthViewModel.create(this)
+        val viewModel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
 
         viewModel.signUpVisible.observe(this, Observer { visible ->
             /* If makeVisible is false, allow default behaviour of back button & fragment manager

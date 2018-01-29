@@ -32,7 +32,7 @@ class SignUpFragment : Fragment() {
         if (activity != null)
             authViewModel = ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
 
-        viewModel = SignUpViewModel.create(this)
+        viewModel = ViewModelProviders.of(this).get(SignUpViewModel::class.java)
 
         return rootView
     }
@@ -51,8 +51,10 @@ class SignUpFragment : Fragment() {
 
         countryAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_item)
         countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        countrySpinner.isEnabled = false
-        countrySpinner.adapter = countryAdapter
+        countrySpinner.apply {
+            isEnabled = false
+            adapter = countryAdapter
+        }
 
         institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -102,7 +104,7 @@ class SignUpFragment : Fragment() {
                 it.isEnabled = true
 
             } else {
-                authViewModel!!.signUpUser.setValue(newUser)
+                authViewModel!!.signUpUser.value = newUser
             }
         }
 

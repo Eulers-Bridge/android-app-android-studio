@@ -24,12 +24,12 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/profile_tasks_progress_bar"
+                android:id="@+id/progressBar"
                 android:progress="0"
                 android:max="1000"/>
 
             <TextView
-                android:id="@+id/profile_tasks_progress_level_text_view"
+                android:id="@+id/levelTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -38,7 +38,7 @@
                 android:textStyle="bold"/>
 
             <TextView
-                android:id="@+id/profile_tasks_progress_description_text_view"
+                android:id="@+id/descriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -59,7 +59,7 @@
             android:textStyle="bold" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/profile_tasks_progress_completed_list_view"
+            android:id="@+id/completedTasksListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -77,7 +77,7 @@
             android:textStyle="bold"/>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/profile_tasks_progress_remaining_list_view"
+            android:id="@+id/remainingTasksListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"

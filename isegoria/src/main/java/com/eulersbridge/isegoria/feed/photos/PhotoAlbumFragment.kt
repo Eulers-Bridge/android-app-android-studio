@@ -6,16 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PHOTO_ALBUM
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse
-import com.eulersbridge.isegoria.util.Constants
 import com.eulersbridge.isegoria.util.network.SimpleCallback
 import kotlinx.android.synthetic.main.photo_album_fragment.*
-import org.parceler.Parcels
 import retrofit2.Response
 
 class PhotoAlbumFragment : Fragment() {
@@ -27,7 +26,7 @@ class PhotoAlbumFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.photo_album_fragment, container, false)
 
         if (arguments != null)
-            album = Parcels.unwrap(arguments!!.getParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM))
+            album = arguments!!.getParcelable(FRAGMENT_EXTRA_PHOTO_ALBUM)
 
         return rootView
     }
@@ -56,7 +55,7 @@ class PhotoAlbumFragment : Fragment() {
     }
 
     private fun setPhotos(photos: List<Photo>?) {
-        adapter.setLoading(false)
+        adapter.isLoading = false
 
         if (photos != null)
             adapter.replaceItems(photos)

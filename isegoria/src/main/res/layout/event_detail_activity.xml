@@ -12,7 +12,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/event_image"
+            android:id="@+id/eventImageView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@null"
@@ -24,7 +24,7 @@
             tools:background="@color/grey" />
 
         <ImageView
-            android:id="@+id/back_button"
+            android:id="@+id/backButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="16dp"
@@ -36,7 +36,7 @@
             app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
 
         <TextView
-            android:id="@+id/event_title"
+            android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -46,11 +46,11 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/back_button"
+            app:layout_constraintTop_toBottomOf="@+id/backButton"
             tools:text="Title" />
 
         <TextView
-            android:id="@+id/event_time"
+            android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -60,13 +60,13 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/white"
             android:textSize="@dimen/newsTimeSize"
-            app:layout_constraintBottom_toBottomOf="@+id/event_button_add_to_calendar"
+            app:layout_constraintBottom_toBottomOf="@+id/addToCalendarButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/event_button_add_to_calendar"
+            app:layout_constraintTop_toTopOf="@+id/addToCalendarButton"
             tools:text="12th June, 09:30AM" />
 
         <Button
-            android:id="@+id/event_button_add_to_calendar"
+            android:id="@+id/addToCalendarButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -79,11 +79,11 @@
             android:paddingStart="16dp"
             android:text="@string/event_add_to_calendar"
             android:theme="@style/BlueButton"
-            app:layout_constraintBottom_toBottomOf="@+id/event_image"
+            app:layout_constraintBottom_toBottomOf="@+id/eventImageView"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/event_location"
+            android:id="@+id/locationTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -96,11 +96,11 @@
             android:textSize="@dimen/eventLocationSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/event_image"
+            app:layout_constraintTop_toBottomOf="@+id/eventImageView"
             tools:text="Octagon Theatre" />
 
         <TextView
-            android:id="@+id/event_details"
+            android:id="@+id/detailsTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -111,11 +111,11 @@
             android:textSize="@dimen/newsArticleSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/event_location"
+            app:layout_constraintTop_toBottomOf="@+id/locationTextView"
             tools:text="Details" />
 
         <TableLayout
-            android:id="@+id/event_details_table_layout"
+            android:id="@+id/tableLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -125,7 +125,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/event_details" />
+            app:layout_constraintTop_toBottomOf="@+id/detailsTextView" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

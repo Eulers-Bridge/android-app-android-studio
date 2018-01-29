@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     androidExtensions {
+        // Generated Kotlin fields for XML layout views
         experimental = true
     }
     signingConfigs {
@@ -61,15 +62,12 @@ if (project.hasProperty('devBuild')) {
 }
 
 dependencies {
-    // Annotation to parcel/un-parcel a given class
-    implementation 'org.parceler:parceler-api:1.1.9'
-    annotationProcessor 'org.parceler:parceler:1.1.9'
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // Image loading / caching
     implementation 'com.github.bumptech.glide:glide:4.5.0'
     kapt 'com.github.bumptech.glide:compiler:4.5.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.5.0'
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.5.0'
 
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.9.0'
 
@@ -87,7 +85,6 @@ dependencies {
     // ViewModel and LiveData
     implementation 'android.arch.lifecycle:extensions:1.1.0'
     kapt 'android.arch.lifecycle:common-java8:1.1.0'
-    annotationProcessor 'android.arch.lifecycle:common-java8:1.1.0'
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
@@ -108,7 +105,6 @@ dependencies {
 
     // Secures/obfuscates user email/password storage for auto-login
     implementation 'com.github.scottyab:secure-preferences:v0.1.6'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'

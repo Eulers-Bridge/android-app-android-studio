@@ -17,7 +17,10 @@ import kotlinx.android.synthetic.main.feed_fragment.*
 class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     private var tabLayout: TabLayout? = null
-    private lateinit var viewModel: FeedViewModel
+
+    private val viewModel: FeedViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(FeedViewModel::class.java)
+    }
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
@@ -25,26 +28,23 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab) {}
-
         override fun onTabReselected(tab: TabLayout.Tab) {}
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.feed_fragment, container, false)
 
-        activity?.let {
-            val colour = ContextCompat.getColor(it, R.color.darkBlue)
-            it.statusBarColour = colour
-            it.setMultitaskColour(colour)
+        activity?.apply {
+            val colour = ContextCompat.getColor(this, R.color.darkBlue)
+            statusBarColour = colour
+            setMultitaskColour(colour)
 
             // Ensure options menu from another fragment is not carried over
-            it.invalidateOptionsMenu()
+            invalidateOptionsMenu()
 
             // Hide keyboard if navigating from login
-            it.keyboardVisible = false
+            keyboardVisible = false
         }
-
-        viewModel = ViewModelProviders.of(this).get(FeedViewModel::class.java)
 
         setHasOptionsMenu(true)
 
@@ -55,9 +55,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
         setupViewPager()
     }
 
-    override fun getTitle(context: Context): String? {
-        return context.getString(R.string.section_title_feed)
-    }
+    override fun getTitle(context: Context?) = context?.getString(R.string.section_title_feed)
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         inflater!!.inflate(R.menu.feed, menu)
@@ -82,10 +80,11 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     }
 
     private fun setupViewPager() {
-        val viewPagerAdapter = FeedViewPagerAdapter(childFragmentManager)
-        viewPager.adapter = viewPagerAdapter
-        viewPager.offscreenPageLimit = 3
-        viewPager.currentItem = 0
+        viewPager.apply {
+            adapter = FeedViewPagerAdapter(childFragmentManager)
+            offscreenPageLimit = 3
+            currentItem = 0
+        }
 
         tabLayout?.setupWithViewPager(viewPager)
     }
@@ -93,12 +92,14 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     override fun setupTabLayout(tabLayout: TabLayout) {
         this.tabLayout = tabLayout
 
-        tabLayout.removeAllTabs()
-        tabLayout.visibility = View.VISIBLE
-        tabLayout.addOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.apply {
+            tabLayout.removeAllTabs()
+            tabLayout.visibility = View.VISIBLE
+            tabLayout.addOnTabSelectedListener(onTabSelectedListener)
 
-        if (viewPager != null)
-            tabLayout.setupWithViewPager(viewPager)
+            if (viewPager != null)
+                setupWithViewPager(viewPager)
+        }
     }
 
     override fun onPause() {

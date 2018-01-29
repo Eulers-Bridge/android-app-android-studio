@@ -12,21 +12,20 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 
 class EventsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var eventsList: LiveData<List<Event>>? = null
+    private var eventsList: LiveData<List<Event>?>? = null
 
-    internal val events: LiveData<List<Event>>
-        get() {
-            val app = getApplication<IsegoriaApp>()
+    fun getEvents() : LiveData<List<Event>?> {
+        val app = getApplication<IsegoriaApp>()
 
-            return Transformations.switchMap<User, List<Event>>(app.loggedInUser) { user ->
-                if (user?.institutionId != null) {
-                    eventsList = RetrofitLiveData(app.api.getEvents(user.institutionId!!))
-                    eventsList
-                }
-
+        return Transformations.switchMap<User, List<Event>>(app.loggedInUser) { user ->
+            if (user.institutionId != null) {
+                eventsList = RetrofitLiveData(app.api.getEvents(user.institutionId!!))
+                eventsList
+            } else {
                 SingleLiveData(null)
             }
         }
+    }
 
     override fun onCleared() {
         (eventsList as? RetrofitLiveData)?.cancel()

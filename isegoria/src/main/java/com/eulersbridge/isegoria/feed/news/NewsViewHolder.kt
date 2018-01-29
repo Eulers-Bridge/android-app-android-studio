@@ -11,11 +11,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.eulersbridge.isegoria.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.util.Constants
-import com.eulersbridge.isegoria.util.Strings
+import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
@@ -37,7 +37,7 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
                 val activityIntent = Intent(view.context, NewsDetailActivity::class.java)
 
                 val extras = Bundle()
-                extras.putParcelable(Constants.ACTIVITY_EXTRA_NEWS_ARTICLE, item)
+                extras.putParcelable(ACTIVITY_EXTRA_NEWS_ARTICLE, item)
                 activityIntent.putExtras(extras)
 
                 //Animate with a scale-up transition between the activities
@@ -69,15 +69,10 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
 
         } else {
             titleTextView.text = item.title
-
-            val dateTime = Strings.fromTimestamp(dateTextView.context, item.dateTimestamp)
-            dateTextView.text = dateTime
-
-            ViewCompat.setTransitionName(titleTextView, item.title + "TextView")
-            ViewCompat.setTransitionName(imageView, item.title + "ImageView")
+            dateTextView.text = item.date.toDateString(dateTextView.context)
 
             GlideApp.with(imageView.context)
-                    .load(item.photoUrl)
+                    .load(item.getPhotoUrl())
                     .placeholder(placeholderRes)
                     .transforms(CenterCrop(), TintTransformation(), RoundedCornersTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())

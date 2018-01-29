@@ -21,7 +21,7 @@ class PhotoAlbumsViewModel(application: Application) : AndroidViewModel(applicat
             return Transformations.switchMap<User, List<PhotoAlbum>>(app.loggedInUser) { user ->
                 if (user != null) {
                     photoAlbumsList = RetrofitLiveData(app.api.getPhotoAlbums(user.newsFeedId))
-                    photoAlbumsList
+                    return@switchMap photoAlbumsList
                 }
 
                 SingleLiveData(null)

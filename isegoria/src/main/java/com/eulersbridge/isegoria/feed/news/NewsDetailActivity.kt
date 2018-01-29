@@ -5,15 +5,14 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
 import android.view.View
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.eulersbridge.isegoria.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.util.Constants
-import com.eulersbridge.isegoria.util.Strings
+import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import kotlinx.android.synthetic.main.news_detail_activity.*
@@ -28,44 +27,45 @@ class NewsDetailActivity : AppCompatActivity() {
 
         setContentView(R.layout.news_detail_activity)
 
-        viewModel = ViewModelProviders.of(this).get(NewsDetailViewModel::class.java)
-        setupModelObservers()
-
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
         backButton.setOnClickListener { onBackPressed() }
 
-        val article = intent.getParcelableExtra<NewsArticle>(Constants.ACTIVITY_EXTRA_NEWS_ARTICLE)
+        val article = intent.getParcelableExtra<NewsArticle>(ACTIVITY_EXTRA_NEWS_ARTICLE)
+
+        viewModel = ViewModelProviders.of(this).get(NewsDetailViewModel::class.java)
         viewModel.newsArticle.value = article
+
+        createViewModelObservers()
     }
 
-    private fun setupModelObservers() {
-        viewModel.newsArticle.observe(this, Observer<NewsArticle> {
-            it?.let {
-                populateUIWithArticle(it)
-            }
-        })
-
-        viewModel.articleLikes.observe(this, Observer { likes ->
-            likes?.let {
-                runOnUiThread { likesTextView.text = likes.size.toString() }
-            }
-        })
-
-        viewModel.articleLikedByUser.observe(this, Observer { liked ->
-            if (liked == true) {
-                runOnUiThread {
-                    userLikedArticle = true
-                    starImageView.setImageResource(R.drawable.star)
-                    starImageView.isEnabled = true
+    private fun createViewModelObservers() {
+        viewModel.apply {
+            newsArticle.observe(this@NewsDetailActivity, Observer<NewsArticle> {
+                it?.let {
+                    populateUIWithArticle(it)
                 }
-            }
-        })
+            })
+
+            articleLikeCount.observe(this@NewsDetailActivity, Observer {
+                runOnUiThread { likesTextView.text = it.toString() }
+            })
+
+            articleLikedByUser.observe(this@NewsDetailActivity, Observer { liked ->
+                if (liked == true) {
+                    runOnUiThread {
+                        userLikedArticle = true
+                        starImageView.setImageResource(R.drawable.star)
+                        starImageView.isEnabled = true
+                    }
+                }
+            })
+        }
     }
 
     private fun populateUIWithArticle(article: NewsArticle) {
         GlideApp.with(this)
-                .load(article.photoUrl)
+                .load(article.getPhotoUrl())
                 .priority(Priority.HIGH)
                 .transforms(BlurTransformation(this), TintTransformation())
                 .placeholder(R.color.lightGrey)
@@ -75,7 +75,7 @@ class NewsDetailActivity : AppCompatActivity() {
         runOnUiThread {
             val creatorPhotoURL = article.creator.profilePhotoURL
 
-            if (TextUtils.isEmpty(creatorPhotoURL)) {
+            if (creatorPhotoURL.isNullOrBlank()) {
                 authorImageView.visibility = View.GONE
 
             } else {
@@ -90,7 +90,7 @@ class NewsDetailActivity : AppCompatActivity() {
             likesTextView.text = article.likeCount.toString()
             contentTextView.text = article.content
             authorNameTextView.text = article.creator.fullName
-            dateTextView.text = Strings.fromTimestamp(this, article.dateTimestamp)
+            dateTextView.text = article.date.toDateString(this)
 
             flagImageView.setOnClickListener { flagImageView.setImageResource(R.drawable.flag) }
 

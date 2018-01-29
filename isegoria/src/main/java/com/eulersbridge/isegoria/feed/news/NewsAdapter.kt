@@ -8,8 +8,9 @@ import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 class NewsAdapter internal constructor() : LoadingAdapter<NewsArticle, NewsViewHolder>(3) {
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): NewsViewHolder {
-        val itemView = LayoutInflater.from(viewGroup.context).inflate(R.layout.news_partial_grid_item, viewGroup, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.news_partial_grid_item,
+            parent, false)
         return NewsViewHolder(itemView)
     }
 }

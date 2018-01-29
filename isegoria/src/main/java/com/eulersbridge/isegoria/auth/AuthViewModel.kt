@@ -17,12 +17,6 @@ import retrofit2.Response
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
-    companion object {
-        fun create(fragmentActivity: FragmentActivity): AuthViewModel {
-            return ViewModelProviders.of(fragmentActivity).get(AuthViewModel::class.java)
-        }
-    }
-
     private val countriesData = MutableLiveData<List<Country>>()
 
     val signUpVisible = MutableLiveData<Boolean>()
@@ -34,7 +28,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val app = application as IsegoriaApp
 
-        app.api.generalInfo.enqueue(object : SimpleCallback<GeneralInfoResponse>() {
+        app.api.getGeneralInfo().enqueue(object : SimpleCallback<GeneralInfoResponse>() {
             override fun handleResponse(response: Response<GeneralInfoResponse>) {
                 countriesData.value = response.body()?.countries
             }
@@ -54,8 +48,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val updatedUser = signUpUser.value!!.copy()
 
         val institution = countries
-                .flatMap { it.institutions }
-                .singleOrNull { it.name == updatedUser.institutionName }
+            .flatMap { it.institutions!!  }
+            .singleOrNull { it.getName() == updatedUser.institutionName }
 
         institution?.id.let {
             updatedUser.institutionId = it!!

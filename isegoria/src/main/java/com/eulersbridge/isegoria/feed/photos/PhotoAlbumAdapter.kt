@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PHOTO_ALBUM
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
-import com.eulersbridge.isegoria.util.Constants
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
-import org.parceler.Parcels
 import java.lang.ref.WeakReference
 
 internal class PhotoAlbumAdapter internal constructor(fragment: Fragment) : LoadingAdapter<PhotoAlbum, PhotoAlbumViewHolder>(0), PhotoAlbumViewHolder.ClickListener {
@@ -23,8 +22,9 @@ internal class PhotoAlbumAdapter internal constructor(fragment: Fragment) : Load
                 && fragment.isAdded)
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): PhotoAlbumViewHolder {
-        val itemView = LayoutInflater.from(viewGroup.context).inflate(R.layout.photo_album_list_item, viewGroup, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoAlbumViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.photo_album_list_item,
+            parent, false)
         return PhotoAlbumViewHolder(itemView, this)
     }
 
@@ -35,7 +35,7 @@ internal class PhotoAlbumAdapter internal constructor(fragment: Fragment) : Load
             val albumFragment = PhotoAlbumFragment()
 
             val args = Bundle()
-            args.putParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM, Parcels.wrap<PhotoAlbum>(item))
+            args.putParcelable(FRAGMENT_EXTRA_PHOTO_ALBUM, item)
 
             albumFragment.arguments = args
 

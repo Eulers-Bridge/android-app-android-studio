@@ -9,14 +9,13 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.eulersbridge.isegoria.ACTIVITY_EXTRA_EVENT
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Event
-import com.eulersbridge.isegoria.util.Constants
-import com.eulersbridge.isegoria.util.Strings
+import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
-import org.parceler.Parcels
 
 internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event>(view), View.OnClickListener {
 
@@ -41,11 +40,10 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
         } else {
             titleTextView.text = item.name
 
-            val dateTime = Strings.fromTimestamp(detailsTextView.context, item.date)
-            detailsTextView.text = dateTime
+            detailsTextView.text = item.date.toDateString(detailsTextView.context)
 
             GlideApp.with(imageView.context)
-                    .load(item.photoUrl)
+                    .load(item.getPhotoUrl())
                     .placeholder(placeholderRes)
                     .transform(TintTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -58,10 +56,10 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
     override fun onClick(view: View) {
         if (item == null) return
 
-        val activityIntent = Intent(view.context, EventDetailActivity::class.java)
-
         val extras = Bundle()
-        extras.putParcelable(Constants.ACTIVITY_EXTRA_EVENT, Parcels.wrap<Event>(item))
+        extras.putParcelable(ACTIVITY_EXTRA_EVENT, item)
+
+        val activityIntent = Intent(view.context, EventDetailActivity::class.java)
         activityIntent.putExtras(extras)
 
         val location = intArrayOf(0, 0)

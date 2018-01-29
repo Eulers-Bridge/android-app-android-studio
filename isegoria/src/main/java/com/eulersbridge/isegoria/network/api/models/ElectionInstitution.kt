@@ -1,0 +1,13 @@
+package com.eulersbridge.isegoria.network.api.models
+
+import com.squareup.moshi.Json
+
+data class ElectionInstitution (
+    @Json(name = "institutionId")
+    var id: Long = 0,
+
+    val name: String?,
+    val campus: String?,
+    val state: String?,
+    val country: String?
+)

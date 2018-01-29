@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.PagerAdapter
@@ -18,14 +19,9 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Photo
-import com.eulersbridge.isegoria.util.Constants
-import com.eulersbridge.isegoria.util.Strings
 import kotlinx.android.synthetic.main.photo_detail_activity.*
-import org.parceler.Parcels
-import java.util.*
 
 class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
 
@@ -38,12 +34,13 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         setContentView(R.layout.photo_detail_activity)
 
         viewModel = ViewModelProviders.of(this).get(PhotoDetailViewModel::class.java)
-        setupModelObservers()
 
-        val photos = Parcels.unwrap<ArrayList<Photo>>(intent.getParcelableExtra(Constants.ACTIVITY_EXTRA_PHOTOS))
-        val startIndex = intent.getIntExtra(Constants.ACTIVITY_EXTRA_PHOTOS_POSITION, 0)
+        val photosList = intent.getParcelableArrayListExtra<Parcelable>(ACTIVITY_EXTRA_PHOTOS) as? ArrayList<Photo>
+        val startIndex = intent.getIntExtra(ACTIVITY_EXTRA_PHOTOS_POSITION, 0)
 
-        viewModel.setPhotos(photos, startIndex)
+        photosList?.let { photos ->
+            viewModel.setPhotos(photos, startIndex)
+        }
 
         starImageView.setOnClickListener { view ->
             userLikedCurrentPhoto = !userLikedCurrentPhoto
@@ -76,17 +73,20 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         }
 
         setupPager(startIndex)
+
+        createViewModelObservers()
     }
 
-    private fun setupModelObservers() {
+    private fun createViewModelObservers() {
         viewModel.currentPhoto.observe(this, Observer { photo ->
+
             userLikedCurrentPhoto = false
 
             runOnUiThread {
                 if (photo != null) {
                     titleTextView.text = photo.title
 
-                    val dateStr = Strings.fromTimestamp(this, photo.dateTimestamp)
+                    val dateStr = photo.date.toDateString(this)
                     dateTextView.text = dateStr.toUpperCase()
 
                     likesTextView.text = photo.likeCount.toString()
@@ -97,18 +97,16 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
             }
         })
 
-        viewModel.photoLikes.observe(this, Observer { likes ->
-            if (likes != null)
-                runOnUiThread { likesTextView.text = likes.size.toString() }
+        viewModel.getPhotoLikeCount().observe(this, Observer { likes ->
+            runOnUiThread { likesTextView.text = likes.toString() }
         })
 
-        viewModel.photoLikedByUser.observe(this, Observer { likedByUser ->
-            if (likedByUser == true) {
+        viewModel.getPhotoLikedByUser().observe(this, Observer {
+            if (it == true)
                 runOnUiThread {
                     userLikedCurrentPhoto = true
                     starImageView.setImageResource(R.drawable.star)
                 }
-            }
         })
     }
 
@@ -116,27 +114,22 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         val pagerAdapter = object : PagerAdapter() {
 
             override fun instantiateItem(container: ViewGroup, position: Int): Any {
-                val photo = viewModel.currentPhoto.value
+                val imageView = SubsamplingScaleImageView(this@PhotoDetailActivity)
+                imageView.layoutParams = ViewPager.LayoutParams()
 
-                val context = this@PhotoDetailActivity
-
-                val imageView = SubsamplingScaleImageView(context)
-
-                val layoutParams = ViewPager.LayoutParams()
-                imageView.layoutParams = layoutParams
-
-                if (photo != null) {
-                    GlideApp.with(context)
-                            .asBitmap()
-                            .load(photo.thumbnailUrl)
-                            .priority(Priority.HIGH)
-                            .placeholder(R.color.black)
-                            .override(Target.SIZE_ORIGINAL)
-                            .into(object: SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    imageView.setImage(ImageSource.bitmap(resource))
-                                }
-                            })
+                val photoUrl = viewModel.getPhotoUrl(position)
+                if (photoUrl != null) {
+                    GlideApp.with(imageView.context)
+                        .asBitmap()
+                        .load(photoUrl)
+                        .priority(Priority.HIGH)
+                        .placeholder(R.color.black)
+                        .override(Target.SIZE_ORIGINAL)
+                        .into(object: SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                imageView.setImage(ImageSource.bitmap(resource))
+                            }
+                        })
                 }
 
                 container.addView(imageView)
@@ -152,15 +145,17 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
             override fun isViewFromObject(view: View, obj: Any) = view === obj
         }
 
-        viewPager.adapter = pagerAdapter
+        viewPager.apply {
+            adapter = pagerAdapter
 
-        val marginDp = 8
-        val marginPixels = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp.toFloat(), resources.displayMetrics))
-        viewPager.pageMargin = marginPixels
+            val marginDp = 8
+            val marginPx = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp.toFloat(), resources.displayMetrics))
+            pageMargin = marginPx
 
-        viewPager.addOnPageChangeListener(this)
+            addOnPageChangeListener(this@PhotoDetailActivity)
+            currentItem = startIndex
+        }
 
-        viewPager.currentItem = startIndex
         onPageSelected(startIndex)
     }
 
@@ -168,14 +163,11 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
      * When a new 'page' is selected, fetch the corresponding photo and populate text fields
      * and like/flag button states.
      */
-    override fun onPageSelected(position: Int) {
-        viewModel.changePhoto(position)
-    }
+    override fun onPageSelected(position: Int) = viewModel.changePhoto(position)
 
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
     override fun onPageScrollStateChanged(state: Int) {
-
         val dragging = state == ViewPager.SCROLL_STATE_DRAGGING
         val durationMillis = (if (dragging) 100 else 250).toLong()
         val alpha = if (dragging) 0.3f else 1.0f

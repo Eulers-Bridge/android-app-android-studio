@@ -46,6 +46,10 @@
 }
 -keep @com.squareup.moshi.JsonQualifier interface *
 
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+
 ## BottomNavigationViewEx ##
 -keep public class android.support.design.widget.BottomNavigationView { *; }
 -keep public class android.support.design.internal.BottomNavigationMenuView { *; }

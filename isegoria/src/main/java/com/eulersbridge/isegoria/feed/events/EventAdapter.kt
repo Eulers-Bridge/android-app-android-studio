@@ -8,8 +8,9 @@ import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class EventAdapter : LoadingAdapter<Event, EventViewHolder>(1) {
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): EventViewHolder {
-        val itemView = LayoutInflater.from(viewGroup.context).inflate(R.layout.events_list_item, viewGroup, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.events_list_item,
+            parent, false)
         return EventViewHolder(itemView)
     }
 }

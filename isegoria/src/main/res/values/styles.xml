@@ -94,10 +94,6 @@
         <item name="android:textSize">33sp</item>
     </style>
 
-    <style name="SignUpHeadingTextAppearance" parent="LoginSignUpHeadingTextAppearance">
-        <item name="android:textSize">25sp</item>
-    </style>
-
     <style name="LoginSignUpSmallPrintText">
         <item name="android:textColor">@color/white</item>
         <item name="android:alpha">0.7</item>

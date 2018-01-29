@@ -10,7 +10,7 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 
 class EmailVerificationViewModel(application: Application) : AndroidViewModel(application) {
 
-    val app: IsegoriaApp by lazy {
+    private val app: IsegoriaApp by lazy {
         getApplication<IsegoriaApp>()
     }
 

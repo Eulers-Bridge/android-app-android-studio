@@ -13,9 +13,7 @@ import kotlinx.android.synthetic.main.sign_up_fragment.*
 class ConsentAgreementFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.consent_agreement_fragment, container, false)
-
-        return rootView
+        return inflater.inflate(R.layout.consent_agreement_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
