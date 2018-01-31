@@ -26,7 +26,7 @@ data class CandidateTicket (
                 return name!!
 
             } else {
-                String.format("%s %s", givenName, familyName)
+                "$givenName $familyName"
             }
         }
 

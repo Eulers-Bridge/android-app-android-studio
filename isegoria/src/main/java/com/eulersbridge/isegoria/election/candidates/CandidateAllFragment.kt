@@ -31,18 +31,16 @@ import kotlinx.android.synthetic.main.candidate_all_fragment.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.*
 
 class CandidateAllFragment : Fragment() {
     private lateinit var rootView: View
 
-    private val firstNames = ArrayList<String>()
-    private val lastNames = ArrayList<String>()
-    private val rows = ArrayList<TableRow>()
+    private val firstNames = mutableListOf<String>()
+    private val lastNames = mutableListOf<String>()
+    private val rows = mutableListOf<TableRow>()
 
     private var dpWidth: Float = 0.toFloat()
 
-    private var candidateAllFragment: CandidateAllFragment? = null
     private var app: IsegoriaApp? = null
 
     private val electionsCallback = object : Callback<List<Election>> {
@@ -55,17 +53,19 @@ class CandidateAllFragment : Fragment() {
             }
         }
 
-        override fun onFailure(call: Call<List<Election>>, t: Throwable) = t.printStackTrace()
+        override fun onFailure(call: Call<List<Election>>, t: Throwable)
+                = t.printStackTrace()
     }
 
     private val candidatesCallback = object : Callback<List<Candidate>> {
         override fun onResponse(call: Call<List<Candidate>>, response: Response<List<Candidate>>) {
-            val candidates = response.body()
-            if (candidates != null)
+            response.body()?.let { candidates ->
                 addCandidates(candidates)
+            }
         }
 
-        override fun onFailure(call: Call<List<Candidate>>, t: Throwable) = t.printStackTrace()
+        override fun onFailure(call: Call<List<Candidate>>, t: Throwable)
+                = t.printStackTrace()
     }
 
     override fun onCreateView(
@@ -73,11 +73,9 @@ class CandidateAllFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        candidateAllFragment = this
-        val displayMetrics = activity!!.resources.displayMetrics
-
         rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false)
 
+        val displayMetrics = activity!!.resources.displayMetrics
         dpWidth = displayMetrics.widthPixels.toFloat()
 
         return rootView
@@ -90,20 +88,17 @@ class CandidateAllFragment : Fragment() {
         candidateAllTable!!.addView(dividerView)
 
         searchViewCandidatesAll.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(query: String): Boolean {
-                return handleSearchQueryTextChange(query)
-            }
+            override fun onQueryTextChange(query: String)
+                    =  handleSearchQueryTextChange(query)
 
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return handleSearchQueryTextChange(query)
-            }
+            override fun onQueryTextSubmit(query: String)
+                    = handleSearchQueryTextChange(query)
         })
 
-        app = activity!!.application as IsegoriaApp
-        if (app != null) {
-            app!!.loggedInUser.value?.institutionId?.let { institutionId ->
-                app!!.api.getElections(institutionId).enqueue(electionsCallback)
-            }
+        app = activity?.application as IsegoriaApp
+
+        app?.loggedInUser?.value?.institutionId?.let {
+            app?.api?.getElections(it)?.enqueue(electionsCallback)
         }
     }
 
@@ -118,8 +113,8 @@ class CandidateAllFragment : Fragment() {
                     val firstName = firstNames[i]
                     val lastName = lastNames[i]
 
-                    if (!firstName.toLowerCase().contains(query.toLowerCase())
-                        && !lastName.toLowerCase().contains(query.toLowerCase()))
+                    if (!firstName.contains(query.toLowerCase(), true)
+                        && !lastName.contains(query.toLowerCase(), true))
                         candidateAllTable.removeView(view)
 
                 } catch (ignored: Exception) {
@@ -130,6 +125,7 @@ class CandidateAllFragment : Fragment() {
 
             return true
         }
+
         return false
     }
 
@@ -341,10 +337,12 @@ class CandidateAllFragment : Fragment() {
             layoutParams = relativeParamsRight
         }
 
-        layout.addView(candidateProfileView)
-        layout.addView(partyLayout)
-        layout.addView(linLayout)
-        layout.layoutParams = relativeParamsLeft
+        layout.apply {
+            addView(candidateProfileView)
+            addView(partyLayout)
+            addView(linLayout)
+            layoutParams = relativeParamsLeft
+        }
 
         relLayoutMaster.addView(layout)
         relLayoutMaster.addView(linLayout2)
@@ -354,9 +352,8 @@ class CandidateAllFragment : Fragment() {
         candidateAllTable.addView(tr)
         candidateAllTable.addView(dividerView)
 
-        firstNames + candidate.givenName!!
-        lastNames + candidate.familyName!!
-
-        rows + tr
+        firstNames += candidate.givenName!!
+        lastNames += candidate.givenName!!
+        rows += tr
     }
 }

@@ -1,3 +1,5 @@
+@file:JvmName("Constants")
+
 package com.eulersbridge.isegoria
 
 const val APP_ID = "au.com.isegoria.app"

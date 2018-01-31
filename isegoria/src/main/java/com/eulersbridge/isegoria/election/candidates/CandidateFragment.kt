@@ -27,9 +27,7 @@ class CandidateFragment : Fragment() {
         )
 
         viewPager.adapter = object : FragmentPagerAdapter(childFragmentManager) {
-            override fun getItem(position: Int): Fragment {
-                return fragments[position]
-            }
+            override fun getItem(position: Int) = fragments[position]
 
             override fun getPageTitle(position: Int): CharSequence? {
                 return when (position) {

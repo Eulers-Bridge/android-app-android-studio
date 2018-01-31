@@ -47,7 +47,7 @@ class NetworkService(private val application: IsegoriaApp) {
 
         private val moshiConverterFactory: MoshiConverterFactory
 
-        private var needsSetup: Boolean = true
+        private var needsSetup = true
 
         init {
             val moshi = Moshi.Builder()
@@ -63,7 +63,7 @@ class NetworkService(private val application: IsegoriaApp) {
     private val cacheDirectory = File(application.cacheDir, "network")
     private var httpClient: OkHttpClient? = null
 
-    internal var api: API? = null
+    internal lateinit var api: API
 
     internal var email: String? = null
     internal var password: String? = null
@@ -145,11 +145,11 @@ class NetworkService(private val application: IsegoriaApp) {
     fun updateAPIBaseURL(user: User) {
         user.institutionId?.let { institutionId ->
 
-            api!!.getInstitution(institutionId).enqueue(object : SimpleCallback<Institution>() {
+            api.getInstitution(institutionId).enqueue(object : SimpleCallback<Institution>() {
                 override fun handleResponse(response: retrofit2.Response<Institution>) {
                     response.body()?.getName()?.let { institutionName ->
 
-                        api!!.getInstitutionURLs()
+                        api.getInstitutionURLs()
                             .enqueue(object : SimpleCallback<List<ClientInstitution>>() {
                                 override fun handleResponse(response: retrofit2.Response<List<ClientInstitution>>) {
                                     val institution = response.body()?.singleOrNull {
@@ -184,7 +184,7 @@ class NetworkService(private val application: IsegoriaApp) {
 
         return if (deviceToken != null) {
             val snsPlatformArn = SNS_PLATFORM_APPLICATION_ARN
-            RetrofitLiveData(api!!.login(snsPlatformArn, deviceToken))
+            RetrofitLiveData(api.login(snsPlatformArn, deviceToken))
 
         } else {
             SingleLiveData(null)

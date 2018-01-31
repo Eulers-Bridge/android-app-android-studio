@@ -9,12 +9,11 @@ import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.GenericUser
 import com.eulersbridge.isegoria.network.api.models.Institution
 import java.lang.ref.WeakReference
-import java.util.*
 
 class FriendAdapter internal constructor(private val delegate: Delegate?) :
     RecyclerView.Adapter<UserViewHolder>(), UserViewHolder.OnClickListener {
 
-    private val items = ArrayList<Contact>()
+    private val items = mutableListOf<Contact>()
 
     internal interface Delegate {
         fun getContactInstitution(
@@ -43,9 +42,9 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
         val item = items[position]
         holder.setItem(item)
 
-        if (delegate != null && item.institutionId != null) {
+        if (item.institutionId != null) {
             val weakViewHolder = WeakReference(holder)
-            delegate.getContactInstitution(item.institutionId!!, weakViewHolder)
+            delegate?.getContactInstitution(item.institutionId!!, weakViewHolder)
         }
     }
 

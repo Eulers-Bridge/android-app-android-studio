@@ -43,15 +43,12 @@ class CandidatePositionFragment : Fragment() {
 
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
-        app = activity!!.application as IsegoriaApp
+        app = activity?.application as IsegoriaApp
 
-        app!!.api.getPositionCandidates(position.id)
-            .enqueue(object : SimpleCallback<List<Candidate>>() {
+        app?.api?.getPositionCandidates(position.id)
+            ?.enqueue(object : SimpleCallback<List<Candidate>>() {
                 public override fun handleResponse(response: Response<List<Candidate>>) {
-                    val candidates = response.body()
-
-                    if (candidates != null && candidates.isNotEmpty())
-                        addCandidates(candidates)
+                    response.body()?.let { candidates -> addCandidates(candidates)}
                 }
             })
 

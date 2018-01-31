@@ -1,3 +1,5 @@
+@file:JvmName("ActivityUtil")
+
 package com.eulersbridge.isegoria
 
 import android.app.Activity
@@ -16,16 +18,14 @@ fun Activity.setMultitaskColour(@ColorInt colour: Int) {
 
 private fun setMultitaskDescription(activity: Activity, title: String, @ColorInt colour: Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
         val icon = BitmapFactory.decodeResource(activity.resources, R.drawable.app_icon)
-
         activity.setTaskDescription(ActivityManager.TaskDescription(title, icon, colour))
-
         icon.recycle()
     }
 }
 
 var Activity.statusBarColour: Int?
+    @JvmSynthetic
     get() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.statusBarColor
@@ -34,6 +34,7 @@ var Activity.statusBarColour: Int?
             null
         }
     }
+
     set(colour) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && colour != null)
             window.statusBarColor = colour
@@ -44,7 +45,9 @@ var Activity.statusBarColour: Int?
  * visibility.
  */
 var Activity.keyboardVisible: Boolean
+    @JvmSynthetic
     get() = false
+
     set(value) {
         if (value) {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)

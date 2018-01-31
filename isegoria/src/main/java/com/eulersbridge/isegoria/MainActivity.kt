@@ -82,6 +82,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
             if (userLoggedOut) {
                 finish()
+
             } else {
                 onLoginSuccess()
             }

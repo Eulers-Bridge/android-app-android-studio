@@ -17,7 +17,6 @@ import com.eulersbridge.isegoria.profile.settings.SettingsActivity
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.profile_viewpager_fragment.*
-import java.util.*
 
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
@@ -52,17 +51,12 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = setupViewPager()
 
     private fun setupViewPager() {
-        val fragmentList = ArrayList<Fragment>()
-        fragmentList.apply {
-            add(ProfileOverviewFragment())
-            add(ProfileTaskProgressFragment())
-            add(ProfileBadgesFragment())
-        }
 
-        val pagerAdapter = object : SimpleFragmentPagerAdapter(childFragmentManager, fragmentList) {
-            override fun getPageTitle(position: Int): CharSequence? {
-                return (fragmentList[position] as TitledFragment).getTitle(context!!)
-            }
+        val fragments = listOf<Fragment>(ProfileOverviewFragment(), ProfileTaskProgressFragment(), ProfileBadgesFragment())
+
+        val pagerAdapter = object : SimpleFragmentPagerAdapter(childFragmentManager, fragments) {
+            override fun getPageTitle(position: Int): CharSequence?
+                    = (fragments[position] as TitledFragment).getTitle(context!!)
         }
 
         viewPager.apply {

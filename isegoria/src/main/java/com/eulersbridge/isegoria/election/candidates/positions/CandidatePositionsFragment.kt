@@ -18,25 +18,24 @@ import retrofit2.Response
 class CandidatePositionsFragment : Fragment() {
 
     private var api: API? = null
-    private lateinit var adapter: PositionAdapter
+    private val adapter: PositionAdapter by lazy {
+        PositionAdapter(this, api)
+    }
 
     private val electionsCallback = object : SimpleCallback<List<Election>>() {
         override fun handleResponse(response: Response<List<Election>>) {
             val elections = response.body()
             if (elections != null && elections.isNotEmpty()) {
-                val election = elections[0]
+                val (id) = elections[0]
 
-                api!!.getElectionPositions(election.id).enqueue(positionsCallback)
+                api!!.getElectionPositions(id).enqueue(positionsCallback)
             }
         }
     }
 
     private val positionsCallback = object : SimpleCallback<List<Position>>() {
         override fun handleResponse(response: Response<List<Position>>) {
-            val positions = response.body()
-
-            if (positions != null)
-                setPositions(positions)
+            response.body()?.let { positions -> setPositions(positions) }
         }
     }
 
@@ -52,8 +51,6 @@ class CandidatePositionsFragment : Fragment() {
         if (app != null)
             api = app.api
 
-        adapter = PositionAdapter(this, api)
-
         return rootView
     }
 
@@ -68,7 +65,9 @@ class CandidatePositionsFragment : Fragment() {
     }
 
     private fun setPositions(positions: List<Position>) {
-        adapter.isLoading = false
-        adapter.replaceItems(positions)
+        adapter.apply {
+            isLoading = false
+            replaceItems(positions)
+        }
     }
 }

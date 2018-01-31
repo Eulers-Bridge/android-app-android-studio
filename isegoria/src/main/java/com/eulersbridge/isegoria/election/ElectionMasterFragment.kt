@@ -6,7 +6,6 @@ import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,27 +15,24 @@ import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.election_master_layout.*
-import java.lang.ref.WeakReference
 
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var overviewFragment: ElectionOverviewFragment? = null
-    private var candidateFragment: CandidateFragment? = null
+    private val overviewFragment: ElectionOverviewFragment by lazy { ElectionOverviewFragment() }
+    private val candidateFragment: CandidateFragment by lazy { CandidateFragment() }
 
-    private var weakActivity: WeakReference<AppCompatActivity>? = null
     private var tabLayout: TabLayout? = null
 
-    private var viewModel: ElectionViewModel? = null
+    private val viewModel: ElectionViewModel by lazy {
+        ViewModelProviders.of(this).get(ElectionViewModel::class.java)
+    }
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
-            var subFragment: Fragment? = null
-
-            if (tab.position == 0) {
-                subFragment = overviewFragment
-
-            } else if (tab.position == 1) {
-                subFragment = candidateFragment
+            val subFragment = when (tab.position) {
+                0 -> overviewFragment
+                1 -> candidateFragment
+                else -> null
             }
 
             if (subFragment != null && activity != null)
@@ -54,14 +50,7 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     ): View? {
         val rootView = inflater.inflate(R.layout.election_master_layout, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(ElectionViewModel::class.java)
-
-        weakActivity = WeakReference<AppCompatActivity>(activity as AppCompatActivity?)
-
         activity?.invalidateOptionsMenu()
-
-        overviewFragment = ElectionOverviewFragment()
-        candidateFragment = CandidateFragment()
 
         showFirstTab()
 
@@ -96,26 +85,21 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
-    private fun showFirstTab() {
-        showTabFragment(overviewFragment!!)
-    }
+    private fun showFirstTab()
+        = showTabFragment(overviewFragment!!)
 
     private fun showTabFragment(fragment: Fragment) {
-        val activity = weakActivity!!.get()
-
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.election_frame, fragment)
             ?.commitAllowingStateLoss()
 
-        viewModel!!.userCompletedEfficacyQuestions().observe(this, Observer { completed ->
-            if (completed != null && (!completed)) {
+        viewModel.userCompletedEfficacyQuestions().observe(this, Observer { completed ->
+            if (completed == true) {
                 overlayView.visibility = View.VISIBLE
 
                 overlaySurveyButton.setOnClickListener {
-                    val innerActivity = weakActivity!!.get()
-
-                    innerActivity?.supportFragmentManager
+                    activity?.supportFragmentManager
                         ?.beginTransaction()
                         ?.addToBackStack(null)
                         ?.add(R.id.container, SelfEfficacyQuestionsFragment())

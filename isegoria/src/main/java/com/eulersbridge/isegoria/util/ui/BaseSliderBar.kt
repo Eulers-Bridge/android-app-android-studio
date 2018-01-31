@@ -81,7 +81,7 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
     }
 
     protected fun addPoint(point: SliderBarPoint) {
-        points + point
+        points.add(point)
     }
 
     protected open fun setupPaints() {

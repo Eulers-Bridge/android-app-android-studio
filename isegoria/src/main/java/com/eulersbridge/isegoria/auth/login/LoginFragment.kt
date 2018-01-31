@@ -22,23 +22,17 @@ import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment() {
 
-    private lateinit var viewModel: LoginViewModel
-    private lateinit var authViewModel: AuthViewModel
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.login_fragment, container, false)
-
-        authViewModel = ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-
-        return rootView
+    private val viewModel: LoginViewModel by lazy {
+        ViewModelProviders.of(this).get(LoginViewModel::class.java)
+    }
+    private val authViewModel: AuthViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        signUpButton.setOnClickListener {
-            authViewModel.signUpVisible.value = true
-        }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.login_fragment, container, false)
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val hasTranslucentStatusBar = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
         if (hasTranslucentStatusBar) {
             val params = logoImage.layoutParams as ConstraintLayout.LayoutParams
@@ -50,6 +44,7 @@ class LoginFragment : Fragment() {
 
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
+        signUpButton.setOnClickListener { authViewModel.signUpVisible.value = true }
 
         createViewModelObservers()
     }

@@ -55,9 +55,10 @@ class PhotoAlbumFragment : Fragment() {
     }
 
     private fun setPhotos(photos: List<Photo>?) {
-        adapter.isLoading = false
+        adapter.apply {
+            isLoading = true
 
-        if (photos != null)
-            adapter.replaceItems(photos)
+            if (photos != null) replaceItems(photos)
+        }
     }
 }

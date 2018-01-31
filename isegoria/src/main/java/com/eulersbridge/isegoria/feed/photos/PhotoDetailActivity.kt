@@ -38,39 +38,9 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         val photosList = intent.getParcelableArrayListExtra<Parcelable>(ACTIVITY_EXTRA_PHOTOS) as? ArrayList<Photo>
         val startIndex = intent.getIntExtra(ACTIVITY_EXTRA_PHOTOS_POSITION, 0)
 
-        photosList?.let { photos ->
-            viewModel.setPhotos(photos, startIndex)
-        }
+        photosList?.let { viewModel.setPhotos(it, startIndex) }
 
-        starImageView.setOnClickListener { view ->
-            userLikedCurrentPhoto = !userLikedCurrentPhoto
-
-            view.isEnabled = false
-
-            if (userLikedCurrentPhoto) {
-                viewModel.likePhoto().observe(this, Observer { success ->
-                    view.isEnabled = true
-
-                    if (success == true) {
-                        starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
-
-                        val likes = Integer.parseInt(likesTextView.text.toString()) + 1
-                        likesTextView.text = likes.toString()
-                    }
-                })
-            } else {
-                viewModel.unlikePhoto().observe(this, Observer { success ->
-                    view.isEnabled = true
-
-                    if (success == true) {
-                        starImageView.colorFilter = null
-
-                        val likes = Integer.parseInt(likesTextView.text.toString()) - 1
-                        likesTextView.text = likes.toString()
-                    }
-                })
-            }
-        }
+        starImageView.setOnClickListener { onStar(it) }
 
         setupPager(startIndex)
 
@@ -173,5 +143,35 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         val alpha = if (dragging) 0.3f else 1.0f
 
         detailsContainer.animate().setDuration(durationMillis).alpha(alpha)
+    }
+
+    private fun onStar(view: View) {
+        userLikedCurrentPhoto = !userLikedCurrentPhoto
+
+        view.isEnabled = false
+
+        if (userLikedCurrentPhoto) {
+            viewModel.likePhoto().observe(this, Observer { success ->
+                view.isEnabled = true
+
+                if (success == true) {
+                    starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
+
+                    val likes = Integer.parseInt(likesTextView.text.toString()) + 1
+                    likesTextView.text = likes.toString()
+                }
+            })
+        } else {
+            viewModel.unlikePhoto().observe(this, Observer { success ->
+                view.isEnabled = true
+
+                if (success == true) {
+                    starImageView.colorFilter = null
+
+                    val likes = Integer.parseInt(likesTextView.text.toString()) - 1
+                    likesTextView.text = likes.toString()
+                }
+            })
+        }
     }
 }

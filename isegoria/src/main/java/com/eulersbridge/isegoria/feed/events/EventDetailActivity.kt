@@ -24,7 +24,11 @@ import kotlinx.android.synthetic.main.event_detail_activity.*
 
 class EventDetailActivity : AppCompatActivity() {
 
-    private var dpWidth: Float = 0.toFloat()
+    private val dpWidth: Float by lazy {
+        val displayMetrics = resources.displayMetrics
+        displayMetrics.widthPixels / displayMetrics.density
+    }
+
     private lateinit var viewModel: EventDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +43,6 @@ class EventDetailActivity : AppCompatActivity() {
 
         backButton.setOnClickListener { onBackPressed() }
         addToCalendarButton.setOnClickListener { addToCalendar() }
-
-        val displayMetrics = resources.displayMetrics
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density
 
         val event = intent.getParcelableExtra<Event>(ACTIVITY_EXTRA_EVENT)
         viewModel.event.value = event

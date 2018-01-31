@@ -44,8 +44,10 @@ class PhotosFragment : Fragment(), TitledFragment {
             refreshLayout.postDelayed({ refreshLayout.isRefreshing = false }, 6000)
         }
 
-        albumsListView.addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-        albumsListView.adapter = this.adapter
+        albumsListView.apply {
+            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            adapter = this.adapter
+        }
 
         refresh()
     }

@@ -17,9 +17,9 @@ class ElectionViewModel(application: Application) : AndroidViewModel(application
     internal fun userCompletedEfficacyQuestions(): LiveData<Boolean> {
         val app = getApplication<IsegoriaApp>()
 
-        return Transformations.switchMap<User, Boolean>(
-            app.loggedInUser
-        ) { user -> SingleLiveData(user != null && user.hasPPSEQuestions) }
+        return Transformations.switchMap<User, Boolean>(app.loggedInUser) {
+            return@switchMap SingleLiveData(it != null && it.hasPPSEQuestions)
+        }
     }
 
     internal fun getElection(): LiveData<Election?> {
@@ -31,8 +31,8 @@ class ElectionViewModel(application: Application) : AndroidViewModel(application
             if (user?.institutionId != null) {
                 val electionsList = RetrofitLiveData(app.api.getElections(user.institutionId!!))
 
-                election = Transformations.switchMap(electionsList) { elections ->
-                    SingleLiveData(elections?.get(0))
+                election = Transformations.switchMap(electionsList) {
+                    SingleLiveData(it?.get(0))
                 }
 
                 return@switchMap election

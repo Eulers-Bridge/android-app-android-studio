@@ -12,13 +12,14 @@ import kotlinx.android.synthetic.main.email_verification.*
 
 class EmailVerificationFragment : Fragment() {
 
-    private lateinit var viewModel: EmailVerificationViewModel
+    private val viewModel: EmailVerificationViewModel by lazy {
+        ViewModelProviders.of(this).get(EmailVerificationViewModel::class.java)
+    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.email_verification, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+        = inflater.inflate(R.layout.email_verification, container, false)
 
-        viewModel = ViewModelProviders.of(this).get(EmailVerificationViewModel::class.java)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         verifiedButton.setOnClickListener {
             it.isEnabled = false
 
@@ -35,8 +36,6 @@ class EmailVerificationFragment : Fragment() {
                 button.isEnabled = true
             })
         }
-
-        return rootView
     }
 
     override fun onDestroy() {

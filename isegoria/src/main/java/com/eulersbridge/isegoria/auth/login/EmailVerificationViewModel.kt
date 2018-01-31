@@ -18,15 +18,13 @@ class EmailVerificationViewModel(application: Application) : AndroidViewModel(ap
         app.userVerificationVisible.value = false
     }
 
-    internal fun userVerified(): LiveData<Boolean> {
-        return app.login()
-    }
+    internal fun userVerified(): LiveData<Boolean> = app.login()
 
     internal fun resendVerification(): LiveData<Boolean> {
-        return Transformations.switchMap(app.loggedInUser) { user ->
-            if (user != null) {
-                val verificationRequest = RetrofitLiveData(app.api.sendVerificationEmail(user.email))
-                Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
+        return Transformations.switchMap(app.loggedInUser) {
+            if (it != null) {
+                val verificationRequest = RetrofitLiveData(app.api.sendVerificationEmail(it.email))
+                return@switchMap Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
             }
 
             SingleLiveData(false)

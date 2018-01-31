@@ -14,26 +14,11 @@ internal class FeedViewPagerAdapter(fragmentManager: FragmentManager) : Fragment
         private const val FRAGMENT_COUNT = 3
     }
 
-    private val fragments: ArrayList<Fragment> by lazy {
-        ArrayList<Fragment>(FRAGMENT_COUNT)
+    private val fragments by lazy {
+        arrayOf<Fragment>(NewsFragment(), PhotosFragment(), EventsFragment())
     }
 
-    override fun getItem(position: Int): Fragment {
-        return try {
-            fragments[position]
-
-        } catch (e: Exception) {
-            val fragment: Fragment = when (position) {
-                1 -> PhotosFragment()
-                2 -> EventsFragment()
-                else -> NewsFragment()
-            }
-
-            fragments.add(position, fragment)
-
-            fragment
-        }
-    }
+    override fun getItem(position: Int) = fragments[position]
 
     override fun getCount() = FRAGMENT_COUNT
 

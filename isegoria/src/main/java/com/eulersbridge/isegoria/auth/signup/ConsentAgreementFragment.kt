@@ -12,17 +12,16 @@ import kotlinx.android.synthetic.main.sign_up_fragment.*
 
 class ConsentAgreementFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.consent_agreement_fragment, container, false)
+    private val authViewModel: AuthViewModel by lazy {
+        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val authViewModel = ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.consent_agreement_fragment, container, false)
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) =
         nextButton.setOnClickListener {
             it.isEnabled = false
-
             authViewModel.signUpConsentGiven.value = true
         }
-    }
 }

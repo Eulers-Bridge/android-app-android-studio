@@ -33,10 +33,10 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val app = application as IsegoriaApp
-        val cachedLoginArticles = app.cachedLoginArticles
 
-        if (cachedLoginArticles != null)
-            newsArticlesList = SingleLiveData(cachedLoginArticles)
+        app.cachedLoginArticles?.let {
+            newsArticlesList = SingleLiveData(it)
+        }
     }
 
     override fun onCleared() {

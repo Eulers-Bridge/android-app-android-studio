@@ -1,3 +1,5 @@
+@file:JvmName("Util")
+
 package com.eulersbridge.isegoria
 
 import android.content.Context
@@ -7,7 +9,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.util.Patterns
+import android.view.View
+import android.widget.AdapterView
 import android.widget.EditText
+import android.widget.Spinner
 import java.util.*
 
 fun Context.isNetworkAvailable(): Boolean {
@@ -16,13 +21,25 @@ fun Context.isNetworkAvailable(): Boolean {
     return activeNetworkInfo?.isConnectedOrConnecting ?: false
 }
 
-fun EditText.onTextChanged(onTextChanged: (String) -> Unit) {
+@JvmSynthetic
+inline fun Spinner.onItemSelected(crossinline onItemSelected: (position: Int) -> Unit) {
+    this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(p0: AdapterView<*>?) { }
+
+        override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+            onItemSelected(position)
+        }
+    }
+}
+
+@JvmSynthetic
+inline fun EditText.onTextChanged(crossinline onTextChanged: (String?) -> Unit) {
     this.addTextChangedListener(object : TextWatcher {
         override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
         }
 
         override fun onTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {
-            onTextChanged(charSequence.toString())
+            onTextChanged(charSequence?.toString())
         }
 
         override fun afterTextChanged(editable: Editable?) {
@@ -30,6 +47,7 @@ fun EditText.onTextChanged(onTextChanged: (String) -> Unit) {
     })
 }
 
+@JvmName("Util")
 fun Long.toDateString(context: Context): String {
     val date = Date(this)
 

@@ -27,7 +27,7 @@ class PersonalityViewModel(application: Application) : AndroidViewModel(applicat
             return Transformations.switchMap(request) { success ->
                 if (success != null) {
                     userCompletedQuestions.postValue(true)
-                    SingleLiveData(true)
+                    return@switchMap SingleLiveData(true)
                 }
 
                 SingleLiveData(false)

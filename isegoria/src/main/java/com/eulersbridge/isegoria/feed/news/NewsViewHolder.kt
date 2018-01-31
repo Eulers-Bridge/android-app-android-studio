@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.support.annotation.DrawableRes
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.view.ViewCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -62,10 +61,7 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
         @DrawableRes val placeholderRes = R.drawable.round_rect_placeholder
 
         if (item == null) {
-            ViewCompat.setTransitionName(titleTextView, null)
-
             imageView.setBackgroundResource(placeholderRes)
-            ViewCompat.setTransitionName(imageView, null)
 
         } else {
             titleTextView.text = item.title

@@ -20,18 +20,14 @@ class NewsFragment : Fragment(), TitledFragment {
         ViewModelProviders.of(activity!!).get(NewsViewModel::class.java)
     }
 
-    private lateinit var newsAdapter: NewsAdapter
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.news_fragment, container, false)
-
-        newsAdapter = NewsAdapter()
-        newsAdapter.isLoading = true
-
-        refresh()
-
-        return rootView
+    private val newsAdapter: NewsAdapter by lazy {
+        val adapter = NewsAdapter()
+        adapter.isLoading = true
+        adapter
     }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.news_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         refreshLayout.apply {
@@ -51,6 +47,8 @@ class NewsFragment : Fragment(), TitledFragment {
         }
 
         gridView.adapter = newsAdapter
+
+        refresh()
     }
 
     override fun getTitle(context: Context?) = "News"

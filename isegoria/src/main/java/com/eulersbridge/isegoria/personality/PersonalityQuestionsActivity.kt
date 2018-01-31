@@ -36,9 +36,7 @@ class PersonalityQuestionsActivity : AppCompatActivity() {
         setupViewPager()
     }
 
-    private fun getViewPager(): NonSwipeableViewPager {
-        return viewPager as NonSwipeableViewPager
-    }
+    private fun getViewPager() = viewPager as NonSwipeableViewPager
 
     private fun setupViewPager() {
         val fragments = listOf(
@@ -47,8 +45,10 @@ class PersonalityQuestionsActivity : AppCompatActivity() {
         )
 
         val viewPagerAdapter = SimpleFragmentPagerAdapter(supportFragmentManager, fragments)
-        getViewPager().adapter = viewPagerAdapter
 
-        getViewPager().currentItem = 0
+        getViewPager().apply {
+            adapter = viewPagerAdapter
+            currentItem = 0
+        }
     }
 }

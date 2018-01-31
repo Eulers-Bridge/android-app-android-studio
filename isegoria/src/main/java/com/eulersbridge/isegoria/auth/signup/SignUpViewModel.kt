@@ -41,7 +41,7 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
             val country = it[index]
             selectedCountry.value = country
 
-            country.institutions
+            return country.institutions
         }
 
         return null

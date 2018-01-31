@@ -55,7 +55,6 @@ class AuthActivity : AppCompatActivity() {
 
         viewModel.signUpConsentGiven.observe(this, Observer { consent ->
             if (consent == false)
-
                 viewModel.signUp().observe(this, Observer { success ->
                     if (success == false)
                         presentRootContent(LoginFragment())
@@ -70,21 +69,19 @@ class AuthActivity : AppCompatActivity() {
         })
     }
 
-    private fun presentRootContent(fragment: Fragment) {
+    private fun presentRootContent(fragment: Fragment) =
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.activity_auth_container, fragment)
                 .commit()
-    }
 
-    private fun presentContent(fragment: Fragment) {
+    private fun presentContent(fragment: Fragment) =
         supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.activity_auth_container, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .addToBackStack(null)
                 .commit()
-    }
 
     /*private fun onSignUpFailure() {
         new AlertDialog.Builder(this)

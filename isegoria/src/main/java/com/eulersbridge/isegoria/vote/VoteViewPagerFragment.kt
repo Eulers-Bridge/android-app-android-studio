@@ -23,9 +23,7 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {}
-
         override fun onTabUnselected(tab: TabLayout.Tab) {}
-
         override fun onTabReselected(tab: TabLayout.Tab) {}
     }
 
