@@ -12,12 +12,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
-import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
-import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
-import com.eulersbridge.isegoria.util.transformation.TintTransformation;
 import com.eulersbridge.isegoria.network.api.models.Event;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.Strings;
+import com.eulersbridge.isegoria.util.transformation.TintTransformation;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 
 import org.parceler.Parcels;
 

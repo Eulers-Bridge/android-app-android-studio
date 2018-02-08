@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.content.Intent;
@@ -16,12 +17,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.eulersbridge.isegoria.auth.AuthActivity;
 import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.network.api.API;
 import com.eulersbridge.isegoria.network.api.models.NewsArticle;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.util.data.SingleLiveData;
@@ -46,6 +47,8 @@ public class IsegoriaApp extends Application {
     public final MutableLiveData<Boolean> userVerificationVisible = new MutableLiveData<>();
 	public final MutableLiveData<Boolean> friendsVisible = new MutableLiveData<>();
 
+	private Observer<Boolean> loginObserver;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -62,6 +65,38 @@ public class IsegoriaApp extends Application {
         loginVisible.setValue(false);
         userVerificationVisible.setValue(false);
         friendsVisible.setValue(false);
+
+        LiveData<Boolean> login = login();
+
+        loginObserver = loginSuccess -> {
+            if (loginSuccess != null) {
+                if (!loginSuccess) {
+                    showLoginScreen();
+                } else {
+                    showMainActivity();
+                }
+            }
+
+            login.removeObserver(loginObserver);
+        };
+
+        login.observeForever(loginObserver);
+    }
+
+    private void showMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+    }
+
+    public void showLoginScreen() {
+        if (loginVisible.getValue() == null || !loginVisible.getValue()) {
+            loginVisible.setValue(true);
+            startActivity(new Intent(this, AuthActivity.class));
+        }
+    }
+
+    public void hideLoginScreen() {
+        if (loginVisible.getValue() == null || loginVisible.getValue())
+            loginVisible.setValue(false);
     }
 
     private void createNotificationChannels() {
@@ -130,10 +165,6 @@ public class IsegoriaApp extends Application {
         }
     }
 
-    public void showVerification() {
-        userVerificationVisible.setValue(true);
-    }
-
 	public API getAPI() {
 	    return networkService.getAPI();
     }
@@ -174,7 +205,6 @@ public class IsegoriaApp extends Application {
                 return login(email, password);
 
             } else {
-                loginVisible.setValue(true);
                 return new SingleLiveData<>(false);
             }
         }
@@ -195,20 +225,17 @@ public class IsegoriaApp extends Application {
                 if (user != null) {
                     user.setId(response.userId);
 
+                    hideLoginScreen();
+
                     if (user.accountVerified) {
                         networkService.updateAPIBaseURL(user);
 
-                        if (!user.hasPersonality)
-                            startActivity(new Intent(this, PersonalityQuestionsActivity.class));
-
                     } else {
+                        hideLoginScreen();
                         userVerificationVisible.setValue(true);
                     }
 
                     return new SingleLiveData<>(true);
-
-                } else {
-                    loginVisible.setValue(true);
                 }
 
                 return new SingleLiveData<>(false);
@@ -239,7 +266,7 @@ public class IsegoriaApp extends Application {
                 shortcutManager.removeAllDynamicShortcuts();
         }
 
-        loginVisible.setValue(true);
+        showLoginScreen();
 	}
 
 	public void setTrackingOff(boolean trackingOff) {

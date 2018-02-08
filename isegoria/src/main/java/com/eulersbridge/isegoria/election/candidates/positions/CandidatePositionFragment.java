@@ -24,13 +24,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.network.api.models.Candidate;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.models.Ticket;
-import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import org.parceler.Parcels;
 

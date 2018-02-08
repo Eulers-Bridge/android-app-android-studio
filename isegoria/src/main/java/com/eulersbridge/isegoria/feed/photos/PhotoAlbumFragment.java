@@ -14,10 +14,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import org.parceler.Parcels;
