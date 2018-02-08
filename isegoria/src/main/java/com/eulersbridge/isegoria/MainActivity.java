@@ -18,11 +18,11 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.eulersbridge.isegoria.auth.AuthActivity;
 import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.friends.FriendsFragment;
+import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity;
 import com.eulersbridge.isegoria.poll.PollsFragment;
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment;
 import com.eulersbridge.isegoria.util.Constants;
@@ -44,9 +44,11 @@ public class MainActivity extends AppCompatActivity implements
 	private Deque<Fragment> tabFragmentsStack;
     private TabLayout tabLayout;
     private BottomNavigationViewEx navigationView;
+
+    private boolean loginActionsComplete;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState){
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if (savedInstanceState == null)
@@ -58,11 +60,6 @@ public class MainActivity extends AppCompatActivity implements
 
         IsegoriaApp application = (IsegoriaApp) getApplicationContext();
         setupApplicationObservers(application);
-
-        application.login().observe(this, success -> {
-            if (success != null && success)
-                onLoginSuccess();
-        });
 	}
 
     private void setupNavigation() {
@@ -88,13 +85,12 @@ public class MainActivity extends AppCompatActivity implements
         application.loggedInUser.observe(this, user -> {
             final boolean userLoggedOut = user == null;
 
-            if (userLoggedOut)
+            if (userLoggedOut) {
                 finish();
-        });
 
-        application.loginVisible.observe(this, loginVisible -> {
-            if (loginVisible != null && loginVisible)
-                startActivity(new Intent(this, AuthActivity.class));
+            } else {
+                onLoginSuccess();
+            }
         });
 
         application.userVerificationVisible.observe(this, verificationVisible -> {
@@ -109,10 +105,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void onLoginSuccess() {
+	    if (loginActionsComplete) return;
+
 	    navigationView.setEnabled(true);
 
         if (!handleAppShortcutIntent())
             navigationView.setSelectedItemId(R.id.navigation_feed);
+
+        IsegoriaApp app = (IsegoriaApp) getApplication();
+
+        loginActionsComplete = true;
+
+        if (app.loggedInUser.getValue() != null && !app.loggedInUser.getValue().hasPersonality)
+            startActivity(new Intent(this, PersonalityQuestionsActivity.class));
     }
 
     private boolean handleAppShortcutIntent() {

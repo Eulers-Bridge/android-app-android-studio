@@ -230,14 +230,14 @@ public class NetworkService {
     public LiveData<Boolean> signUp(@NonNull SignUpUser user) {
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("email", email)
+                .addFormDataPart("email", user.email)
                 .addFormDataPart("givenName", user.givenName)
                 .addFormDataPart("familyName", user.familyName)
                 .addFormDataPart("gender", user.gender)
                 .addFormDataPart("nationality", user.nationality)
                 .addFormDataPart("yearOfBirth", user.yearOfBirth)
                 .addFormDataPart("accountVerified", String.valueOf(user.accountVerified))
-                .addFormDataPart("password", password)
+                .addFormDataPart("password", user.password)
                 .addFormDataPart("institutionId", String.valueOf(user.institutionId))
                 .addFormDataPart("hasPersonality", String.valueOf(user.hasPersonality))
                 .build();

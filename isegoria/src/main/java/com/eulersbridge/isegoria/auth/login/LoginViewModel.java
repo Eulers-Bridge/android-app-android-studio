@@ -52,7 +52,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     void onExit() {
         IsegoriaApp app = getApplication();
-        app.loginVisible.setValue(false);
+        app.hideLoginScreen();
     }
 
     void setEmail(String email) {

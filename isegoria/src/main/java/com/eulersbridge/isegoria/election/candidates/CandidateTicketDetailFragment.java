@@ -32,17 +32,17 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Candidate;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.models.Ticket;
+import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.network.IgnoredCallback;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
-import com.eulersbridge.isegoria.R;
 
 import java.util.List;
 

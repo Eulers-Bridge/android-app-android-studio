@@ -31,10 +31,10 @@ class OkHttpLiveData extends LiveData<String> implements Callback {
     public void onResponse(Call call, Response response) throws IOException {
         if (response.isSuccessful()) {
             ResponseBody body = response.body();
-            setValue(body == null? "" : body.toString());
+            postValue(body == null? "" : body.toString());
 
         } else {
-            setValue(null);
+            postValue(null);
         }
     }
 
