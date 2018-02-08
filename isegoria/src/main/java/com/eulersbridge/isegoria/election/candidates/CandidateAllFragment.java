@@ -53,7 +53,7 @@ public class CandidateAllFragment extends Fragment {
 	private float dpWidth;
 
     private CandidateAllFragment candidateAllFragment;
-    private IsegoriaApp isegoriaApp;
+    private IsegoriaApp app;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,12 +70,12 @@ public class CandidateAllFragment extends Fragment {
         dividerView.setBackgroundColor(Color.parseColor("#676475"));
         candidateAllTableLayout.addView(dividerView);
 
-        isegoriaApp = (IsegoriaApp)getActivity().getApplication();
-        if (isegoriaApp != null) {
-            User user = isegoriaApp.loggedInUser.getValue();
+        app = (IsegoriaApp)getActivity().getApplication();
+        if (app != null) {
+            User user = app.loggedInUser.getValue();
 
             if (user != null && user.institutionId != null)
-                isegoriaApp.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
+                app.getAPI().getElections(user.institutionId).enqueue(electionsCallback);
         }
 
         SearchView searchViewCandidatesAll = rootView.findViewById(R.id.searchViewCandidatesAll);
@@ -127,7 +127,7 @@ public class CandidateAllFragment extends Fragment {
             if (elections != null && elections.size() > 0) {
                 Election election = elections.get(0);
 
-                isegoriaApp.getAPI().getElectionCandidates(election.id).enqueue(candidatesCallback);
+                app.getAPI().getElectionCandidates(election.id).enqueue(candidatesCallback);
             }
         }
 
@@ -197,7 +197,7 @@ public class CandidateAllFragment extends Fragment {
         candidateProfileView.setLayoutParams(layoutParams);
         candidateProfileView.setScaleType(ScaleType.CENTER_CROP);
 
-        isegoriaApp.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
+        app.getAPI().getPhotos(candidate.userId).enqueue(new SimpleCallback<PhotosResponse>() {
             @Override
             protected void handleResponse(Response<PhotosResponse> response) {
                 PhotosResponse body = response.body();
@@ -241,7 +241,7 @@ public class CandidateAllFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoriaApp.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
+        app.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
             protected void handleResponse(Response<Ticket> response) {
                 Ticket ticket = response.body();
@@ -286,7 +286,7 @@ public class CandidateAllFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoriaApp.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
+        app.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
             protected void handleResponse(Response<Position> response) {
                 Position position = response.body();

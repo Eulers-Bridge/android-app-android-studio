@@ -59,9 +59,9 @@ public class SignUpViewModel extends AndroidViewModel {
 
     LiveData<List<Country>> getCountries() {
         if (countries == null) {
-            IsegoriaApp isegoriaApp = getApplication();
+            IsegoriaApp app = getApplication();
 
-            LiveData<GeneralInfoResponse> generalInfo = new RetrofitLiveData<>(isegoriaApp.getAPI().getGeneralInfo());
+            LiveData<GeneralInfoResponse> generalInfo = new RetrofitLiveData<>(app.getAPI().getGeneralInfo());
 
             countries = Transformations.switchMap(generalInfo, info -> {
                 if (info != null && info.countries.size() > 0)

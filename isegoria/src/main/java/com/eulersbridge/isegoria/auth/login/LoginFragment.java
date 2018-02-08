@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.auth.AuthViewModel;
 import com.eulersbridge.isegoria.util.data.SimpleTextWatcher;
@@ -87,12 +86,19 @@ public class LoginFragment extends Fragment {
 		return rootView;
 	}
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        viewModel.onExit();
+    }
+
     private void showForgotPasswordDialog() {
 	    Boolean canContinue = viewModel.canShowPasswordResetDialog.getValue();
 	    if (canContinue != null && !canContinue) return;
 
         @SuppressLint("InflateParams")
-	    View alertView = getLayoutInflater().inflate(R.layout.alert_dialog_input_forgot_password, null);
+	    final View alertView = getLayoutInflater().inflate(R.layout.alert_dialog_input_forgot_password, null);
         final EditText alertEmailInput = alertView.findViewById(R.id.alert_dialog_email_address_input);
 
         //noinspection ConstantConditions
@@ -107,18 +113,13 @@ public class LoginFragment extends Fragment {
     }
 
     private void resetPassword(Editable editable) {
-        String forgottenAccountEmail = editable.toString();
+        final String forgottenAccountEmail = editable.toString();
 
-        boolean validEmail = viewModel.requestPasswordRecoveryEmail(forgottenAccountEmail);
+        final boolean validEmail = viewModel.requestPasswordRecoveryEmail(forgottenAccountEmail);
 
         if (validEmail) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-
-            if (mainActivity != null) {
-                CoordinatorLayout coordinatorLayout = mainActivity.getCoordinatorLayout();
-                String message = getString(R.string.forgot_password_email_sent, forgottenAccountEmail);
-                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
-            }
+            final String message = getString(R.string.forgot_password_email_sent, forgottenAccountEmail);
+            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG).show();
         }
     }
 

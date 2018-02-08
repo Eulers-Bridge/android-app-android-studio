@@ -32,18 +32,18 @@ public class EfficacyQuestionsViewModel extends AndroidViewModel {
             return new SingleLiveData<>(false);
         }
 
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
         //noinspection ConstantConditions
-        String userEmail = isegoriaApp.loggedInUser.getValue().email;
+        String userEmail = app.loggedInUser.getValue().email;
 
         UserSelfEfficacy answers = new UserSelfEfficacy(
                 score1.getValue(), score2.getValue(), score3.getValue(), score4.getValue()
         );
 
-        LiveData<Void> efficacyRequest = new RetrofitLiveData<>(isegoriaApp.getAPI().addUserEfficacy(userEmail, answers));
+        LiveData<Void> efficacyRequest = new RetrofitLiveData<>(app.getAPI().addUserEfficacy(userEmail, answers));
         return Transformations.switchMap(efficacyRequest, __ -> {
-            isegoriaApp.onUserSelfEfficacyCompleted();
+            app.onUserSelfEfficacyCompleted();
 
             return new SingleLiveData<>(true);
         });

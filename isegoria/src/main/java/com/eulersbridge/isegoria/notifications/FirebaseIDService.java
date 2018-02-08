@@ -47,7 +47,7 @@ public class FirebaseIDService extends FirebaseInstanceIdService {
         if (result != null)
             new SecurePreferences(getApplicationContext())
                     .edit()
-                    .putString("endpointArn", result.getEndpointArn())
+                    .putString(Constants.ENDPOINT_ARN_KEY, result.getEndpointArn())
                     .apply();
     }
 }

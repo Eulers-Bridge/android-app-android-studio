@@ -24,15 +24,15 @@ public class PollsViewModel extends AndroidViewModel {
     }
 
     LiveData<List<Poll>> getPolls() {
-        IsegoriaApp isegoriaApp = getApplication();
+        IsegoriaApp app = getApplication();
 
         if (polls == null || polls.getValue() == null) {
-            return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+            return Transformations.switchMap(app.loggedInUser, user -> {
 
                 if (user == null || user.institutionId == null)
                     return new SingleLiveData<>(null);
 
-                LiveData<PollsResponse> pollsResponse = new RetrofitLiveData<>(isegoriaApp.getAPI().getPolls(user.institutionId));
+                LiveData<PollsResponse> pollsResponse = new RetrofitLiveData<>(app.getAPI().getPolls(user.institutionId));
                 return Transformations.switchMap(pollsResponse, response -> {
                     if (response != null && response.totalPolls > 0) {
                         polls = new SingleLiveData<>(response.polls);

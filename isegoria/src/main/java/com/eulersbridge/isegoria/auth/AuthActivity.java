@@ -1,13 +1,14 @@
 package com.eulersbridge.isegoria.auth;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import com.bumptech.glide.Priority;
@@ -15,7 +16,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.eulersbridge.isegoria.GlideApp;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.auth.login.LoginFragment;
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment;
@@ -59,21 +59,39 @@ public class AuthActivity extends AppCompatActivity {
 
         viewModel.signUpConsentGiven.observe(this, consent -> {
             if (consent != null && consent)
+                presentRootContent(new LoginFragment());
+
                 viewModel.signUp().observe(this, signUpComplete -> {
-                    if (signUpComplete != null && signUpComplete)
-                        presentRootContent(new LoginFragment());
+                    if (signUpComplete != null) {
+                        if (signUpComplete) {
+                            presentRootContent(new LoginFragment());
+
+                        } else {
+                            presentRootContent(new LoginFragment());
+                            presentContent(new SignUpFragment());
+
+                            new AlertDialog.Builder(this)
+                                    .setTitle(getString(R.string.user_sign_up_error_title))
+                                    .setMessage(getString(R.string.user_sign_up_error_message))
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .show();
+                        }
+                    }
                 });
         });
 
         viewModel.userLoggedIn.observe(this, loggedIn -> {
-            if (loggedIn != null && loggedIn) {
-                startActivity(new Intent(this, MainActivity.class));
+            if (loggedIn != null && loggedIn)
                 finish();
-            }
         });
     }
 
     private void presentRootContent(@NonNull Fragment fragment) {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate(null,
+                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.activity_auth_container, fragment)
@@ -88,13 +106,4 @@ public class AuthActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
-
-    /*private void onSignUpFailure() {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.user_sign_up_error_title))
-                .setMessage(getString(R.string.user_sign_up_error_message))
-                .setPositiveButton(android.R.string.ok, null)
-                .show();
-    }*/
-
 }

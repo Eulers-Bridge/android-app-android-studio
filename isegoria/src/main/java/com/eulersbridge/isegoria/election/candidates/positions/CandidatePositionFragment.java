@@ -24,13 +24,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.network.api.models.Candidate;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.models.Ticket;
-import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment;
+import com.eulersbridge.isegoria.util.Constants;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import org.parceler.Parcels;
 
@@ -43,7 +43,7 @@ public class CandidatePositionFragment extends Fragment {
 	
 	private float dpWidth;
 
-	private IsegoriaApp isegoriaApp;
+	private IsegoriaApp app;
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -59,9 +59,9 @@ public class CandidatePositionFragment extends Fragment {
         
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
-        isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+        app = (IsegoriaApp)getActivity().getApplication();
 
-        isegoriaApp.getAPI().getPositionCandidates(positionId).enqueue(new SimpleCallback<List<Candidate>>() {
+        app.getAPI().getPositionCandidates(positionId).enqueue(new SimpleCallback<List<Candidate>>() {
             @Override
             public void handleResponse(Response<List<Candidate>> response) {
                 List<Candidate> candidates = response.body();
@@ -107,7 +107,7 @@ public class CandidatePositionFragment extends Fragment {
 		//candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
 		candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0);
 
-		isegoriaApp.getAPI().getPhoto(candidate.userId).enqueue(new SimpleCallback<Photo>() {
+		app.getAPI().getPhoto(candidate.userId).enqueue(new SimpleCallback<Photo>() {
             @Override
             protected void handleResponse(Response<Photo> response) {
                 Photo photo = response.body();
@@ -148,7 +148,7 @@ public class CandidatePositionFragment extends Fragment {
         textViewParty.setGravity(Gravity.CENTER);
         textViewParty.setTypeface(null, Typeface.BOLD);
 
-        isegoriaApp.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
+        app.getAPI().getTicket(candidate.ticketId).enqueue(new SimpleCallback<Ticket>() {
             @Override
             protected void handleResponse(Response<Ticket> response) {
                 Ticket ticket = response.body();
@@ -183,7 +183,7 @@ public class CandidatePositionFragment extends Fragment {
         textViewPosition.setPadding(paddingMargin, 0, paddingMargin, 0);
         textViewPosition.setGravity(Gravity.START);
 
-        isegoriaApp.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
+        app.getAPI().getPosition(candidate.positionId).enqueue(new SimpleCallback<Position>() {
             @Override
             public void handleResponse(Response<Position> response) {
                 Position position = response.body();

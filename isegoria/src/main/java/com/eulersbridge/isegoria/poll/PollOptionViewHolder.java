@@ -9,9 +9,9 @@ import android.widget.TextView;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 import com.eulersbridge.isegoria.network.api.models.PollOption;
 import com.eulersbridge.isegoria.network.api.models.PollResult;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 
 class PollOptionViewHolder extends LoadingAdapter.ItemViewHolder<PollOption> {
 

@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
@@ -12,45 +14,90 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.eulersbridge.isegoria.auth.AuthActivity;
 import com.eulersbridge.isegoria.network.NetworkService;
 import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.NewsArticle;
 import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
 import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation;
 import com.securepreferences.SecurePreferences;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class IsegoriaApp extends Application {
 
-	private WeakReference<MainActivity> weakMainActivity;
 	public static NetworkService networkService;
+	private static SecurePreferences securePreferences;
 
 	public final MutableLiveData<User> loggedInUser =  new MutableLiveData<>();
+    public @Nullable List<NewsArticle> cachedLoginArticles;
+
+	public final MutableLiveData<Boolean> loginVisible = new MutableLiveData<>();
+    public final MutableLiveData<Boolean> userVerificationVisible = new MutableLiveData<>();
+	public final MutableLiveData<Boolean> friendsVisible = new MutableLiveData<>();
+
+	private Observer<Boolean> loginObserver;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        float screenDensity = getResources().getDisplayMetrics().density;
-        BlurTransformation.screenDensity = screenDensity;
-        RoundedCornersTransformation.screenDensity = screenDensity;
-
         createNotificationChannels();
 
         networkService = new NetworkService(this);
+        securePreferences = new SecurePreferences(this);
+
+        final float screenDensity = getResources().getDisplayMetrics().density;
+        BlurTransformation.screenDensity = screenDensity;
+        RoundedCornersTransformation.screenDensity = screenDensity;
+
+        loginVisible.setValue(false);
+        userVerificationVisible.setValue(false);
+        friendsVisible.setValue(false);
+
+        LiveData<Boolean> login = login();
+
+        loginObserver = loginSuccess -> {
+            if (loginSuccess != null) {
+                if (!loginSuccess) {
+                    showLoginScreen();
+                } else {
+                    showMainActivity();
+                }
+            }
+
+            login.removeObserver(loginObserver);
+        };
+
+        login.observeForever(loginObserver);
     }
-	
-	public void setMainActivity(MainActivity mainActivity) {
-        weakMainActivity = new WeakReference<>(mainActivity);
-	}
+
+    private void showMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+    }
+
+    public void showLoginScreen() {
+        if (loginVisible.getValue() == null || !loginVisible.getValue()) {
+            loginVisible.setValue(true);
+            startActivity(new Intent(this, AuthActivity.class));
+        }
+    }
+
+    public void hideLoginScreen() {
+        if (loginVisible.getValue() == null || loginVisible.getValue())
+            loginVisible.setValue(false);
+    }
 
     private void createNotificationChannels() {
         // Notification channels are only supported on Android O+
@@ -118,13 +165,6 @@ public class IsegoriaApp extends Application {
         }
     }
 
-    public void showVerification() {
-        MainActivity mainActivity = weakMainActivity.get();
-
-        if (mainActivity != null)
-            mainActivity.showVerification();
-    }
-
 	public API getAPI() {
 	    return networkService.getAPI();
     }
@@ -146,8 +186,61 @@ public class IsegoriaApp extends Application {
         setupAppShortcuts();
 	}
 
-	public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
-        return networkService.login(email, password);
+	public @Nullable String getSavedUserEmail() {
+        return securePreferences.getString(Constants.USER_EMAIL_KEY, null);
+    }
+
+    public @Nullable String getSavedUserPassword() {
+        return securePreferences.getString(Constants.USER_PASSWORD_KEY, null);
+    }
+
+	public LiveData<Boolean> login() {
+        if (loggedInUser.getValue() == null) {
+            String email = getSavedUserEmail();
+            String password = getSavedUserPassword();
+
+            final boolean haveStoredCredentials = email != null && password != null;
+
+            if (haveStoredCredentials) {
+                return login(email, password);
+
+            } else {
+                return new SingleLiveData<>(false);
+            }
+        }
+
+        return new SingleLiveData<>(false);
+    }
+
+    public LiveData<Boolean> login(@NonNull String email, @NonNull String password) {
+        LiveData<LoginResponse> login = networkService.login(email, password);
+        return Transformations.switchMap(login, response -> {
+            if (response == null) {
+                return new SingleLiveData<>(null);
+
+            } else {
+                User user = response.user;
+                cachedLoginArticles = response.articles;
+
+                if (user != null) {
+                    user.setId(response.userId);
+
+                    hideLoginScreen();
+
+                    if (user.accountVerified) {
+                        networkService.updateAPIBaseURL(user);
+
+                    } else {
+                        hideLoginScreen();
+                        userVerificationVisible.setValue(true);
+                    }
+
+                    return new SingleLiveData<>(true);
+                }
+
+                return new SingleLiveData<>(false);
+            }
+        });
     }
 
 	public void logOut() {
@@ -173,10 +266,7 @@ public class IsegoriaApp extends Application {
                 shortcutManager.removeAllDynamicShortcuts();
         }
 
-        MainActivity mainActivity = weakMainActivity.get();
-
-        if (mainActivity != null)
-            mainActivity.showLogin();
+        showLoginScreen();
 	}
 
 	public void setTrackingOff(boolean trackingOff) {

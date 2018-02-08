@@ -13,14 +13,23 @@ import com.eulersbridge.isegoria.R;
 
 public class EmailVerificationFragment extends Fragment {
 
+    private EmailVerificationViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.email_verification, container, false);
 
-        EmailVerificationViewModel viewModel = ViewModelProviders.of(this).get(EmailVerificationViewModel.class);
+        viewModel = ViewModelProviders.of(this).get(EmailVerificationViewModel.class);
 
         final Button verifiedButton = rootView.findViewById(R.id.verifiedButton);
-        verifiedButton.setOnClickListener(view -> viewModel.userVerified());
+        verifiedButton.setOnClickListener(view -> {
+            verifiedButton.setEnabled(false);
+
+            viewModel.userVerified().observe(this, success -> {
+                if (success != null && !success)
+                    verifiedButton.setEnabled(true);
+            });
+        });
 
         final Button resendVerificationButton = rootView.findViewById(R.id.resendVerificationButton);
         resendVerificationButton.setOnClickListener(view -> {
@@ -31,5 +40,12 @@ public class EmailVerificationFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        viewModel.onExit();
     }
 }

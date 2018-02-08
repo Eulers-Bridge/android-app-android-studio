@@ -34,8 +34,8 @@ public class PollViewModel extends AndroidViewModel {
     final LiveData<Contact> pollCreator = Transformations.switchMap(poll, thePoll -> {
         if (thePoll != null) {
             if (thePoll.creator == null && !TextUtils.isEmpty(thePoll.creatorEmail)) {
-                IsegoriaApp isegoriaApp = getApplication();
-                return new RetrofitLiveData<>(isegoriaApp.getAPI().getContact(thePoll.creatorEmail));
+                IsegoriaApp app = getApplication();
+                return new RetrofitLiveData<>(app.getAPI().getContact(thePoll.creatorEmail));
 
             } else if (thePoll.creator != null) {
                 return new SingleLiveData<>(thePoll.creator);
@@ -59,8 +59,8 @@ public class PollViewModel extends AndroidViewModel {
 
         PollOption option = currentPoll.options.get(optionIndex);
 
-        IsegoriaApp isegoriaApp = getApplication();
-        API api = isegoriaApp.getAPI();
+        IsegoriaApp app = getApplication();
+        API api = app.getAPI();
         api.answerPoll(currentPoll.id, option.id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {

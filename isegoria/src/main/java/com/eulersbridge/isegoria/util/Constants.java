@@ -14,6 +14,7 @@ public final class Constants {
     // Used for storing the user's email to automatically log them in on subsequent app launches
     public static final String USER_EMAIL_KEY = "userEmail";
     public static final String USER_PASSWORD_KEY = "userPassword";
+    public static final String ENDPOINT_ARN_KEY = "endpointArn";
 
     // Used for home screen long-press app shortcuts on Android 7.1+
     public static final String SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION";

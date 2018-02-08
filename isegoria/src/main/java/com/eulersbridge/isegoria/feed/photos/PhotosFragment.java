@@ -24,7 +24,7 @@ import retrofit2.Response;
 
 public class PhotosFragment extends Fragment implements TitledFragment {
 
-    private IsegoriaApp isegoriaApp = null;
+    private IsegoriaApp app = null;
 
     private final PhotoAlbumAdapter adapter = new PhotoAlbumAdapter(this);
     private SwipeRefreshLayout refreshLayout;
@@ -40,7 +40,7 @@ public class PhotosFragment extends Fragment implements TitledFragment {
 		viewModel = ViewModelProviders.of(this).get(PhotoAlbumsViewModel.class);
 
 		if (getActivity() != null)
-            isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+            app = (IsegoriaApp)getActivity().getApplication();
 
         refreshLayout = rootView.findViewById(R.id.photos_refresh_layout);
         refreshLayout.setOnRefreshListener(() -> {
@@ -73,19 +73,19 @@ public class PhotosFragment extends Fragment implements TitledFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        if (getView() != null && isegoriaApp != null && !fetchedPhotos)
+        if (getView() != null && app != null && !fetchedPhotos)
             refresh();
     }
 
     private void refresh() {
         fetchedPhotos = true;
 
-        User user = isegoriaApp.loggedInUser.getValue();
+        User user = app.loggedInUser.getValue();
         if (user != null && user.institutionId != null) {
 
             long newsFeedId = user.getNewsFeedId();
             if (newsFeedId == 0) {
-                isegoriaApp.getAPI().getInstitutionNewsFeed(user.institutionId).enqueue(new SimpleCallback<NewsFeedResponse>() {
+                app.getAPI().getInstitutionNewsFeed(user.institutionId).enqueue(new SimpleCallback<NewsFeedResponse>() {
                     @Override
                     protected void handleResponse(Response<NewsFeedResponse> response) {
                         NewsFeedResponse body = response.body();
@@ -93,7 +93,7 @@ public class PhotosFragment extends Fragment implements TitledFragment {
                         if (body != null) {
                             User updatedUser = new User(user);
                             updatedUser.setNewsFeedId(body.newsFeedId);
-                            isegoriaApp.updateLoggedInUser(updatedUser);
+                            app.updateLoggedInUser(updatedUser);
 
                             fetchPhotoAlbums();
                         }

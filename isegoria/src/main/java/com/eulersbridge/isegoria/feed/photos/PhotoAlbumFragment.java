@@ -14,10 +14,10 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.network.api.models.Photo;
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import org.parceler.Parcels;
@@ -40,7 +40,7 @@ public class PhotoAlbumFragment extends Fragment {
         photosGridView.setAdapter(adapter);
 
         if (getActivity() != null && getArguments() != null) {
-            IsegoriaApp isegoriaApp = (IsegoriaApp)getActivity().getApplication();
+            IsegoriaApp app = (IsegoriaApp)getActivity().getApplication();
 
             PhotoAlbum album = Parcels.unwrap(getArguments().getParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM));
 
@@ -57,7 +57,7 @@ public class PhotoAlbumFragment extends Fragment {
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(albumImageView);
 
-            isegoriaApp.getAPI().getAlbumPhotos(album.id).enqueue(new SimpleCallback<PhotosResponse>() {
+            app.getAPI().getAlbumPhotos(album.id).enqueue(new SimpleCallback<PhotosResponse>() {
                 @Override
                 protected void handleResponse(Response<PhotosResponse> response) {
                     PhotosResponse body = response.body();

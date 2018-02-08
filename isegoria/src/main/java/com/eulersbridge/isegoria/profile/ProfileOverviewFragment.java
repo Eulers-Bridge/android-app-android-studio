@@ -19,7 +19,6 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
@@ -64,13 +63,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         institutionTextView = rootView.findViewById(R.id.profile_institution);
         personalityTestButton = rootView.findViewById(R.id.profile_personality_test_button);
 
-        View.OnClickListener friendsClickListener = view -> {
-            boolean isAnotherUser = viewModel.user.getValue() != null
-                    && viewModel.user.getValue() instanceof Contact;
-
-            if (getActivity() != null && !isAnotherUser)
-                ((MainActivity)getActivity()).showFriends();
-        };
+        View.OnClickListener friendsClickListener = view -> viewModel.showFriends();
 
         friendsNumTextView = rootView.findViewById(R.id.profile_friends_num);
         friendsNumTextView.setOnClickListener(friendsClickListener);
@@ -98,9 +91,9 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         viewModel = ViewModelProviders.of(lifecycleOwner).get(ProfileViewModel.class);
 
-        IsegoriaApp isegoriaApp = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
-        if (isegoriaApp != null)
-            isegoriaApp.loggedInUser.observe(this, user -> {
+        IsegoriaApp app = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
+        if (app != null)
+            app.loggedInUser.observe(this, user -> {
                 if (user != null && viewModel.user.getValue() == null)
                     viewModel.setUser(user);
             });

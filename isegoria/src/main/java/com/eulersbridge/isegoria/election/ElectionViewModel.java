@@ -23,8 +23,8 @@ public class ElectionViewModel extends AndroidViewModel {
     }
 
     LiveData<Boolean> userCompletedEfficacyQuestions() {
-        IsegoriaApp isegoriaApp = getApplication();
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user ->
+        IsegoriaApp app = getApplication();
+        return Transformations.switchMap(app.loggedInUser, user ->
                 new SingleLiveData<>(user != null && user.hasPPSEQuestions)
         );
     }
@@ -33,10 +33,10 @@ public class ElectionViewModel extends AndroidViewModel {
         if (election != null)
             return election;
 
-        IsegoriaApp isegoriaApp = getApplication();
-        return Transformations.switchMap(isegoriaApp.loggedInUser, user -> {
+        IsegoriaApp app = getApplication();
+        return Transformations.switchMap(app.loggedInUser, user -> {
             if (user != null && user.institutionId != null) {
-                LiveData<List<Election>> electionsList = new RetrofitLiveData<>(isegoriaApp.getAPI().getElections(user.institutionId));
+                LiveData<List<Election>> electionsList = new RetrofitLiveData<>(app.getAPI().getElections(user.institutionId));
 
                 election = Transformations.switchMap(electionsList, elections -> {
                     if (elections != null && elections.size() > 0) {
