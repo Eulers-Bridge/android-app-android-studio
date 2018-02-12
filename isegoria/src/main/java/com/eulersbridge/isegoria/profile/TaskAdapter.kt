@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Task
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse
-import com.eulersbridge.isegoria.util.network.SimpleCallback
-import retrofit2.Response
+import com.eulersbridge.isegoria.onSuccess
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -26,13 +24,6 @@ internal class TaskAdapter(fragment: Fragment) : RecyclerView.Adapter<TaskViewHo
 
     override fun getItemCount() = items.size
 
-    private fun isValidFragment(fragment: Fragment?): Boolean {
-        return (fragment != null
-                && fragment.activity != null
-                && !fragment.isDetached
-                && fragment.isAdded)
-    }
-
     private fun getImageIndex(fragment: Fragment): Int {
         val dpi = fragment.resources.displayMetrics.densityDpi
         return when (dpi) {
@@ -47,33 +38,29 @@ internal class TaskAdapter(fragment: Fragment) : RecyclerView.Adapter<TaskViewHo
 
         viewHolder.setItem(item)
 
-        val fragment = weakFragment.get()
+        weakFragment.get()?.takeIf {
+            it.activity != null && !it.isDetached && it.isAdded
 
-        if (isValidFragment(fragment)) {
-
-            val app = fragment!!.activity!!.application as IsegoriaApp?
+        }?.let {
+            val app = it.activity?.application as? IsegoriaApp
 
             if (app != null) {
-                val imageIndex = getImageIndex(fragment)
+                val imageIndex = getImageIndex(it)
 
                 val weakViewHolder = WeakReference(viewHolder)
 
-                app.api.getPhotos(item.id).enqueue(object : SimpleCallback<PhotosResponse>() {
-                    override fun handleResponse(response: Response<PhotosResponse>) {
-                        val body = response.body()
+                app.api.getPhotos(item.id).onSuccess {
+                    if (it.totalPhotos > imageIndex + 1) {
+                        val innerViewHolder = weakViewHolder.get()
 
-                        if (body != null && body.totalPhotos > imageIndex + 1) {
-                            val innerViewHolder = weakViewHolder.get()
+                        if (innerViewHolder != null) {
+                            val imageUrl = it.photos?.get(imageIndex)?.thumbnailUrl
 
-                            if (innerViewHolder != null) {
-                                val imageUrl = body.photos?.get(imageIndex)?.thumbnailUrl
-
-                                if (!imageUrl.isNullOrBlank())
-                                    innerViewHolder.loadItemImage(item.id, imageUrl!!)
-                            }
+                            if (!imageUrl.isNullOrBlank())
+                                innerViewHolder.loadItemImage(item.id, imageUrl!!)
                         }
                     }
-                })
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.personality
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.UserPersonality
+import com.eulersbridge.isegoria.observe
 import kotlinx.android.synthetic.main.personality_screen2_fragment.*
 
 class PersonalityQuestionsFragment : Fragment() {
@@ -42,11 +42,10 @@ class PersonalityQuestionsFragment : Fragment() {
                 emotionalStability, extroversion, opennessToExperiences
             )
 
-            viewModel.setUserCompletedQuestions(personality).observe(this, Observer { success ->
-                if (success == false) {
+            observe(viewModel.setUserCompletedQuestions(personality)) { success ->
+                if (success == false)
                     doneButton.post { doneButton.isEnabled = true }
-                }
-            })
+            }
         }
     }
 

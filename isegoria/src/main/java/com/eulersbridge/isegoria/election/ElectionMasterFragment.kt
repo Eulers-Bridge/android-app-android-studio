@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.election
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -13,6 +12,7 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.election_master_layout.*
 
@@ -21,7 +21,7 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     private val overviewFragment: ElectionOverviewFragment by lazy { ElectionOverviewFragment() }
     private val candidateFragment: CandidateFragment by lazy { CandidateFragment() }
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
 
     private val viewModel: ElectionViewModel by lazy {
         ViewModelProviders.of(this).get(ElectionViewModel::class.java)
@@ -82,11 +82,11 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     override fun onPause() {
         super.onPause()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     private fun showFirstTab()
-        = showTabFragment(overviewFragment!!)
+        = showTabFragment(overviewFragment)
 
     private fun showTabFragment(fragment: Fragment) {
         activity?.supportFragmentManager
@@ -94,8 +94,8 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
             ?.replace(R.id.election_frame, fragment)
             ?.commitAllowingStateLoss()
 
-        viewModel.userCompletedEfficacyQuestions().observe(this, Observer { completed ->
-            if (completed == true) {
+        observe(viewModel.userCompletedEfficacyQuestions()) {
+            if (it == true) {
                 overlayView.visibility = View.VISIBLE
 
                 overlaySurveyButton.setOnClickListener {
@@ -106,6 +106,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
                         ?.commit()
                 }
             }
-        })
+        }
     }
 }

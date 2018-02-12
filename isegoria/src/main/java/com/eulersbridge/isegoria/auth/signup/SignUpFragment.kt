@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.auth.signup
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Build
 import android.os.Bundle
@@ -9,13 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import com.eulersbridge.isegoria.R
+import androidx.view.updatePadding
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.auth.AuthViewModel
-import com.eulersbridge.isegoria.keyboardVisible
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.onItemSelected
-import com.eulersbridge.isegoria.onTextChanged
 import kotlinx.android.synthetic.main.sign_up_fragment.*
 import java.util.*
 
@@ -39,12 +36,7 @@ class SignUpFragment : Fragment() {
         val hasTranslucentStatusBar = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
         if (hasTranslucentStatusBar) {
             val additionalTopPadding = Math.round(22 * resources.displayMetrics.density)
-
-            container!!.setPadding(
-                    container.paddingLeft,
-                    container.paddingTop + additionalTopPadding,
-                    container.paddingRight,
-                    container.paddingBottom)
+            container.updatePadding(top = container.paddingTop + additionalTopPadding)
         }
 
         countryAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_item)
@@ -77,28 +69,28 @@ class SignUpFragment : Fragment() {
 
         setupViewListeners()
 
-        viewModel.getCountries().observe(this, Observer {
+        observe(viewModel.getCountries()) {
             it?.let { setCountries(it) }
-        })
+        }
 
-        activity?.keyboardVisible = true
+        activity?.setKeyboardVisible(true)
     }
 
     private fun setupViewListeners() {
-        backButton!!.setOnClickListener {
-            if (activity != null) {
+        backButton.setOnClickListener {
+            activity?.let {
                 authViewModel.onSignUpBackPressed()
-                activity!!.onBackPressed()
+                it.onBackPressed()
             }
         }
 
         nextButton.setOnClickListener {
             it.isEnabled = false
-            backButton!!.isEnabled = false
+            backButton.isEnabled = false
 
             val newUser = viewModel.signUpUser
             if (newUser == null) {
-                backButton!!.isEnabled = true
+                backButton.isEnabled = true
                 it.isEnabled = true
 
             } else {

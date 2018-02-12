@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.vote
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -11,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.vote_view_pager_fragment.*
@@ -18,7 +18,7 @@ import java.util.*
 
 class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
     private lateinit var viewPagerAdapter: SimpleFragmentPagerAdapter
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
@@ -35,15 +35,13 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
 
         val viewModel = ViewModelProviders.of(this).get(VoteViewModel::class.java)
 
-        viewModel.locationAndDateComplete.observe(this, Observer { complete ->
-            if (complete == true)
-                viewPager.currentItem = 1
-        })
+        observe(viewModel.locationAndDateComplete) {
+            if (it == true) viewPager.currentItem = 1
+        }
 
-        viewModel.pledgeComplete.observe(this, Observer { complete ->
-            if (complete == true)
-                viewPager.currentItem = 2
-        })
+        observe(viewModel.pledgeComplete) {
+            if (it == true) viewPager.currentItem = 2
+        }
 
         return rootView
     }
@@ -90,6 +88,6 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
     override fun onPause() {
         super.onPause()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 }

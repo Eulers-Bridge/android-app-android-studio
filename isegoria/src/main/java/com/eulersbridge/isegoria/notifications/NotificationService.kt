@@ -6,7 +6,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import com.eulersbridge.isegoria.NOTIFICATION_CHANNEL_FRIENDS
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.util.Strings
+import com.eulersbridge.isegoria.notificationChannelIDFromName
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -19,16 +19,16 @@ class NotificationService : FirebaseMessagingService() {
         val text: String?
 
         if (remoteMessage?.notification != null) {
-            title = remoteMessage.notification!!.title
-            text = remoteMessage.notification!!.body
+            title = remoteMessage.notification?.title
+            text = remoteMessage.notification?.body
 
         } else {
             // Data payload instead of notification object
-            title = remoteMessage!!.data["title"]
-            text = remoteMessage.data["text"]
+            title = remoteMessage?.data?.get("title")
+            text = remoteMessage?.data?.get("text")
 
             if (title.isNullOrBlank() && text.isNullOrBlank())
-                title = remoteMessage.data["default"]
+                title = remoteMessage?.data?.get("default")
         }
 
         if (!title.isNullOrBlank() && !text.isNullOrBlank())
@@ -38,13 +38,13 @@ class NotificationService : FirebaseMessagingService() {
     }
 
     private fun createNotification(title: String, text: String) {
-        val notificationBuilder = NotificationCompat.Builder(this,
-                Strings.notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS))
-                .setContentTitle(title)
-                .setSmallIcon(R.drawable.notification_icon)
-
-        if (!text.isBlank())
-            notificationBuilder.setContentText(text)
+        val notificationBuilder = NotificationCompat.Builder(
+            this,
+            notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS)
+        )
+            .setContentTitle(title)
+            .setContentText(text)
+            .setSmallIcon(R.drawable.notification_icon)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_SOCIAL)

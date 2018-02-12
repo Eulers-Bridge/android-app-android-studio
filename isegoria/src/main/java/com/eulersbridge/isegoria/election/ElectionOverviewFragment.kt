@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria.election
 
 
 import android.animation.LayoutTransition
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Election
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.toDateString
 import kotlinx.android.synthetic.main.election_overview_fragment.*
 
@@ -23,10 +23,11 @@ class ElectionOverviewFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.election_overview_fragment, container, false)
 
         val viewModel = ViewModelProviders.of(this).get(ElectionViewModel::class.java)
-        viewModel.getElection().observe(this, Observer { election ->
-            if (election != null)
-                populateElectionText(election)
-        })
+
+        observe(viewModel.getElection()) {
+            if (it != null)
+                populateElectionText(it)
+        }
 
         return rootView
     }
@@ -49,7 +50,7 @@ class ElectionOverviewFragment : Fragment() {
             introductionTextView.text = election.introduction
 
         } else {
-            introductionHeadingTextView!!.visibility = View.GONE
+            introductionHeadingTextView.visibility = View.GONE
             introductionTextView.visibility = View.GONE
         }
 

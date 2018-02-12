@@ -17,6 +17,7 @@ import android.widget.RelativeLayout
 import android.widget.TableRow
 import android.widget.TableRow.LayoutParams
 import android.widget.TextView
+import androidx.os.bundleOf
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.CandidateTicket
@@ -44,11 +45,8 @@ class CandidateTicketFragment : Fragment() {
 
     private val electionsCallback = object : Callback<List<Election>> {
         override fun onResponse(call: Call<List<Election>>, response: Response<List<Election>>) {
-            val elections = response.body()
-            if (elections != null && elections.isNotEmpty()) {
-                val election = elections[0]
-
-                app!!.api.getTickets(election.id).enqueue(ticketsCallback)
+            response.body()?.firstOrNull()?.let {
+                app?.api?.getTickets(it.id)?.enqueue(ticketsCallback)
             }
         }
 
@@ -60,9 +58,9 @@ class CandidateTicketFragment : Fragment() {
             call: Call<List<CandidateTicket>>,
             response: Response<List<CandidateTicket>>
         ) {
-            val tickets = response.body()
-            if (tickets != null)
+            response.body()?.let { tickets ->
                 addTickets(tickets)
+            }
         }
 
         override fun onFailure(call: Call<List<CandidateTicket>>, t: Throwable) = t.printStackTrace()
@@ -92,45 +90,46 @@ class CandidateTicketFragment : Fragment() {
     }
 
     private fun addTickets(tickets: List<CandidateTicket>?) {
-        if (activity != null && tickets!!.isNotEmpty()) {
-            activity!!.runOnUiThread {
+        if (tickets == null)
+            return
 
-                for (ticket in tickets) {
-                    addedCounter += 1
-                    if (added) {
-                        this.addTableRow(
-                            lastTicketId,
-                            ticket.id,
-                            lastColour, ticket.getColour(),
-                            true,
-                            false,
-                            lastName,
-                            ticket.fullName,
-                            lastNoOfSupporters,
-                            ticket.supportersCount,
-                            lastLogo,
-                            ticket.logo
-                        )
-                    }
+        activity?.runOnUiThread {
 
-                    lastTicketId = ticket.id
-                    lastName = ticket.name
-                    lastInformation = ticket.information
-                    lastNoOfSupporters = ticket.supportersCount
-                    lastColour = ticket.getColour()
-                    lastLogo = ticket.logo
+            for (ticket in tickets) {
+                addedCounter += 1
+                if (added) {
+                    this.addTableRow(
+                        lastTicketId,
+                        ticket.id,
+                        lastColour, ticket.getColour(),
+                        true,
+                        false,
+                        lastName,
+                        ticket.fullName,
+                        lastNoOfSupporters,
+                        ticket.supportersCount,
+                        lastLogo,
+                        ticket.logo
+                    )
+                }
 
-                    added = !added
+                lastTicketId = ticket.id
+                lastName = ticket.name
+                lastInformation = ticket.information
+                lastNoOfSupporters = ticket.supportersCount
+                lastColour = ticket.getColour()
+                lastLogo = ticket.logo
 
-                    if (tickets.size == addedCounter && tickets.size % 2 != 0) {
-                        this.addTableRowOneSquare(
-                            ticket.id,
-                            ticket.getColour(),
-                            ticket.fullName,
-                            ticket.supportersCount,
-                            ticket.logo
-                        )
-                    }
+                added = !added
+
+                if (tickets.size == addedCounter && tickets.size % 2 != 0) {
+                    this.addTableRowOneSquare(
+                        ticket.id,
+                        ticket.getColour(),
+                        ticket.fullName,
+                        ticket.supportersCount,
+                        ticket.logo
+                    )
                 }
             }
         }
@@ -223,20 +222,18 @@ class CandidateTicketFragment : Fragment() {
             )
             view.background = rectShapeDrawable
             view.setOnClickListener {
-
-                val args = Bundle()
-                args.apply {
-                    putLong("TicketId", lastTicketId)
-                    putString("TicketName", title1)
-                    putString("Colour", colour1)
-                    putInt("NoOfSupporters", Integer.parseInt(supporters1))
-                    putString("Logo", logo1)
-                }
+                val args = bundleOf(
+                    "TicketId" to lastTicketId,
+                    "TicketName" to title1,
+                    "Colour" to colour1,
+                    "NoOfSupporters" to Integer.parseInt(supporters1),
+                    "Logo" to logo1
+                )
 
                 val detailFragment = CandidateTicketDetailFragment()
                 detailFragment.arguments = args
 
-                activity!!.supportFragmentManager.beginTransaction().apply {
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
                     addToBackStack(null)
                     add(R.id.candidateFrame, detailFragment)
                     commit()
@@ -319,19 +316,18 @@ class CandidateTicketFragment : Fragment() {
             )
             view.background = rect2ShapeDrawable
             view.setOnClickListener {
-                val args = Bundle()
-                args.apply {
-                    putLong("TicketId", ticketId)
-                    putString("TicketName", title2)
-                    putString("Colour", colour2)
-                    putInt("NoOfSupporters", Integer.parseInt(supporters2))
-                    putString("Logo", logo2)
-                }
+                val args = bundleOf(
+                    "TicketId" to ticketId,
+                    "TicketName" to title2,
+                    "Colour" to colour2,
+                    "NoOfSupporters" to Integer.parseInt(supporters2),
+                    "Logo" to logo2
+                )
 
                 val detailFragment = CandidateTicketDetailFragment()
                 detailFragment.arguments = args
 
-                activity!!.supportFragmentManager.beginTransaction().apply {
+                activity?.supportFragmentManager?.beginTransaction()?.apply {
                     addToBackStack(null)
                     add(R.id.candidateFrame, detailFragment)
                     commit()
@@ -397,7 +393,7 @@ class CandidateTicketFragment : Fragment() {
             relativeLayout.addView(textViewTitle, params1)
 
             tr.addView(relativeLayout)
-            positionsTableLayout!!.addView(tr)
+            positionsTableLayout.addView(tr)
         }
     }
 
@@ -476,19 +472,18 @@ class CandidateTicketFragment : Fragment() {
         view.background = rectShapeDrawable
 
         view.setOnClickListener {
-            val args = Bundle()
-            args.apply {
-                putLong("TicketId", lastTicketId)
-                putString("TicketName", title1)
-                putString("Colour", colour1)
-                putInt("NoOfSupporters", Integer.parseInt(supporters1))
-                putString("Logo", logo1)
-            }
+            val args = bundleOf(
+                "TicketId" to lastTicketId,
+                "TicketName" to title1,
+                "Colour" to colour1,
+                "NoOfSupporters" to Integer.parseInt(supporters1),
+                "Logo" to logo1
+            )
 
             val detailFragment = CandidateTicketDetailFragment()
             detailFragment.arguments = args
 
-            activity!!.supportFragmentManager.beginTransaction().apply {
+            activity?.supportFragmentManager?.beginTransaction()?.apply {
                 addToBackStack(null)
                 add(R.id.candidateFrame, detailFragment)
                 commit()
@@ -504,6 +499,6 @@ class CandidateTicketFragment : Fragment() {
         relativeLayout.addView(linLayout, params1)
         tr.addView(relativeLayout)
 
-        positionsTableLayout!!.addView(tr)
+        positionsTableLayout.addView(tr)
     }
 }

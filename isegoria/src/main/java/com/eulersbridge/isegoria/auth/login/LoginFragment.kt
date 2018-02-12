@@ -1,7 +1,6 @@
 package com.eulersbridge.isegoria.auth.login
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.onTextChanged
 import kotlinx.android.synthetic.main.login_fragment.*
 
@@ -92,7 +92,7 @@ class LoginFragment : Fragment() {
                 passwordField.setText(it)
             }
 
-            emailError.observe(this@LoginFragment, Observer {
+            observe(emailError) {
                 if (it == true) {
                     emailLayout.error = getString(R.string.user_login_email_error_required)
                     emailLayout.isErrorEnabled = true
@@ -101,9 +101,9 @@ class LoginFragment : Fragment() {
                 } else {
                     emailLayout.isErrorEnabled = false
                 }
-            })
+            }
 
-            passwordError.observe(this@LoginFragment, Observer {
+            observe(passwordError) {
                 if (it == true) {
                     passwordLayout.error = getString(R.string.user_login_password_error_required)
                     passwordLayout.isErrorEnabled = true
@@ -111,9 +111,9 @@ class LoginFragment : Fragment() {
                 } else {
                     passwordLayout.isErrorEnabled = false
                 }
-            })
+            }
 
-            networkError.observe(this@LoginFragment, Observer {
+            observe(networkError) {
                 if (it == true) {
                     Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
                         .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
@@ -122,21 +122,21 @@ class LoginFragment : Fragment() {
 
                     setNetworkErrorShown()
                 }
-            })
+            }
 
-            formEnabled.observe(this@LoginFragment, Observer { enabled ->
+            observe(formEnabled) { enabled ->
                 arrayOf(emailLayout, passwordLayout, loginButton, signUpButton).forEach {
                     it.isEnabled = enabled == true
                 }
-            })
+            }
         }
     }
 
     private fun onLoginClicked() {
-        viewModel.login().observe(this, Observer { success ->
+        observe(viewModel.login()) { success ->
             if (success == true)
                 authViewModel.userLoggedIn.value = true
-        })
+        }
     }
 
 }

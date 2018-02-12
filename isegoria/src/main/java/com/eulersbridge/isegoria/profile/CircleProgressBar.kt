@@ -27,8 +27,6 @@
 
 package com.eulersbridge.isegoria.profile
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.Context
@@ -42,12 +40,19 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.ColorInt
 import android.support.annotation.FloatRange
+import android.support.annotation.Px
 import android.support.annotation.RequiresApi
 import android.support.v4.content.res.ResourcesCompat
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import androidx.animation.doOnEnd
+import androidx.graphics.component1
+import androidx.graphics.component2
+import androidx.graphics.component3
+import androidx.graphics.component4
+import androidx.os.bundleOf
 import com.eulersbridge.isegoria.R
 
 class CircleProgressBar : View {
@@ -86,7 +91,7 @@ class CircleProgressBar : View {
         private const val DEFAULT_FILLED_COLOR = Color.GREEN
     }
 
-    private var bounds: RectF? = null
+    private lateinit var bounds: RectF
     private lateinit var circlePaint: Paint
 
     internal var topText: String? = null
@@ -153,7 +158,7 @@ class CircleProgressBar : View {
     /**
      * @return Thickness of the circle & progress bar (PX).
      */
-    private val thickness: Int
+    @get:Px private val thickness: Int
         get() = Math.round(THICKNESS_DP * density)
 
     /**
@@ -249,9 +254,8 @@ class CircleProgressBar : View {
             textSize = bottomTextFontSize
         }
 
-        if (context != null && !isInEditMode) {
+        if (context != null && !isInEditMode)
             topTextPaint.typeface = ResourcesCompat.getFont(context, R.font.museo)
-        }
 
         if (isInEditMode) {
             value = 3
@@ -272,34 +276,29 @@ class CircleProgressBar : View {
         invalidate()
     }
 
-    public override fun onSaveInstanceState(): Parcelable? {
-        val bundle = Bundle()
-
-        bundle.putParcelable("superState", super.onSaveInstanceState())
-
-        bundle.putInt("value", value)
-        bundle.putInt("maximumValue", maximumValue)
-        bundle.putString("topText", topText)
-        bundle.putString("bottomText", bottomText)
-        bundle.putInt("baseColor", baseColor)
-        bundle.putInt("filledColor", filledColor)
-
-        return bundle
-    }
+    public override fun onSaveInstanceState() =
+        bundleOf(
+            "superState" to super.onSaveInstanceState(),
+            "value" to value,
+            "maximumValue" to maximumValue,
+            "topText" to topText,
+            "bottomText" to bottomText,
+            "baseColor" to baseColor,
+            "filledColor" to filledColor
+        )
 
     public override fun onRestoreInstanceState(state: Parcelable?) {
         var updatedState = state
-        if (state is Bundle) {
-            val bundle = state as Bundle?
 
-            value = bundle!!.getInt("value")
-            maximumValue = bundle.getInt("maximumValue")
-            topText = bundle.getString("topText")
-            bottomText = bundle.getString("bottomText")
-            baseColor = bundle.getInt("baseColor")
-            filledColor = bundle.getInt("filledColor")
+        (state as? Bundle)?.let {
+            value = it.getInt("value")
+            maximumValue = it.getInt("maximumValue")
+            topText = it.getString("topText")
+            bottomText = it.getString("bottomText")
+            baseColor = it.getInt("baseColor")
+            filledColor = it.getInt("filledColor")
 
-            updatedState = bundle.getParcelable("superState")
+            updatedState = it.getParcelable("superState")
         }
 
         super.onRestoreInstanceState(updatedState)
@@ -334,16 +333,12 @@ class CircleProgressBar : View {
             val propertyRotate = PropertyValuesHolder.ofFloat("angle", 0.0f, sweepAngle)
 
             animator = ValueAnimator()
-            animator!!.apply {
+            animator?.apply {
                 setValues(propertyRadius, propertyRotate)
                 duration = ANIMATION_DURATION_MS.toLong()
                 interpolator = DecelerateInterpolator()
 
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        animator = null
-                    }
-                })
+                doOnEnd { animator = null }
 
                 addUpdateListener {
                     animatedAlpha = it.getAnimatedValue("alpha") as Int
@@ -378,7 +373,7 @@ class CircleProgressBar : View {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         // getLeft(), getTop(), etc. are 0 until this point.
-        if (bounds == null) {
+        if (!this::bounds.isInitialized) {
             val halfThickness = (thickness / 2).toFloat()
 
             // `(THICKNESS_PX / 2)` as path stroke is centred, rather than outside or inside
@@ -427,26 +422,28 @@ class CircleProgressBar : View {
         // Draw the base circle
         circlePaint.color = baseColor
         circlePaint.alpha = 128 // 255 = 100% opacity, or fully opaque
-        canvas.drawArc(bounds!!, 0f, 360f, false, circlePaint)
+        canvas.drawArc(bounds, 0f, 360f, false, circlePaint)
+
+        val (_,_,right,bottom) = bounds
 
         if (value > 0) {
             /* If progress has been made (value is > 0), draw an arc with the current progress
                 inside the circle */
             circlePaint.color = filledColor
             circlePaint.alpha = animatedAlpha
-            canvas.drawArc(bounds!!, -90f, fillEndAngle, false, circlePaint)
+            canvas.drawArc(bounds, -90f, fillEndAngle, false, circlePaint)
         }
 
         val thickness = thickness.toFloat()
 
-        if (!topText.isNullOrBlank()) {
+        topText?.takeUnless { it.isBlank() }?.let {
             val y = thickness * 6
-            drawText(canvas, topText!!, bounds!!.right, y, topTextPaint)
+            drawText(canvas, it, right, y, topTextPaint)
         }
 
-        if (!bottomText.isNullOrBlank()) {
-            val y = bounds!!.bottom - thickness * 3
-            drawText(canvas, bottomText!!, bounds!!.right, y, bottomTextPaint)
+        topText?.takeUnless { it.isBlank() }?.let {
+            val y = bottom - thickness * 3
+            drawText(canvas, it, right, y, bottomTextPaint)
         }
     }
 }

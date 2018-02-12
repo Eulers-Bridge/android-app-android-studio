@@ -6,10 +6,10 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
 import com.eulersbridge.isegoria.isValidEmail
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.network.IgnoredCallback
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -18,7 +18,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     internal val password = MutableLiveData<String>()
 
-    internal val passwordError = Transformations.switchMap(password) { SingleLiveData(!it.isNullOrBlank()) }
+    internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
     internal val formEnabled = MutableLiveData<Boolean>()
     internal val networkError = MutableLiveData<Boolean>()
@@ -33,7 +33,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         val app = application as IsegoriaApp
 
         app.savedUserEmail?.let { email.value = it }
-
         app.savedUserPassword?.let { password.value = it }
     }
 
@@ -42,7 +41,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     internal fun onExit() {
-        app.loginVisible.value = false
+        app.hideLoginScreen()
     }
 
     internal fun login(): LiveData<Boolean> {
@@ -81,7 +80,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
-            app.api.requestPasswordReset(email!!).enqueue(IgnoredCallback())
+            // If email is valid, it is non-null
+            app.api.requestPasswordReset(email!!).enqueue()
             canShowPasswordResetDialog.value = true
 
             return true

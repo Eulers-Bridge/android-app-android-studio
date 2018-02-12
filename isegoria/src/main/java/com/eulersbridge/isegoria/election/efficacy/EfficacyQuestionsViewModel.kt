@@ -18,24 +18,25 @@ class EfficacyQuestionsViewModel(application: Application) : AndroidViewModel(ap
     internal val score4 = MutableLiveData<Int>()
 
     internal fun addUserEfficacy(): LiveData<Boolean> {
-        if (score1.value == null
-                || score2.value == null
-                || score3.value == null
-                || score4.value == null)
+
+        val scores = listOfNotNull(score1.value, score2.value, score3.value, score4.value)
+            .map { it.toFloat() }
+
+        if (scores.isEmpty()) {
             return SingleLiveData(false)
 
-        val app: IsegoriaApp = getApplication()
+        } else {
+            val app: IsegoriaApp = getApplication()
 
-        val userEmail = app.loggedInUser.value!!.email
-        val answers = UserSelfEfficacy(
-                score1.value!!.toFloat(), score2.value!!.toFloat(), score3.value!!.toFloat(), score4.value!!.toFloat()
-        )
+            val userEmail = app.loggedInUser.value!!.email
+            val answers = UserSelfEfficacy(scores[0], scores[1], scores[2], scores[3])
 
-        val efficacyRequest = RetrofitLiveData(app.api.addUserEfficacy(userEmail, answers))
+            val efficacyRequest = RetrofitLiveData(app.api.addUserEfficacy(userEmail, answers))
 
-        return Transformations.switchMap(efficacyRequest) {
-            app.onUserSelfEfficacyCompleted()
-            SingleLiveData(true)
+            return Transformations.switchMap(efficacyRequest) {
+                app.onUserSelfEfficacyCompleted()
+                SingleLiveData(true)
+            }
         }
     }
 

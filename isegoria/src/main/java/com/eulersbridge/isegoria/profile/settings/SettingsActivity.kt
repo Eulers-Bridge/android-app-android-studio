@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile.settings
 
 import android.app.Activity
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -13,6 +14,7 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.theartofdev.edmodo.cropper.CropImage
@@ -72,43 +74,43 @@ class SettingsActivity : AppCompatActivity() {
     private fun createViewModelObservers() {
         // Checked deliberately observed before enabled, to avoid changing switch state
         // whilst being enabled, causing callback to change view model and enter loop.
-        viewModel.doNotTrackSwitchChecked.observe(this, observeBoolean { checked ->
-            doNotTrackSwitch.isChecked = checked
-        })
+        observeBoolean(viewModel.doNotTrackSwitchChecked) {
+            doNotTrackSwitch.isChecked = it
+        }
 
-        viewModel.doNotTrackSwitchChecked.observe(this, observeBoolean { checked ->
-            doNotTrackSwitch.isChecked = checked == true
-        })
+        observeBoolean(viewModel.doNotTrackSwitchEnabled) {
+            doNotTrackSwitch.isEnabled = it
+        }
 
-        viewModel.doNotTrackSwitchEnabled.observe(this, observeBoolean { enabled ->
-            doNotTrackSwitch.isEnabled = enabled == true
-        })
+        observeBoolean(viewModel.optOutDataCollectionSwitchChecked) {
+            optOutDataCollectionSwitch.isChecked = it
+        }
 
-        viewModel.optOutDataCollectionSwitchChecked.observe(this, observeBoolean { checked ->
-            optOutDataCollectionSwitch.isChecked = checked == true
-        })
-
-        viewModel.optOutDataCollectionSwitchEnabled.observe(this, observeBoolean { enabled ->
-            optOutDataCollectionSwitch.isEnabled = enabled == true
-        })
+        observeBoolean(viewModel.optOutDataCollectionSwitchEnabled) {
+            optOutDataCollectionSwitch.isEnabled = it
+        }
     }
 
     /**
      * Convenience function to map an optional boolean to a non-null boolean value
      */
-    private inline fun observeBoolean(crossinline f: (value: Boolean) -> Unit) : Observer<Boolean?>
-            = Observer { f(it == true) }
+    private inline fun <T> observeBoolean(data: LiveData<T>, crossinline onChanged: (value: Boolean) -> Unit) {
+        data.observe(this, Observer {
+            onChanged(it == true)
+        })
+    }
+
 
     private fun fetchData() {
-        viewModel.userProfilePhotoURL.observe(this, Observer {
+        observe(viewModel.userProfilePhotoURL) {
             if (!it.isNullOrBlank())
                 GlideApp.with(this)
                     .load(it)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(smallImageView)
-        })
+        }
 
-        viewModel.getUserPhoto()?.observe(this, Observer {
+        observe(viewModel.getUserPhoto()) {
             if (it != null)
                 GlideApp.with(this)
                     .load(it.thumbnailUrl)
@@ -116,7 +118,7 @@ class SettingsActivity : AppCompatActivity() {
                     .priority(Priority.HIGH)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(backgroundImageView)
-        })
+        }
     }
 
     private fun showImagePicker() {
@@ -156,10 +158,10 @@ class SettingsActivity : AppCompatActivity() {
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(backgroundImageView)
 
-        viewModel.updateUserPhoto(imageUri).observe(this, Observer { success ->
+        observe(viewModel.updateUserPhoto(imageUri)) { success ->
             if (success != null)
                 changePhotoButton.isEnabled = true
-        })
+        }
     }
 
     public override fun onActivityResult(

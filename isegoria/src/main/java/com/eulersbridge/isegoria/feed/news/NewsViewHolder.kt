@@ -1,16 +1,15 @@
 package com.eulersbridge.isegoria.feed.news
 
 import android.content.Intent
-import android.os.Bundle
 import android.support.annotation.DrawableRes
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
@@ -28,27 +27,25 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
     private var dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
 
     init {
-        imageView.setOnClickListener { view ->
+        imageView.setOnClickListener {
             if (item != null) {
                 val location = intArrayOf(0, 0)
-                view.getLocationOnScreen(location)
+                it.getLocationOnScreen(location)
 
-                val activityIntent = Intent(view.context, NewsDetailActivity::class.java)
+                val activityIntent = Intent(it.context, NewsDetailActivity::class.java)
 
-                val extras = Bundle()
-                extras.putParcelable(ACTIVITY_EXTRA_NEWS_ARTICLE, item)
-                activityIntent.putExtras(extras)
+                activityIntent.putExtras(bundleOf(ACTIVITY_EXTRA_NEWS_ARTICLE to item))
 
                 //Animate with a scale-up transition between the activities
                 val options = ActivityOptionsCompat.makeScaleUpAnimation(
-                        view,
-                        location[0],
-                        location[1],
-                        view.width,
-                        view.height)
-                        .toBundle()
+                    it,
+                    location[0],
+                    location[1],
+                    it.width,
+                    it.height)
+                .toBundle()
 
-                ActivityCompat.startActivity(view.context, activityIntent, options)
+                ActivityCompat.startActivity(it.context, activityIntent, options)
             }
         }
     }

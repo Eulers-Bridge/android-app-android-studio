@@ -7,10 +7,8 @@ import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.network.SimpleCallback
-import retrofit2.Response
 
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
@@ -26,11 +24,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val app = application as IsegoriaApp
 
-        app.api.getGeneralInfo().enqueue(object : SimpleCallback<GeneralInfoResponse>() {
-            override fun handleResponse(response: Response<GeneralInfoResponse>) {
-                countriesData.value = response.body()?.countries
-            }
-        })
+        app.api.getGeneralInfo().onSuccess {
+            countriesData.value = it.countries
+        }
     }
 
     fun onSignUpBackPressed() {
@@ -46,11 +42,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val updatedUser = signUpUser.value!!.copy()
 
         val institution = countries
-            .flatMap { it.institutions!!  }
+            .flatMap { it.institutions.orEmpty()  }
             .singleOrNull { it.getName() == updatedUser.institutionName }
 
-        institution?.id.let {
-            updatedUser.institutionId = it!!
+        institution?.id?.let {
+            updatedUser.institutionId = it
             signUpUser.value = updatedUser
         }
 

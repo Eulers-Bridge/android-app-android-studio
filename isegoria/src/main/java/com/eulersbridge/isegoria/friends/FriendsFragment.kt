@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.friends
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -14,10 +15,8 @@ import android.text.InputType
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
-import com.eulersbridge.isegoria.MainActivity
-import com.eulersbridge.isegoria.R
+import androidx.os.bundleOf
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.FriendRequest
 import com.eulersbridge.isegoria.network.api.models.User
@@ -56,35 +55,31 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
         viewModel = ViewModelProviders.of(this).get(FriendsViewModel::class.java)
 
-        viewModel.searchSectionVisible.observe(this, observeVisibility { visible ->
-            searchContainer.visibility = visible
-        })
+        observeVisibility(viewModel.searchSectionVisible) {
+            searchContainer.visibility = it
+        }
 
-        viewModel.friendsVisible.observe(this, observeVisibility { visible ->
-            friendsContainer.visibility = visible
-        })
+        observeVisibility(viewModel.friendsVisible) {
+            friendsContainer.visibility = it
+        }
 
-        viewModel.sentRequestsVisible.observe(this, observeVisibility { visible ->
-            sentRequestsContainer.visibility = visible
-        })
+        observeVisibility(viewModel.sentRequestsVisible) {
+            sentRequestsContainer.visibility = it
+        }
 
-        viewModel.receivedRequestsVisible.observe(this, observeVisibility { visible ->
-            receivedRequestsContainer.visibility = visible
-        })
+        observeVisibility(viewModel.receivedRequestsVisible) {
+            receivedRequestsContainer.visibility = it
+        }
 
-        viewModel.receivedRequestsVisible.observe(this, observeVisibility { visible ->
-            receivedRequestsContainer.visibility = visible
-        })
-
-        viewModel.getFriends().observe(this, Observer { friends ->
+        observe(viewModel.getFriends()) { friends ->
             if (friends != null)
                 friendsAdapter.setItems(friends)
-        })
+        }
 
-        viewModel.getSentFriendRequests()?.observe(this, Observer { requests ->
+        observe(viewModel.getSentFriendRequests()) { requests ->
             if (requests != null)
                 sentAdapter.setItems(requests)
-        })
+        }
 
         getReceivedFriendRequests()
 
@@ -92,10 +87,13 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     /**
-     * Convenience function to map a boolean to a view visibility int
+     * Convenience function to map a LiveData<Boolean?>'s value to a view visibility int
      */
-    private inline fun observeVisibility(crossinline f: (visibility: Int) -> Unit) : Observer<Boolean>
-            = Observer { f(if (it == true) View.VISIBLE else View.GONE) }
+    private inline fun <T> observeVisibility(data: LiveData<T>, crossinline onChanged: (visibility: Int) -> Unit) {
+        data.observe(this, Observer {
+            onChanged(if (it == true) View.VISIBLE else View.GONE)
+        })
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         searchResultsList.adapter = searchAdapter
@@ -111,50 +109,48 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun getReceivedFriendRequests() {
-        viewModel.getReceivedFriendRequests()?.observe(this, Observer { requests ->
+        observe(viewModel.getReceivedFriendRequests()) { requests ->
             if (requests != null)
                 receivedAdapter.setItems(requests)
-        })
+        }
     }
 
     override fun getContactInstitution(
         institutionId: Long,
         weakViewHolder: WeakReference<UserViewHolder>
     ) {
-        viewModel.getInstitution(institutionId).observe(
-            this,
-            Observer { institution -> friendsAdapter.setInstitution(institution, weakViewHolder) }
-        )
+        observe(viewModel.getInstitution(institutionId)) {
+            friendsAdapter.setInstitution(it, weakViewHolder)
+        }
     }
 
     override fun getSearchedUserInstitution(
         institutionId: Long,
         weakViewHolder: WeakReference<UserViewHolder>
     ) {
-        viewModel.getInstitution(institutionId).observe(
-            this,
-            Observer { institution -> searchAdapter.setInstitution(institution, weakViewHolder) }
-        )
+        observe(viewModel.getInstitution(institutionId)) {
+            searchAdapter.setInstitution(it, weakViewHolder)
+        }
     }
 
     override fun getFriendRequestInstitution(
         institutionId: Long, @FriendRequestType type: Int,
         weakViewHolder: WeakReference<RecyclerView.ViewHolder>
     ) {
-        viewModel.getInstitution(institutionId).observe(this, Observer { institution ->
+        observe(viewModel.getInstitution(institutionId)) {
             if (type == RECEIVED)
-                receivedAdapter.setInstitution(institution, weakViewHolder)
+                receivedAdapter.setInstitution(it, weakViewHolder)
             else
-                sentAdapter.setInstitution(institution, weakViewHolder)
-        })
+                sentAdapter.setInstitution(it, weakViewHolder)
+        }
     }
 
     override fun performFriendRequestAction(type: Int, request: FriendRequest) {
         if (type == RECEIVED) {
 
-            // Show accept or reject dialog
-            if (context != null)
-                AlertDialog.Builder(context!!)
+            // Show accept/reject dialog
+            context?.let {
+                AlertDialog.Builder(it)
                     .setTitle(getString(R.string.friend_request_action_dialog_title) + request.requester!!.fullName)
                     .setPositiveButton(
                         R.string.friend_request_action_dialog_positive
@@ -164,55 +160,47 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
                     ) { _, _ -> rejectFriendRequest(request) }
                     .setNeutralButton(R.string.friend_request_action_dialog_neutral, null)
                     .show()
+            }
 
         } else if (type == SENT && mainActivity != null) {
             val user = request.requestReceiver
 
-            val args = Bundle()
-            args.putParcelable(FRAGMENT_EXTRA_USER, user)
-
             val profileFragment = ProfileOverviewFragment()
-            profileFragment.arguments = args
+            profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
-            mainActivity!!.presentContent(profileFragment)
+            mainActivity?.presentContent(profileFragment)
         }
     }
 
     private fun acceptFriendRequest(friendRequest: FriendRequest) {
-        viewModel.acceptFriendRequest(friendRequest.id).observe(this, Observer { success ->
+        observe(viewModel.acceptFriendRequest(friendRequest.id)) { success ->
             if (success == true)
                 showAcceptedMessage(friendRequest.requester!!.fullName)
-        })
+        }
     }
 
     private fun rejectFriendRequest(friendRequest: FriendRequest) {
-        viewModel.rejectFriendRequest(friendRequest.id).observe(this, Observer { success ->
+        observe(viewModel.rejectFriendRequest(friendRequest.id)) { success ->
             if (success == true)
                 showRejectedMessage()
-        })
+        }
     }
 
     override fun onSearchedUserClick(user: User?) {
-        val args = Bundle()
-        args.putParcelable(FRAGMENT_EXTRA_USER, user)
-
         val profileFragment = ProfileOverviewFragment()
-        profileFragment.arguments = args
+        profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
         mainActivity?.presentContent(profileFragment)
     }
 
     override fun onSearchedUserActionClick(user: User?) {
         if (user != null)
-            viewModel.addFriend(user.email).observe(this, Observer { showAddedMessage() })
+            observe(viewModel.addFriend(user.email)) { showAddedMessage() }
     }
 
     override fun onContactClick(contact: Contact) {
-        val args = Bundle()
-        args.putParcelable(FRAGMENT_EXTRA_CONTACT, contact)
-
         val profileFragment = ProfileOverviewFragment()
-        profileFragment.arguments = args
+        profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
         mainActivity?.presentContent(profileFragment)
     }
@@ -220,7 +208,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_friends)
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.friends, menu)
+        inflater?.inflate(R.menu.friends, menu)
         super.onCreateOptionsMenu(menu, inflater)
 
         val searchItem = menu!!.findItem(R.id.friends_search_view)
@@ -243,7 +231,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         (searchEditFrame.layoutParams as LinearLayout.LayoutParams).leftMargin = 0
 
         searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            mainActivity!!.setToolbarShowsTitle(!hasFocus)
+            mainActivity?.setToolbarShowsTitle(!hasFocus)
 
             if (!hasFocus)
                 viewModel.hideSearch()
@@ -263,12 +251,12 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun searchQueryChanged(query: String) {
-        viewModel.onSearchQueryChanged(query)?.observe(this, Observer { searchResults ->
+        observe(viewModel.onSearchQueryChanged(query)) { searchResults ->
             searchAdapter.clearItems()
 
             if (searchResults != null)
                 searchAdapter.setItems(searchResults)
-        })
+        }
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {

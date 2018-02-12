@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.profile
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -12,6 +11,7 @@ import android.support.v7.app.AlertDialog
 import android.view.*
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.profile_viewpager_fragment.*
 
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
     private lateinit var viewModel: ProfileViewModel
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
@@ -40,10 +40,10 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
 
-        viewModel.currentSectionIndex.observe(this, Observer { it ->
+        observe(viewModel.currentSectionIndex) {
             if (it != null && viewPager.currentItem != it)
                 viewPager.currentItem = it
-        })
+        }
 
         return rootView
     }
@@ -80,25 +80,26 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
             = context?.getString(R.string.section_title_profile)
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.profile, menu)
+        inflater?.inflate(R.menu.profile, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+        when (item?.itemId) {
             R.id.profile_settings -> {
                 startActivity(Intent(context, SettingsActivity::class.java))
                 return true
             }
 
             R.id.profile_logout -> {
-                if (context != null)
-                    AlertDialog.Builder(context!!)
-                            .setTitle(R.string.log_out_confirmation_title)
-                            .setPositiveButton(android.R.string.yes
-                            ) { _, _ -> viewModel.logOut() }
-                            .setNegativeButton(android.R.string.no, null)
-                            .show()
+                context?.let {
+                    AlertDialog.Builder(it)
+                        .setTitle(R.string.log_out_confirmation_title)
+                        .setPositiveButton(android.R.string.yes
+                        ) { _, _ -> viewModel.logOut() }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+                }
 
                 return true
             }
@@ -121,6 +122,6 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
     override fun onPause() {
         super.onPause()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 }

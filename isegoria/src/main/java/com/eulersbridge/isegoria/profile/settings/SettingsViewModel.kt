@@ -7,13 +7,11 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.net.Uri
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -59,20 +57,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         if (user != null) {
             val userSettings = UserSettings(user.trackingOff, isChecked)
 
-            app.api.updateUserDetails(user.email, userSettings).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        optOutDataCollectionSwitchChecked.value = isChecked
-                        optOutDataCollectionSwitchEnabled.value = true
-
-                        app.setOptedOutOfDataCollection(isChecked)
-                    }
-                }
-
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    optOutDataCollectionSwitchChecked.value = !isChecked
+            app.api.updateUserDetails(user.email, userSettings).enqueue({
+                if (it.isSuccessful) {
+                    optOutDataCollectionSwitchChecked.value = isChecked
                     optOutDataCollectionSwitchEnabled.value = true
+
+                    app.setOptedOutOfDataCollection(isChecked)
                 }
+            }, {
+                optOutDataCollectionSwitchChecked.value = !isChecked
+                optOutDataCollectionSwitchEnabled.value = true
             })
         }
     }
@@ -86,25 +80,22 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         if (user != null) {
             val userSettings = UserSettings(isChecked, user.isOptedOutOfDataCollection)
 
-            app.api.updateUserDetails(user.email, userSettings).enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        doNotTrackSwitchChecked.value = isChecked
+            app.api.updateUserDetails(user.email, userSettings).enqueue({
+                if (it.isSuccessful) {
+                    doNotTrackSwitchChecked.value = isChecked
 
-                        app.setTrackingOff(isChecked)
+                    app.setTrackingOff(isChecked)
 
-                    } else {
-                        doNotTrackSwitchChecked.value = !isChecked
-                    }
-
-                    doNotTrackSwitchEnabled.value = true
-                }
-
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    // Restore to previous checked state
+                } else {
                     doNotTrackSwitchChecked.value = !isChecked
-                    doNotTrackSwitchEnabled.value = true
                 }
+
+                doNotTrackSwitchEnabled.value = true
+
+            }, {
+                // Restore to previous checked state
+                doNotTrackSwitchChecked.value = !isChecked
+                doNotTrackSwitchEnabled.value = true
             })
         }
     }
@@ -117,11 +108,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             if (user != null) {
                 val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
 
-                userPhoto = Transformations.switchMap(photosRequest) { photosResponse ->
-                    if (photosResponse != null && photosResponse.totalPhotos > 0)
-                        SingleLiveData(photosResponse.photos?.get(0))
-
-                    SingleLiveData<Photo?>(null)
+                userPhoto = Transformations.switchMap(photosRequest) { response ->
+                    SingleLiveData(response?.photos?.firstOrNull())
                 }
             }
         }

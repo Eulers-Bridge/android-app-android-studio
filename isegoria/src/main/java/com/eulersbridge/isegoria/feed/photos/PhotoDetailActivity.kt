@@ -1,11 +1,11 @@
 package com.eulersbridge.isegoria.feed.photos
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.DrawableRes
+import android.support.annotation.Px
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
@@ -19,8 +19,11 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Photo
+import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.toDateString
 import kotlinx.android.synthetic.main.photo_detail_activity.*
 
 class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
@@ -48,36 +51,35 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
     }
 
     private fun createViewModelObservers() {
-        viewModel.currentPhoto.observe(this, Observer { photo ->
-
+        observe(viewModel.currentPhoto) {
             userLikedCurrentPhoto = false
 
             runOnUiThread {
-                if (photo != null) {
-                    titleTextView.text = photo.title
+                if (it != null) {
+                    titleTextView.text = it.title
 
-                    val dateStr = photo.date.toDateString(this)
+                    val dateStr = it.date.toDateString(this)
                     dateTextView.text = dateStr.toUpperCase()
 
-                    likesTextView.text = photo.likeCount.toString()
+                    likesTextView.text = it.likeCount.toString()
 
-                    @DrawableRes val flagImage = if (photo.hasInappropriateContent) R.drawable.flag else R.drawable.flagdefault
+                    @DrawableRes val flagImage = if (it.hasInappropriateContent) R.drawable.flag else R.drawable.flagdefault
                     flagImageView.setImageResource(flagImage)
                 }
             }
-        })
+        }
 
-        viewModel.getPhotoLikeCount().observe(this, Observer { likes ->
-            runOnUiThread { likesTextView.text = likes.toString() }
-        })
+        observe(viewModel.getPhotoLikeCount()) {
+            runOnUiThread { likesTextView.text = it.toString() }
+        }
 
-        viewModel.getPhotoLikedByUser().observe(this, Observer {
+        observe(viewModel.getPhotoLikedByUser()) {
             if (it == true)
                 runOnUiThread {
                     userLikedCurrentPhoto = true
                     starImageView.setImageResource(R.drawable.star)
                 }
-        })
+        }
     }
 
     private fun setupPager(startIndex: Int) {
@@ -119,7 +121,8 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
             adapter = pagerAdapter
 
             val marginDp = 8
-            val marginPx = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, marginDp.toFloat(), resources.displayMetrics))
+            @Px val marginPx = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                marginDp.toFloat(), resources.displayMetrics))
             pageMargin = marginPx
 
             addOnPageChangeListener(this@PhotoDetailActivity)
@@ -151,7 +154,7 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
         view.isEnabled = false
 
         if (userLikedCurrentPhoto) {
-            viewModel.likePhoto().observe(this, Observer { success ->
+            observe(viewModel.likePhoto()) { success ->
                 view.isEnabled = true
 
                 if (success == true) {
@@ -160,9 +163,9 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
                     val likes = Integer.parseInt(likesTextView.text.toString()) + 1
                     likesTextView.text = likes.toString()
                 }
-            })
+            }
         } else {
-            viewModel.unlikePhoto().observe(this, Observer { success ->
+            observe(viewModel.unlikePhoto()) { success ->
                 view.isEnabled = true
 
                 if (success == true) {
@@ -171,7 +174,7 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
                     val likes = Integer.parseInt(likesTextView.text.toString()) - 1
                     likesTextView.text = likes.toString()
                 }
-            })
+            }
         }
     }
 }

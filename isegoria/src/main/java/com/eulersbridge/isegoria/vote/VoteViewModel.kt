@@ -112,13 +112,13 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     internal fun setPledgeComplete(): LiveData<Boolean> {
-        if (pledgeComplete.value != null && pledgeComplete.value!!)
+        if (pledgeComplete.value != null && pledgeComplete.value == true)
             return pledgeComplete
 
         val app = getApplication<IsegoriaApp>()
 
         app.loggedInUser.value?.let { user ->
-            val election = this.electionData!!.value
+            val election = this.electionData?.value
             val voteLocation = selectedVoteLocation.value
             val dateTimeCalendar = dateTime.value
 

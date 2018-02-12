@@ -15,22 +15,12 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
+import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Candidate
-import com.eulersbridge.isegoria.network.api.models.Election
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.network.api.models.Ticket
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
-import com.eulersbridge.isegoria.util.network.SimpleCallback
 import kotlinx.android.synthetic.main.candidate_all_fragment.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class CandidateAllFragment : Fragment() {
     private lateinit var rootView: View
@@ -43,31 +33,6 @@ class CandidateAllFragment : Fragment() {
 
     private var app: IsegoriaApp? = null
 
-    private val electionsCallback = object : Callback<List<Election>> {
-        override fun onResponse(call: Call<List<Election>>, response: Response<List<Election>>) {
-            val elections = response.body()
-            if (elections != null && elections.isNotEmpty()) {
-                val (id) = elections[0]
-
-                app!!.api.getElectionCandidates(id).enqueue(candidatesCallback)
-            }
-        }
-
-        override fun onFailure(call: Call<List<Election>>, t: Throwable)
-                = t.printStackTrace()
-    }
-
-    private val candidatesCallback = object : Callback<List<Candidate>> {
-        override fun onResponse(call: Call<List<Candidate>>, response: Response<List<Candidate>>) {
-            response.body()?.let { candidates ->
-                addCandidates(candidates)
-            }
-        }
-
-        override fun onFailure(call: Call<List<Candidate>>, t: Throwable)
-                = t.printStackTrace()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,8 +40,9 @@ class CandidateAllFragment : Fragment() {
     ): View? {
         rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false)
 
-        val displayMetrics = activity!!.resources.displayMetrics
-        dpWidth = displayMetrics.widthPixels.toFloat()
+        activity?.resources?.displayMetrics?.let {
+            dpWidth = it.widthPixels.toFloat()
+        }
 
         return rootView
     }
@@ -85,7 +51,7 @@ class CandidateAllFragment : Fragment() {
         val dividerView = View(activity)
         dividerView.layoutParams = TableRow.LayoutParams(LayoutParams.MATCH_PARENT, 1)
         dividerView.setBackgroundColor(Color.parseColor("#676475"))
-        candidateAllTable!!.addView(dividerView)
+        candidateAllTable.addView(dividerView)
 
         searchViewCandidatesAll.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(query: String)
@@ -98,7 +64,13 @@ class CandidateAllFragment : Fragment() {
         app = activity?.application as IsegoriaApp
 
         app?.loggedInUser?.value?.institutionId?.let {
-            app?.api?.getElections(it)?.enqueue(electionsCallback)
+            app?.api?.getElections(it)?.onSuccess { elections ->
+                elections.firstOrNull()?.let {
+                    app!!.api.getElectionCandidates(it.id).onSuccess { candidates ->
+                        addCandidates(candidates)
+                    }
+                }
+            }
         }
     }
 
@@ -130,23 +102,16 @@ class CandidateAllFragment : Fragment() {
     }
 
     private fun addAllRows() {
-        try {
-            candidateAllTable.removeAllViews()
+        candidateAllTable.removeAllViews()
 
-            for (row in rows)
-                candidateAllTable.addView(row)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        for (row in rows)
+            candidateAllTable.addView(row)
     }
 
     private fun addCandidates(candidates: List<Candidate>) {
-        if (activity != null && candidates.isNotEmpty()) {
-            activity!!.runOnUiThread {
-                for (candidate in candidates)
-                    addTableRow(candidate)
-            }
+        activity?.runOnUiThread {
+            for (candidate in candidates)
+                addTableRow(candidate)
         }
     }
 
@@ -184,18 +149,23 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        app!!.api.getPhotos(candidate.userId).enqueue(object : SimpleCallback<PhotosResponse>() {
-            override fun handleResponse(response: Response<PhotosResponse>) {
-                val body = response.body()
-
-                if (body != null && body.totalPhotos > 0) {
-                    GlideApp.with(this@CandidateAllFragment)
-                        .load(body.photos?.get(0)?.thumbnailUrl)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
-                }
+        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+            it.photos?.firstOrNull()?.let {
+                GlideApp.with(this@CandidateAllFragment)
+                    .load(it.thumbnailUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(candidateProfileView)
             }
-        })
+        }
+
+        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+            it.photos?.firstOrNull()?.let {
+                GlideApp.with(this@CandidateAllFragment)
+                    .load(it.thumbnailUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(candidateProfileView)
+            }
+        }
 
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
@@ -213,11 +183,8 @@ class CandidateAllFragment : Fragment() {
         }
 
         candidateProfileImage.setOnClickListener {
-            val args = Bundle()
-            args.putParcelable(FRAGMENT_EXTRA_USER, candidate)
-
             val profileFragment = ProfileOverviewFragment()
-            profileFragment.arguments = args
+            profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to candidate)
 
             childFragmentManager
                 .beginTransaction()
@@ -239,16 +206,12 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        app!!.api.getTicket(candidate.ticketId).enqueue(object : SimpleCallback<Ticket>() {
-            override fun handleResponse(response: Response<Ticket>) {
-                val ticket = response.body()
-
-                if (ticket != null) {
-                    textViewParty.text = ticket.code
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
-                }
+        app?.api?.getTicket(candidate.ticketId)?.onSuccess {
+            it.let { ticket ->
+                textViewParty.text = ticket.code
+                textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
             }
-        })
+        }
 
         val rect = RectShape()
         val rectShapeDrawable = ShapeDrawable(rect)
@@ -294,14 +257,9 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app!!.api.getPosition(candidate.positionId).enqueue(object : SimpleCallback<Position>() {
-            override fun handleResponse(response: Response<Position>) {
-                val position = response.body()
-                if (position != null) {
-                    textViewPosition.text = position.name
-                }
-            }
-        })
+        app!!.api.getPosition(candidate.positionId).onSuccess {
+            textViewPosition.text = it.name
+        }
 
         val dividerView = View(activity)
         dividerView.apply {

@@ -1,14 +1,19 @@
 package com.eulersbridge.isegoria.util.transformation
 
 import android.graphics.*
+import android.support.annotation.IntRange
+import android.support.annotation.Px
+import androidx.graphics.applyCanvas
+import androidx.graphics.toXfermode
 import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.eulersbridge.isegoria.APP_ID
 import java.security.MessageDigest
 
-class RoundedCornersTransformation(// Radius of rounded corners in DP
-    private val cornerRadius: Int
+class RoundedCornersTransformation(
+    // Radius of rounded corners in DP
+    @IntRange(from = 1) private val cornerRadius: Int
 ) : BitmapTransformation() {
 
     companion object {
@@ -18,7 +23,7 @@ class RoundedCornersTransformation(// Radius of rounded corners in DP
         var screenDensity = 2.0f
     }
 
-    constructor() : this(0)
+    constructor() : this(1)
 
     override fun transform(
         pool: BitmapPool,
@@ -28,20 +33,19 @@ class RoundedCornersTransformation(// Radius of rounded corners in DP
     ): Bitmap {
         val bitmap = pool.get(outWidth, outHeight, Bitmap.Config.ARGB_8888)
 
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.DITHER_FLAG)
-        paint.color = Color.BLACK
+        return bitmap.applyCanvas {
+            val rect = RectF(0f, 0f, outWidth.toFloat(), outHeight.toFloat())
+            @Px val cornerRadiusPx = Math.round(cornerRadius.toFloat() * screenDensity)
 
-        val canvas = Canvas(bitmap)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.DITHER_FLAG)
+            paint.color = Color.BLACK
 
-        val rect = RectF(0f, 0f, outWidth.toFloat(), outHeight.toFloat())
-        val cornerRadiusPx = Math.round(cornerRadius.toFloat() * screenDensity)
+            drawRoundRect(rect, cornerRadiusPx.toFloat(), cornerRadiusPx.toFloat(), paint)
 
-        canvas.drawRoundRect(rect, cornerRadiusPx.toFloat(), cornerRadiusPx.toFloat(), paint)
+            paint.xfermode = PorterDuff.Mode.SRC_IN.toXfermode()
 
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(toTransform, 0f, 0f, paint)
-
-        return bitmap
+            drawBitmap(toTransform, 0f, 0f, paint)
+        }
     }
 
     override fun equals(other: Any?) = other is RoundedCornersTransformation

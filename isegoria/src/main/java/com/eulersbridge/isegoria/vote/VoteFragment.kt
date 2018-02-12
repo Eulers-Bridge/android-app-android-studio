@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria.vote
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -18,6 +17,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.VoteLocation
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.vote_fragment.*
 import java.util.*
@@ -74,18 +74,18 @@ class VoteFragment : Fragment(), TitledFragment {
                         context,
                         { _, hourOfDay, minute ->
 
-                            val updatedCalendar = viewModel.dateTime.value
+                            viewModel.dateTime.value?.also {
+                                it.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                                it.set(Calendar.MINUTE, minute)
 
-                            updatedCalendar!!.set(Calendar.HOUR_OF_DAY, hourOfDay)
-                            updatedCalendar.set(Calendar.MINUTE, minute)
-
-                            viewModel.dateTime.value = updatedCalendar
+                                viewModel.dateTime.value = it
+                            }
                         },
                         calendar.get(Calendar.HOUR_OF_DAY),
                         calendar.get(Calendar.MINUTE),
                         DateFormat.is24HourFormat(context)
                     )
-                    openDialog!!.show()
+                    openDialog?.show()
                 }
             }
         }
@@ -99,27 +99,27 @@ class VoteFragment : Fragment(), TitledFragment {
                         context!!,
                         { _, year, monthOfYear, dayOfMonth ->
 
-                            val updatedCalendar = viewModel.dateTime.value
+                            viewModel.dateTime.value?.also {
+                                it.set(Calendar.YEAR, year)
+                                it.set(Calendar.MONTH, monthOfYear)
+                                it.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                            updatedCalendar!!.set(Calendar.YEAR, year)
-                            updatedCalendar.set(Calendar.MONTH, monthOfYear)
-                            updatedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-
-                            viewModel.dateTime.value = updatedCalendar
+                                viewModel.dateTime.value = it
+                            }
                         },
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH)
                     )
 
-                    val election = viewModel.electionData?.value
-                    if (election != null && election.startVoting < election.endVoting) {
+                    val election = viewModel.electionData?.value?.takeIf { it.startVoting < it.endVoting }
+                    if (election != null) {
                         datePickerDialog.datePicker.minDate = election.startVoting
                         datePickerDialog.datePicker.maxDate = election.endVoting
                     }
 
                     openDialog = datePickerDialog
-                    openDialog!!.show()
+                    openDialog?.show()
                 }
             }
         }
@@ -128,22 +128,22 @@ class VoteFragment : Fragment(), TitledFragment {
     }
 
     private fun createViewModelObservers() {
-        viewModel.dateTime.observe(this, Observer { calendar ->
-            calendar?.let {
+        observe(viewModel.dateTime) {
+            it?.let {
                 updateDateLabel(dateTextView, it)
                 updateTimeLabel(timeTextView, it)
             }
-        })
+        }
 
-        viewModel.getVoteLocations().observe(this, Observer { locations ->
+        observe(viewModel.getVoteLocations()) { locations ->
             if (locations != null)
                 voteLocationArrayAdapter.addAll(locations)
-        })
+        }
 
-        viewModel.getElection().observe(this, Observer {
+        observe(viewModel.getElection()) {
             dateTextView.isEnabled = true
             timeTextView.isEnabled = true
-        })
+        }
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.vote_tab_1)

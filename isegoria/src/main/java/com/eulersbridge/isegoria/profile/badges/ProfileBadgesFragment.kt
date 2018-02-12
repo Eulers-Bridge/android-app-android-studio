@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.profile.badges
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -11,6 +10,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.MemoryCategory
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.ProfileViewModel
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.profile_badges_fragment.*
@@ -29,8 +29,9 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
 
         viewModel = ViewModelProviders.of(parentFragment!!).get(ProfileViewModel::class.java)
 
-        if (arguments != null)
-            viewModel.setTargetBadgeLevel(arguments!!.getInt("level"))
+        arguments?.getInt("level")?.let {
+            viewModel.setTargetBadgeLevel(it)
+        }
 
         Glide.get(context!!).setMemoryCategory(MemoryCategory.HIGH)
 
@@ -45,22 +46,21 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
             setItemViewCacheSize(21)
         }
 
-        viewModel.user.observe(this, Observer {
-            if (it != null)
-                getBadges()
-        })
+        observe(viewModel.user) {
+            if (it != null) getBadges()
+        }
     }
 
     private fun getBadges() {
-        viewModel.getRemainingBadges(true)?.observe(this, Observer { remainingBadges ->
+        observe(viewModel.getRemainingBadges(true)) { remainingBadges ->
             if (remainingBadges != null)
                 badgeAdapter.replaceRemainingItems(remainingBadges)
-        })
+        }
 
-        viewModel.getCompletedBadges()?.observe(this, Observer { completedBadges ->
+        observe(viewModel.getCompletedBadges()) { completedBadges ->
             if (completedBadges != null)
                 badgeAdapter.replaceCompletedItems(completedBadges)
-        })
+        }
     }
 
     override fun onDetach() {

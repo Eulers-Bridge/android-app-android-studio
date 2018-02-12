@@ -1,13 +1,13 @@
 package com.eulersbridge.isegoria.profile
 
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.Px
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.util.TypedValue
@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Task
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.profile_task_progress_fragment.*
 
@@ -36,10 +37,10 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
         viewModel = ViewModelProviders.of(parentFragment!!).get(ProfileViewModel::class.java)
 
-        viewModel.totalXp.observe(this, Observer {
+        observe(viewModel.totalXp) {
             if (it != null)
                 setLevel(it)
-        })
+        }
 
         return rootView
     }
@@ -57,15 +58,15 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
     }
 
     private fun fetchTasks() {
-        viewModel.getRemainingTasks()?.observe(this, Observer { remainingTasks ->
+        observe(viewModel.getRemainingTasks()) { remainingTasks ->
             if (remainingTasks != null)
                 setRemainingTasks(remainingTasks)
-        })
+        }
 
-        viewModel.getCompletedTasks()?.observe(this, Observer { completedTasks ->
+        observe(viewModel.getCompletedTasks()) { completedTasks ->
             if (completedTasks != null)
                 completedAdapter.setItems(completedTasks)
-        })
+        }
     }
 
     override fun onDetach() {
@@ -88,32 +89,27 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
     @UiThread
     private fun setLevel(totalXp: Long) {
-        if (activity != null) {
-            activity!!.runOnUiThread {
-                val level = totalXp.toInt() / 1000 + 1
+        activity?.runOnUiThread {
+            val level = totalXp.toInt() / 1000 + 1
 
-                levelTextView.text = getString(R.string.profile_tasks_progress_level, level)
+            levelTextView.text = getString(R.string.profile_tasks_progress_level, level)
 
-                var nextLevelPoints = totalXp.toInt() + 500
-                nextLevelPoints /= 1000
-                nextLevelPoints *= 1000
+            var nextLevelPoints = totalXp.toInt() + 500
+            if (nextLevelPoints == 0) nextLevelPoints = 1000
 
-                if (nextLevelPoints == 0) nextLevelPoints = 1000
+            progressBar.max = nextLevelPoints
 
-                progressBar.max = nextLevelPoints
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    progressBar.setProgress(totalXp.toInt(), true)
-                } else {
-                    progressBar.progress = totalXp.toInt()
-                }
-
-                descriptionTextView.text = getString(
-                    R.string.profile_tasks_progress_description,
-                    totalXp,
-                    nextLevelPoints
-                )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                progressBar.setProgress(totalXp.toInt(), true)
+            } else {
+                progressBar.progress = totalXp.toInt()
             }
+
+            descriptionTextView.text = getString(
+                R.string.profile_tasks_progress_description,
+                totalXp,
+                nextLevelPoints
+            )
         }
     }
 
@@ -122,10 +118,10 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
             remainingAdapter.setItems(remainingTasks)
 
             // Calculate rough new list view size to 'autosize' it
-            activity!!.runOnUiThread {
+            activity?.runOnUiThread {
                 val heightDp = 44 * remainingTasks.size
 
-                val heightPx = Math.round(
+                @Px val heightPx = Math.round(
                     TypedValue.applyDimension(
                         TypedValue.COMPLEX_UNIT_DIP, heightDp.toFloat(), resources.displayMetrics
                     )

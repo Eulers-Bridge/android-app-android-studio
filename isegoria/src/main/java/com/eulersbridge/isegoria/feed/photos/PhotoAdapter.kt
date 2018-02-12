@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_PHOTOS
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_PHOTOS_POSITION
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
@@ -14,6 +12,7 @@ internal class PhotoAdapter : LoadingAdapter<Photo, PhotoViewHolder>(0), PhotoVi
 
     override fun onClick(context: Context, position: Int) {
         val activityIntent = Intent(context, PhotoDetailActivity::class.java)
+
         activityIntent.also {
             it.putParcelableArrayListExtra(ACTIVITY_EXTRA_PHOTOS, items)
             it.putExtra(ACTIVITY_EXTRA_PHOTOS_POSITION, position)

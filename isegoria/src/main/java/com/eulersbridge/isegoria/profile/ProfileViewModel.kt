@@ -7,10 +7,9 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.models.*
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.network.SimpleCallback
-import retrofit2.Response
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -74,14 +73,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
         val app = getApplication<IsegoriaApp>()
 
-        app.api.getContact(email).enqueue(object : SimpleCallback<Contact>() {
-            override fun handleResponse(response: Response<Contact>) {
-                response.body()?.let { contact ->
-                    contactsCount.value = contact.contactsCount
-                    totalTasksCount.value = contact.totalTasksCount
-                }
-            }
-        })
+        app.api.getContact(email).onSuccess {
+            contactsCount.value = it.contactsCount
+            totalTasksCount.value = it.totalTasksCount
+        }
     }
 
     private fun getUser(): User? {
@@ -232,7 +227,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
 
                 userPhoto = Transformations.switchMap(photosRequest) {
-                    SingleLiveData(it?.photos?.get(0))
+                    SingleLiveData(it?.photos?.firstOrNull())
                 }
 
                 return@switchMap userPhoto

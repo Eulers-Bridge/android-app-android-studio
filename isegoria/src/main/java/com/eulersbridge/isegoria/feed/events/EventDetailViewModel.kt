@@ -4,9 +4,9 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
-
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.Position
@@ -18,7 +18,7 @@ class EventDetailViewModel(application: Application) : AndroidViewModel(applicat
     internal val event = MutableLiveData<Event>()
 
     // Make event 1 hour long (add an hour in in milliseconds to event start)
-    internal val addToCalendarIntent: Intent?
+    private val addToCalendarIntent: Intent?
         get() {
             val event = event.value ?: return null
 
@@ -43,5 +43,12 @@ class EventDetailViewModel(application: Application) : AndroidViewModel(applicat
 
     internal fun getPosition(positionId: Long): LiveData<Position>
             = RetrofitLiveData(app.api.getPosition(positionId))
+
+    internal fun addToCalendar(context: Context) {
+        addToCalendarIntent?.let {
+            if (it.resolveActivity(context.packageManager) != null)
+                context.startActivity(it)
+        }
+    }
 
 }

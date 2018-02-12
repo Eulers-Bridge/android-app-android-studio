@@ -26,8 +26,9 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
     init {
 
         itemView.setOnClickListener {
-            if (item != null)
-                clickListener?.onClick(item!!, adapterPosition)
+            item?.let {
+                clickListener?.onClick(it, adapterPosition)
+            }
         }
 
         imageView = itemView.findViewById(R.id.poll_vote_option_list_item_image_view)

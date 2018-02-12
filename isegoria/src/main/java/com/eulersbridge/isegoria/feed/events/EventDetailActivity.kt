@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.feed.events
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
 import android.graphics.Paint
@@ -13,6 +12,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.os.bundleOf
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
@@ -42,7 +42,7 @@ class EventDetailActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this).get(EventDetailViewModel::class.java)
 
         backButton.setOnClickListener { onBackPressed() }
-        addToCalendarButton.setOnClickListener { addToCalendar() }
+        addToCalendarButton.setOnClickListener { viewModel.addToCalendar(this) }
 
         val event = intent.getParcelableExtra<Event>(ACTIVITY_EXTRA_EVENT)
         viewModel.event.value = event
@@ -71,13 +71,6 @@ class EventDetailActivity : AppCompatActivity() {
                 addCandidate(it)
             }
         }
-    }
-
-    private fun addToCalendar() {
-        val intent = viewModel.addToCalendarIntent
-
-        if (intent?.resolveActivity(packageManager) != null)
-            startActivity(intent)
     }
 
     private fun addCandidate(email: String) {
@@ -152,7 +145,7 @@ class EventDetailActivity : AppCompatActivity() {
         }
 
         GlideApp.with(this)
-            .load(user!!.profilePhotoURL)
+            .load(user?.profilePhotoURL)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(candidateProfileView)
 
@@ -170,12 +163,8 @@ class EventDetailActivity : AppCompatActivity() {
             setImageResource(R.drawable.profilelight)
             setPadding(10, 0, 10, 0)
             setOnClickListener {
-
-                val args = Bundle()
-                args.putInt(FRAGMENT_EXTRA_PROFILE_ID, userId)
-
                 val profileFragment = ProfileOverviewFragment()
-                profileFragment.arguments = args
+                profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to userId)
 
                 supportFragmentManager.beginTransaction()
                     .setReorderingAllowed(true)
@@ -200,14 +189,13 @@ class EventDetailActivity : AppCompatActivity() {
             )
         }
 
-        viewModel.getTicket(ticketId.toLong()).observe(this, Observer { ticket ->
-            if (ticket != null) {
+        observe(viewModel.getTicket(ticketId.toLong())) {
+            if (it != null)
                 textViewParty.apply {
-                    text = ticket.code
-                    setBackgroundColor(Color.parseColor(ticket.getColour()))
+                    text = it.code
+                    setBackgroundColor(Color.parseColor(it.getColour()))
                 }
-            }
-        })
+        }
 
         val rect = RectShape()
         val rectShapeDrawable = ShapeDrawable(rect)
@@ -244,9 +232,9 @@ class EventDetailActivity : AppCompatActivity() {
             gravity = Gravity.START
         }
 
-        viewModel.getPosition(positionId.toLong()).observe(this, Observer {
+        observe(viewModel.getPosition(positionId.toLong())) {
             textViewPosition.text = it?.name
-        })
+        }
 
         val dividerView = View(this)
         dividerView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)

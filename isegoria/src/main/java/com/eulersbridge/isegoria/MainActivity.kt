@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria
 
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.content.pm.ShortcutManager
 import android.os.Build
@@ -15,11 +14,12 @@ import android.support.v4.app.FragmentManager
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import com.eulersbridge.isegoria.auth.AuthActivity
+import androidx.content.systemService
 import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment
+import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity
 import com.eulersbridge.isegoria.poll.PollsFragment
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -30,15 +30,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.main_partial_appbar.*
 import java.util.*
 
+
+
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
     FragmentManager.OnBackStackChangedListener {
 
     private var tabFragmentsStack: ArrayDeque<Fragment> = ArrayDeque(4)
     private val currentFragment: Fragment?
-        get() = if (tabFragmentsStack.size == 0) null else tabFragmentsStack.peekFirst()
+        get() = tabFragmentsStack.peekFirst() ?: null
 
     private val navigationView: BottomNavigationViewEx
         get() = navigation
+
+    private var loginActionsComplete = false
 
     interface TabbedFragment {
         fun setupTabLayout(tabLayout: TabLayout)
@@ -56,11 +60,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         val application = applicationContext as IsegoriaApp
         setupApplicationObservers(application)
-
-        application.login().observe(this, Observer { success ->
-            if (success == true)
-                onLoginSuccess()
-        })
     }
 
     private fun setupNavigation() {
@@ -77,8 +76,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private fun setupApplicationObservers(application: IsegoriaApp) {
-        application.loggedInUser.observe(this, Observer { user ->
-            val userLoggedOut = user == null
+        observe(application.loggedInUser) {
+            val userLoggedOut = it == null
 
             if (userLoggedOut) {
                 finish()
@@ -86,31 +85,37 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             } else {
                 onLoginSuccess()
             }
-        })
+        }
 
-        application.loginVisible.observe(this, Observer {
-            if (it == true)
-                startActivity(Intent(this, AuthActivity::class.java))
-        })
-
-        application.userVerificationVisible.observe(this, Observer {
+        observe(application.userVerificationVisible) {
             if (it == true)
                 presentRootContent(EmailVerificationFragment())
-        })
+        }
 
-        application.friendsVisible.observe(this, Observer {
+        observe(application.friendsVisible) {
             if (it == true)
                 showFriends()
-        })
+        }
     }
 
-    private fun onLoginSuccess() = navigationView.apply {
-        if (!isEnabled) {
-            isEnabled = true
+    private fun onLoginSuccess() {
+        if (loginActionsComplete)
+            return
 
-            if (!handleAppShortcutIntent())
-                selectedItemId = R.id.navigation_feed
+        navigationView.apply {
+            if (!isEnabled) {
+                isEnabled = true
+
+                if (!handleAppShortcutIntent())
+                    selectedItemId = R.id.navigation_feed
+            }
         }
+
+        loginActionsComplete = true
+
+        val app = application as IsegoriaApp
+        if (app.loggedInUser.value?.hasPersonality == false)
+            startActivity(Intent(this, PersonalityQuestionsActivity::class.java))
     }
 
     @SuppressLint("NewApi")
@@ -133,7 +138,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 }
 
                 if (handledShortcut) {
-                    val shortcutManager: ShortcutManager = getSystemService(ShortcutManager::class.java)
+                    val shortcutManager: ShortcutManager = systemService<ShortcutManager>()
                     shortcutManager.reportShortcutUsed(it)
                 }
             }
@@ -159,8 +164,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         } else if (tabFragmentsStack.size == 1) {
             // Return to launcher
             val launcherAction = Intent(Intent.ACTION_MAIN)
-            launcherAction.addCategory(Intent.CATEGORY_HOME)
-            launcherAction.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            launcherAction.apply {
+                addCategory(Intent.CATEGORY_HOME)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
             startActivity(launcherAction)
         }
     }
@@ -168,11 +176,11 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onBackStackChanged() {
         val canGoBack = supportFragmentManager.backStackEntryCount > 0
 
-        supportActionBar?.let {
+        supportActionBar?.apply {
             /* When a fragment is added to the stack, show the back button in the app bar,
                as the user can navigate back to a previous fragment. */
-            it.setDisplayHomeAsUpEnabled(canGoBack)
-            it.setDisplayShowHomeEnabled(canGoBack)
+            setDisplayHomeAsUpEnabled(canGoBack)
+            setDisplayShowHomeEnabled(canGoBack)
         }
 
         updateAppBarState()

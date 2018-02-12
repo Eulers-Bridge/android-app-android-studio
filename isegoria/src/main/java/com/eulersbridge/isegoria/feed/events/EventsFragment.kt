@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.feed.events
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -8,8 +7,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.postDelayed
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Event
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.events_fragment.*
 
@@ -33,7 +34,7 @@ class EventsFragment : Fragment(), TitledFragment {
             refresh()
 
             refreshLayout.isRefreshing = true
-            refreshLayout.postDelayed({ refreshLayout.isRefreshing = false }, 7000)
+            refreshLayout.postDelayed(7000) { refreshLayout.isRefreshing = false }
         }
 
         refresh()
@@ -42,9 +43,9 @@ class EventsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "Events"
 
     private fun refresh() {
-        viewModel.getEvents().observe(this, Observer {
+        observe(viewModel.getEvents()) {
             setEvents(it)
-        })
+        }
     }
 
     private fun setEvents(events: List<Event>?) {

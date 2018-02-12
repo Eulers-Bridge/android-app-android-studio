@@ -61,14 +61,10 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     internal fun hideSearch() {
         searchSectionVisible.value = false
 
-        val haveSentRequests =
-            sentFriendRequests?.value != null && sentFriendRequests!!.value!!.isNotEmpty()
-
+        val haveSentRequests: Boolean = sentFriendRequests?.value?.isNotEmpty() ?: false
         sentRequestsVisible.value = haveSentRequests
 
-        val haveReceivedRequests =
-            receivedFriendRequests?.value != null && receivedFriendRequests!!.value!!.isNotEmpty()
-
+        val haveReceivedRequests: Boolean = receivedFriendRequests?.value?.isNotEmpty() ?: false
         receivedRequestsVisible.value = haveReceivedRequests
 
         friendsVisible.value = true

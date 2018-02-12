@@ -32,7 +32,7 @@ internal class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     fun loadItemImage(itemId: Long, imageUrl: String) {
-        if (item?.id == itemId)
+        if (item?.id == itemId && imageView.context != null)
             GlideApp.with(imageView.context)
                     .load(imageUrl)
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

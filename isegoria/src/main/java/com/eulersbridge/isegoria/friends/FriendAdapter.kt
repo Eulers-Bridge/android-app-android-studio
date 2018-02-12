@@ -25,8 +25,9 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
     }
 
     override fun onViewClick(user: GenericUser?) {
-        if (user != null)
-            delegate?.onContactClick((user as Contact?)!!)
+        (user as? Contact)?.let {
+            delegate?.onContactClick(it)
+        }
     }
 
     override fun onActionClick(user: GenericUser?) = onViewClick(user)
@@ -42,9 +43,9 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
         val item = items[position]
         holder.setItem(item)
 
-        if (item.institutionId != null) {
+        item.institutionId?.let {
             val weakViewHolder = WeakReference(holder)
-            delegate?.getContactInstitution(item.institutionId!!, weakViewHolder)
+            delegate?.getContactInstitution(it, weakViewHolder)
         }
     }
 
@@ -56,8 +57,9 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
         institution: Institution?,
         weakViewHolder: WeakReference<UserViewHolder>
     ) {
-        if (institution != null)
-            weakViewHolder.get()?.setInstitution(institution)
+        institution?.let {
+            weakViewHolder.get()?.setInstitution(it)
+        }
     }
 
     internal fun setItems(newItems: List<Contact>) {

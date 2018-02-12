@@ -79,19 +79,22 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
     }
 
     fun setInstitution(institution: Institution?, weakViewHolder: WeakReference<UserViewHolder>) {
-        if (institution != null)
-            weakViewHolder.get()?.setInstitution(institution)
+        institution?.let {
+            weakViewHolder.get()?.setInstitution(it)
+        }
     }
 
     override fun getItemCount() = items.size
 
     override fun onViewClick(user: GenericUser?) {
-        if (user != null)
-            delegate?.onSearchedUserClick(user as User?)
+        (user as? User)?.let {
+            delegate?.onSearchedUserClick(it)
+        }
     }
 
     override fun onActionClick(user: GenericUser?) {
-        if (user != null)
-            delegate?.onSearchedUserActionClick(user as User?)
+        (user as? User)?.let {
+            delegate?.onSearchedUserActionClick(it)
+        }
     }
 }

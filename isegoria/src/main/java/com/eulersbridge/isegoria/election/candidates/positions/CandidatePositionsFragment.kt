@@ -9,34 +9,15 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Election
 import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.util.network.SimpleCallback
+import com.eulersbridge.isegoria.onSuccess
 import kotlinx.android.synthetic.main.election_positions_fragment.*
-import retrofit2.Response
 
 class CandidatePositionsFragment : Fragment() {
 
     private var api: API? = null
     private val adapter: PositionAdapter by lazy {
         PositionAdapter(this, api)
-    }
-
-    private val electionsCallback = object : SimpleCallback<List<Election>>() {
-        override fun handleResponse(response: Response<List<Election>>) {
-            val elections = response.body()
-            if (elections != null && elections.isNotEmpty()) {
-                val (id) = elections[0]
-
-                api!!.getElectionPositions(id).enqueue(positionsCallback)
-            }
-        }
-    }
-
-    private val positionsCallback = object : SimpleCallback<List<Position>>() {
-        override fun handleResponse(response: Response<List<Position>>) {
-            response.body()?.let { positions -> setPositions(positions) }
-        }
     }
 
     override fun onCreateView(
@@ -60,7 +41,14 @@ class CandidatePositionsFragment : Fragment() {
         val app = activity?.application as IsegoriaApp?
 
         app?.loggedInUser?.value?.institutionId?.let { institutionId ->
-            api?.getElections(institutionId)?.enqueue(electionsCallback)
+            api?.getElections(institutionId)?.onSuccess { elections ->
+
+                elections.firstOrNull()?.also {
+                    api?.getElectionPositions(it.id)?.onSuccess { positions ->
+                        setPositions(positions)
+                    }
+                }
+            }
         }
     }
 

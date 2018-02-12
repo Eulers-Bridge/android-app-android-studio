@@ -12,16 +12,14 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
+import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.models.Candidate
-import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.network.api.models.Ticket
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
-import com.eulersbridge.isegoria.util.network.SimpleCallback
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
-import retrofit2.Response
 
 class CandidatePositionFragment : Fragment() {
     private var dpWidth: Float = 0.toFloat()
@@ -36,31 +34,28 @@ class CandidatePositionFragment : Fragment() {
         val rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false)
 
         val position =
-            arguments!!.getParcelable<Position>(FRAGMENT_EXTRA_CANDIDATE_POSITION)
+            arguments?.getParcelable<Position>(FRAGMENT_EXTRA_CANDIDATE_POSITION)
 
-        val displayMetrics = activity!!.resources.displayMetrics
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density
+        activity?.resources?.displayMetrics?.let {
+            dpWidth = it.widthPixels / it.density
+        }
 
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         app = activity?.application as IsegoriaApp
 
-        app?.api?.getPositionCandidates(position.id)
-            ?.enqueue(object : SimpleCallback<List<Candidate>>() {
-                public override fun handleResponse(response: Response<List<Candidate>>) {
-                    response.body()?.let { candidates -> addCandidates(candidates)}
-                }
-            })
+        position?.id?.let { positionId ->
+            app?.api?.getPositionCandidates(positionId)?.onSuccess { candidates ->
+                addCandidates(candidates)
+            }
+        }
 
         return rootView
     }
 
     private fun addCandidates(candidates: List<Candidate>?) {
-        if (activity != null && candidates!!.isNotEmpty()) {
-            activity!!.runOnUiThread {
-                for (candidate in candidates)
-                    addTableRow(candidate)
-            }
+        activity?.runOnUiThread {
+            candidates?.forEach { addTableRow(it) }
         }
     }
 
@@ -92,17 +87,12 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        app!!.api.getPhoto(candidate.userId).enqueue(object : SimpleCallback<Photo>() {
-            override fun handleResponse(response: Response<Photo>) {
-                val photo = response.body()
-                if (photo != null) {
-                    GlideApp.with(this@CandidatePositionFragment)
-                        .load(photo.thumbnailUrl)
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
-                }
-            }
-        })
+        app?.api?.getPhoto(candidate.userId)?.onSuccess {
+            GlideApp.with(this@CandidatePositionFragment)
+                .load(it.thumbnailUrl)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(candidateProfileView)
+        }
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -117,11 +107,8 @@ class CandidatePositionFragment : Fragment() {
             setPadding(paddingMargin, 0, paddingMargin, 0)
             setOnClickListener {
 
-                val args = Bundle()
-                args.putLong(FRAGMENT_EXTRA_PROFILE_ID, candidate.userId)
-
                 val profileOverviewFragment = ProfileOverviewFragment()
-                profileOverviewFragment.arguments = args
+                profileOverviewFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to candidate.userId)
 
                 childFragmentManager
                     .beginTransaction()
@@ -144,14 +131,10 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        app!!.api.getTicket(candidate.ticketId).enqueue(object : SimpleCallback<Ticket>() {
-            override fun handleResponse(response: Response<Ticket>) {
-                response.body()?.let { ticket ->
-                    textViewParty.text = ticket.code
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
-                }
-            }
-        })
+        app?.api?.getTicket(candidate.ticketId)?.onSuccess {
+            textViewParty.text = it.code
+            textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
+        }
 
         val imageSize2 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -184,13 +167,9 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app!!.api.getPosition(candidate.positionId).enqueue(object : SimpleCallback<Position>() {
-            public override fun handleResponse(response: Response<Position>) {
-                response.body()?.let { position ->
-                    textViewPosition.text = position.name
-                }
-            }
-        })
+        app?.api?.getPosition(candidate.positionId)?.onSuccess {
+            textViewPosition.text = it.name
+        }
 
         val dividerView = View(activity)
         dividerView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)

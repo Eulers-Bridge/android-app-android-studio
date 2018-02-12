@@ -7,22 +7,16 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
-import com.eulersbridge.isegoria.BuildConfig
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.SNS_PLATFORM_APPLICATION_ARN
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
-import com.eulersbridge.isegoria.isNetworkAvailable
 import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
 import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter
 import com.eulersbridge.isegoria.network.adapters.TimestampAdapter
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.ClientInstitution
-import com.eulersbridge.isegoria.network.api.models.Institution
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.responses.LoginResponse
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.network.SimpleCallback
 import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.moshi.Moshi
 import okhttp3.Cache
@@ -67,6 +61,10 @@ class NetworkService(private val application: IsegoriaApp) {
 
     internal var email: String? = null
     internal var password: String? = null
+
+    init {
+        setup()
+    }
 
     private fun setup() {
         if (needsSetup) {
@@ -145,31 +143,26 @@ class NetworkService(private val application: IsegoriaApp) {
     fun updateAPIBaseURL(user: User) {
         user.institutionId?.let { institutionId ->
 
-            api.getInstitution(institutionId).enqueue(object : SimpleCallback<Institution>() {
-                override fun handleResponse(response: retrofit2.Response<Institution>) {
-                    response.body()?.getName()?.let { institutionName ->
+            api.getInstitution(institutionId).onSuccess {
+                it.getName()?.let { institutionName ->
 
-                        api.getInstitutionURLs()
-                            .enqueue(object : SimpleCallback<List<ClientInstitution>>() {
-                                override fun handleResponse(response: retrofit2.Response<List<ClientInstitution>>) {
-                                    val institution = response.body()?.singleOrNull {
-                                        it.name == institutionName && !it.apiRoot.isNullOrBlank()
-                                    }
+                    api.getInstitutionURLs().onSuccess { urls ->
+                        val institution = urls.singleOrNull {
+                            it.name == institutionName && !it.apiRoot.isNullOrBlank()
+                        }
 
-                                    institution?.let {
-                                        apiBaseURL = it.apiRoot!! + "api/"
+                        institution?.let {
+                            apiBaseURL = it.apiRoot!! + "api/"
 
-                                        // Recreate the API with the new base URL
-                                        //createAPI(institution.apiRoot);
-                                        createAPI()
+                            // Recreate the API with the new base URL
+                            //createAPI(institution.apiRoot);
+                            createAPI()
 
-                                        application.setLoggedInUser(user, password!!)
-                                    }
-                                }
-                            })
+                            application.setLoggedInUser(user, password!!)
+                        }
                     }
                 }
-            })
+            }
         }
     }
 
@@ -194,14 +187,14 @@ class NetworkService(private val application: IsegoriaApp) {
     fun signUp(user: SignUpUser): LiveData<Boolean> {
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("email", email!!)
+            .addFormDataPart("email", user.email)
             .addFormDataPart("givenName", user.givenName)
             .addFormDataPart("familyName", user.familyName)
             .addFormDataPart("gender", user.gender)
             .addFormDataPart("nationality", user.nationality)
             .addFormDataPart("yearOfBirth", user.yearOfBirth)
             .addFormDataPart("accountVerified", user.accountVerified.toString())
-            .addFormDataPart("password", password!!)
+            .addFormDataPart("password", user.password!!)
             .addFormDataPart("institutionId", user.institutionId.toString())
             .addFormDataPart("hasPersonality", user.hasPersonality.toString())
             .build()

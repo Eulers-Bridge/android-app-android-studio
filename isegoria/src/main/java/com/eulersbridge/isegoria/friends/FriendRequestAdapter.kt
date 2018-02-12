@@ -87,18 +87,21 @@ internal class FriendRequestAdapter(
         institutionId: Long?,
         weakViewHolder: WeakReference<RecyclerView.ViewHolder>
     ) {
-        if (institutionId != null)
-            delegate.getFriendRequestInstitution(institutionId, itemType, weakViewHolder)
+        institutionId?.let {
+            delegate.getFriendRequestInstitution(it, itemType, weakViewHolder)
+        }
     }
 
     override fun onClick(friendRequest: FriendRequest?) {
-        if (friendRequest != null)
-            delegate.performFriendRequestAction(itemType, friendRequest)
+        friendRequest?.let {
+            delegate.performFriendRequestAction(itemType, it)
+        }
     }
 
     override fun onActionClick(friendRequest: FriendRequest?) {
-        if (friendRequest != null)
-            delegate.performFriendRequestAction(itemType, friendRequest)
+        friendRequest?.let {
+            delegate.performFriendRequestAction(itemType, it)
+        }
     }
 
     fun setInstitution(

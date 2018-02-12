@@ -16,25 +16,17 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
+import androidx.os.bundleOf
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Candidate
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.network.api.models.Ticket
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
-import com.eulersbridge.isegoria.util.network.IgnoredCallback
-import com.eulersbridge.isegoria.util.network.SimpleCallback
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.*
-import retrofit2.Response
 
 class CandidateTicketDetailFragment : Fragment() {
 
@@ -68,8 +60,9 @@ class CandidateTicketDetailFragment : Fragment() {
             partyLogo = it.getString("Logo")
         }
 
-        val displayMetrics = activity!!.resources.displayMetrics
-        dpWidth = displayMetrics.widthPixels / displayMetrics.density
+        activity?.resources?.displayMetrics?.let {
+            dpWidth = it.widthPixels / it.density
+        }
 
         GlideApp.with(this)
             .load(R.drawable.birmingham)
@@ -86,42 +79,30 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        app = activity!!.application as IsegoriaApp
-        app!!.api.getTicketCandidates(ticketId).enqueue(object : SimpleCallback<List<Candidate>>() {
-            public override fun handleResponse(response: Response<List<Candidate>>) {
-                response.body()?.let { candidates ->
-                    addCandidates(candidates)
+        app = activity?.application as IsegoriaApp
+        app?.api?.getTicketCandidates(ticketId)?.onSuccess { candidates ->
+            addCandidates(candidates)
+        }
+
+        app?.api?.getPhotos(ticketId)?.onSuccess {
+            it.photos?.firstOrNull()?.let {
+                GlideApp.with(this@CandidateTicketDetailFragment)
+                    .load(it.thumbnailUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(partyDetailLogoImageView)
+            }
+        }
+
+        app?.api?.getUserSupportedTickets(app!!.loggedInUser.value!!.email)?.onSuccess {
+            it.singleOrNull { ticket ->
+                ticket.id == ticketId
+
+            }?.let {
+                activity?.runOnUiThread {
+                    ticketSupportButton.text = "Unsupport"
                 }
             }
-        })
-
-        app!!.api.getPhotos(ticketId).enqueue(object : SimpleCallback<PhotosResponse>() {
-            override fun handleResponse(response: Response<PhotosResponse>) {
-                val photosResponse = response.body()
-
-                if (photosResponse != null && photosResponse.totalPhotos > 0) {
-
-                    GlideApp.with(this@CandidateTicketDetailFragment)
-                        .load(photosResponse.photos?.get(0))
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(partyDetailLogoImageView)
-                }
-            }
-        })
-
-        app!!.api.getUserSupportedTickets(app!!.loggedInUser.value!!.email)
-            .enqueue(object : SimpleCallback<List<Ticket>>() {
-                public override fun handleResponse(response: Response<List<Ticket>>) {
-
-                    response.body()?.singleOrNull { ticket ->
-                        ticket.id == ticketId
-                    }?.let {
-                        activity!!.runOnUiThread {
-                            ticketSupportButton.text = "Unsupport"
-                        }
-                    }
-                }
-            })
+        }
 
         ticketSupportButton.setOnClickListener {
 
@@ -129,7 +110,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             if (ticketSupportButton.text == "Support") {
 
-                app!!.api.supportTicket(ticketId, userEmail).enqueue(IgnoredCallback())
+                app?.api?.supportTicket(ticketId, userEmail)?.enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
@@ -137,7 +118,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             } else if (ticketSupportButton.text == "Unsupport") {
 
-                app!!.api.unsupportTicket(ticketId, userEmail).enqueue(IgnoredCallback())
+                app?.api?.unsupportTicket(ticketId, userEmail)?.enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
@@ -187,16 +168,14 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        app!!.api.getPhotos(candidate.userId).enqueue(object : SimpleCallback<PhotosResponse>() {
-            override fun handleResponse(response: Response<PhotosResponse>) {
-                val body = response.body()
-                if (body != null && body.totalPhotos > 0)
-                    GlideApp.with(this@CandidateTicketDetailFragment)
-                        .load(body.photos?.get(0))
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
+        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+            it.photos?.firstOrNull()?.let {
+                GlideApp.with(this@CandidateTicketDetailFragment)
+                    .load(it.thumbnailUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(candidateProfileView)
             }
-        })
+        }
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -211,11 +190,8 @@ class CandidateTicketDetailFragment : Fragment() {
 
             setOnClickListener {
 
-                val args = Bundle()
-                args.putLong(FRAGMENT_EXTRA_PROFILE_ID, candidate.userId)
-
                 val profileFragment = ProfileOverviewFragment()
-                profileFragment.arguments = args
+                profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to candidate.userId)
 
                 childFragmentManager
                     .beginTransaction()
@@ -275,11 +251,9 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app!!.api.getPosition(candidate.positionId).enqueue(object : SimpleCallback<Position>() {
-            public override fun handleResponse(response: Response<Position>) {
-                textViewPosition.text = response.body()?.name
-            }
-        })
+        app!!.api.getPosition(candidate.positionId).onSuccess {
+            textViewPosition.text = it.name
+        }
 
         val dividerView = View(activity)
         dividerView.apply {

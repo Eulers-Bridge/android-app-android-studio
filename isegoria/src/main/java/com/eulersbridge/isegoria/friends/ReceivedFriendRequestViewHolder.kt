@@ -40,14 +40,14 @@ internal class ReceivedFriendRequestViewHolder(
         } else {
             val user = item.requester
 
-            nameTextView.text = user!!.fullName
+            nameTextView.text = user?.fullName
             dataSource.getFriendRequestInstitution(
-                user.institutionId,
+                user?.institutionId,
                 WeakReference(this)
             )
 
             GlideApp.with(imageView.context)
-                .load(user.profilePhotoURL)
+                .load(user?.profilePhotoURL)
                 .placeholder(R.color.white)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)

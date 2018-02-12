@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.feed.news
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -9,8 +8,10 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.postDelayed
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.news_fragment.*
 
@@ -35,7 +36,7 @@ class NewsFragment : Fragment(), TitledFragment {
             setOnRefreshListener {
                 isRefreshing = true
                 refresh()
-                postDelayed({ isRefreshing = false }, 6000)
+                postDelayed(6000) { isRefreshing = false }
             }
         }
 
@@ -54,9 +55,9 @@ class NewsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "News"
 
     private fun refresh() {
-        viewModel.newsArticles.observe(this, Observer {
+        observe(viewModel.newsArticles) {
             setNewsArticles(it)
-        })
+        }
     }
 
     private fun setNewsArticles(articles: List<NewsArticle>?) {

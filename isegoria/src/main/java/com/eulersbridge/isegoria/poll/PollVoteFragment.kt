@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.poll
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,7 +10,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.ACTIVITY_EXTRA_POLL
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Poll
+import com.eulersbridge.isegoria.observe
 import kotlinx.android.synthetic.main.poll_fragment.*
 
 class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
@@ -29,11 +28,7 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
         viewModel = ViewModelProviders.of(this).get(PollViewModel::class.java)
 
-        if (arguments != null) {
-            val poll =
-                arguments!!.getParcelable<Poll>(ACTIVITY_EXTRA_POLL)
-            viewModel.poll.value = poll
-        }
+        viewModel.poll.value = arguments?.getParcelable(ACTIVITY_EXTRA_POLL)
 
         return rootView
     }
@@ -45,29 +40,29 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
     }
 
     private fun createViewModelObservers() {
-        viewModel.poll.observe(this, Observer {
+        observe(viewModel.poll) {
             if (it != null) {
                 questionTextView.text = it.question
                 populatePollOptions()
             }
-        })
+        }
 
-        viewModel.pollCreator.observe(this, Observer { creator ->
-            if (creator != null) {
+        observe(viewModel.pollCreator) {
+            if (it != null) {
                 GlideApp.with(this)
-                    .load(creator.profilePhotoURL)
+                    .load(it.profilePhotoURL)
                     .placeholder(R.color.lightGrey)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(creatorImageView)
 
                 creatorNameTextView.apply {
-                    text = getString(R.string.poll_asked_by, creator.fullName)
+                    text = getString(R.string.poll_asked_by, it.fullName)
                     visibility = View.VISIBLE
                 }
             }
-        })
+        }
 
-        viewModel.pollResults.observe(this, Observer { results ->
+        observe(viewModel.pollResults) { results ->
             results?.let {
                 val answersCount = results.size
 
@@ -77,7 +72,7 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
                 populatePollOptions()
             }
-        })
+        }
     }
 
     private fun populatePollOptions() {

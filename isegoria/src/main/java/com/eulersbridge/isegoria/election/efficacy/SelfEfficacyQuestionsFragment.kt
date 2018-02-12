@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.election.efficacy
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -10,9 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 
 class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
@@ -31,44 +30,38 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
 
         val viewModel = ViewModelProviders.of(this).get(EfficacyQuestionsViewModel::class.java)
 
-        viewModel.score1.observe(this, Observer {
-            if (it != null)
-                sliderBar1.score = it.toInt()
-        })
-        viewModel.score2.observe(this, Observer {
-            if (it != null)
-                sliderBar2.score = it.toInt()
-        })
-        viewModel.score3.observe(this, Observer {
-            if (it != null)
-                sliderBar3.score = it.toInt()
-        })
-        viewModel.score4.observe(this, Observer {
-            if (it != null)
-                sliderBar4.score = it.toInt()
-        })
+        val pairs = mapOf(
+            viewModel.score1 to sliderBar1,
+            viewModel.score2 to sliderBar2,
+            viewModel.score3 to sliderBar3,
+            viewModel.score4 to sliderBar4
+        )
+        for ((liveData, sliderBar) in pairs) {
+            observe(liveData) {
+                if (it != null)
+                    sliderBar.score = it.toInt()
+            }
+        }
 
         val doneButton = rootView.findViewById<Button>(R.id.selfEfficacyDoneButton)
-        doneButton.setOnClickListener { view ->
-            view.isEnabled = false
+        doneButton.setOnClickListener {
+            it.isEnabled = false
 
-            viewModel.addUserEfficacy().observe(this, Observer { success ->
+            observe(viewModel.addUserEfficacy()) { success ->
                 if (success == true) {
-                    if (activity != null)
-                        activity!!.supportFragmentManager.popBackStack()
+                    activity?.supportFragmentManager?.popBackStack()
 
                 } else {
-                    view.isEnabled = true
+                    it.isEnabled = true
                 }
-            })
+            }
         }
 
         return rootView
     }
 
-    override fun getTitle(context: Context?): String? {
-        return context?.getString(R.string.section_title_self_efficacy_questions)
-    }
+    override fun getTitle(context: Context?) =
+        context?.getString(R.string.section_title_self_efficacy_questions)
 
     override fun setupTabLayout(tabLayout: TabLayout) {
         tabLayout.visibility = View.GONE

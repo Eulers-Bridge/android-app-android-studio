@@ -16,15 +16,14 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
 
     internal val newsArticles: LiveData<List<NewsArticle>>
         get() {
-            if (newsArticlesList?.value != null)
-                return newsArticlesList!!
+            newsArticlesList?.takeIf { it.value != null } ?: newsArticlesList
 
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap<User, List<NewsArticle>>(app.loggedInUser) { user ->
-                if (user?.institutionId != null) {
-                    newsArticlesList = RetrofitLiveData(app.api.getNewsArticles(user.institutionId!!))
-                    newsArticlesList
+                user?.institutionId?.let {
+                    newsArticlesList = RetrofitLiveData(app.api.getNewsArticles(it))
+                    return@switchMap newsArticlesList
                 }
 
                 SingleLiveData(null)

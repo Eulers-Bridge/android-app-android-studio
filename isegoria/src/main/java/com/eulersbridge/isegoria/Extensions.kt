@@ -2,6 +2,8 @@
 
 package com.eulersbridge.isegoria
 
+import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.LiveData
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
@@ -13,7 +15,42 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
+import com.securepreferences.SecurePreferences
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
+
+fun <T> LifecycleOwner.observe(data: LiveData<T>?, onChanged: (value: T?) -> Unit) {
+    data?.observe(this, android.arch.lifecycle.Observer {
+        onChanged(it)
+    })
+}
+
+fun <T> Call<T>.enqueue() = this.enqueue({}, { it.printStackTrace() })
+
+inline fun <T> Call<T>.onSuccess(crossinline success: (value: T) -> Unit) {
+    this.enqueue({
+        it.takeIf { it.isSuccessful }?.body()?.let { body ->
+            success(body)
+        }
+    })
+}
+
+inline fun <T> Call<T>.enqueue(crossinline success: (response: Response<T>) -> Unit = {},
+                        crossinline failure: (t: Throwable) -> Unit = {}) {
+    enqueue(object : Callback<T> {
+        override fun onResponse(call: Call<T>?, response: Response<T>) = success(response)
+
+        override fun onFailure(call: Call<T>?, t: Throwable) = failure(t)
+    })
+}
+
+inline fun SecurePreferences.edit(action: SecurePreferences.Editor.() -> Unit) {
+    val editor = edit()
+    action(editor)
+    editor.apply()
+}
 
 fun Context.isNetworkAvailable(): Boolean {
     val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -47,7 +84,6 @@ inline fun EditText.onTextChanged(crossinline onTextChanged: (String?) -> Unit) 
     })
 }
 
-@JvmName("Util")
 fun Long.toDateString(context: Context): String {
     val date = Date(this)
 
@@ -59,6 +95,11 @@ fun Long.toDateString(context: Context): String {
         val flags = DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_YEAR or DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_NO_MIDNIGHT or DateUtils.FORMAT_NO_NOON
         DateUtils.formatDateTime(context, date.time, flags)
     }
+}
+
+@JvmName("StringUtil")
+fun notificationChannelIDFromName(name: String): String {
+    return name.toLowerCase().replace(" ", "_")
 }
 
 val String?.isValidEmail

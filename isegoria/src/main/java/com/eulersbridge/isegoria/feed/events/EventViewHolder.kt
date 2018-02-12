@@ -1,15 +1,14 @@
 package com.eulersbridge.isegoria.feed.events
 
 import android.content.Intent
-import android.os.Bundle
 import android.support.annotation.ColorRes
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_EVENT
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Event
@@ -56,11 +55,8 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
     override fun onClick(view: View) {
         if (item == null) return
 
-        val extras = Bundle()
-        extras.putParcelable(ACTIVITY_EXTRA_EVENT, item)
-
         val activityIntent = Intent(view.context, EventDetailActivity::class.java)
-        activityIntent.putExtras(extras)
+        activityIntent.putExtras(bundleOf(ACTIVITY_EXTRA_EVENT to item))
 
         val location = intArrayOf(0, 0)
         view.getLocationOnScreen(location)

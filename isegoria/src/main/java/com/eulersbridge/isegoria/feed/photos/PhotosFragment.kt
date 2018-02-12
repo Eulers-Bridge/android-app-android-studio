@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.feed.photos
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -10,13 +9,13 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.postDelayed
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.responses.NewsFeedResponse
-import com.eulersbridge.isegoria.util.network.SimpleCallback
+import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.photos_fragment.*
-import retrofit2.Response
 
 class PhotosFragment : Fragment(), TitledFragment {
 
@@ -41,7 +40,7 @@ class PhotosFragment : Fragment(), TitledFragment {
         refreshLayout.setOnRefreshListener {
             refreshLayout.isRefreshing = true
             refresh()
-            refreshLayout.postDelayed({ refreshLayout.isRefreshing = false }, 6000)
+            refreshLayout.postDelayed(6000) { refreshLayout.isRefreshing = false }
         }
 
         albumsListView.apply {
@@ -68,19 +67,13 @@ class PhotosFragment : Fragment(), TitledFragment {
         if (user?.institutionId != null) {
 
             if (user.newsFeedId == 0L) {
-                app!!.api.getInstitutionNewsFeed(user.institutionId!!).enqueue(object : SimpleCallback<NewsFeedResponse>() {
-                    override fun handleResponse(response: Response<NewsFeedResponse>) {
-                        val body = response.body()
+                app!!.api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { body ->
+                    val updatedUser = user.copy()
+                    updatedUser.newsFeedId = body.newsFeedId
+                    app?.updateLoggedInUser(updatedUser)
 
-                        if (body != null) {
-                            val updatedUser = user.copy()
-                            updatedUser.newsFeedId = body.newsFeedId
-                            app!!.updateLoggedInUser(updatedUser)
-
-                            fetchPhotoAlbums()
-                        }
-                    }
-                })
+                    fetchPhotoAlbums()
+                }
 
             } else {
                 fetchPhotoAlbums()
@@ -89,12 +82,12 @@ class PhotosFragment : Fragment(), TitledFragment {
     }
 
     private fun fetchPhotoAlbums() {
-        viewModel.photoAlbums.observe(this, Observer { albums ->
+        observe(viewModel.photoAlbums) { albums ->
             refreshLayout?.isRefreshing = false
             adapter.isLoading = false
 
             if (albums != null)
                 adapter.replaceItems(albums)
-        })
+        }
     }
 }

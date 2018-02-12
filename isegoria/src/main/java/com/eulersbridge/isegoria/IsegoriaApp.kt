@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.Transformations
 import android.content.Context
 import android.content.Intent
@@ -14,12 +15,12 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.support.v4.app.NotificationManagerCompat
+import androidx.content.systemService
+import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity
-import com.eulersbridge.isegoria.util.Strings
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation
@@ -36,11 +37,13 @@ class IsegoriaApp : Application() {
     val loggedInUser = MutableLiveData<User>()
     var cachedLoginArticles: List<NewsArticle>? = null
 
-    val loginVisible = MutableLiveData<Boolean>()
+    private val loginVisible = MutableLiveData<Boolean>()
     val userVerificationVisible = MutableLiveData<Boolean>()
     val friendsVisible = MutableLiveData<Boolean>()
 
-    val api: API by lazy { networkService.api!! }
+    private lateinit var loginObserver: Observer<Boolean>
+
+    val api: API by lazy { networkService.api }
     val savedUserEmail: String? by lazy { securePreferences.getString(USER_EMAIL_KEY, null) }
     val savedUserPassword: String? by lazy { securePreferences.getString(USER_PASSWORD_KEY, null) }
 
@@ -61,6 +64,38 @@ class IsegoriaApp : Application() {
         val screenDensity = resources.displayMetrics.density
         BlurTransformation.screenDensity = screenDensity
         RoundedCornersTransformation.screenDensity = screenDensity
+
+        val login = login()
+
+        loginObserver = Observer { loginSuccess ->
+            if (loginSuccess != null) {
+                if (loginSuccess == false) {
+                    showLoginScreen()
+                } else {
+                    showMainActivity()
+                }
+            }
+
+            login.removeObserver(loginObserver)
+        }
+
+        login.observeForever(loginObserver)
+    }
+
+    private fun showMainActivity() {
+        startActivity(Intent(this, MainActivity::class.java))
+    }
+
+    private fun showLoginScreen() {
+        if (loginVisible.value == null || loginVisible.value == false) {
+            loginVisible.value = true
+            startActivity(Intent(this, AuthActivity::class.java))
+        }
+    }
+
+    fun hideLoginScreen() {
+        if (loginVisible.value == null || loginVisible.value == true)
+            loginVisible.value = false
     }
 
     @SuppressLint("NewApi")
@@ -68,24 +103,23 @@ class IsegoriaApp : Application() {
         // Notification channels are only supported on Android O+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
-            //Build a simple map of channel names (Strings) to their importance level (Integer)
-            val channels = arrayOf(
-                Pair(NOTIFICATION_CHANNEL_FRIENDS, NotificationManager.IMPORTANCE_DEFAULT),
-                Pair(NOTIFICATION_CHANNEL_VOTE_REMINDERS, NotificationManager.IMPORTANCE_DEFAULT)
-            )
-
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            /* Loop through the map, creating notification channels based on the names/importance
-            values in the map. `createNotificationChannel` is no-op if the channels have already
-            been created from a previous launch. */
-            for ((name, importance) in channels) {
-                val channelId = Strings.notificationChannelIDFromName(name)
+            //Simple map of channel names (Strings) to their importance level (Integer)
+            mapOf(
+                NOTIFICATION_CHANNEL_FRIENDS to NotificationManager.IMPORTANCE_DEFAULT,
+                NOTIFICATION_CHANNEL_VOTE_REMINDERS to NotificationManager.IMPORTANCE_DEFAULT
+
+            ).forEach{ name, importance ->
+                val channelId = notificationChannelIDFromName(name)
 
                 val notificationChannel =
                     NotificationChannel(channelId, name, importance)
                 notificationChannel.setShowBadge(true)
+
+                /*`createNotificationChannel` is no-op if the channels have already
+                been created from a previous launch. */
                 notificationManager.createNotificationChannel(notificationChannel)
             }
         }
@@ -119,8 +153,7 @@ class IsegoriaApp : Application() {
                 )
                 .build()
 
-            val shortcutManager = getSystemService(ShortcutManager::class.java)
-            shortcutManager.dynamicShortcuts = Arrays.asList(election, friends)
+            systemService<ShortcutManager>().dynamicShortcuts = Arrays.asList(election, friends)
         }
     }
 
@@ -131,11 +164,10 @@ class IsegoriaApp : Application() {
     fun setLoggedInUser(user: User, password: String) {
         loggedInUser.value = user
 
-        SecurePreferences(applicationContext)
-            .edit()
-            .putString(USER_EMAIL_KEY, user.email)
-            .putString(USER_PASSWORD_KEY, password)
-            .apply()
+        SecurePreferences(applicationContext).edit {
+            putString(USER_EMAIL_KEY, user.email)
+            putString(USER_PASSWORD_KEY, password)
+        }
 
         setupAppShortcuts()
     }
@@ -151,7 +183,6 @@ class IsegoriaApp : Application() {
                 login(email!!, password!!)
 
             } else {
-                loginVisible.value = true
                 SingleLiveData(false)
             }
         }
@@ -173,13 +204,13 @@ class IsegoriaApp : Application() {
                 if (user != null) {
                     user.id = response.userId
 
+                    hideLoginScreen()
+
                     if (user.accountVerified) {
                         networkService.updateAPIBaseURL(user)
 
-                        if (!user.hasPersonality)
-                            startActivity(Intent(this, PersonalityQuestionsActivity::class.java))
-
                     } else {
+                        hideLoginScreen()
                         userVerificationVisible.value = true
                     }
 
@@ -201,21 +232,18 @@ class IsegoriaApp : Application() {
         networkService.email = null
         networkService.password = null
 
-        SecurePreferences(applicationContext)
-            .edit()
-            .remove(USER_PASSWORD_KEY)
-            .apply()
+        SecurePreferences(applicationContext).edit {
+            remove(USER_PASSWORD_KEY)
+        }
 
         // Remove any notifications that are still visible
         NotificationManagerCompat.from(applicationContext).cancelAll()
 
         // Remove all app long-press shortcuts
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1) {
-            val shortcutManager = getSystemService(ShortcutManager::class.java)
-            shortcutManager.removeAllDynamicShortcuts()
-        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)
+            systemService<ShortcutManager>().removeAllDynamicShortcuts()
 
-        loginVisible.value = true
+        showLoginScreen()
     }
 
     fun setTrackingOff(trackingOff: Boolean) {

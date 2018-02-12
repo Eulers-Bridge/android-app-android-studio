@@ -6,16 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PHOTO_ALBUM
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse
-import com.eulersbridge.isegoria.util.network.SimpleCallback
 import kotlinx.android.synthetic.main.photo_album_fragment.*
-import retrofit2.Response
 
 class PhotoAlbumFragment : Fragment() {
 
@@ -25,8 +19,7 @@ class PhotoAlbumFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.photo_album_fragment, container, false)
 
-        if (arguments != null)
-            album = arguments!!.getParcelable(FRAGMENT_EXTRA_PHOTO_ALBUM)
+        album = arguments?.getParcelable(FRAGMENT_EXTRA_PHOTO_ALBUM)
 
         return rootView
     }
@@ -44,13 +37,11 @@ class PhotoAlbumFragment : Fragment() {
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(thumbnailImageView)
 
-            val app: IsegoriaApp? = activity!!.application as IsegoriaApp?
+            val app: IsegoriaApp? = activity?.application as? IsegoriaApp
 
-            app?.api?.getAlbumPhotos(it.id.toLong())?.enqueue(object : SimpleCallback<PhotosResponse>() {
-                override fun handleResponse(response: Response<PhotosResponse>) {
-                    setPhotos(response.body()?.photos)
-                }
-            })
+            app?.api?.getAlbumPhotos(it.id.toLong())?.onSuccess {
+                setPhotos(it.photos)
+            }
         }
     }
 
@@ -58,7 +49,8 @@ class PhotoAlbumFragment : Fragment() {
         adapter.apply {
             isLoading = true
 
-            if (photos != null) replaceItems(photos)
+            if (photos != null)
+                replaceItems(photos)
         }
     }
 }

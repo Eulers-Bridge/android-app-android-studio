@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.profile
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -39,18 +38,18 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         val rootView = inflater.inflate(R.layout.profile_overview_fragment, container, false)
 
         val app = activity?.application as IsegoriaApp?
-        app?.loggedInUser?.observe(this, Observer { user ->
-            if (user != null && viewModel.user.value == null)
-                viewModel.setUser(user)
-        })
+        observe(app?.loggedInUser) {
+            if (it != null && viewModel.user.value == null)
+                viewModel.setUser(it)
+        }
 
         var user: GenericUser? = null
 
         if (arguments != null) {
-            user = arguments!!.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
+            user = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
 
             if (user == null) {
-                val userId = arguments!!.getLong(FRAGMENT_EXTRA_PROFILE_ID)
+                val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
             }
         }
 
@@ -76,36 +75,36 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     }
 
     private fun createViewModelObservers() {
-        viewModel.user.observe(this, Observer { user ->
+        observe(viewModel.user) { user ->
             if (user == null) {
-                personalityTestButton!!.visibility = View.GONE
-                return@Observer
+                personalityTestButton.visibility = View.GONE
+                return@observe
             }
 
-            viewModel.getUserPhoto()?.observe(this, Observer { photo ->
-                if (photo != null)
+            observe(viewModel.getUserPhoto()) {
+                if (it != null)
                     GlideApp.with(this)
-                        .load(photo.thumbnailUrl)
+                        .load(it.thumbnailUrl)
                         .transforms(BlurTransformation(context!!), TintTransformation(0.1))
                         .priority(Priority.HIGH)
                         .placeholder(R.color.profileImageBackground)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(backgroundImageView)
-            })
+            }
 
-            viewModel.getInstitutionName()?.observe(this, Observer { institutionName ->
-                institutionTextView.text = institutionName
-            })
+            observe(viewModel.getInstitutionName()) {
+                institutionTextView.text = it
+            }
 
-            viewModel.getRemainingBadges()?.observe(this, Observer { remainingBadges ->
+            observe(viewModel.getRemainingBadges()) { remainingBadges ->
                 if (remainingBadges != null)
                     updateBadgesCount(user.completedBadgesCount, remainingBadges.size.toLong())
-            })
+            }
 
-            viewModel.getTasks().observe(this, Observer { tasks ->
+            observe(viewModel.getTasks()) { tasks ->
                 if (tasks != null)
                     taskAdapter.setItems(tasks)
-            })
+            }
 
             viewModel.fetchUserStats()
 
@@ -135,17 +134,15 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
             updateCompletedTasksCount(user.completedTasksCount)
             updateExperience(user.level, user.experience)
-        })
+        }
 
-        viewModel.contactsCount.observe(this, Observer { contactsCount ->
-            if (contactsCount != null)
-                updateContactsCount(contactsCount)
-        })
+        observe(viewModel.contactsCount) {
+            if (it != null) updateContactsCount(it)
+        }
 
-        viewModel.totalTasksCount.observe(this, Observer { totalTasksCount ->
-            if (totalTasksCount != null)
-                updateTotalTasksCount(totalTasksCount)
-        })
+        observe(viewModel.totalTasksCount) {
+            if (it != null) updateTotalTasksCount(it)
+        }
     }
 
     private fun updateBadgesCount(completedCount: Long, remainingCount: Long) {
@@ -182,7 +179,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     }
 
     private fun updateTotalTasksCount(totalTasksCount: Long) {
-        tasksProgressCircle?.post { tasksProgressCircle!!.maximumValue  = totalTasksCount.toInt() }
+        tasksProgressCircle?.post { tasksProgressCircle.maximumValue  = totalTasksCount.toInt() }
     }
 
     override fun onDetach() {

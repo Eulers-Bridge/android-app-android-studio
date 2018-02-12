@@ -5,16 +5,14 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.Poll
+import com.eulersbridge.isegoria.network.api.models.PollOption
 import com.eulersbridge.isegoria.network.api.models.PollResult
-import com.eulersbridge.isegoria.network.api.responses.PollResultsResponse
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.network.SimpleCallback
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class PollViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -42,30 +40,22 @@ class PollViewModel(application: Application) : AndroidViewModel(application) {
 
         val api = getApplication<IsegoriaApp>().api
 
-        api.answerPoll(currentPoll.id, id).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                // After voting, fetch poll results
+        api.answerPoll(currentPoll.id, id).enqueue({
 
-                api.getPollResults(currentPoll.id)
-                    .enqueue(object : SimpleCallback<PollResultsResponse>() {
-                        override fun handleResponse(response: Response<PollResultsResponse>) {
-                            response.body()?.results?.let { results ->
-
-                                val updatedPollOptions = currentPoll.options!!
-                                    .mapIndexed { index, pollOption ->
-                                        pollOption.copy(result = results[index])
-                                    }
-
-                                val updatedPoll = currentPoll.copy(options = updatedPollOptions)
-                                poll.value = updatedPoll
-
-                                pollResults.value = results
-                            }
+            // After voting, fetch poll results
+            api.getPollResults(currentPoll.id) .onSuccess { response ->
+                response.results?.let { results ->
+                    val updatedPollOptions = currentPoll.options ?: listOf<PollOption>()
+                        .mapIndexed { index, pollOption ->
+                            pollOption.copy(result = results[index])
                         }
-                    })
-            }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) = t.printStackTrace()
+                    val updatedPoll = currentPoll.copy(options = updatedPollOptions)
+                    poll.value = updatedPoll
+
+                    pollResults.value = results
+                }
+            }
         })
     }
 

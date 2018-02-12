@@ -129,11 +129,12 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
             circleStrokePaint
         )
 
-        val answer = currentPoint!!.answer
-        canvas.drawText(
-            answer, (parentWidth - textPaint.measureText(answer)) / 2, (lineY + 50).toFloat(),
-            textPaint
-        )
+        currentPoint?.answer?.let { answer ->
+            canvas.drawText(
+                answer, (parentWidth - textPaint.measureText(answer)) / 2, (lineY + 50).toFloat(),
+                textPaint
+            )
+        }
     }
 
     /**

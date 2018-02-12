@@ -2,7 +2,8 @@ package com.eulersbridge.isegoria.util.transformation
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.support.annotation.IntRange
+import android.support.annotation.FloatRange
+import android.support.annotation.Px
 import android.support.v8.renderscript.Allocation
 import android.support.v8.renderscript.Element
 import android.support.v8.renderscript.RenderScript
@@ -11,12 +12,14 @@ import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.eulersbridge.isegoria.APP_ID
+import java.lang.Math.min
+import java.lang.Math.round
 import java.lang.ref.WeakReference
 import java.security.MessageDigest
 
 class BlurTransformation @JvmOverloads constructor(
     context: Context, // Blur radius in DP
-    @param:IntRange(from = 1, to = 25) private val blurRadius: Int = 25
+    @param:FloatRange(from = 1.0, to = 25.0) private val blurRadius: Double = 25.0
 ) : BitmapTransformation() {
 
     companion object {
@@ -37,22 +40,19 @@ class BlurTransformation @JvmOverloads constructor(
         if (context == null || blurRadius <= 0)
             return toTransform
 
-        var blurRadiusPx = Math.round(blurRadius.toFloat() * screenDensity)
-        if (blurRadiusPx > 25) blurRadiusPx = 25
+        @Px val blurRadius = min(round(blurRadius * screenDensity), 25)
 
-        if (blurRadiusPx <= 0)
+        if (blurRadius <= 0)
             return toTransform
 
         val renderScript = RenderScript.create(context)
-
         val outputBitmap = toTransform.copy(toTransform.config, true)
-
         val tmpIn = Allocation.createFromBitmap(renderScript, toTransform)
         val tmpOut = Allocation.createFromBitmap(renderScript, outputBitmap)
 
         val blur = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
         blur.apply {
-            setRadius(blurRadiusPx.toFloat())
+            setRadius(blurRadius.toFloat())
             setInput(tmpIn)
             forEach(tmpOut)
         }

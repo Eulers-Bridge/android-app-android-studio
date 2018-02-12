@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.*
+import androidx.graphics.toColorFilter
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.feed_fragment.*
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.feed_fragment.*
 
 class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
 
     private val viewModel: FeedViewModel by lazy {
         ViewModelProviders.of(activity!!).get(FeedViewModel::class.java)
@@ -36,14 +37,14 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         activity?.apply {
             val colour = ContextCompat.getColor(this, R.color.darkBlue)
-            statusBarColour = colour
+            setStatusBarColour(colour)
             setMultitaskColour(colour)
 
             // Ensure options menu from another fragment is not carried over
             invalidateOptionsMenu()
 
             // Hide keyboard if navigating from login
-            keyboardVisible = false
+            setKeyboardVisible(false)
         }
 
         setHasOptionsMenu(true)
@@ -58,18 +59,18 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_feed)
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.feed, menu)
+        inflater?.inflate(R.menu.feed, menu)
         super.onCreateOptionsMenu(menu, inflater)
 
-        val friendsItem = menu!!.findItem(R.id.feed_menu_item_friends)
-        friendsItem.icon?.let {
+        val friendsItem = menu?.findItem(R.id.feed_menu_item_friends)
+        friendsItem?.icon?.let {
             it.mutate()
-            it.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
+            it.colorFilter = PorterDuff.Mode.SRC_ATOP.toColorFilter(Color.WHITE)
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item!!.itemId) {
+        return when (item?.itemId) {
             R.id.feed_menu_item_friends -> {
                 viewModel.showFriends()
                 true
@@ -86,7 +87,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
             currentItem = 0
         }
 
-        tabLayout?.setupWithViewPager(viewPager)
+        tabLayout.setupWithViewPager(viewPager)
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {
@@ -105,12 +106,12 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     override fun onPause() {
         super.onPause()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 }

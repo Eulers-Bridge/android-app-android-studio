@@ -10,7 +10,7 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment
 
 internal class FeedViewPagerAdapter(fragmentManager: FragmentManager) : FragmentPagerAdapter(fragmentManager) {
 
-    companion object {
+    private companion object {
         private const val FRAGMENT_COUNT = 3
     }
 

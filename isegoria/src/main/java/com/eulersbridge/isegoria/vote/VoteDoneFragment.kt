@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.vote
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.vote_fragment_done.*
 
@@ -21,11 +21,6 @@ class VoteDoneFragment : Fragment(), TitledFragment {
 
         viewModel = ViewModelProviders.of(parentFragment!!).get(VoteViewModel::class.java)
 
-        viewModel.getLatestVoteReminder().observe(this, Observer { success ->
-            if (success == false)
-                addToCalendarButton!!.isEnabled = true
-        })
-
         return rootView
     }
 
@@ -34,17 +29,22 @@ class VoteDoneFragment : Fragment(), TitledFragment {
             isEnabled = false
             setOnClickListener { addToCalendar() }
         }
+
+        observe(viewModel.getLatestVoteReminder()) { success ->
+            if (success == false)
+                addToCalendarButton.isEnabled = true
+        }
     }
 
     private fun addToCalendar() {
         addToCalendarButton.isEnabled = false
 
-        val addToCalendarIntent = viewModel.addVoteReminderToCalendarIntent
-
-        if (addToCalendarIntent != null
-                && activity != null
-                && addToCalendarIntent.resolveActivity(activity!!.packageManager) != null)
-            activity!!.startActivity(addToCalendarIntent)
+        activity?.let { activity ->
+            val addToCalendarIntent = viewModel.addVoteReminderToCalendarIntent
+            if (addToCalendarIntent?.resolveActivity(activity.packageManager) != null) {
+                activity.startActivity(addToCalendarIntent)
+            }
+        }
 
         addToCalendarButton.isEnabled = true
     }

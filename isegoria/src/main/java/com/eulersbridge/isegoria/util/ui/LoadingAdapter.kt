@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.BuildConfig
 import java.util.*
 
-open class LoadingAdapter<I, VH : LoadingAdapter.ItemViewHolder<I>> protected constructor(private val loadingItemCount: Int) : RecyclerView.Adapter<VH>() {
+open class LoadingAdapter<I, VH : LoadingAdapter.ItemViewHolder<I>>
+protected constructor(private val loadingItemCount: Int) : RecyclerView.Adapter<VH>() {
 
     internal val items = ArrayList<I>()
-
     internal var isLoading = true
 
-    abstract class ItemViewHolder<in T> protected constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    abstract class ItemViewHolder<in T> protected constructor(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
         abstract fun setItem(item: T?)
         abstract fun onRecycled()
     }

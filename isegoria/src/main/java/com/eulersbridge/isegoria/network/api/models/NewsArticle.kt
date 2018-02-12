@@ -31,6 +31,6 @@ data class NewsArticle(
 
 ) : Parcelable {
     internal fun getPhotoUrl(): String? {
-        return photos?.get(0)?.thumbnailUrl
+        return photos?.firstOrNull()?.thumbnailUrl
     }
 }

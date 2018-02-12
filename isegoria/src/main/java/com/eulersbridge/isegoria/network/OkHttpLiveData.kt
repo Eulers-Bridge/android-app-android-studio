@@ -18,16 +18,15 @@ internal class OkHttpLiveData(private val call: Call) : LiveData<String>(), Call
 
     @Throws(IOException::class)
     override fun onResponse(call: Call, response: Response) {
-        value = if (response.isSuccessful) {
-            response.body()?.toString() ?: ""
-
+        if (response.isSuccessful) {
+            postValue(response.body()?.toString() ?: "")
         } else {
-            null
+            postValue(null)
         }
     }
 
     override fun onFailure(call: Call, e: IOException) {
-        value = null
+        postValue(null)
     }
 
     fun cancel() {

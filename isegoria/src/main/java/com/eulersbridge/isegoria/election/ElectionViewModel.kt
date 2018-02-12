@@ -32,7 +32,7 @@ class ElectionViewModel(application: Application) : AndroidViewModel(application
                 val electionsList = RetrofitLiveData(app.api.getElections(user.institutionId!!))
 
                 election = Transformations.switchMap(electionsList) {
-                    SingleLiveData(it?.get(0))
+                    SingleLiveData(it?.firstOrNull())
                 }
 
                 return@switchMap election

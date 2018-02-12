@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.poll
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -10,10 +9,12 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.os.bundleOf
 import com.eulersbridge.isegoria.ACTIVITY_EXTRA_POLL
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Poll
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.poll_vote_fragment.*
@@ -21,7 +22,7 @@ import java.util.*
 
 class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var tabLayout: TabLayout? = null
+    private lateinit var tabLayout: TabLayout
     private lateinit var pagerAdapter: SimpleFragmentPagerAdapter
     private var fragments: MutableList<Fragment> = Vector()
 
@@ -45,10 +46,10 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
         activity?.invalidateOptionsMenu()
 
         val viewModel = ViewModelProviders.of(this).get(PollsViewModel::class.java)
-        viewModel.getPolls().observe(this, Observer { polls ->
+        observe(viewModel.getPolls()) { polls ->
             if (polls != null)
                 addPolls(polls)
-        })
+        }
 
         return rootView
     }
@@ -85,17 +86,17 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private fun updateTabs() {
         pagerAdapter.notifyDataSetChanged()
 
-        tabLayout?.visibility = if (fragments.size < 2) View.GONE else View.VISIBLE
+        tabLayout.visibility = if (fragments.size < 2) View.GONE else View.VISIBLE
     }
 
     override fun onPause() {
         super.onPause()
 
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     private fun setupTabLayout() {
-        tabLayout?.apply {
+        tabLayout.apply {
             setupWithViewPager(viewPager)
             addOnTabSelectedListener(onTabSelectedListener)
         }
@@ -103,11 +104,8 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     private fun addPolls(polls: List<Poll>) {
         val fragments = polls.map {
-            val args = Bundle()
-            args.putParcelable(ACTIVITY_EXTRA_POLL, it)
-
             val pollVoteFragment = PollVoteFragment()
-            pollVoteFragment.arguments = args
+            pollVoteFragment.arguments = bundleOf(ACTIVITY_EXTRA_POLL to it)
 
             pollVoteFragment
         }

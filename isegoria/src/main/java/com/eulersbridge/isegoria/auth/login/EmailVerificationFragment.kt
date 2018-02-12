@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.auth.login
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.observe
 import kotlinx.android.synthetic.main.email_verification.*
 
 class EmailVerificationFragment : Fragment() {
@@ -23,18 +23,18 @@ class EmailVerificationFragment : Fragment() {
         verifiedButton.setOnClickListener {
             it.isEnabled = false
 
-            viewModel.userVerified().observe(this, Observer { success ->
-                if (success == null || success == false)
+            observe(viewModel.userVerified()) {
+                if (it == null || it == false)
                     verifiedButton.isEnabled = true
-            })
+            }
         }
 
         resendVerificationButton.setOnClickListener { button ->
             button.isEnabled = false
 
-            viewModel.resendVerification().observe(this, Observer {
+            observe(viewModel.resendVerification()) {
                 button.isEnabled = true
-            })
+            }
         }
     }
 

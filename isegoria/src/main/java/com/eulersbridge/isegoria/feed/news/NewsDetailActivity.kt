@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.feed.news
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -8,10 +7,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
+import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
@@ -41,25 +40,24 @@ class NewsDetailActivity : AppCompatActivity() {
 
     private fun createViewModelObservers() {
         viewModel.apply {
-            newsArticle.observe(this@NewsDetailActivity, Observer<NewsArticle> {
+            observe(newsArticle) {
                 it?.let {
                     populateUIWithArticle(it)
                 }
-            })
+            }
 
-            articleLikeCount.observe(this@NewsDetailActivity, Observer {
+            observe(articleLikeCount) {
                 runOnUiThread { likesTextView.text = it.toString() }
-            })
+            }
 
-            articleLikedByUser.observe(this@NewsDetailActivity, Observer { liked ->
-                if (liked == true) {
+            observe(articleLikedByUser) {
+                if (it == true)
                     runOnUiThread {
                         userLikedArticle = true
                         starImageView.setImageResource(R.drawable.star)
                         starImageView.isEnabled = true
                     }
-                }
-            })
+            }
         }
     }
 
@@ -103,7 +101,7 @@ class NewsDetailActivity : AppCompatActivity() {
                 view.isEnabled = false
 
                 if (userLikedArticle) {
-                    viewModel.likeArticle().observe(this, Observer { success ->
+                    observe(viewModel.likeArticle()) { success ->
                         view.isEnabled = true
 
                         if (success == true) {
@@ -112,10 +110,10 @@ class NewsDetailActivity : AppCompatActivity() {
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) + 1
                             likesTextView.text = newLikes.toString()
                         }
-                    })
+                    }
 
                 } else {
-                    viewModel.unlikeArticle().observe(this, Observer { success ->
+                    observe(viewModel.unlikeArticle()) {success ->
                         view.isEnabled = true
 
                         if (success == true) {
@@ -124,7 +122,7 @@ class NewsDetailActivity : AppCompatActivity() {
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) - 1
                             likesTextView.text = newLikes.toString()
                         }
-                    })
+                    }
                 }
             }
 
