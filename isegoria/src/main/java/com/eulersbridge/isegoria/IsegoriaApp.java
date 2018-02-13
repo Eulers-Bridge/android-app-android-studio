@@ -90,7 +90,13 @@ public class IsegoriaApp extends Application {
     public void showLoginScreen() {
         if (loginVisible.getValue() == null || !loginVisible.getValue()) {
             loginVisible.setValue(true);
-            startActivity(new Intent(this, AuthActivity.class));
+            Intent activityIntent = new Intent(this, AuthActivity.class);
+
+            if (Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
+                activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+
+            startActivity(activityIntent);
         }
     }
 
