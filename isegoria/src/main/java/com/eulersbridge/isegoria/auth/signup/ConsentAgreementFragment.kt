@@ -11,7 +11,6 @@ import androidx.view.updatePadding
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import kotlinx.android.synthetic.main.consent_agreement_fragment.*
-import kotlinx.android.synthetic.main.sign_up_fragment.*
 
 
 class ConsentAgreementFragment : Fragment() {
@@ -32,9 +31,14 @@ class ConsentAgreementFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) =
-        nextButton.setOnClickListener {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        agreeButton.setOnClickListener {
             it.isEnabled = false
             authViewModel.signUpConsentGiven.value = true
         }
+
+        disagreeButton.setOnClickListener {
+            activity?.onBackPressed()
+        }
+    }
 }

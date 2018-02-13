@@ -9,7 +9,7 @@ import java.io.IOException
 /**
  * LiveData wrapper for an OkHttp request call.
  */
-internal class OkHttpLiveData(private val call: Call) : LiveData<String>(), Callback {
+internal class OkHttpLiveData(private val call: Call) : LiveData<Boolean>(), Callback {
 
     override fun onActive() {
         if (!call.isCanceled && !call.isExecuted)
@@ -18,15 +18,11 @@ internal class OkHttpLiveData(private val call: Call) : LiveData<String>(), Call
 
     @Throws(IOException::class)
     override fun onResponse(call: Call, response: Response) {
-        if (response.isSuccessful) {
-            postValue(response.body()?.toString() ?: "")
-        } else {
-            postValue(null)
-        }
+        postValue(response.isSuccessful && response.body() != null)
     }
 
     override fun onFailure(call: Call, e: IOException) {
-        postValue(null)
+        postValue(false)
     }
 
     fun cancel() {

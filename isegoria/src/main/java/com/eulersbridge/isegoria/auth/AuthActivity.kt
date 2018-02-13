@@ -51,7 +51,7 @@ class AuthActivity : AppCompatActivity() {
         }
 
         observe(viewModel.signUpUser) {
-            if (it != null)
+            if (it != null && viewModel.signUpConsentGiven.value == false)
                 presentContent(ConsentAgreementFragment())
         }
 

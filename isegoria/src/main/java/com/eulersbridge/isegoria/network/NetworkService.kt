@@ -19,15 +19,17 @@ import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.google.firebase.iid.FirebaseInstanceId
 import com.squareup.moshi.Moshi
-import okhttp3.Cache
-import okhttp3.Interceptor
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONException
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.*
+
+
+
 
 class NetworkService(private val application: IsegoriaApp) {
 
@@ -185,23 +187,32 @@ class NetworkService(private val application: IsegoriaApp) {
     }
 
     fun signUp(user: SignUpUser): LiveData<Boolean> {
-        val requestBody = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("email", user.email)
-            .addFormDataPart("givenName", user.givenName)
-            .addFormDataPart("familyName", user.familyName)
-            .addFormDataPart("gender", user.gender)
-            .addFormDataPart("nationality", user.nationality)
-            .addFormDataPart("yearOfBirth", user.yearOfBirth)
-            .addFormDataPart("accountVerified", user.accountVerified.toString())
-            .addFormDataPart("password", user.password!!)
-            .addFormDataPart("institutionId", user.institutionId.toString())
-            .addFormDataPart("hasPersonality", user.hasPersonality.toString())
-            .build()
+
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.apply {
+                put("email", user.email)
+                put("givenName", user.givenName)
+                put("familyName", user.familyName)
+                put("gender", user.gender)
+                put("nationality", user.nationality)
+                put("yearOfBirth", user.yearOfBirth)
+                put("accountVerified", user.accountVerified.toString())
+                put("password", user.password)
+                put("institutionId", user.institutionId.toString())
+                put("hasPersonality", user.hasPersonality.toString())
+            }
+
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            return SingleLiveData(false)
+        }
+
+        val json = MediaType.parse("application/json; charset=utf-8")
+        val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
             .url(SERVER_URL + "signUp")
-            .method("POST", requestBody)
             .addHeader("Accept", "application/json")
             .addHeader("Content-type", "application/json")
             .addHeader("User-Agent", "IsegoriaApp Android")
@@ -209,11 +220,7 @@ class NetworkService(private val application: IsegoriaApp) {
             .build()
 
         // Create new HTTP client rather than using application's, as no auth is required
-        val responseBody = OkHttpLiveData(OkHttpClient().newCall(request))
-
-        return Transformations.switchMap(responseBody) {
-            SingleLiveData(it != null && it.contains(email!!))
-        }
+        return OkHttpLiveData(OkHttpClient().newCall(request))
     }
 
     fun uploadNewUserPhoto(imageFile: File): LiveData<Boolean> {
@@ -261,29 +268,34 @@ class NetworkService(private val application: IsegoriaApp) {
         val timestamp = System.currentTimeMillis() / 1000L
         val loggedInUser = application.loggedInUser.value ?: return SingleLiveData(false)
 
-        val requestBody = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("url", pictureURL)
-            .addFormDataPart("thumbNailUrl", pictureURL)
-            .addFormDataPart("title", "Profile Picture")
-            .addFormDataPart("description", "Profile Picture")
-            .addFormDataPart("date", timestamp.toString())
-            .addFormDataPart("ownerId", loggedInUser.email)
-            .addFormDataPart("sequence", "0")
-            .build()
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.apply {
+                put("url", pictureURL)
+                put("thumbNailUrl", pictureURL)
+                put("title", "Profile Picture")
+                put("description", "Profile Picture")
+                put("date", timestamp.toString())
+                put("ownerId", loggedInUser.email)
+                put("sequence", "0")
+            }
+
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            return SingleLiveData(false)
+        }
+
+        val json = MediaType.parse("application/json; charset=utf-8")
+        val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
             .url(apiBaseURL + "photo")
-            .method("PUT", requestBody)
             .addHeader("Accept", "application/json")
             .addHeader("Content-type", "application/json")
             .addHeader("User-Agent", "IsegoriaApp Android")
             .post(requestBody)
             .build()
 
-        val updateRequest = OkHttpLiveData(httpClient!!.newCall(request))
-        return Transformations.switchMap(updateRequest) { bodyString ->
-            SingleLiveData(bodyString != null)
-        }
+        return OkHttpLiveData(httpClient!!.newCall(request))
     }
 }

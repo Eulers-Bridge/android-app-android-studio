@@ -50,7 +50,7 @@ class SignUpFragment : Fragment() {
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         institutionSpinner.adapter = institutionAdapter
 
-        val spinnerGenderArrayAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, arrayOf("Male", "Female"))
+        val spinnerGenderArrayAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, arrayOf("Male", "Female", "Other"))
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         genderSpinner.adapter = spinnerGenderArrayAdapter
 

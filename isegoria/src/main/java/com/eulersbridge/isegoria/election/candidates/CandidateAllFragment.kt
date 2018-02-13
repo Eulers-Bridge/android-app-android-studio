@@ -81,16 +81,12 @@ class CandidateAllFragment : Fragment() {
             for (i in rows.indices) {
                 val view = rows[i]
 
-                try {
-                    val firstName = firstNames[i]
-                    val lastName = lastNames[i]
+                val firstName = firstNames[i]
+                val lastName = lastNames[i]
 
-                    if (!firstName.contains(query.toLowerCase(), true)
-                        && !lastName.contains(query.toLowerCase(), true))
-                        candidateAllTable.removeView(view)
-
-                } catch (ignored: Exception) {
-                }
+                if (!firstName.contains(query.toLowerCase(), true)
+                    && !lastName.contains(query.toLowerCase(), true))
+                    candidateAllTable.removeView(view)
             }
 
             rootView.invalidate()

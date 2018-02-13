@@ -4,6 +4,7 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.api.models.Country
@@ -50,7 +51,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             signUpUser.value = updatedUser
         }
 
-        return IsegoriaApp.networkService.signUp(updatedUser)
-    }
+        return Transformations.switchMap(IsegoriaApp.networkService.signUp(updatedUser)) { success ->
+            if (!success)
+                signUpUser.value = null
 
+            SingleLiveData(success)
+        }
+    }
 }
