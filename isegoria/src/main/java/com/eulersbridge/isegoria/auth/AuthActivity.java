@@ -53,7 +53,8 @@ public class AuthActivity extends AppCompatActivity {
         });
 
         viewModel.signUpUser.observe(this, newUser -> {
-            if (newUser != null)
+            Boolean consentValue = viewModel.signUpConsentGiven.getValue();
+            if (newUser != null && (consentValue == null || !consentValue))
                 presentContent(new ConsentAgreementFragment());
         });
 

@@ -8,12 +8,11 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * LiveData wrapper for an OkHttp request call.
  */
-class OkHttpLiveData extends LiveData<String> implements Callback {
+class OkHttpLiveData extends LiveData<Boolean> implements Callback {
 
     private final @NonNull Call call;
 
@@ -30,17 +29,16 @@ class OkHttpLiveData extends LiveData<String> implements Callback {
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         if (response.isSuccessful()) {
-            ResponseBody body = response.body();
-            postValue(body == null? "" : body.toString());
+            postValue(response.isSuccessful() && response.body() != null);
 
         } else {
-            postValue(null);
+            postValue(false);
         }
     }
 
     @Override
     public void onFailure(Call call, IOException e) {
-        setValue(null);
+        setValue(false);
     }
 
     @SuppressWarnings("unused")

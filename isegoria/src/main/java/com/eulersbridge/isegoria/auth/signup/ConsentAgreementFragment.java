@@ -36,12 +36,15 @@ public class ConsentAgreementFragment extends Fragment {
 		//noinspection ConstantConditions
 		AuthViewModel authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
 
-		final Button agreeButton = rootView.findViewById(R.id.user_consent_next_button);
+		final Button agreeButton = rootView.findViewById(R.id.user_consent_agree_button);
 		agreeButton.setOnClickListener(view -> {
 			agreeButton.setEnabled(false);
 
-            authViewModel.setSignUpConsentGiven();
+            authViewModel.setSignUpConsentGiven(true);
 		});
+
+		final Button disagreeButton = rootView.findViewById(R.id.user_consent_disagree_button);
+		disagreeButton.setOnClickListener(view -> getActivity().onBackPressed());
 
 		return rootView;
 	}
