@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Transformations;
 import android.support.annotation.NonNull;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
@@ -50,8 +51,8 @@ public class AuthViewModel extends AndroidViewModel {
         signUpUser.setValue(null);
     }
 
-    public void setSignUpConsentGiven() {
-        signUpConsentGiven.setValue(true);
+    public void setSignUpConsentGiven(boolean consentGiven) {
+        signUpConsentGiven.setValue(consentGiven);
     }
 
     LiveData<Boolean> signUp() {
@@ -76,7 +77,12 @@ public class AuthViewModel extends AndroidViewModel {
             signUpUser.setValue(updatedUser);
         }
 
-        return IsegoriaApp.networkService.signUp(updatedUser);
+        return Transformations.switchMap(IsegoriaApp.networkService.signUp(updatedUser), success -> {
+            if (!success)
+                signUpUser.setValue(null);
+
+            return new SingleLiveData<>(success);
+        });
     }
 
 }
