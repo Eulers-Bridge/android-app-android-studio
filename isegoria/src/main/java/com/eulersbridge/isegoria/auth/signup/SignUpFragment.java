@@ -94,7 +94,7 @@ public class SignUpFragment extends Fragment {
         institutionSpinner.setAdapter(institutionAdapter);
         
         genderSpinner = rootView.findViewById(R.id.sign_up_gender);
-		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, new String[]{ "Male", "Female" });
+		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, new String[]{ "Male", "Female", "Other" });
         spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         genderSpinner.setAdapter(spinnerGenderArrayAdapter);
         

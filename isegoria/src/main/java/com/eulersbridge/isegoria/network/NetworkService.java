@@ -29,13 +29,16 @@ import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.moshi.Moshi;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
 import okhttp3.Cache;
 import okhttp3.Interceptor;
-import okhttp3.MultipartBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -228,23 +231,30 @@ public class NetworkService {
     }
 
     public LiveData<Boolean> signUp(@NonNull SignUpUser user) {
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("email", user.email)
-                .addFormDataPart("givenName", user.givenName)
-                .addFormDataPart("familyName", user.familyName)
-                .addFormDataPart("gender", user.gender)
-                .addFormDataPart("nationality", user.nationality)
-                .addFormDataPart("yearOfBirth", user.yearOfBirth)
-                .addFormDataPart("accountVerified", String.valueOf(user.accountVerified))
-                .addFormDataPart("password", user.password)
-                .addFormDataPart("institutionId", String.valueOf(user.institutionId))
-                .addFormDataPart("hasPersonality", String.valueOf(user.hasPersonality))
-                .build();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("email", user.email);
+            jsonObject.put("givenName", user.givenName);
+            jsonObject.put("familyName", user.familyName);
+            jsonObject.put("gender", user.gender);
+            jsonObject.put("nationality", user.nationality);
+            jsonObject.put("yearOfBirth", user.yearOfBirth);
+            jsonObject.put("accountVerified", String.valueOf(user.accountVerified));
+            jsonObject.put("password", user.password);
+            jsonObject.put("institutionId", String.valueOf(user.institutionId));
+            jsonObject.put("hasPersonality", String.valueOf(user.hasPersonality));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return new SingleLiveData<>(false);
+        }
+
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(SERVER_URL + "signUp")
-                .method("POST", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
                 .addHeader("User-Agent", "IsegoriaApp Android")
@@ -254,10 +264,7 @@ public class NetworkService {
         // Create new HTTP client rather than using application's, as no auth is required
         final OkHttpClient httpClient = new OkHttpClient();
 
-        final LiveData<String> responseBody = new OkHttpLiveData(httpClient.newCall(request));
-        return Transformations.switchMap(responseBody, bodyString ->
-           new SingleLiveData<>(bodyString != null && bodyString.contains(email))
-        );
+        return new OkHttpLiveData(httpClient.newCall(request));
     }
 
     public LiveData<Boolean> uploadNewUserPhoto(@NonNull File imageFile) {
@@ -306,29 +313,33 @@ public class NetworkService {
         if (loggedInUser == null)
             return new SingleLiveData<>(false);
 
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("url", pictureURL)
-                .addFormDataPart("thumbNailUrl", pictureURL)
-                .addFormDataPart("title", "Profile Picture")
-                .addFormDataPart("description", "Profile Picture")
-                .addFormDataPart("date", String.valueOf(timestamp))
-                .addFormDataPart("ownerId", String.valueOf(loggedInUser.email))
-                .addFormDataPart("sequence", String.valueOf("0"))
-                .build();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("url", pictureURL);
+            jsonObject.put("thumbNailUrl", pictureURL);
+            jsonObject.put("title", "Profile Picture");
+            jsonObject.put("description", "Profile Picture");
+            jsonObject.put("date", String.valueOf(timestamp));
+            jsonObject.put("ownerId", String.valueOf(loggedInUser.email));
+            jsonObject.put("sequence", String.valueOf("0"));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return new SingleLiveData<>(false);
+        }
+
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody requestBody = RequestBody.create(JSON, jsonObject.toString());
 
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(apiBaseURL + "photo")
-                .method("PUT", requestBody)
                 .addHeader("Accept", "application/json")
                 .addHeader("Content-type", "application/json")
                 .addHeader("User-Agent", "IsegoriaApp Android")
                 .post(requestBody)
                 .build();
 
-        final LiveData<String> updateRequest = new OkHttpLiveData(httpClient.newCall(request));
-        return Transformations.switchMap(updateRequest, bodyString ->
-            new SingleLiveData<>(bodyString != null)
-        );
+        return new OkHttpLiveData(httpClient.newCall(request));
     }
 }
