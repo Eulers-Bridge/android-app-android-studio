@@ -40,11 +40,12 @@
     <string name="connection_error_message">No connection</string>
     <string name="connection_error_action">Retry</string>
 
-    <string name="user_sign_up_first_name">Given Name</string>
-    <string name="user_sign_up_last_name">Family Name</string>
-    <string name="user_sign_up_university_email">Email Address</string>
-    <string name="user_sign_up_first_password">New Password</string>
-    <string name="user_sign_up_confirm_password">Confirm Password</string>
+    <string name="user_sign_up_first_name_hint">Given Name</string>
+    <string name="user_sign_up_last_name_hint">Family Name</string>
+    <string name="user_sign_up_university_email_hint">Email Address</string>
+    <string name="user_sign_up_first_password_hint">New Password</string>
+    <string name="user_sign_up_confirm_password_hint">Confirm Password</string>
+    <string name="user_sign_up_gender_hint">Gender</string>
     <string name="user_sign_up_choose_country_hint">Country</string>
     <string name="user_sign_up_choose_institution_hint">Institution</string>
     <string name="user_sign_up_next_button">Next</string>

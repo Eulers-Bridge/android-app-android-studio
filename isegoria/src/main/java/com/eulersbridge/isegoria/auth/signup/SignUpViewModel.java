@@ -28,10 +28,10 @@ public class SignUpViewModel extends AndroidViewModel {
     private final MutableLiveData<String> email = new MutableLiveData<>();
     private final MutableLiveData<String> password = new MutableLiveData<>();
     private final MutableLiveData<String> confirmPassword = new MutableLiveData<>();
+    private final MutableLiveData<String> gender = new MutableLiveData<>();
     private final MutableLiveData<Country> selectedCountry = new MutableLiveData<>();
     private final MutableLiveData<Institution> selectedInstitution = new MutableLiveData<>();
     private final MutableLiveData<String> selectedBirthYear = new MutableLiveData<>();
-    private final MutableLiveData<String> selectedGender = new MutableLiveData<>();
 
     void setGivenName(String givenName) {
         this.givenName.setValue(givenName);
@@ -51,6 +51,10 @@ public class SignUpViewModel extends AndroidViewModel {
 
     void setConfirmPassword(String confirmPassword) {
         this.confirmPassword.setValue(confirmPassword);
+    }
+
+    void setGender(@NonNull String gender) {
+        this.gender.setValue(gender);
     }
 
     public SignUpViewModel(@NonNull Application application) {
@@ -109,10 +113,6 @@ public class SignUpViewModel extends AndroidViewModel {
         selectedBirthYear.setValue(birthYear);
     }
 
-    void onGenderSelected(@NonNull String gender) {
-        selectedGender.setValue(gender);
-    }
-
 
     @Nullable SignUpUser getSignUpUser() {
         String givenName = this.givenName.getValue();
@@ -139,7 +139,7 @@ public class SignUpViewModel extends AndroidViewModel {
         String birthYear = selectedBirthYear.getValue();
         boolean birthYearValid = birthYear != null;
 
-        String gender = selectedGender.getValue();
+        String gender = this.gender.getValue();
         boolean genderValid = gender != null;
 
         boolean allFieldsValid = givenNameValid && familyNameValid && emailValid
