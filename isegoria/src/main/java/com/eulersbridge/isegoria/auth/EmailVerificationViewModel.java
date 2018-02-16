@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.auth.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

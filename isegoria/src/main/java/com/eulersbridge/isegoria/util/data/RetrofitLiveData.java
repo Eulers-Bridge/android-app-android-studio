@@ -25,10 +25,10 @@ public class RetrofitLiveData<T> extends LiveData<T> implements Callback<T> {
     @Override
     public void onResponse(Call<T> call, Response<T> response) {
         if (response.isSuccessful()) {
-            setValue(response.body());
+            postValue(response.body());
 
         } else {
-            setValue(null);
+            postValue(null);
         }
     }
 

@@ -27,6 +27,7 @@ public class AuthViewModel extends AndroidViewModel {
     final public MutableLiveData<Boolean> signUpVisible = new MutableLiveData<>();
     final public MutableLiveData<SignUpUser> signUpUser = new MutableLiveData<>();
     final MutableLiveData<Boolean> signUpConsentGiven =  new MutableLiveData<>();
+    final public MutableLiveData<Boolean> verificationComplete = new MutableLiveData<>();
 
     final public MutableLiveData<Boolean> userLoggedIn = new MutableLiveData<>();
 

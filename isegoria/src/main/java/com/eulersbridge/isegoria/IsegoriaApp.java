@@ -83,20 +83,24 @@ public class IsegoriaApp extends Application {
         login.observeForever(loginObserver);
     }
 
+    private void startActivity(Class<?> activityClass) {
+        Intent activityIntent = new Intent(this, activityClass);
+
+        if (Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
+            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        startActivity(activityIntent);
+    }
+
     private void showMainActivity() {
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(MainActivity.class);
     }
 
     public void showLoginScreen() {
         if (loginVisible.getValue() == null || !loginVisible.getValue()) {
             loginVisible.setValue(true);
-            Intent activityIntent = new Intent(this, AuthActivity.class);
-
-            if (Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O) {
-                activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            }
-
-            startActivity(activityIntent);
+            startActivity(AuthActivity.class);
         }
     }
 

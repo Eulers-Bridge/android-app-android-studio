@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.auth.login;
+package com.eulersbridge.isegoria.auth;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -21,9 +21,14 @@ public class EmailVerificationFragment extends Fragment {
 
         viewModel = ViewModelProviders.of(this).get(EmailVerificationViewModel.class);
 
+        //noinspection ConstantConditions
+        AuthViewModel authViewModel = ViewModelProviders.of(getActivity()).get(AuthViewModel.class);
+
         final Button verifiedButton = rootView.findViewById(R.id.verifiedButton);
         verifiedButton.setOnClickListener(view -> {
             verifiedButton.setEnabled(false);
+
+            authViewModel.verificationComplete.setValue(true);
 
             viewModel.userVerified().observe(this, success -> {
                 if (success != null && !success)

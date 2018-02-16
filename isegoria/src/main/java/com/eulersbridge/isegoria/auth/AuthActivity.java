@@ -60,12 +60,12 @@ public class AuthActivity extends AppCompatActivity {
 
         viewModel.signUpConsentGiven.observe(this, consent -> {
             if (consent != null && consent)
-                presentRootContent(new LoginFragment());
 
                 viewModel.signUp().observe(this, signUpComplete -> {
                     if (signUpComplete != null) {
                         if (signUpComplete) {
                             presentRootContent(new LoginFragment());
+                            presentContent(new EmailVerificationFragment());
 
                         } else {
                             presentRootContent(new LoginFragment());
@@ -79,6 +79,11 @@ public class AuthActivity extends AppCompatActivity {
                         }
                     }
                 });
+        });
+
+        viewModel.verificationComplete.observe(this, verificationComplete -> {
+            if (verificationComplete != null && verificationComplete)
+                presentRootContent(new LoginFragment());
         });
 
         viewModel.userLoggedIn.observe(this, loggedIn -> {

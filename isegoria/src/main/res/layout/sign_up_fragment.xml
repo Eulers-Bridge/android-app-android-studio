@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/white"
-            android:hint="@string/user_sign_up_first_name"
+            android:hint="@string/user_sign_up_first_name_hint"
             android:maxLines="1"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
@@ -83,7 +83,7 @@
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
             android:layout_marginTop="1dp"
             android:background="@color/white"
-            android:hint="@string/user_sign_up_last_name"
+            android:hint="@string/user_sign_up_last_name_hint"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
             android:paddingStart="8dp"
@@ -101,7 +101,7 @@
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
             android:layout_marginTop="1dp"
             android:background="@color/white"
-            android:hint="@string/user_sign_up_university_email"
+            android:hint="@string/user_sign_up_university_email_hint"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
             android:paddingStart="8dp"
@@ -120,7 +120,7 @@
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
             android:layout_marginTop="1dp"
             android:background="@color/white"
-            android:hint="@string/user_sign_up_first_password"
+            android:hint="@string/user_sign_up_first_password_hint"
             android:inputType="textWebPassword"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
@@ -138,8 +138,7 @@
             app:layout_constraintEnd_toEndOf="@id/sign_up_guideline_end"
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
             android:layout_marginTop="1dp"
-            android:background="@color/white"
-            android:hint="@string/user_sign_up_confirm_password"
+            android:hint="@string/user_sign_up_confirm_password_hint"
             android:inputType="textWebPassword"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
@@ -149,15 +148,22 @@
             android:maxLines="1"
             android:textColor="@color/grey" />
 
-        <Spinner
+        <EditText
             android:id="@+id/sign_up_gender"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/sign_up_confirm_new_password"
             app:layout_constraintEnd_toEndOf="@id/sign_up_guideline_end"
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
+            android:background="@color/white"
             android:layout_marginTop="1dp"
-            android:background="@color/white" />
+            android:hint="@string/user_sign_up_gender_hint"
+            android:minHeight="40dp"
+            android:paddingLeft="8dp"
+            android:paddingStart="8dp"
+            android:paddingRight="8dp"
+            android:paddingEnd="8dp"
+            android:maxLines="1" />
 
         <Spinner
             android:id="@+id/sign_up_birth_year"
