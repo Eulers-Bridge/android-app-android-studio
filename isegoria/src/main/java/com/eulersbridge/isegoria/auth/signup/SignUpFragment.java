@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.auth.AuthViewModel;
@@ -31,16 +31,16 @@ public class SignUpFragment extends Fragment {
     private Button signUpButton;
     private ImageView backButton;
 
-    private TextView givenNameField;
-    private TextView familyNameField;
-    private TextView emailField;
-    private TextView newPasswordField;
-    private TextView confirmNewPasswordField;
+    private EditText givenNameField;
+    private EditText familyNameField;
+    private EditText emailField;
+    private EditText newPasswordField;
+    private EditText confirmNewPasswordField;
+    private EditText genderField;
 
     private Spinner countrySpinner;
     private Spinner institutionSpinner;
     private Spinner yearOfBirthSpinner;
-    private Spinner genderSpinner;
 
 	private ArrayAdapter<Country> countryAdapter;
 	private ArrayAdapter<Institution> institutionAdapter;
@@ -79,6 +79,7 @@ public class SignUpFragment extends Fragment {
         emailField = rootView.findViewById(R.id.sign_up_email);
         newPasswordField = rootView.findViewById(R.id.sign_up_new_password);
         confirmNewPasswordField = rootView.findViewById(R.id.sign_up_confirm_new_password);
+        genderField = rootView.findViewById(R.id.sign_up_gender);
 
         AppCompatActivity activity = (AppCompatActivity)getActivity();
 
@@ -92,11 +93,6 @@ public class SignUpFragment extends Fragment {
         institutionAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item);
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         institutionSpinner.setAdapter(institutionAdapter);
-        
-        genderSpinner = rootView.findViewById(R.id.sign_up_gender);
-		ArrayAdapter<String> spinnerGenderArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, new String[]{ "Male", "Female", "Other" });
-        spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        genderSpinner.setAdapter(spinnerGenderArrayAdapter);
         
         yearOfBirthSpinner = rootView.findViewById(R.id.sign_up_birth_year);
 		ArrayAdapter<String> spinnerYearOfBirthArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item);
@@ -161,6 +157,9 @@ public class SignUpFragment extends Fragment {
         confirmNewPasswordField.addTextChangedListener(new SimpleTextWatcher(value ->
             viewModel.setConfirmPassword(value.toString())
         ));
+        genderField.addTextChangedListener(new SimpleTextWatcher(value ->
+            viewModel.setGender(value.toString())
+        ));
 
         countrySpinner.setOnItemSelectedListener(new SimpleOnItemSelectedListener() {
             @Override
@@ -189,14 +188,6 @@ public class SignUpFragment extends Fragment {
             void onItemSelected(int position) {
                 String birthYear = (String) yearOfBirthSpinner.getSelectedItem();
                 viewModel.onBirthYearSelected(birthYear);
-            }
-        });
-
-        genderSpinner.setOnItemSelectedListener(new SimpleOnItemSelectedListener() {
-            @Override
-            void onItemSelected(int position) {
-                String gender = (String) genderSpinner.getSelectedItem();
-                viewModel.onGenderSelected(gender);
             }
         });
     }

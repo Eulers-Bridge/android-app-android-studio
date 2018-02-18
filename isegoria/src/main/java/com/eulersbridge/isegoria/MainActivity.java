@@ -18,7 +18,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment;
+import com.eulersbridge.isegoria.auth.EmailVerificationFragment;
 import com.eulersbridge.isegoria.election.ElectionMasterFragment;
 import com.eulersbridge.isegoria.feed.FeedFragment;
 import com.eulersbridge.isegoria.friends.FriendsFragment;
