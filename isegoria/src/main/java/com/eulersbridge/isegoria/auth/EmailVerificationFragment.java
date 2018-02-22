@@ -49,8 +49,9 @@ public class EmailVerificationFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        if (viewModel != null)
+            viewModel.onExit();
 
-        viewModel.onExit();
+        super.onDestroy();
     }
 }

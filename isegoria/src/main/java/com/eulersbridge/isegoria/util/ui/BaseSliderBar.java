@@ -49,13 +49,15 @@ public class BaseSliderBar extends View {
                 @SuppressLint("NewApi")
                 @Override
                 public void getOutline(View view, Outline outline) {
-                    final int x = getCircleX();
-                    outline.setOval(
-                            x - circleRadius,
-                            y - circleRadius,
-                            x + circleRadius,
-                            y + circleRadius
-                    );
+                    if (currentPoint != null) {
+                        final int x = getCircleX();
+                        outline.setOval(
+                                x - circleRadius,
+                                y - circleRadius,
+                                x + circleRadius,
+                                y + circleRadius
+                        );
+                    }
                 }
             });
         }
@@ -132,7 +134,7 @@ public class BaseSliderBar extends View {
         canvas.drawCircle(circleX, y, circleRadius, circleStrokePaint);
 
         String answer = currentPoint.getAnswer();
-        canvas.drawText(answer, (parentWidth - textPaint.measureText(answer))/2, lineY + 50,
+        canvas.drawText(answer, (parentWidth - textPaint.measureText(answer))/2, lineY + 90,
                 textPaint);
     }
 

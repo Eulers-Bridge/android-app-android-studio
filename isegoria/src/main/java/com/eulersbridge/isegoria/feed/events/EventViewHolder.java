@@ -29,6 +29,8 @@ class EventViewHolder extends LoadingAdapter.ItemViewHolder<Event> implements Vi
     final private TextView titleTextView;
     final private TextView detailsTextView;
 
+    private boolean isImageLoadStarted = false;
+
     EventViewHolder(View view) {
         super(view);
 
@@ -60,12 +62,15 @@ class EventViewHolder extends LoadingAdapter.ItemViewHolder<Event> implements Vi
                     .transform(new TintTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
+
+            isImageLoadStarted = true;
         }
     }
 
     @Override
     protected void onRecycled() {
-        GlideApp.with(imageView.getContext()).clear(imageView);
+        if (imageView.getContext() != null && isImageLoadStarted)
+            GlideApp.with(imageView.getContext()).clear(imageView);
     }
 
     @Override

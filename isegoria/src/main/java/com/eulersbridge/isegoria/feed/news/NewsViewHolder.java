@@ -32,6 +32,8 @@ class NewsViewHolder extends LoadingAdapter.ItemViewHolder<NewsArticle> {
     final private TextView titleTextView;
     final private TextView dateTextView;
 
+    private boolean isImageLoadStarted = false;
+
     NewsViewHolder(View itemView) {
         super(itemView);
 
@@ -67,7 +69,8 @@ class NewsViewHolder extends LoadingAdapter.ItemViewHolder<NewsArticle> {
 
     @Override
     protected void onRecycled() {
-        GlideApp.with(imageView.getContext()).clear(imageView);
+        if (imageView.getContext() != null && isImageLoadStarted)
+            GlideApp.with(imageView.getContext()).clear(imageView);
     }
 
     @Override
@@ -97,6 +100,8 @@ class NewsViewHolder extends LoadingAdapter.ItemViewHolder<NewsArticle> {
                     .transforms(new CenterCrop(), new TintTransformation(), new RoundedCornersTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
+
+            isImageLoadStarted = true;
         }
     }
 }

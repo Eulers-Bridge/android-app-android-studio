@@ -7,9 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Task;
 
@@ -20,6 +19,8 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
     final private ImageView imageView;
     final private TextView nameTextView;
     final private TextView xpTextView;
+
+    private RequestManager glide;
 
     TaskViewHolder(View view) {
         super(view);
@@ -42,13 +43,17 @@ class TaskViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    void loadItemImage(long itemId, @NonNull String imageUrl) {
-        if (item != null && item.id == itemId && imageView.getContext() != null) {
-            GlideApp.with(imageView.getContext())
-                    .load(imageUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+    void setImageUrl(@NonNull RequestManager glide, long itemId, @NonNull String imageUrl) {
+        if (item != null && item.id == itemId ) {
+            this.glide = glide;
+
+            glide.load(imageUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
         }
+    }
+
+    void onRecycled() {
+        glide.clear(imageView);
     }
 }

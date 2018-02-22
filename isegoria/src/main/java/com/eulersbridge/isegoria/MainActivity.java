@@ -62,6 +62,17 @@ public class MainActivity extends AppCompatActivity implements
         setupApplicationObservers(application);
 	}
 
+    @Override
+    protected void onDestroy() {
+	    try {
+            GlideApp.with(this).onDestroy();
+        } catch (Exception e) {
+	        // Ignored
+        }
+
+        super.onDestroy();
+    }
+
     private void setupNavigation() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -221,12 +232,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu){
+	public boolean onCreateOptionsMenu(Menu menu) {
 		return false;
 	}
 
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+	    if (!navigationView.isEnabled())
+	        return false;
 
         Fragment fragment;
 

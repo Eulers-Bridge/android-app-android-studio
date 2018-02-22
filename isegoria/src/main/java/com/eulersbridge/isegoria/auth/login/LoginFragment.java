@@ -88,9 +88,10 @@ public class LoginFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+	    if (viewModel != null)
+            viewModel.onExit();
 
-        viewModel.onExit();
+        super.onDestroy();
     }
 
     private void showForgotPasswordDialog() {
@@ -135,6 +136,7 @@ public class LoginFragment extends Fragment {
         viewModel.emailError.observe(this, hasError -> {
             if (hasError != null && hasError) {
                 emailLayout.setError(getString(R.string.user_login_email_error_required));
+
                 emailLayout.setErrorEnabled(true);
                 emailField.requestFocus();
 

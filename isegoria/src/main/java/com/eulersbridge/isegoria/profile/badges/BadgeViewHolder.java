@@ -8,9 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.models.Badge;
 
@@ -21,6 +20,8 @@ class BadgeViewHolder extends RecyclerView.ViewHolder {
     final private ImageView imageView;
     final private TextView nameTextView;
     final private TextView descriptionTextView;
+
+    private @Nullable RequestManager glide;
 
     BadgeViewHolder(View view) {
         super(view);
@@ -51,13 +52,19 @@ class BadgeViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    void loadItemImage(long itemId, @NonNull String imageUrl) {
+    void setImageUrl(@NonNull RequestManager glide, long itemId, @NonNull String imageUrl) {
         if (item != null && item.id == itemId) {
-            GlideApp.with(imageView.getContext())
-                    .load(imageUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+
+            this.glide = glide;
+
+            glide.load(imageUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
         }
+    }
+
+    void onRecycled() {
+        if (glide != null)
+            glide.clear(imageView);
     }
 }
