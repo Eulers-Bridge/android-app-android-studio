@@ -106,7 +106,7 @@ public class LoginFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.forgot_password_title)
                 .setMessage(R.string.forgot_password_message)
-                .setView(R.layout.alert_dialog_input_forgot_password)
+                .setView(alertView)
                 .setPositiveButton(android.R.string.ok,
                         (dialog, choice) -> resetPassword(alertEmailInput.getText()))
                 .setNegativeButton(android.R.string.cancel, (dialog, __) -> dialog.cancel())

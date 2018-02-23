@@ -15,9 +15,11 @@ import com.eulersbridge.isegoria.network.api.models.FriendRequest;
 import com.eulersbridge.isegoria.network.api.models.Institution;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.util.Strings;
-import com.eulersbridge.isegoria.util.data.SingleLiveData;
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData;
+import com.eulersbridge.isegoria.util.data.SingleLiveData;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
@@ -142,10 +144,27 @@ public class FriendsViewModel extends AndroidViewModel {
                 if (user != null) {
 
                     LiveData<List<FriendRequest>> requests = new RetrofitLiveData<>(app.getAPI().getFriendRequestsReceived(user.getId()));
-                    receivedFriendRequests = Transformations.switchMap(requests, sentFriendRequests -> {
-                        receivedRequestsVisible.setValue(sentFriendRequests != null && sentFriendRequests.size() > 0);
+                    receivedFriendRequests = Transformations.switchMap(requests, receivedFriendRequests -> {
 
-                        return new SingleLiveData<>(sentFriendRequests);
+                        List<FriendRequest> filteredReceivedRequests;
+                        if (receivedFriendRequests != null) {
+                            filteredReceivedRequests = new ArrayList<>(receivedFriendRequests);
+
+                            Iterator<FriendRequest> iterator = filteredReceivedRequests.iterator();
+                            while (iterator.hasNext()) {
+                                FriendRequest request = iterator.next();
+
+                                if (request.accepted != null)
+                                    iterator.remove();
+                            }
+
+                        } else {
+                            filteredReceivedRequests = new ArrayList<>();
+                        }
+
+                        receivedRequestsVisible.setValue(filteredReceivedRequests.size() > 0);
+
+                        return new SingleLiveData<>(filteredReceivedRequests);
                     });
 
                     return receivedFriendRequests;
