@@ -25,6 +25,8 @@ class PhotoAlbumViewHolder extends LoadingAdapter.ItemViewHolder<PhotoAlbum> {
     final private TextView nameTextView;
     final private TextView descriptionTextView;
 
+    private boolean isImageLoadStarted = false;
+
     PhotoAlbumViewHolder(View itemView, ClickListener clickListener) {
         super(itemView);
 
@@ -43,7 +45,8 @@ class PhotoAlbumViewHolder extends LoadingAdapter.ItemViewHolder<PhotoAlbum> {
 
     @Override
     protected void onRecycled() {
-        GlideApp.with(imageView.getContext()).clear(imageView);
+        if (imageView.getContext() != null && isImageLoadStarted)
+            GlideApp.with(imageView.getContext()).clear(imageView);
     }
 
     @Override
@@ -65,6 +68,8 @@ class PhotoAlbumViewHolder extends LoadingAdapter.ItemViewHolder<PhotoAlbum> {
                     .placeholder(placeholderColourRes)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
+
+            isImageLoadStarted = true;
         }
     }
 }

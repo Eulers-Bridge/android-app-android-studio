@@ -136,6 +136,13 @@
     <string name="news_detail_activity_back_button_content_description">Back to News</string>
 
     <string name="feed_menu_item_friends">Friends</string>
+    <string name="friend_request_sent_message">Friend request sent</string>
+    <string name="friend_request_accepted_message">Friend request from %s accepted!</string>
+    <string name="friend_request_rejected_message">Friend request rejected</string>
+    <string name="friend_request_action_dialog_title">Friend request from</string>
+    <string name="friend_request_action_dialog_positive">Accept</string>
+    <string name="friend_request_action_dialog_negative">Reject</string>
+    <string name="friend_request_action_dialog_neutral">Ignore</string>
 
     <!-- Feed/Photos -->
     <string name="photo_detail_view_star">Star Photo</string>
@@ -171,6 +178,9 @@
     <string name="profile_logout">Logout</string>
 
     <!-- User profile – tasks progress -->
+    <string name="profile_tasks_progress_level_placeholder">Level 0</string>
+    <string name="profile_tasks_progress_level_description_placeholder">1000XP to next level</string>
+
     <string name="profile_tasks_progress_level">Level %d</string>
     <string name="profile_tasks_task_xp">%d XP</string>
     <string name="profile_tasks_progress_description" tools:ignore="PluralsCandidate">%d out of %d XP till the next level!</string>
@@ -196,7 +206,7 @@
     <string name="about_android_person">Anthony Quattrone</string>
     <string name="about_behavioral">Behavioral Team</string>
     <string name="about_thanks">Special Thanks To</string>
-    <string name="about_thanks_people">The Eulers Bridge Advisory Network Members</string>
+    <string name="about_thanks_people">The Euler\'s Bridge Advisory Network Members</string>
 
     <!-- Misc -->
     <string name="shortcut_view_latest_election_label_short">Latest Election</string>
@@ -212,12 +222,5 @@
 
     <string name="log_out_confirmation_title">Are you sure?</string>
     <string name="login_forgot_password_hint">Forgot password?</string>
-    <string name="friend_request_sent_message">Friend request sent</string>
-    <string name="friend_request_accepted_message">Friend request from %s accepted!</string>
-    <string name="friend_request_rejected_message">Friend request rejected</string>
-    <string name="friend_request_action_dialog_title">Friend request from</string>
-    <string name="friend_request_action_dialog_positive">Accept</string>
-    <string name="friend_request_action_dialog_negative">Reject</string>
-    <string name="friend_request_action_dialog_neutral">Ignore</string>
 
 </resources>

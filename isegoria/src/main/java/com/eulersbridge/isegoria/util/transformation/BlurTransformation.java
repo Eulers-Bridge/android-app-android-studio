@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.util.transformation;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -22,7 +23,7 @@ public class BlurTransformation extends BitmapTransformation {
 
     // Blur radius in DP
     private final int blurRadius;
-    public static float screenDensity = 2.0f;
+    private static float screenDensity = Resources.getSystem().getDisplayMetrics().density;
 
     private final WeakReference<Context> weakContext;
 

@@ -26,8 +26,6 @@ import com.eulersbridge.isegoria.network.api.responses.LoginResponse;
 import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.Strings;
 import com.eulersbridge.isegoria.util.data.SingleLiveData;
-import com.eulersbridge.isegoria.util.transformation.BlurTransformation;
-import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation;
 import com.securepreferences.SecurePreferences;
 
 import java.util.Arrays;
@@ -57,10 +55,6 @@ public class IsegoriaApp extends Application {
 
         networkService = new NetworkService(this);
         securePreferences = new SecurePreferences(this);
-
-        final float screenDensity = getResources().getDisplayMetrics().density;
-        BlurTransformation.screenDensity = screenDensity;
-        RoundedCornersTransformation.screenDensity = screenDensity;
 
         loginVisible.setValue(false);
         userVerificationVisible.setValue(false);

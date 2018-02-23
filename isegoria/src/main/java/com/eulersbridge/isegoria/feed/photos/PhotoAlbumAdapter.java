@@ -1,38 +1,26 @@
 package com.eulersbridge.isegoria.feed.photos;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.MainActivity;
-import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
-import com.eulersbridge.isegoria.util.Constants;
-import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 import com.eulersbridge.isegoria.R;
-
-import org.parceler.Parcels;
-
-import java.lang.ref.WeakReference;
+import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 
 public class PhotoAlbumAdapter extends LoadingAdapter<PhotoAlbum, PhotoAlbumViewHolder> implements PhotoAlbumViewHolder.ClickListener {
 
-    final private WeakReference<Fragment> weakFragment;
-
-    PhotoAlbumAdapter(@NonNull Fragment fragment) {
-        super(0);
-
-        weakFragment = new WeakReference<>(fragment);
+    interface PhotoAlbumClickListener {
+        void onClick(PhotoAlbum item);
     }
 
-    private boolean isValidFragment(@Nullable Fragment fragment) {
-        return (fragment != null
-                && fragment.getActivity() != null
-                && !fragment.isDetached()
-                && fragment.isAdded());
+    private final PhotoAlbumClickListener clickListener;
+
+    PhotoAlbumAdapter(@NonNull PhotoAlbumClickListener clickListener) {
+        super(0);
+
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -44,19 +32,6 @@ public class PhotoAlbumAdapter extends LoadingAdapter<PhotoAlbum, PhotoAlbumView
 
     @Override
     public void onClick(PhotoAlbum item) {
-        Fragment fragment = weakFragment.get();
-
-        if (isValidFragment(fragment)) {
-            PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
-
-            Bundle args = new Bundle();
-            args.putParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM, Parcels.wrap(item));
-
-            albumFragment.setArguments(args);
-
-            MainActivity mainActivity = (MainActivity) fragment.getActivity();
-            if (mainActivity != null)
-                mainActivity.presentContent(albumFragment);
-        }
+        clickListener.onClick(item);
     }
 }

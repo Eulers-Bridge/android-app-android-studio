@@ -16,6 +16,8 @@
         <item name="colorPrimary">@color/lightBlue</item>
         <item name="colorPrimaryDark">@color/lightBlue</item>
         <item name="colorAccent">@color/lightBlue</item>
+
+        <item name="textColorError">@color/lightRed</item>
     </style>
 
     <style name="AuthTheme" parent="AppTheme">

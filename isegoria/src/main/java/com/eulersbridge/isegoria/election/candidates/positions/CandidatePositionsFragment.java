@@ -9,19 +9,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
+import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.network.api.API;
 import com.eulersbridge.isegoria.network.api.models.Election;
 import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.models.User;
+import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.util.transformation.TintTransformation;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
 import retrofit2.Response;
 
-public class CandidatePositionsFragment extends Fragment {
+public class CandidatePositionsFragment extends Fragment implements PositionAdapter.PositionClickListener {
     private API api;
 
     private PositionAdapter adapter;
@@ -35,7 +42,13 @@ public class CandidatePositionsFragment extends Fragment {
         if (app != null)
             api = app.getAPI();
 
-        adapter = new PositionAdapter(this, api);
+        RequestManager glide = GlideApp.with(this).applyDefaultRequestOptions(
+                new RequestOptions()
+                        .placeholder(R.color.grey)
+                        .transform(new TintTransformation())
+        );
+
+        adapter = new PositionAdapter(glide, api, this);
 
         RecyclerView positionsGridView = rootView.findViewById(R.id.election_positions_grid_view);
         positionsGridView.setAdapter(adapter);
@@ -75,5 +88,20 @@ public class CandidatePositionsFragment extends Fragment {
 	private void setPositions(@NonNull List<Position> positions) {
 	    adapter.setLoading(false);
         adapter.replaceItems(positions);
+    }
+
+    @Override
+    public void onClick(Position item) {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(Constants.FRAGMENT_EXTRA_CANDIDATE_POSITION, Parcels.wrap(item));
+
+        CandidatePositionFragment detailFragment = new CandidatePositionFragment();
+        detailFragment.setArguments(arguments);
+
+        getChildFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.election_candidate_frame, detailFragment)
+                .commit();
     }
 }

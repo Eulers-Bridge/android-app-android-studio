@@ -138,6 +138,7 @@
             app:layout_constraintEnd_toEndOf="@id/sign_up_guideline_end"
             app:layout_constraintStart_toStartOf="@id/sign_up_guideline_start"
             android:layout_marginTop="1dp"
+            android:background="@color/white"
             android:hint="@string/user_sign_up_confirm_password_hint"
             android:inputType="textWebPassword"
             android:minHeight="40dp"

@@ -1,21 +1,17 @@
 package com.eulersbridge.isegoria.election.candidates.positions;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.bumptech.glide.RequestManager;
 import com.eulersbridge.isegoria.R;
-import com.eulersbridge.isegoria.util.Constants;
-import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
-import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.Position;
 import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
-
-import org.parceler.Parcels;
+import com.eulersbridge.isegoria.util.ui.LoadingAdapter;
 
 import java.lang.ref.WeakReference;
 
@@ -23,21 +19,20 @@ import retrofit2.Response;
 
 class PositionAdapter extends LoadingAdapter<Position, PositionViewHolder> implements PositionViewHolder.PositionItemListener {
 
-    final private WeakReference<Fragment> weakFragment;
-    final private API api;
-
-    PositionAdapter(@NonNull Fragment fragment, API api) {
-        super(1);
-
-        weakFragment = new WeakReference<>(fragment);
-        this.api = api;
+    interface PositionClickListener {
+        void onClick(Position item);
     }
 
-    private boolean isValidFragment(@Nullable Fragment fragment) {
-        return (fragment != null
-                && fragment.getActivity() != null
-                && !fragment.isDetached()
-                && fragment.isAdded());
+    final private PositionClickListener clickListener;
+    final private RequestManager glide;
+    final private API api;
+
+    PositionAdapter(@NonNull RequestManager glide, API api, @NonNull PositionClickListener clickListener) {
+        super(1);
+
+        this.glide = glide;
+        this.api = api;
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -54,20 +49,7 @@ class PositionAdapter extends LoadingAdapter<Position, PositionViewHolder> imple
 
     @Override
     public void onClick(Position item) {
-        Fragment fragment = weakFragment.get();
-        if (!isValidFragment(fragment)) return;
-
-        Bundle arguments = new Bundle();
-        arguments.putParcelable(Constants.FRAGMENT_EXTRA_CANDIDATE_POSITION, Parcels.wrap(item));
-
-        CandidatePositionFragment detailFragment = new CandidatePositionFragment();
-        detailFragment.setArguments(arguments);
-
-        fragment.getChildFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.election_candidate_frame, detailFragment)
-                .commit();
+        clickListener.onClick(item);
     }
 
     @Override
@@ -82,7 +64,7 @@ class PositionAdapter extends LoadingAdapter<Position, PositionViewHolder> imple
                     PhotosResponse body = response.body();
 
                     if (body != null && body.totalPhotos > 0 && wrViewHolder.get() != null) {
-                        wrViewHolder.get().setImageURL(body.photos.get(0).thumbnailUrl, itemId);
+                        wrViewHolder.get().setImageUrl(glide, body.photos.get(0).thumbnailUrl, itemId);
                     }
                 }
             });

@@ -20,6 +20,8 @@ class PhotoViewHolder extends LoadingAdapter.ItemViewHolder<Photo> {
     private final ClickListener clickListener;
     final private ImageView imageView;
 
+    private boolean isImageLoadStarted = false;
+
     PhotoViewHolder(View itemView, ClickListener clickListener) {
         super(itemView);
 
@@ -34,7 +36,8 @@ class PhotoViewHolder extends LoadingAdapter.ItemViewHolder<Photo> {
 
     @Override
     protected void onRecycled() {
-        GlideApp.with(imageView.getContext()).clear(imageView);
+        if (imageView.getContext() != null && isImageLoadStarted)
+            GlideApp.with(imageView.getContext()).clear(imageView);
     }
 
     @Override
@@ -46,6 +49,8 @@ class PhotoViewHolder extends LoadingAdapter.ItemViewHolder<Photo> {
                     .load(item.thumbnailUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView);
+
+            isImageLoadStarted = true;
         }
     }
 }

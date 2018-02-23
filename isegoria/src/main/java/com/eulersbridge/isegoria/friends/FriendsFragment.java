@@ -132,9 +132,10 @@ public class FriendsFragment extends Fragment implements TitledFragment, MainAct
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        if (viewModel != null)
+            viewModel.onExit();
 
-        viewModel.onExit();
+        super.onDestroy();
     }
 
     private void getReceivedFriendRequests() {

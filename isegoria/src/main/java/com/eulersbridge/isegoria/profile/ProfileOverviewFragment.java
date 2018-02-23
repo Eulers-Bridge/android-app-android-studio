@@ -15,11 +15,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.api.API;
 import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
 import com.eulersbridge.isegoria.network.api.models.User;
@@ -48,7 +50,8 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     private CircleProgressBar badgesProgressCircle;
     private CircleProgressBar tasksProgressCircle;
 
-    private final TaskAdapter taskAdapter = new TaskAdapter(this);
+    private RecyclerView tasksListView;
+    private TaskAdapter taskAdapter;
 
     private ProfileViewModel viewModel;
 
@@ -77,10 +80,23 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
         badgesProgressCircle = rootView.findViewById(R.id.profile_badges_progress_circle);
         tasksProgressCircle = rootView.findViewById(R.id.profile_tasks_progress_circle);
 
-        RecyclerView tasksListView = rootView.findViewById(R.id.profile_tasks_list_view);
+        tasksListView = rootView.findViewById(R.id.profile_tasks_list_view);
+
+		return rootView;
+	}
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        //noinspection ConstantConditions: getActivity() cannot be null in onActivityCreated()
+        IsegoriaApp app = (IsegoriaApp) getActivity().getApplication();
+
+        API api = app.getAPI();
+
+        taskAdapter = new TaskAdapter(Glide.with(this), api);
         tasksListView.setAdapter(taskAdapter);
         tasksListView.setNestedScrollingEnabled(false);
-
         tasksListView.setDrawingCacheEnabled(true);
         tasksListView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
 
@@ -91,12 +107,10 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         viewModel = ViewModelProviders.of(lifecycleOwner).get(ProfileViewModel.class);
 
-        IsegoriaApp app = (getActivity() != null)? (IsegoriaApp)getActivity().getApplication() : null;
-        if (app != null)
-            app.loggedInUser.observe(this, user -> {
-                if (user != null && viewModel.user.getValue() == null)
-                    viewModel.setUser(user);
-            });
+        app.loggedInUser.observe(this, user -> {
+            if (user != null && viewModel.user.getValue() == null)
+                viewModel.setUser(user);
+        });
 
         setupViewModelObservers();
 
@@ -115,9 +129,14 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         if (user != null)
             viewModel.setUser(user);
+    }
 
-		return rootView;
-	}
+    @Override
+    public void onDestroyView() {
+        GlideApp.with(this).onDestroy();
+
+        super.onDestroyView();
+    }
 
     private void setupViewModelObservers() {
         viewModel.user.observe(this, user -> {
