@@ -1,8 +1,7 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -10,11 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eulersbridge.isegoria.IsegoriaApp;
-import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
-import com.eulersbridge.isegoria.network.api.models.Task;
-import com.eulersbridge.isegoria.util.network.SimpleCallback;
+import com.bumptech.glide.RequestManager;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.Task;
+import com.eulersbridge.isegoria.network.api.responses.PhotosResponse;
+import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -23,14 +23,16 @@ import java.util.List;
 import retrofit2.Response;
 
 class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
-    private final WeakReference<Fragment> weakFragment;
+    final private RequestManager glide;
+    final private API api;
     final private List<Task> items = new ArrayList<>();
 
-    TaskAdapter(@NonNull Fragment fragment) {
-        weakFragment = new WeakReference<>(fragment);
+    TaskAdapter(@NonNull RequestManager glide, @NonNull API api) {
+        this.glide = glide;
+        this.api = api;
     }
 
-    public void setItems(@NonNull List<Task> newItems) {
+    void setItems(@NonNull List<Task> newItems) {
         items.clear();
         items.addAll(newItems);
         notifyItemRangeChanged(0, newItems.size());
@@ -39,25 +41,14 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
     @Override
     public int getItemCount() { return items.size(); }
 
-    private boolean isValidFragment(@Nullable Fragment fragment) {
-        return (fragment != null
-                && fragment.getActivity() != null
-                && !fragment.isDetached()
-                && fragment.isAdded());
-    }
-
-    private int getImageIndex(@NonNull Fragment fragment) {
-        DisplayMetrics dm = fragment.getResources().getDisplayMetrics();
-
-        int dpi = dm.densityDpi;
-        if (dpi == DisplayMetrics.DENSITY_LOW) {
-            return 5;
-
-        } else if (dpi == DisplayMetrics.DENSITY_MEDIUM) {
-            return 4;
-
-        } else {
-            return 3;
+    private int getImageIndex() {
+        switch (Resources.getSystem().getDisplayMetrics().densityDpi) {
+            case DisplayMetrics.DENSITY_LOW:
+                return 5;
+            case DisplayMetrics.DENSITY_MEDIUM:
+                return 4;
+            default:
+                return 3;
         }
     }
 
@@ -67,39 +58,29 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
 
         viewHolder.setItem(item);
 
-        Fragment fragment = weakFragment.get();
+        final int imageIndex = getImageIndex();
+        final long itemId = item.id;
 
-        if (isValidFragment(fragment)) {
-            //noinspection ConstantConditions
-            IsegoriaApp app = (IsegoriaApp)fragment.getActivity().getApplication();
+        WeakReference<TaskViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
 
-            if (app != null) {
-                int imageIndex = getImageIndex(fragment);
+        api.getPhotos(itemId).enqueue(new SimpleCallback<PhotosResponse>() {
+            @Override
+            protected void handleResponse(Response<PhotosResponse> response) {
+                PhotosResponse body = response.body();
 
-                final long itemId = item.id;
+                if (body != null
+                        && body.totalPhotos > (imageIndex + 1)) {
+                    TaskViewHolder innerViewHolder = weakViewHolder.get();
 
-                WeakReference<TaskViewHolder> weakViewHolder = new WeakReference<>(viewHolder);
+                    if (innerViewHolder != null) {
+                        String imageUrl = body.photos.get(imageIndex).thumbnailUrl;
 
-                app.getAPI().getPhotos(item.id).enqueue(new SimpleCallback<PhotosResponse>() {
-                    @Override
-                    protected void handleResponse(Response<PhotosResponse> response) {
-                        PhotosResponse body = response.body();
-
-                        if (body != null
-                                && body.totalPhotos > (imageIndex + 1)) {
-                            TaskViewHolder innerViewHolder = weakViewHolder.get();
-
-                            if (innerViewHolder != null) {
-                                String imageUrl = body.photos.get(imageIndex).thumbnailUrl;
-
-                                if (!TextUtils.isEmpty(imageUrl))
-                                    innerViewHolder.loadItemImage(itemId, imageUrl);
-                            }
-                        }
+                        if (!TextUtils.isEmpty(imageUrl))
+                            innerViewHolder.setImageUrl(glide, itemId, imageUrl);
                     }
-                });
+                }
             }
-        }
+        });
     }
 
     @Override
@@ -107,5 +88,12 @@ class TaskAdapter extends RecyclerView.Adapter<TaskViewHolder> {
         View itemView = LayoutInflater.from(viewGroup.getContext()).
                 inflate(R.layout.profile_tasks_list_item, viewGroup, false);
         return new TaskViewHolder(itemView);
+    }
+
+    @Override
+    public void onViewRecycled(TaskViewHolder holder) {
+        holder.onRecycled();
+
+        super.onViewRecycled(holder);
     }
 }

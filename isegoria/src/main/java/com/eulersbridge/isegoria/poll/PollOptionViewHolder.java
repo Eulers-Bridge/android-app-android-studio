@@ -27,6 +27,8 @@ class PollOptionViewHolder extends LoadingAdapter.ItemViewHolder<PollOption> {
     final private ProgressBar progressBar;
     final private TextView textTextView;
 
+    private boolean isImageLoadStarted = false;
+
     PollOptionViewHolder(View itemView, ClickListener clickListener) {
         super(itemView);
 
@@ -45,7 +47,8 @@ class PollOptionViewHolder extends LoadingAdapter.ItemViewHolder<PollOption> {
 
     @Override
     protected void onRecycled() {
-        GlideApp.with(imageView.getContext()).clear(imageView);
+        if (imageView.getContext() != null && isImageLoadStarted)
+            GlideApp.with(imageView.getContext()).clear(imageView);
     }
 
     @Override

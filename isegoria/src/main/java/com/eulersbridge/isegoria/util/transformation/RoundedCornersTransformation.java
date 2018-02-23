@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.util.transformation;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -22,7 +23,7 @@ public class RoundedCornersTransformation extends BitmapTransformation {
     // Radius of rounded corners in DP
     private final int cornerRadius;
 
-    public static float screenDensity = 2.0f;
+    private static float screenDensity = Resources.getSystem().getDisplayMetrics().density;
 
     public RoundedCornersTransformation() {
         this(0);

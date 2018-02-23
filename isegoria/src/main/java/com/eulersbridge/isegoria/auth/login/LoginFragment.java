@@ -88,9 +88,10 @@ public class LoginFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+	    if (viewModel != null)
+            viewModel.onExit();
 
-        viewModel.onExit();
+        super.onDestroy();
     }
 
     private void showForgotPasswordDialog() {
@@ -105,7 +106,7 @@ public class LoginFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.forgot_password_title)
                 .setMessage(R.string.forgot_password_message)
-                .setView(R.layout.alert_dialog_input_forgot_password)
+                .setView(alertView)
                 .setPositiveButton(android.R.string.ok,
                         (dialog, choice) -> resetPassword(alertEmailInput.getText()))
                 .setNegativeButton(android.R.string.cancel, (dialog, __) -> dialog.cancel())
@@ -135,6 +136,7 @@ public class LoginFragment extends Fragment {
         viewModel.emailError.observe(this, hasError -> {
             if (hasError != null && hasError) {
                 emailLayout.setError(getString(R.string.user_login_email_error_required));
+
                 emailLayout.setErrorEnabled(true);
                 emailField.requestFocus();
 

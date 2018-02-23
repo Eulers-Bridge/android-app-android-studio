@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.eulersbridge.isegoria.GlideApp;
+import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.api.API;
 import com.eulersbridge.isegoria.network.api.models.Task;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
 
@@ -30,12 +34,14 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
 
     private View rootView;
 
-    private final TaskAdapter completedAdapter = new TaskAdapter(this);
-    private final TaskAdapter remainingAdapter = new TaskAdapter(this);
-
-    private ProgressBar progressBar;
+    private TextView completedTextView;
+    private RecyclerView completedListView;
+    private TaskAdapter completedAdapter;
 
     private RecyclerView remainingListView;
+    private TaskAdapter remainingAdapter;
+
+    private ProgressBar progressBar;
 
     private ProfileViewModel viewModel;
 
@@ -55,15 +61,33 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
         progressBar = rootView.findViewById(R.id.profile_tasks_progress_bar);
         progressBar.getProgressDrawable().setColorFilter(Color.parseColor("#4FBF31"), PorterDuff.Mode.SRC_IN);
 
-        RecyclerView completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
+        completedTextView = rootView.findViewById(R.id.profile_tasks_progress_complete_text_view);
+        completedListView = rootView.findViewById(R.id.profile_tasks_progress_completed_list_view);
+        remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
+
+        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        API api = ((IsegoriaApp)getActivity().getApplication()).getAPI();
+
+        completedAdapter = new TaskAdapter(GlideApp.with(this), api);
         completedListView.setAdapter(completedAdapter);
 
-        remainingListView = rootView.findViewById(R.id.profile_tasks_progress_remaining_list_view);
+        remainingAdapter = new TaskAdapter(GlideApp.with(this), api);
         remainingListView.setAdapter(remainingAdapter);
 
         fetchTasks();
+    }
 
-        return rootView;
+    @Override
+    public void onDestroyView() {
+        GlideApp.with(this).onDestroy();
+
+        super.onDestroyView();
     }
 
     private void fetchTasks() {
@@ -73,8 +97,13 @@ public class ProfileTaskProgressFragment extends Fragment implements TitledFragm
         });
 
         viewModel.getCompletedTasks().observe(this, completedTasks -> {
-            if (completedTasks != null)
+            if (completedTasks != null) {
+                completedTextView.setVisibility(View.VISIBLE);
                 completedAdapter.setItems(completedTasks);
+
+            } else {
+                completedTextView.setVisibility(View.GONE);
+            }
         });
     }
 

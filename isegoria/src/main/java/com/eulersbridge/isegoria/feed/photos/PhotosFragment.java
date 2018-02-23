@@ -14,17 +14,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eulersbridge.isegoria.IsegoriaApp;
+import com.eulersbridge.isegoria.MainActivity;
 import com.eulersbridge.isegoria.R;
+import com.eulersbridge.isegoria.network.api.models.PhotoAlbum;
+import com.eulersbridge.isegoria.util.Constants;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import com.eulersbridge.isegoria.network.api.models.User;
 import com.eulersbridge.isegoria.network.api.responses.NewsFeedResponse;
 import com.eulersbridge.isegoria.util.network.SimpleCallback;
 
+import org.parceler.Parcels;
+
 import retrofit2.Response;
 
-public class PhotosFragment extends Fragment implements TitledFragment {
+public class PhotosFragment extends Fragment implements TitledFragment, PhotoAlbumAdapter.PhotoAlbumClickListener {
 
-    private IsegoriaApp app = null;
+    private IsegoriaApp app;
 
     private final PhotoAlbumAdapter adapter = new PhotoAlbumAdapter(this);
     private SwipeRefreshLayout refreshLayout;
@@ -113,5 +118,19 @@ public class PhotosFragment extends Fragment implements TitledFragment {
                 adapter.replaceItems(albums);
             }
         });
+    }
+
+    @Override
+    public void onClick(PhotoAlbum item) {
+        PhotoAlbumFragment albumFragment = new PhotoAlbumFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(Constants.FRAGMENT_EXTRA_PHOTO_ALBUM, Parcels.wrap(item));
+
+        albumFragment.setArguments(args);
+
+        MainActivity mainActivity = (MainActivity)getActivity();
+        if (mainActivity != null)
+            mainActivity.presentContent(albumFragment);
     }
 }
