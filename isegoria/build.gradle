@@ -83,7 +83,7 @@ dependencies {
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
@@ -91,9 +91,9 @@ dependencies {
     // Used in Candidate fragment for bottom tabs
     implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.15'
-    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.15'
-    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.15'
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.16'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.16'
+    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.16'
 
     // Required for push notifications
     implementation 'com.google.firebase:firebase-messaging:11.8.0'

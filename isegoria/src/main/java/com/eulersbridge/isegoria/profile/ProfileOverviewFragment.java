@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.Badge;
 import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
 import com.eulersbridge.isegoria.network.api.models.User;
@@ -34,6 +36,7 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import org.parceler.Parcels;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class ProfileOverviewFragment extends Fragment implements TitledFragment {
 
@@ -161,10 +164,13 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
                     institutionTextView.setText(institutionName);
             });
 
-            viewModel.getRemainingBadges().observe(this, remainingBadges -> {
-                if (remainingBadges != null)
-                    updateBadgesCount(user.completedBadgesCount, remainingBadges.size());
-            });
+            @Nullable LiveData<List<Badge>> remainingBadgesData = viewModel.getRemainingBadges();
+            if (remainingBadgesData != null) {
+                remainingBadgesData.observe(this, remainingBadges -> {
+                    if (remainingBadges != null)
+                        updateBadgesCount(user.completedBadgesCount, remainingBadges.size());
+                });
+            }
 
             viewModel.getTasks().observe(this, tasks -> {
                 if (tasks != null)
