@@ -92,8 +92,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //noinspection ConstantConditions: getActivity() cannot be null in onActivityCreated()
-        IsegoriaApp app = (IsegoriaApp) getActivity().getApplication();
+        IsegoriaApp app =  (IsegoriaApp) requireActivity().getApplication();
 
         API api = app.getAPI();
 

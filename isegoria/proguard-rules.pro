@@ -37,6 +37,12 @@
 
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
 
+## OkHttp ##
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
 ## Retrofit ##
 -dontwarn retrofit2.Platform$Java8
 
