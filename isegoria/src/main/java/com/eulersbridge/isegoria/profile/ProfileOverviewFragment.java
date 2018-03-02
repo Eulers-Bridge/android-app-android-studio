@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import com.eulersbridge.isegoria.GlideApp;
 import com.eulersbridge.isegoria.IsegoriaApp;
 import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.network.api.API;
+import com.eulersbridge.isegoria.network.api.models.Badge;
 import com.eulersbridge.isegoria.network.api.models.Contact;
 import com.eulersbridge.isegoria.network.api.models.GenericUser;
 import com.eulersbridge.isegoria.network.api.models.User;
@@ -34,6 +36,7 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment;
 import org.parceler.Parcels;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class ProfileOverviewFragment extends Fragment implements TitledFragment {
 
@@ -49,6 +52,8 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     private CircleProgressBar experienceProgressCircle;
     private CircleProgressBar badgesProgressCircle;
     private CircleProgressBar tasksProgressCircle;
+
+    private TextView showProgressButton;
 
     private RecyclerView tasksListView;
     private TaskAdapter taskAdapter;
@@ -73,8 +78,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         rootView.findViewById(R.id.profile_friends_label).setOnClickListener(friendsClickListener);
 
-        TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
-        showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
+        showProgressButton = rootView.findViewById(R.id.profile_show_progress);
 
         experienceProgressCircle = rootView.findViewById(R.id.profile_experience_progress_circle);
         badgesProgressCircle = rootView.findViewById(R.id.profile_badges_progress_circle);
@@ -89,8 +93,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //noinspection ConstantConditions: getActivity() cannot be null in onActivityCreated()
-        IsegoriaApp app = (IsegoriaApp) getActivity().getApplication();
+        IsegoriaApp app =  (IsegoriaApp) requireActivity().getApplication();
 
         API api = app.getAPI();
 
@@ -161,10 +164,13 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
                     institutionTextView.setText(institutionName);
             });
 
-            viewModel.getRemainingBadges().observe(this, remainingBadges -> {
-                if (remainingBadges != null)
-                    updateBadgesCount(user.completedBadgesCount, remainingBadges.size());
-            });
+            @Nullable LiveData<List<Badge>> remainingBadgesData = viewModel.getRemainingBadges();
+            if (remainingBadgesData != null) {
+                remainingBadgesData.observe(this, remainingBadges -> {
+                    if (remainingBadges != null)
+                        updateBadgesCount(user.completedBadgesCount, remainingBadges.size());
+                });
+            }
 
             viewModel.getTasks().observe(this, tasks -> {
                 if (tasks != null)
@@ -181,14 +187,20 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
             nameTextView.setText(user.getFullName());
 
-            boolean loggedInUserWithPersonality = user instanceof User && ((User)user).hasPersonality;
-            boolean externalUser = user instanceof Contact;
-            if (externalUser || loggedInUserWithPersonality) {
+            boolean isLoggedInUserWithPersonality = user instanceof User && ((User)user).hasPersonality;
+            boolean isExternalUser = user instanceof Contact;
+            if (isExternalUser || isLoggedInUserWithPersonality) {
                 personalityTestButton.setVisibility(View.GONE);
 
             } else {
                 personalityTestButton.setOnClickListener(view ->
                         startActivity(new Intent(getActivity(), PersonalityQuestionsActivity.class)));
+            }
+
+            if (isExternalUser) {
+                showProgressButton.setVisibility(View.GONE);
+            } else {
+                showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
             }
 
             updateCompletedTasksCount(user.completedTasksCount);
