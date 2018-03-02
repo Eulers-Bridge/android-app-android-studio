@@ -13,10 +13,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.eulersbridge.isegoria.MainActivity;
+import com.eulersbridge.isegoria.R;
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment;
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment;
 import com.eulersbridge.isegoria.util.ui.TitledFragment;
-import com.eulersbridge.isegoria.R;
 
 import java.lang.ref.WeakReference;
 

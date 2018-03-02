@@ -68,14 +68,14 @@ dependencies {
 
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
 
-    implementation 'com.android.support:support-fragment:27.0.2'
+    implementation 'com.android.support:support-fragment:27.1.0'
     // core-ui in order to access `ViewPager` (does not affect APK size)
-    implementation 'com.android.support:support-core-ui:27.0.2'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'com.android.support:design:27.0.2'
+    implementation 'com.android.support:support-core-ui:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.android.support:design:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
-    implementation 'com.android.support:recyclerview-v7:27.0.2'
-    implementation 'com.android.support:support-vector-drawable:27.0.2'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:support-vector-drawable:27.1.0'
 
     // ViewModel and LiveData
     implementation 'android.arch.lifecycle:extensions:1.1.0'
@@ -83,17 +83,17 @@ dependencies {
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
-    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 
     // Used in Candidate fragment for bottom tabs
     implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.15'
-    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.15'
-    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.15'
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.16'
+    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.16'
+    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.16'
 
     // Required for push notifications
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
