@@ -53,6 +53,8 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
     private CircleProgressBar badgesProgressCircle;
     private CircleProgressBar tasksProgressCircle;
 
+    private TextView showProgressButton;
+
     private RecyclerView tasksListView;
     private TaskAdapter taskAdapter;
 
@@ -76,8 +78,7 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
         rootView.findViewById(R.id.profile_friends_label).setOnClickListener(friendsClickListener);
 
-        TextView showProgressButton = rootView.findViewById(R.id.profile_show_progress);
-        showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
+        showProgressButton = rootView.findViewById(R.id.profile_show_progress);
 
         experienceProgressCircle = rootView.findViewById(R.id.profile_experience_progress_circle);
         badgesProgressCircle = rootView.findViewById(R.id.profile_badges_progress_circle);
@@ -186,14 +187,20 @@ public class ProfileOverviewFragment extends Fragment implements TitledFragment 
 
             nameTextView.setText(user.getFullName());
 
-            boolean loggedInUserWithPersonality = user instanceof User && ((User)user).hasPersonality;
-            boolean externalUser = user instanceof Contact;
-            if (externalUser || loggedInUserWithPersonality) {
+            boolean isLoggedInUserWithPersonality = user instanceof User && ((User)user).hasPersonality;
+            boolean isExternalUser = user instanceof Contact;
+            if (isExternalUser || isLoggedInUserWithPersonality) {
                 personalityTestButton.setVisibility(View.GONE);
 
             } else {
                 personalityTestButton.setOnClickListener(view ->
                         startActivity(new Intent(getActivity(), PersonalityQuestionsActivity.class)));
+            }
+
+            if (isExternalUser) {
+                showProgressButton.setVisibility(View.GONE);
+            } else {
+                showProgressButton.setOnClickListener(view -> viewModel.showTasksProgress());
             }
 
             updateCompletedTasksCount(user.completedTasksCount);
