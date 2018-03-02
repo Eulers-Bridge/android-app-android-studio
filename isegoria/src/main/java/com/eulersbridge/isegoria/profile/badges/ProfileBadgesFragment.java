@@ -45,8 +45,7 @@ public class ProfileBadgesFragment extends Fragment implements TitledFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //noinspection ConstantConditions: getActivity() cannot be null in onActivityCreated()
-        API api = ((IsegoriaApp) getActivity().getApplication()).getAPI();
+        API api = ((IsegoriaApp) requireActivity().getApplication()).getAPI();
 
         badgeAdapter = new BadgeAdapter(GlideApp.with(this), api);
         badgesGridView.setAdapter(badgeAdapter);
