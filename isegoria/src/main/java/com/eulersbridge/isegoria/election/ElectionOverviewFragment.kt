@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.isVisible
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Election
 import com.eulersbridge.isegoria.observe
@@ -45,23 +46,23 @@ class ElectionOverviewFragment : Fragment() {
         dateTextView.text = election.start.toDateString(context!!)
 
         if (!election.introduction.isNullOrBlank()) {
-            introductionHeadingTextView.visibility = View.VISIBLE
-            introductionTextView.visibility = View.VISIBLE
+            introductionHeadingTextView.isVisible = true
+            introductionTextView.isVisible = true
             introductionTextView.text = election.introduction
 
         } else {
-            introductionHeadingTextView.visibility = View.GONE
-            introductionTextView.visibility = View.GONE
+            introductionHeadingTextView.isVisible = false
+            introductionTextView.isVisible = false
         }
 
         if (!election.process.isNullOrBlank()) {
-            processHeadingTextView.visibility = View.VISIBLE
-            processTextView.visibility = View.VISIBLE
+            processHeadingTextView.isVisible = true
+            processTextView.isVisible = true
             processTextView.text = election.process
 
         } else {
-            processHeadingTextView.visibility = View.GONE
-            processTextView.visibility = View.GONE
+            processHeadingTextView.isVisible = false
+            processTextView.isVisible = false
         }
     }
 }

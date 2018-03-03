@@ -26,6 +26,8 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
     private var titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
     private var dateTextView: TextView = itemView.findViewById(R.id.dateTextView)
 
+    private var isImageLoadStarted = false
+
     init {
         imageView.setOnClickListener {
             if (item != null) {
@@ -50,7 +52,10 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
         }
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        if (imageView.context != null && isImageLoadStarted)
+            GlideApp.with(imageView.context).clear(imageView)
+    }
 
     override fun setItem(item: NewsArticle?) {
         this.item = item
@@ -70,6 +75,8 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
                     .transforms(CenterCrop(), TintTransformation(), RoundedCornersTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
+
+            isImageLoadStarted = true
         }
     }
 }

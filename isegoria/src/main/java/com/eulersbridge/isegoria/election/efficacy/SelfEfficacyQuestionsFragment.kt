@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.view.isGone
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
@@ -64,6 +65,6 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
         context?.getString(R.string.section_title_self_efficacy_questions)
 
     override fun setupTabLayout(tabLayout: TabLayout) {
-        tabLayout.visibility = View.GONE
+        tabLayout.isGone = true
     }
 }

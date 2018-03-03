@@ -3,16 +3,16 @@ package com.eulersbridge.isegoria.election.candidates.positions
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PositionViewHolder(itemView: View, private val listener: PositionItemListener?) :
     LoadingAdapter.ItemViewHolder<Position>(itemView) {
 
+    private var glide: RequestManager? = null
     private var item: Position? = null
     private val imageView: ImageView = itemView.findViewById(R.id.election_position_grid_item_image_view)
     private val titleTextView: TextView = itemView.findViewById(R.id.election_position_grid_item_title_text_view)
@@ -43,14 +43,14 @@ internal class PositionViewHolder(itemView: View, private val listener: Position
         }
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        glide?.clear(imageView)
+    }
 
-    fun setImageURL(imageURL: String?, itemId: Long) {
-        if (itemId == item!!.id && !imageURL.isNullOrBlank()) {
-            GlideApp.with(imageView.context)
-                .load(imageURL)
-                .placeholder(R.color.lightGrey)
-                .transform(TintTransformation())
+    fun setImageUrl(glide: RequestManager, url: String?, itemId: Long) {
+        if (itemId == item!!.id && !url.isNullOrBlank()) {
+            glide
+                .load(url)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)
         }

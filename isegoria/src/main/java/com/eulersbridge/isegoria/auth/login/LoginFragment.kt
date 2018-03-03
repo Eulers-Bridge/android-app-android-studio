@@ -17,7 +17,7 @@ import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.onTextChanged
+import com.eulersbridge.isegoria.auth.onTextChanged
 import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment() {
@@ -50,9 +50,9 @@ class LoginFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-
         viewModel.onExit()
+
+        super.onDestroy()
     }
 
     private fun showForgotPasswordDialog() {
@@ -66,7 +66,7 @@ class LoginFragment : Fragment() {
         AlertDialog.Builder(context!!)
                 .setTitle(R.string.forgot_password_title)
                 .setMessage(R.string.forgot_password_message)
-                .setView(R.layout.alert_dialog_input_forgot_password)
+                .setView(alertView)
                 .setPositiveButton(android.R.string.ok) { _, _ -> resetPassword(alertEmailInput.text) }
                 .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.cancel() }
                 .show()

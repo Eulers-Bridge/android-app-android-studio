@@ -30,7 +30,7 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     internal val articleLikeCount = Transformations.switchMap(articleLikes) { likes ->
-        SingleLiveData(likes?.size ?: 0)
+        return@switchMap SingleLiveData(likes?.size ?: 0)
     }
 
     internal val articleLikedByUser = Transformations.switchMap(articleLikes) { likes ->
@@ -58,7 +58,7 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
     internal fun likeArticle(): LiveData<Boolean> {
         return Transformations.switchMap<User, Boolean>(app.loggedInUser) { user ->
             if (user != null)
-                Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
+                return@switchMap Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
                     val like = RetrofitLiveData(app.api.likeArticle(article.id, user.email))
 
                     Transformations.switchMap(like) {

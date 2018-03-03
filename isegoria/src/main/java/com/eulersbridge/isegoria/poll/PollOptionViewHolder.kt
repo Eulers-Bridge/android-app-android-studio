@@ -4,6 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.view.isGone
+import androidx.view.isVisible
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
@@ -18,6 +20,8 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
     private val checkBoxImageView: ImageView
     private val progressBar: ProgressBar
     private val textTextView: TextView
+
+    private var isImageLoadStarted = false
 
     internal interface ClickListener {
         fun onClick(item: PollOption, position: Int)
@@ -37,28 +41,31 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
         textTextView = itemView.findViewById(R.id.poll_vote_option_list_item_text_text_view)
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        if (imageView.context != null && isImageLoadStarted)
+            GlideApp.with(imageView.context).clear(imageView)
+    }
 
     override fun setItem(item: PollOption?) {
         this.item = item
 
         if (item == null) {
             textTextView.text = null
-            imageView.visibility = View.GONE
+            imageView.isGone = true
             checkBoxImageView.setImageResource(R.drawable.tickempty)
 
         } else {
             textTextView.text = item.text
 
             if (item.photo != null) {
-                imageView.visibility = View.VISIBLE
+                imageView.isVisible = true
 
                 GlideApp.with(imageView.context)
                         .load(item.photo.thumbnailUrl)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(imageView)
             } else {
-                imageView.visibility = View.GONE
+                imageView.isGone = true
             }
 
             if (item.hasVoted) {

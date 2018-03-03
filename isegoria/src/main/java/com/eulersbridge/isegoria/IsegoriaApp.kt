@@ -22,8 +22,6 @@ import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.transformation.BlurTransformation
-import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation
 import com.securepreferences.SecurePreferences
 import java.util.*
 
@@ -61,10 +59,6 @@ class IsegoriaApp : Application() {
         networkService = NetworkService(this)
         securePreferences = SecurePreferences(this)
 
-        val screenDensity = resources.displayMetrics.density
-        BlurTransformation.screenDensity = screenDensity
-        RoundedCornersTransformation.screenDensity = screenDensity
-
         val login = login()
 
         loginObserver = Observer { loginSuccess ->
@@ -82,14 +76,23 @@ class IsegoriaApp : Application() {
         login.observeForever(loginObserver)
     }
 
+    private fun startActivity(activityClass: Class<*>) {
+        val activityIntent = Intent(this, activityClass)
+
+        if (Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O)
+            activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+        startActivity(activityIntent)
+    }
+
     private fun showMainActivity() {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(MainActivity::class.java)
     }
 
     private fun showLoginScreen() {
         if (loginVisible.value == null || loginVisible.value == false) {
             loginVisible.value = true
-            startActivity(Intent(this, AuthActivity::class.java))
+            startActivity(AuthActivity::class.java)
         }
     }
 
@@ -183,7 +186,7 @@ class IsegoriaApp : Application() {
                 login(email!!, password!!)
 
             } else {
-                SingleLiveData(false)
+                return SingleLiveData(false)
             }
         }
 
@@ -214,7 +217,7 @@ class IsegoriaApp : Application() {
                         userVerificationVisible.value = true
                     }
 
-                    SingleLiveData(true)
+                    return@switchMap SingleLiveData(true)
 
                 } else {
                     loginVisible.value = true

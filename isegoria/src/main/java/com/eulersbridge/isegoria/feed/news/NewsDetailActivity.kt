@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import androidx.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
@@ -74,7 +75,7 @@ class NewsDetailActivity : AppCompatActivity() {
             val creatorPhotoURL = article.creator.profilePhotoURL
 
             if (creatorPhotoURL.isNullOrBlank()) {
-                authorImageView.visibility = View.GONE
+                authorImageView.isGone = true
 
             } else {
                 GlideApp.with(this)

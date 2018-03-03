@@ -1,23 +1,31 @@
 package com.eulersbridge.isegoria.feed
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.*
 import androidx.graphics.toColorFilter
-import com.eulersbridge.isegoria.*
+import androidx.view.isVisible
+import com.eulersbridge.isegoria.MainActivity
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.setKeyboardVisible
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.feed_fragment.*
 
 
 class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private lateinit var tabLayout: TabLayout
+    private var tabLayout: TabLayout? = null
 
     private val viewModel: FeedViewModel by lazy {
         ViewModelProviders.of(activity!!).get(FeedViewModel::class.java)
@@ -30,6 +38,24 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         override fun onTabUnselected(tab: TabLayout.Tab) {}
         override fun onTabReselected(tab: TabLayout.Tab) {}
+    }
+
+    private fun Activity.setStatusBarColour(colour: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            window.statusBarColor = colour
+    }
+
+    private fun Activity.setMultitaskColour(@ColorInt colour: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            setMultitaskDescription(this, getString(R.string.app_name), colour)
+    }
+
+    private fun setMultitaskDescription(activity: Activity, title: String, @ColorInt colour: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val icon = BitmapFactory.decodeResource(activity.resources, R.drawable.app_icon)
+            activity.setTaskDescription(ActivityManager.TaskDescription(title, icon, colour))
+            icon.recycle()
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -87,7 +113,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
             currentItem = 0
         }
 
-        tabLayout.setupWithViewPager(viewPager)
+        tabLayout?.setupWithViewPager(viewPager)
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {
@@ -95,7 +121,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         tabLayout.apply {
             tabLayout.removeAllTabs()
-            tabLayout.visibility = View.VISIBLE
+            tabLayout.isVisible = true
             tabLayout.addOnTabSelectedListener(onTabSelectedListener)
 
             if (viewPager != null)
@@ -106,12 +132,12 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     override fun onPause() {
         super.onPause()
 
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 }

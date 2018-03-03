@@ -18,7 +18,7 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
     private val visibleIndex = MutableLiveData<Int>()
 
     internal val currentPhoto = Transformations.switchMap<Int, Photo>(visibleIndex) { index ->
-        SingleLiveData(photos?.get(index))
+        return@switchMap SingleLiveData(photos?.get(index))
     }
 
     internal fun getPhotoUrl(position: Int): String? = photos?.get(position)?.thumbnailUrl
@@ -42,7 +42,7 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
 
     internal fun getPhotoLikeCount(): LiveData<Int> {
         return Transformations.switchMap(getPhotoLikes()) { likes ->
-            SingleLiveData(likes?.size ?: 0)
+            return@switchMap SingleLiveData(likes?.size ?: 0)
         }
     }
 
@@ -57,7 +57,7 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 if (like != null)
-                    SingleLiveData(true)
+                    return@switchMap SingleLiveData(true)
             }
 
             SingleLiveData(false)
@@ -109,7 +109,7 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
             ) { (id) ->
                 val unlike = RetrofitLiveData(app.api.unlikePhoto(id.toLong(), user.email))
 
-                Transformations.switchMap(unlike) { SingleLiveData(true) }
+                Transformations.switchMap(unlike) unlike@ { return@unlike SingleLiveData(true) }
             }
         }
 

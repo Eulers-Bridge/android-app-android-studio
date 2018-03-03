@@ -58,6 +58,8 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
             outlineProvider = object : ViewOutlineProvider() {
                 @SuppressLint("NewApi")
                 override fun getOutline(view: View, outline: Outline) {
+                    if (currentPoint == null) return
+
                     val x = circleX
                     outline.setOval(
                         x - circleRadius,
@@ -131,7 +133,7 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
 
         currentPoint?.answer?.let { answer ->
             canvas.drawText(
-                answer, (parentWidth - textPaint.measureText(answer)) / 2, (lineY + 50).toFloat(),
+                answer, (parentWidth - textPaint.measureText(answer)) / 2, (lineY + 90).toFloat(),
                 textPaint
             )
         }

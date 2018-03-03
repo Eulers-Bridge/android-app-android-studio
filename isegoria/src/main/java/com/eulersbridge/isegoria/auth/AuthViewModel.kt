@@ -19,6 +19,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val signUpVisible = MutableLiveData<Boolean>()
     val signUpUser = MutableLiveData<SignUpUser>()
     val signUpConsentGiven = MutableLiveData<Boolean>()
+    val verificationComplete = MutableLiveData<Boolean>()
 
     val userLoggedIn = MutableLiveData<Boolean>()
 

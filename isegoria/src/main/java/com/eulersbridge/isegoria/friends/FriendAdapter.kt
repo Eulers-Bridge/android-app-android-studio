@@ -49,7 +49,7 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
         }
     }
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: List<Any>?) {
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
         onBindViewHolder(holder, position)
     }
 

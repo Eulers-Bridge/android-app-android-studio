@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
+import com.eulersbridge.isegoria.onSuccess
 import kotlinx.android.synthetic.main.photo_album_fragment.*
 
 class PhotoAlbumFragment : Fragment() {
@@ -39,7 +42,7 @@ class PhotoAlbumFragment : Fragment() {
 
             val app: IsegoriaApp? = activity?.application as? IsegoriaApp
 
-            app?.api?.getAlbumPhotos(it.id.toLong())?.onSuccess {
+            app?.api?.getAlbumPhotos(it.id)?.onSuccess {
                 setPhotos(it.photos)
             }
         }
@@ -47,7 +50,7 @@ class PhotoAlbumFragment : Fragment() {
 
     private fun setPhotos(photos: List<Photo>?) {
         adapter.apply {
-            isLoading = true
+            isLoading = false
 
             if (photos != null)
                 replaceItems(photos)

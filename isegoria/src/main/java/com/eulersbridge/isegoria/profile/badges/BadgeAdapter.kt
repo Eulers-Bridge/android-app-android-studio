@@ -1,20 +1,22 @@
 package com.eulersbridge.isegoria.profile.badges
 
-import android.support.v4.app.Fragment
+import android.content.res.Resources
 import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Badge
 import com.eulersbridge.isegoria.onSuccess
 import java.lang.ref.WeakReference
 import java.util.*
 
-internal class BadgeAdapter(fragment: Fragment) : RecyclerView.Adapter<BadgeViewHolder>() {
-
-    private val weakFragment: WeakReference<Fragment> = WeakReference(fragment)
+internal class BadgeAdapter(
+    private val glide: RequestManager,
+    private val api: API
+) : RecyclerView.Adapter<BadgeViewHolder>() {
 
     private val completedItems = ArrayList<Badge>()
     private val remainingItems = ArrayList<Badge>()
@@ -41,22 +43,12 @@ internal class BadgeAdapter(fragment: Fragment) : RecyclerView.Adapter<BadgeView
 
     override fun getItemCount() = completedItems.size + remainingItems.size
 
-    private fun getImageIndex(fragment: Fragment): Int {
-        val dm = fragment.resources.displayMetrics
-
-        val dpi = dm.densityDpi
-        return when (dpi) {
+    private fun getImageIndex(): Int {
+        return when (Resources.getSystem().displayMetrics.densityDpi) {
             DisplayMetrics.DENSITY_LOW -> 5
             DisplayMetrics.DENSITY_MEDIUM -> 4
             else -> 3
         }
-    }
-
-    private fun isValidFragment(fragment: Fragment?): Boolean {
-        return (fragment != null
-                && fragment.activity != null
-                && !fragment.isDetached
-                && fragment.isAdded)
     }
 
     override fun onBindViewHolder(viewHolder: BadgeViewHolder, index: Int) {
@@ -78,23 +70,21 @@ internal class BadgeAdapter(fragment: Fragment) : RecyclerView.Adapter<BadgeView
 
         viewHolder.setItem(item, completed)
 
-        weakFragment.get()?.takeIf {
-            it.activity != null && !it.isDetached && it.isAdded
-        }?.let {
-            val app = it.activity?.application as? IsegoriaApp
-            val imageIndex = getImageIndex(it)
-            val weakViewHolder = WeakReference(viewHolder)
+        val imageIndex = getImageIndex()
+        val itemId = item.id
 
-            app?.api?.getPhotos(item.id)?.onSuccess {
-                if (it.totalPhotos > imageIndex + 1) {
-                    val innerViewHolder = weakViewHolder.get()
+        val weakViewHolder = WeakReference(viewHolder)
 
-                    if (innerViewHolder != null) {
-                        val imageUrl = it.photos?.get(imageIndex)?.thumbnailUrl
+        api.getPhotos(itemId).onSuccess {
+            if (it.totalPhotos > imageIndex + 1) {
+                val innerViewHolder = weakViewHolder.get()
 
-                        if (!imageUrl.isNullOrBlank())
-                            innerViewHolder.loadItemImage(item.id, imageUrl!!)
-                    }
+                if (innerViewHolder != null) {
+                    it.photos?.get(imageIndex)?.thumbnailUrl
+                        ?.takeUnless { it.isBlank() }
+                        ?.also {
+                            innerViewHolder.setImageUrl(glide, item.id, it)
+                        }
                 }
             }
         }

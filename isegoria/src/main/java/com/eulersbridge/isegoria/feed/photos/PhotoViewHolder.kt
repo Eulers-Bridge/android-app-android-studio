@@ -13,6 +13,7 @@ import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 internal class PhotoViewHolder(itemView: View, private val clickListener: ClickListener?) : LoadingAdapter.ItemViewHolder<Photo>(itemView) {
 
     private val imageView: ImageView = itemView.findViewById(R.id.photo_grid_item_image_view)
+    private var isImageLoadStarted = false
 
     internal interface ClickListener {
         fun onClick(context: Context, position: Int)
@@ -24,7 +25,10 @@ internal class PhotoViewHolder(itemView: View, private val clickListener: ClickL
         }
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        if (imageView.context != null && isImageLoadStarted)
+            GlideApp.with(imageView.context).clear(imageView)
+    }
 
     override fun setItem(item: Photo?) {
         if (item != null) {
@@ -34,6 +38,8 @@ internal class PhotoViewHolder(itemView: View, private val clickListener: ClickL
                     .load(item.thumbnailUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
+
+            isImageLoadStarted = true
         }
     }
 }

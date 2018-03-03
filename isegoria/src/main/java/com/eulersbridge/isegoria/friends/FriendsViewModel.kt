@@ -124,12 +124,14 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
                 if (user != null) {
                     val requests = RetrofitLiveData(app.api.getFriendRequestsReceived(user.getId()))
                     receivedFriendRequests =
-                            Transformations.switchMap(requests) { sentFriendRequests ->
+                            Transformations.switchMap(requests) { receivedFriendRequests ->
+
+                                val filteredRequests = receivedFriendRequests?.filter { it.accepted == null }
 
                                 receivedRequestsVisible.value =
-                                        sentFriendRequests != null && sentFriendRequests.isNotEmpty()
+                                        filteredRequests != null && filteredRequests.isNotEmpty()
 
-                                SingleLiveData(sentFriendRequests)
+                                SingleLiveData(filteredRequests)
                             }
 
                     receivedFriendRequests

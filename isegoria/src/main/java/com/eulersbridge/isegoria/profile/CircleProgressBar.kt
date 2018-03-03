@@ -441,7 +441,7 @@ class CircleProgressBar : View {
             drawText(canvas, it, right, y, topTextPaint)
         }
 
-        topText?.takeUnless { it.isBlank() }?.let {
+        bottomText?.takeUnless { it.isBlank() }?.let {
             val y = bottom - thickness * 3
             drawText(canvas, it, right, y, bottomTextPaint)
         }

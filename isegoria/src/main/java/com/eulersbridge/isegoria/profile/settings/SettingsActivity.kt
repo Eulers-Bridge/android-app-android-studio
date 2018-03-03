@@ -1,8 +1,6 @@
 package com.eulersbridge.isegoria.profile.settings
 
 import android.app.Activity
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Color
@@ -15,6 +13,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.observeBoolean
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.theartofdev.edmodo.cropper.CropImage
@@ -89,15 +88,6 @@ class SettingsActivity : AppCompatActivity() {
         observeBoolean(viewModel.optOutDataCollectionSwitchEnabled) {
             optOutDataCollectionSwitch.isEnabled = it
         }
-    }
-
-    /**
-     * Convenience function to map an optional boolean to a non-null boolean value
-     */
-    private inline fun <T> observeBoolean(data: LiveData<T>, crossinline onChanged: (value: Boolean) -> Unit) {
-        data.observe(this, Observer {
-            onChanged(it == true)
-        })
     }
 
 

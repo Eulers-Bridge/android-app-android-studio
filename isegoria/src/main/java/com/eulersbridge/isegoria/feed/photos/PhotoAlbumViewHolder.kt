@@ -18,6 +18,8 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
     private val nameTextView: TextView = itemView.findViewById(R.id.photo_album_list_item_title_text_view)
     private val descriptionTextView: TextView = itemView.findViewById(R.id.photo_album_list_item_description_text_view)
 
+    private var isImageLoadStarted = false
+
     internal interface ClickListener {
         fun onClick(item: PhotoAlbum?)
     }
@@ -28,7 +30,10 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
         }
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        if (imageView.context != null && isImageLoadStarted)
+            GlideApp.with(imageView.context).clear(imageView)
+    }
 
     override fun setItem(item: PhotoAlbum?) {
         this.item = item
@@ -48,6 +53,8 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
                     .placeholder(placeholderColourRes)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
+
+            isImageLoadStarted = true
         }
     }
 }

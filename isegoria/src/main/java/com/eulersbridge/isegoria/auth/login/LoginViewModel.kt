@@ -5,10 +5,10 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
-import com.eulersbridge.isegoria.isValidEmail
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
@@ -24,6 +24,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     internal val networkError = MutableLiveData<Boolean>()
 
     internal val canShowPasswordResetDialog = MutableLiveData<Boolean>()
+
+    private val String?.isValidEmail
+        get() = !isNullOrBlank() && Patterns.EMAIL_ADDRESS.matcher(this!!).matches()
 
     init {
         formEnabled.value = true
@@ -61,7 +64,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
                 return Transformations.switchMap(loginRequest) { success ->
                     if (success == true)
-                        SingleLiveData(true)
+                        return@switchMap SingleLiveData(true)
 
                     formEnabled.value = true
                     SingleLiveData(false)

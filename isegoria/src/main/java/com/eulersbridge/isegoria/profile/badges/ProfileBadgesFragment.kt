@@ -7,8 +7,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bumptech.glide.Glide
-import com.bumptech.glide.MemoryCategory
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.ProfileViewModel
@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.profile_badges_fragment.*
 class ProfileBadgesFragment : Fragment(), TitledFragment {
 
     private lateinit var viewModel: ProfileViewModel
-    private val badgeAdapter = BadgeAdapter(this)
+    private lateinit var badgeAdapter: BadgeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,12 +33,16 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
             viewModel.setTargetBadgeLevel(it)
         }
 
-        Glide.get(context!!).setMemoryCategory(MemoryCategory.HIGH)
-
         return rootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        val api = (requireActivity().application as IsegoriaApp).api
+
+        badgeAdapter = BadgeAdapter(GlideApp.with(this), api)
+
         badgesGridView.apply {
             adapter = badgeAdapter
             isDrawingCacheEnabled = true
@@ -61,13 +65,6 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
             if (completedBadges != null)
                 badgeAdapter.replaceCompletedItems(completedBadges)
         }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-
-        if (context != null)
-            Glide.get(context!!).setMemoryCategory(MemoryCategory.NORMAL)
     }
 
     override fun getTitle(context: Context?)

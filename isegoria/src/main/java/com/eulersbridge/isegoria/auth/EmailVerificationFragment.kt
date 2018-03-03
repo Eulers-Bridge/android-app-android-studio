@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.auth.login
+package com.eulersbridge.isegoria.auth
 
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -23,6 +23,9 @@ class EmailVerificationFragment : Fragment() {
         verifiedButton.setOnClickListener {
             it.isEnabled = false
 
+            val authViewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel::class.java)
+            authViewModel.verificationComplete.value = true
+
             observe(viewModel.userVerified()) {
                 if (it == null || it == false)
                     verifiedButton.isEnabled = true
@@ -39,8 +42,8 @@ class EmailVerificationFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-
         viewModel.onExit()
+
+        super.onDestroy()
     }
 }

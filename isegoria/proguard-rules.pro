@@ -12,6 +12,7 @@
 -keepattributes SourceFile,LineNumberTable
 
 -keep class com.eulersbridge.** { *; }
+-dontwarn com.eulersbridge.**
 
 -keep class android.support.v7.widget.SearchView { *; }
 
@@ -37,6 +38,12 @@
 
 -keep class com.bumptech.glide.integration.okhttp3.OkHttpGlideModule
 
+## OkHttp ##
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
 ## Retrofit ##
 -dontwarn retrofit2.Platform$Java8
 
@@ -45,10 +52,6 @@
     @com.squareup.moshi.* <methods>;
 }
 -keep @com.squareup.moshi.JsonQualifier interface *
-
--keepclassmembers class kotlin.Metadata {
-    public <methods>;
-}
 
 ## BottomNavigationViewEx ##
 -keep public class android.support.design.widget.BottomNavigationView { *; }

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.util.transformation
 
+import android.content.res.Resources
 import android.graphics.*
 import android.support.annotation.IntRange
 import android.support.annotation.Px
@@ -20,7 +21,7 @@ class RoundedCornersTransformation(
         private const val ID = "$APP_ID.RoundedCornersTransformation"
         private val ID_BYTES = ID.toByteArray(Key.CHARSET)
 
-        var screenDensity = 2.0f
+        val screenDensity = Resources.getSystem().displayMetrics.density
     }
 
     constructor() : this(1)

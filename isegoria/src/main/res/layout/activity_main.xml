@@ -34,6 +34,6 @@
         android:background="@color/white"
         app:itemIconTint="@color/nav_state_list"
         app:itemTextColor="@color/nav_state_list"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation"/>
 
 </RelativeLayout>

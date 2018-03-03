@@ -21,9 +21,9 @@ class PollsViewModel(application: Application) : AndroidViewModel(application) {
             Transformations.switchMap<User, List<Poll>>(app.loggedInUser) { user ->
 
                 if (user?.institutionId == null)
-                    SingleLiveData(null)
+                    return@switchMap SingleLiveData(null)
 
-                val pollsResponse = RetrofitLiveData(app.api.getPolls(user!!.institutionId!!))
+                val pollsResponse = RetrofitLiveData(app.api.getPolls(user.institutionId!!))
 
                 Transformations.switchMap(pollsResponse) { response ->
                     polls = if (response != null && response.totalPolls > 0) {

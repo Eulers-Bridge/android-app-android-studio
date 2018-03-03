@@ -6,18 +6,29 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.os.bundleOf
+import com.bumptech.glide.request.RequestOptions
+import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import kotlinx.android.synthetic.main.election_positions_fragment.*
 
-class CandidatePositionsFragment : Fragment() {
+class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickListener {
 
     private var api: API? = null
     private val adapter: PositionAdapter by lazy {
-        PositionAdapter(this, api)
+        val glide = GlideApp.with(this).applyDefaultRequestOptions(
+            RequestOptions()
+                .placeholder(R.color.grey)
+                .transform(TintTransformation())
+        )
+
+        PositionAdapter(glide, api, this)
     }
 
     override fun onCreateView(
@@ -57,5 +68,16 @@ class CandidatePositionsFragment : Fragment() {
             isLoading = false
             replaceItems(positions)
         }
+    }
+
+    override fun onClick(item: Position) {
+        val detailFragment = CandidatePositionFragment()
+        detailFragment.arguments = bundleOf(FRAGMENT_EXTRA_CANDIDATE_POSITION to item)
+
+        childFragmentManager
+            .beginTransaction()
+            .addToBackStack(null)
+            .add(R.id.candidateFrame, detailFragment)
+            .commit()
     }
 }

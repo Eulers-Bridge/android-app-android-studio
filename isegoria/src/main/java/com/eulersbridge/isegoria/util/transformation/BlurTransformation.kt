@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.util.transformation
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.support.annotation.FloatRange
 import android.support.annotation.Px
@@ -25,7 +26,7 @@ class BlurTransformation @JvmOverloads constructor(
     companion object {
         private const val ID = "$APP_ID.BlurTransformation"
         private val ID_BYTES = ID.toByteArray(Key.CHARSET)
-        var screenDensity = 2.0f
+        val screenDensity = Resources.getSystem().displayMetrics.density
     }
 
     private val weakContext: WeakReference<Context> = WeakReference(context)

@@ -109,7 +109,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                 val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
 
                 userPhoto = Transformations.switchMap(photosRequest) { response ->
-                    SingleLiveData(response?.photos?.firstOrNull())
+                    return@switchMap SingleLiveData(response?.photos?.firstOrNull())
                 }
             }
         }

@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.os.bundleOf
+import androidx.view.isVisible
 import com.eulersbridge.isegoria.ACTIVITY_EXTRA_POLL
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
@@ -22,7 +23,7 @@ import java.util.*
 
 class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private lateinit var tabLayout: TabLayout
+    private var tabLayout: TabLayout? = null
     private lateinit var pagerAdapter: SimpleFragmentPagerAdapter
     private var fragments: MutableList<Fragment> = Vector()
 
@@ -56,7 +57,6 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViewPager()
-        setupTabLayout()
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_poll)
@@ -79,6 +79,9 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
         tabLayout.apply {
             removeAllTabs()
             visibility = View.VISIBLE
+
+            setupWithViewPager(viewPager)
+            addOnTabSelectedListener(onTabSelectedListener)
         }
     }
 
@@ -86,20 +89,13 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private fun updateTabs() {
         pagerAdapter.notifyDataSetChanged()
 
-        tabLayout.visibility = if (fragments.size < 2) View.GONE else View.VISIBLE
+        tabLayout?.isVisible = fragments.size >= 2
     }
 
     override fun onPause() {
         super.onPause()
 
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
-    }
-
-    private fun setupTabLayout() {
-        tabLayout.apply {
-            setupWithViewPager(viewPager)
-            addOnTabSelectedListener(onTabSelectedListener)
-        }
+        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     private fun addPolls(polls: List<Poll>) {

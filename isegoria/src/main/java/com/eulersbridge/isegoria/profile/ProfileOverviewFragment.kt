@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.isGone
+import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
@@ -23,7 +25,7 @@ import kotlinx.android.synthetic.main.profile_overview_fragment.*
 
 class ProfileOverviewFragment : Fragment(), TitledFragment {
 
-    private val taskAdapter = TaskAdapter(this)
+    private lateinit var taskAdapter: TaskAdapter
 
     private val viewModel: ProfileViewModel by lazy {
         val lifecycleOwner = parentFragment ?: this
@@ -59,10 +61,16 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         return rootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        val app: IsegoriaApp = requireActivity().application as IsegoriaApp
+        val api = app.api
+
+        taskAdapter = TaskAdapter(Glide.with(this), api)
+
         friendsCountTextView.setOnClickListener({  viewModel.viewFriends() })
         friendsLabel.setOnClickListener({  viewModel.viewFriends() })
-        viewProgressTextView.setOnClickListener { viewModel.viewTasksProgress() }
 
         tasksListView.apply {
             adapter = taskAdapter
@@ -77,7 +85,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     private fun createViewModelObservers() {
         observe(viewModel.user) { user ->
             if (user == null) {
-                personalityTestButton.visibility = View.GONE
+                personalityTestButton.isGone = true
                 return@observe
             }
 
@@ -116,20 +124,21 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
             nameTextView.text = user.fullName
 
-            val loggedInUserWithPersonality = user is User && user.hasPersonality
-            val externalUser = user is Contact
-            if (externalUser || loggedInUserWithPersonality) {
-                personalityTestButton.visibility = View.GONE
+            val isLoggedInUserWithPersonality = user is User && user.hasPersonality
+            val isExternalUser = user is Contact
+            if (isExternalUser || isLoggedInUserWithPersonality) {
+                personalityTestButton.isGone = true
 
             } else {
                 personalityTestButton.setOnClickListener {
-                    startActivity(
-                        Intent(
-                            activity,
-                            PersonalityQuestionsActivity::class.java
-                        )
-                    )
+                    startActivity(Intent(activity, PersonalityQuestionsActivity::class.java))
                 }
+            }
+
+            if (isExternalUser) {
+                viewProgressTextView.isGone = true
+            } else {
+                viewProgressTextView.setOnClickListener { viewModel.viewTasksProgress() }
             }
 
             updateCompletedTasksCount(user.completedTasksCount)
@@ -168,7 +177,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             val progress = experience % 1000
             val max: Long = 1000
 
-            experienceProgressCircle.bottomText = "NEED " + progress
+            experienceProgressCircle.bottomText = "NEED $progress"
             experienceProgressCircle.maximumValue = max.toInt()
             experienceProgressCircle.setValue(progress.toInt(), true)
         }
@@ -197,7 +206,6 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         } catch (e: IllegalAccessException) {
             throw RuntimeException(e)
         }
-
     }
 
     override fun getTitle(context: Context?)

@@ -109,13 +109,13 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             if (user != null) {
                 remainingBadges = RetrofitLiveData(app.api.getRemainingBadges(user.getId()))
             } else {
-                SingleLiveData(null)
+                return SingleLiveData(null)
             }
         }
 
         return if (limitToLevel && remainingBadges != null) {
             Transformations.switchMap(remainingBadges!!) { badges ->
-                SingleLiveData(badges?.filter { it.level == targetBadgeLevel.value })
+                return@switchMap SingleLiveData(badges?.filter { it.level == targetBadgeLevel.value })
             }
 
         } else {
@@ -140,7 +140,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             SingleLiveData(null)
         } else {
             Transformations.switchMap(completedBadges!!) { badges ->
-                SingleLiveData(badges?.filter { it.level == targetBadgeLevel.value })
+                return@switchMap SingleLiveData(badges?.filter { it.level == targetBadgeLevel.value })
             }
         }
     }
@@ -155,8 +155,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 val institutionRequest =
                     RetrofitLiveData(app.api.getInstitution(user.institutionId!!))
 
-                institutionName = Transformations.switchMap(institutionRequest) { institution ->
-                    SingleLiveData(institution?.getName())
+                institutionName = Transformations.switchMap(institutionRequest) request@ { institution ->
+                    return@request SingleLiveData(institution?.getName())
                 }
 
             } else {
@@ -226,8 +226,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
                 val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
 
-                userPhoto = Transformations.switchMap(photosRequest) {
-                    SingleLiveData(it?.photos?.firstOrNull())
+                userPhoto = Transformations.switchMap(photosRequest) request@ {
+                    return@request SingleLiveData(it?.photos?.firstOrNull())
                 }
 
                 return@switchMap userPhoto

@@ -74,7 +74,7 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         }
     }
 
-    override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: List<Any>?) {
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
         onBindViewHolder(holder, position)
     }
 

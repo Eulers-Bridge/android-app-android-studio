@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.view.isGone
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
@@ -24,7 +25,7 @@ internal class SentFriendRequestViewHolder(
 
     init {
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
-        actionImageView.visibility = View.GONE
+        actionImageView.isGone = true
 
         itemView.setOnClickListener { dataSource.onClick(item) }
     }

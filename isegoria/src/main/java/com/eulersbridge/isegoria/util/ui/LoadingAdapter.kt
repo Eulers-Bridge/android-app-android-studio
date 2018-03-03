@@ -43,8 +43,8 @@ protected constructor(private val loadingItemCount: Int) : RecyclerView.Adapter<
         viewHolder.setItem(if (isLoading) null else items[position])
     }
 
-    override fun onViewRecycled(viewHolder: VH?) {
-        viewHolder?.onRecycled()
+    override fun onViewRecycled(viewHolder: VH) {
+        viewHolder.onRecycled()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

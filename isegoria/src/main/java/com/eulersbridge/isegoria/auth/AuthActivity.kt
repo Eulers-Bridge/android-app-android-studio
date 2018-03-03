@@ -20,8 +20,6 @@ import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 
-
-
 class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +54,11 @@ class AuthActivity : AppCompatActivity() {
         }
 
         observe(viewModel.signUpConsentGiven) {
-            if (it == false)
-                presentRootContent(LoginFragment())
-
+            if (it == true)
                 observe(viewModel.signUp()) { signUpSuccess ->
                     if (signUpSuccess == true) {
                         presentRootContent(LoginFragment())
+                        presentContent(EmailVerificationFragment())
 
                     } else {
                         presentRootContent(LoginFragment())
@@ -74,6 +71,11 @@ class AuthActivity : AppCompatActivity() {
                             .show()
                     }
                 }
+        }
+
+        observe(viewModel.verificationComplete) {
+            if (it == true)
+                presentRootContent(LoginFragment())
         }
 
         observe(viewModel.userLoggedIn) {

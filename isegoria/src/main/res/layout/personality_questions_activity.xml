@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.eulersbridge.isegoriaApp.common.NonSwipeableViewPager
+    <com.eulersbridge.isegoria.util.ui.NonSwipeableViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

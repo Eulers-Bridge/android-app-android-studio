@@ -40,11 +40,12 @@
     <string name="connection_error_message">No connection</string>
     <string name="connection_error_action">Retry</string>
 
-    <string name="user_sign_up_first_name">Given Name</string>
-    <string name="user_sign_up_last_name">Family Name</string>
-    <string name="user_sign_up_university_email">Email Address</string>
-    <string name="user_sign_up_first_password">New Password</string>
-    <string name="user_sign_up_confirm_password">Confirm Password</string>
+    <string name="user_sign_up_first_name_hint">Given Name</string>
+    <string name="user_sign_up_last_name_hint">Family Name</string>
+    <string name="user_sign_up_university_email_hint">Email Address</string>
+    <string name="user_sign_up_first_password_hint">New Password</string>
+    <string name="user_sign_up_confirm_password_hint">Confirm Password</string>
+    <string name="user_sign_up_gender_hint">Gender</string>
     <string name="user_sign_up_choose_country_hint">Country</string>
     <string name="user_sign_up_choose_institution_hint">Institution</string>
     <string name="user_sign_up_next_button">Next</string>
@@ -135,6 +136,13 @@
     <string name="news_detail_activity_back_button_content_description">Back to News</string>
 
     <string name="feed_menu_item_friends">Friends</string>
+    <string name="friend_request_sent_message">Friend request sent</string>
+    <string name="friend_request_accepted_message">Friend request from %s accepted!</string>
+    <string name="friend_request_rejected_message">Friend request rejected</string>
+    <string name="friend_request_action_dialog_title">Friend request from</string>
+    <string name="friend_request_action_dialog_positive">Accept</string>
+    <string name="friend_request_action_dialog_negative">Reject</string>
+    <string name="friend_request_action_dialog_neutral">Ignore</string>
 
     <!-- Feed/Photos -->
     <string name="photo_detail_view_star">Star Photo</string>
@@ -170,6 +178,9 @@
     <string name="profile_logout">Logout</string>
 
     <!-- User profile – tasks progress -->
+    <string name="profile_tasks_progress_level_placeholder">Level 0</string>
+    <string name="profile_tasks_progress_level_description_placeholder">1000XP to next level</string>
+
     <string name="profile_tasks_progress_level">Level %d</string>
     <string name="profile_tasks_task_xp">%d XP</string>
     <string name="profile_tasks_progress_description" tools:ignore="PluralsCandidate">%d out of %d XP till the next level!</string>
@@ -195,7 +206,7 @@
     <string name="about_android_person">Anthony Quattrone</string>
     <string name="about_behavioral">Behavioral Team</string>
     <string name="about_thanks">Special Thanks To</string>
-    <string name="about_thanks_people">The Eulers Bridge Advisory Network Members</string>
+    <string name="about_thanks_people">The Euler\'s Bridge Advisory Network Members</string>
 
     <!-- Misc -->
     <string name="shortcut_view_latest_election_label_short">Latest Election</string>
@@ -211,12 +222,5 @@
 
     <string name="log_out_confirmation_title">Are you sure?</string>
     <string name="login_forgot_password_hint">Forgot password?</string>
-    <string name="friend_request_sent_message">Friend request sent</string>
-    <string name="friend_request_accepted_message">Friend request from %s accepted!</string>
-    <string name="friend_request_rejected_message">Friend request rejected</string>
-    <string name="friend_request_action_dialog_title">Friend request from</string>
-    <string name="friend_request_action_dialog_positive">Accept</string>
-    <string name="friend_request_action_dialog_negative">Reject</string>
-    <string name="friend_request_action_dialog_neutral">Ignore</string>
 
 </resources>

@@ -15,7 +15,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.content.systemService
-import com.eulersbridge.isegoria.auth.login.EmailVerificationFragment
+import com.eulersbridge.isegoria.auth.EmailVerificationFragment
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment
@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     FragmentManager.OnBackStackChangedListener {
 
     private var tabFragmentsStack: ArrayDeque<Fragment> = ArrayDeque(4)
+
     private val currentFragment: Fragment?
         get() = tabFragmentsStack.peekFirst() ?: null
 
@@ -60,6 +61,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         val application = applicationContext as IsegoriaApp
         setupApplicationObservers(application)
+    }
+
+    override fun onDestroy() {
+        GlideApp.with(this).onDestroy()
+
+        super.onDestroy()
     }
 
     private fun setupNavigation() {
@@ -207,6 +214,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     override fun onCreateOptionsMenu(menu: Menu) = false
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (!navigationView.isEnabled)
+            return false
 
         val fragment: Fragment = when (item.itemId) {
             R.id.navigation_feed -> FeedFragment()
@@ -214,7 +223,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             R.id.navigation_vote -> VoteViewPagerFragment()
             R.id.navigation_profile -> ProfileViewPagerFragment()
             R.id.navigation_election -> ElectionMasterFragment()
-            else -> return true
+            else -> return false
         }
 
         if (currentFragment == null || fragment::class != currentFragment!!::class) {

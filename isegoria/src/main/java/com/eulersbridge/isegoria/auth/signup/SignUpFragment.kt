@@ -7,12 +7,17 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.view.updatePadding
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
+import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.setKeyboardVisible
 import kotlinx.android.synthetic.main.sign_up_fragment.*
 import java.util.*
 
@@ -49,10 +54,6 @@ class SignUpFragment : Fragment() {
         institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         institutionSpinner.adapter = institutionAdapter
-
-        val spinnerGenderArrayAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, arrayOf("Male", "Female", "Other"))
-        spinnerGenderArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        genderSpinner.adapter = spinnerGenderArrayAdapter
 
         val spinnerYearOfBirthArrayAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item)
 
@@ -103,6 +104,7 @@ class SignUpFragment : Fragment() {
         email.onTextChanged { viewModel.email.value = it }
         newPassword.onTextChanged { viewModel.password.value = it }
         confirmNewPassword.onTextChanged { viewModel.confirmPassword.value = it }
+        gender.onTextChanged { viewModel.gender.value = it }
 
         countrySpinner.onItemSelected { position -> updateInstitutionSpinner(position) }
 
@@ -111,11 +113,6 @@ class SignUpFragment : Fragment() {
         birthYearSpinner.onItemSelected {
             val birthYear = birthYearSpinner.selectedItem as String
             viewModel.selectedBirthYear.value = birthYear
-        }
-
-        genderSpinner.onItemSelected {
-            val gender = genderSpinner.selectedItem as String
-            viewModel.selectedGender.value = gender
         }
     }
 
@@ -139,5 +136,15 @@ class SignUpFragment : Fragment() {
         updateInstitutionSpinner(0)
 
         countrySpinner.isEnabled = true
+    }
+
+    private inline fun Spinner.onItemSelected(crossinline onItemSelected: (position: Int) -> Unit) {
+        this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+
+            override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                onItemSelected(position)
+            }
+        }
     }
 }

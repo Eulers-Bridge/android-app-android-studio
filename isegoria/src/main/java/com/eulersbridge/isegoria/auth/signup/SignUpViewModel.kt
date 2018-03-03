@@ -20,17 +20,17 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
     val email = MutableLiveData<String>()
     val password = MutableLiveData<String>()
     val confirmPassword = MutableLiveData<String>()
+    val gender = MutableLiveData<String>()
     private val selectedCountry = MutableLiveData<Country>()
     private val selectedInstitution = MutableLiveData<Institution?>()
     val selectedBirthYear = MutableLiveData<String>()
-    val selectedGender = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
         val app: IsegoriaApp = getApplication()
         val generalInfo = RetrofitLiveData(app.api.getGeneralInfo())
 
         return Transformations.switchMap(generalInfo) {
-            SingleLiveData(it?.countries)
+            return@switchMap SingleLiveData(it?.countries)
         }
     }
 
@@ -79,7 +79,7 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
         val birthYear = selectedBirthYear.value
         val birthYearValid = birthYear != null
 
-        val gender = selectedGender.value
+        val gender = gender.value
         val genderValid = gender != null
 
         val allFieldsValid = givenNameValid && familyNameValid && emailValid

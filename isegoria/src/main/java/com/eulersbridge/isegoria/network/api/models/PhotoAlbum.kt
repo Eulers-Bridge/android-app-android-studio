@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class PhotoAlbum (
-    @Json(name = "nodeId") val id: Int = 0,
+    @Json(name = "nodeId") val id: Long = 0,
     val name: String? = null,
     val description: String?,
     val location: String?,

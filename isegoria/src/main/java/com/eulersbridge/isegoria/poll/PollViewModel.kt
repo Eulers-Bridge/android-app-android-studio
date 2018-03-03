@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.poll
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
@@ -19,14 +20,14 @@ class PollViewModel(application: Application) : AndroidViewModel(application) {
     internal val poll = MutableLiveData<Poll>()
     internal val pollResults = MutableLiveData<List<PollResult>>()
 
-    internal val pollCreator = Transformations.switchMap(poll) { thePoll ->
+    internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) { thePoll ->
         if (thePoll != null) {
             if (thePoll.creator == null && !thePoll.creatorEmail.isNullOrBlank()) {
                 val app = getApplication<IsegoriaApp>()
-                RetrofitLiveData(app.api.getContact(thePoll.creatorEmail!!))
+                return@switchMap RetrofitLiveData(app.api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
 
             } else if (thePoll.creator != null) {
-                SingleLiveData(thePoll.creator)
+                return@switchMap SingleLiveData<Contact?>(thePoll.creator)
             }
         }
 

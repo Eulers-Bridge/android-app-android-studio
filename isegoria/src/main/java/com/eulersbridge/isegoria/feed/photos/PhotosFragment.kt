@@ -9,21 +9,20 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.os.bundleOf
 import androidx.view.postDelayed
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.photos_fragment.*
 
-class PhotosFragment : Fragment(), TitledFragment {
+class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumClickListener {
 
     private var app: IsegoriaApp? = null
     private val adapter = PhotoAlbumAdapter(this)
 
     private val viewModel: PhotoAlbumsViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(PhotoAlbumsViewModel::class.java)
+        ViewModelProviders.of(requireActivity()).get(PhotoAlbumsViewModel::class.java)
     }
 
     private var fetchedPhotos = false
@@ -45,7 +44,7 @@ class PhotosFragment : Fragment(), TitledFragment {
 
         albumsListView.apply {
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-            adapter = this.adapter
+            adapter = this@PhotosFragment.adapter
         }
 
         refresh()
@@ -67,9 +66,9 @@ class PhotosFragment : Fragment(), TitledFragment {
         if (user?.institutionId != null) {
 
             if (user.newsFeedId == 0L) {
-                app!!.api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { body ->
+                app!!.api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { response ->
                     val updatedUser = user.copy()
-                    updatedUser.newsFeedId = body.newsFeedId
+                    updatedUser.newsFeedId = response.newsFeedId
                     app?.updateLoggedInUser(updatedUser)
 
                     fetchPhotoAlbums()
@@ -89,5 +88,12 @@ class PhotosFragment : Fragment(), TitledFragment {
             if (albums != null)
                 adapter.replaceItems(albums)
         }
+    }
+
+    override fun onClick(item: PhotoAlbum) {
+        val albumFragment = PhotoAlbumFragment()
+        albumFragment.arguments = bundleOf(FRAGMENT_EXTRA_PHOTO_ALBUM to item)
+
+        (activity as? MainActivity)?.presentContent(albumFragment)
     }
 }

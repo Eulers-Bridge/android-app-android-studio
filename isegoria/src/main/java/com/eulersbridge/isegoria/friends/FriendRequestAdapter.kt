@@ -78,7 +78,7 @@ internal class FriendRequestAdapter(
     override fun onBindViewHolder(
         holder: RecyclerView.ViewHolder,
         position: Int,
-        payloads: List<*>?
+        payloads: MutableList<Any>
     ) {
         onBindViewHolder(holder, position)
     }

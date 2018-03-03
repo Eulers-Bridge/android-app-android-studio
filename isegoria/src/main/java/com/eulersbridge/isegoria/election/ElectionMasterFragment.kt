@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.view.isVisible
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
@@ -96,7 +97,7 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
         observe(viewModel.userCompletedEfficacyQuestions()) {
             if (it == true) {
-                overlayView.visibility = View.VISIBLE
+                overlayView.isVisible = true
 
                 overlaySurveyButton.setOnClickListener {
                     activity?.supportFragmentManager

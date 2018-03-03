@@ -1,7 +1,5 @@
 package com.eulersbridge.isegoria.friends
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -16,6 +14,8 @@ import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.os.bundleOf
+import androidx.view.isGone
+import androidx.view.isVisible
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.FriendRequest
@@ -37,7 +37,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
     private var mainActivity: MainActivity? = null
 
-    @IntDef(RECEIVED.toLong(), SENT.toLong())
+    @IntDef(RECEIVED, SENT)
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class FriendRequestType
 
@@ -55,20 +55,24 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
         viewModel = ViewModelProviders.of(this).get(FriendsViewModel::class.java)
 
-        observeVisibility(viewModel.searchSectionVisible) {
-            searchContainer.visibility = it
+        observeBoolean(viewModel.searchSectionVisible) {
+            searchContainer.isVisible = it
         }
 
-        observeVisibility(viewModel.friendsVisible) {
-            friendsContainer.visibility = it
+        observeBoolean(viewModel.friendsVisible) {
+            friendsContainer.isVisible = it
         }
 
-        observeVisibility(viewModel.sentRequestsVisible) {
-            sentRequestsContainer.visibility = it
+        observeBoolean(viewModel.sentRequestsVisible) {
+            sentRequestsContainer.isVisible = it
         }
 
-        observeVisibility(viewModel.receivedRequestsVisible) {
-            receivedRequestsContainer.visibility = it
+        observeBoolean(viewModel.receivedRequestsVisible) {
+            receivedRequestsContainer.isVisible = it
+        }
+
+        observeBoolean(viewModel.receivedRequestsVisible) {
+            receivedRequestsContainer.isVisible = it
         }
 
         observe(viewModel.getFriends()) { friends ->
@@ -84,15 +88,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         getReceivedFriendRequests()
 
         return rootView
-    }
-
-    /**
-     * Convenience function to map a LiveData<Boolean?>'s value to a view visibility int
-     */
-    private inline fun <T> observeVisibility(data: LiveData<T>, crossinline onChanged: (visibility: Int) -> Unit) {
-        data.observe(this, Observer {
-            onChanged(if (it == true) View.VISIBLE else View.GONE)
-        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -211,7 +206,10 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         inflater?.inflate(R.menu.friends, menu)
         super.onCreateOptionsMenu(menu, inflater)
 
-        val searchItem = menu!!.findItem(R.id.friends_search_view)
+        if (menu == null)
+            return
+
+        val searchItem = menu.findItem(R.id.friends_search_view)
 
         val searchView = searchItem.actionView as SearchView
         searchView.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME
@@ -260,7 +258,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {
-        tabLayout.visibility = View.GONE
+        tabLayout.isGone = true
     }
 
     private fun showMessage(message: String)

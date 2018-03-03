@@ -84,7 +84,7 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
                     calendar.timeInMillis = election.startVoting
                     dateTime.value = calendar
 
-                    SingleLiveData(election)
+                    return@switchMap SingleLiveData<Election?>(election)
                 }
 
                 SingleLiveData<Election?>(null)
@@ -155,7 +155,7 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (latestReminder != null) {
                     latestVoteReminder.value = latestReminder
-                    SingleLiveData(true)
+                    return@switchMap SingleLiveData(true)
                 }
 
                 SingleLiveData(false)

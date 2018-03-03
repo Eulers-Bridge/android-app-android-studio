@@ -24,6 +24,8 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
     private val titleTextView: TextView = view.findViewById(R.id.event_list_title_text_view)
     private val detailsTextView: TextView = view.findViewById(R.id.event_list_details_text_view)
 
+    private var isImageLoadStarted = false
+
     init {
         view.setOnClickListener(this)
     }
@@ -47,10 +49,15 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
                     .transform(TintTransformation())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
+
+            isImageLoadStarted = true
         }
     }
 
-    override fun onRecycled() = GlideApp.with(imageView.context).clear(imageView)
+    override fun onRecycled() {
+        if (imageView.context != null && isImageLoadStarted)
+            GlideApp.with(imageView.context).clear(imageView)
+    }
 
     override fun onClick(view: View) {
         if (item == null) return

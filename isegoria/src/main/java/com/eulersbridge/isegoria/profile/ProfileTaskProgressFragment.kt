@@ -15,6 +15,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Task
 import com.eulersbridge.isegoria.observe
@@ -23,8 +25,8 @@ import kotlinx.android.synthetic.main.profile_task_progress_fragment.*
 
 class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
-    private val completedAdapter = TaskAdapter(this)
-    private val remainingAdapter = TaskAdapter(this)
+    private lateinit var completedAdapter: TaskAdapter
+    private lateinit var remainingAdapter: TaskAdapter
 
     private lateinit var viewModel: ProfileViewModel
 
@@ -45,11 +47,20 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         return rootView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
         progressBar.progressDrawable.setColorFilter(
             Color.parseColor("#4FBF31"),
             PorterDuff.Mode.SRC_IN
         )
+
+        val glide = GlideApp.with(this)
+        val app = requireActivity().application as IsegoriaApp
+        val api = app.api
+
+        completedAdapter = TaskAdapter(glide, api)
+        remainingAdapter = TaskAdapter(glide, api)
 
         completedTasksListView.adapter = completedAdapter
         remainingTasksListView.adapter = remainingAdapter

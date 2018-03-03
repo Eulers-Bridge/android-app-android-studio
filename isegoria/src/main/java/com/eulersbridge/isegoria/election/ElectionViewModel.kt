@@ -31,8 +31,8 @@ class ElectionViewModel(application: Application) : AndroidViewModel(application
             if (user?.institutionId != null) {
                 val electionsList = RetrofitLiveData(app.api.getElections(user.institutionId!!))
 
-                election = Transformations.switchMap(electionsList) {
-                    SingleLiveData(it?.firstOrNull())
+                election = Transformations.switchMap(electionsList) election@ {
+                    return@election SingleLiveData(it?.firstOrNull())
                 }
 
                 return@switchMap election
