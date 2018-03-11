@@ -72,7 +72,10 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
         val app = getApplication<IsegoriaApp>()
         val user = app.loggedInUser.value
 
-        if (user?.institutionId != null) {
+        return if (user?.institutionId == null) {
+            SingleLiveData(null)
+
+        } else {
             val electionsList = RetrofitLiveData(app.api.getElections(user.institutionId!!))
 
             electionData = Transformations.switchMap(electionsList) { elections ->
@@ -90,10 +93,8 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
                 SingleLiveData<Election?>(null)
             }
 
-            electionData
+            electionData!!
         }
-
-        return SingleLiveData(null)
     }
 
     internal fun getVoteLocations(): LiveData<List<VoteLocation>?> {
@@ -150,15 +151,15 @@ class VoteViewModel(application: Application) : AndroidViewModel(application) {
             val remindersRequest = RetrofitLiveData(app.api.getVoteReminders(user.email))
 
             return Transformations.switchMap(remindersRequest) { reminders ->
-
                 val latestReminder = reminders?.firstOrNull()
 
-                if (latestReminder != null) {
+                return@switchMap if (latestReminder == null) {
                     latestVoteReminder.value = latestReminder
-                    return@switchMap SingleLiveData(true)
-                }
+                    SingleLiveData(true)
 
-                SingleLiveData(false)
+                } else {
+                    SingleLiveData(false)
+                }
             }
         }
 

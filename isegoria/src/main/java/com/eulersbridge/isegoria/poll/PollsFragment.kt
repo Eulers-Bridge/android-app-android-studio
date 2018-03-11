@@ -99,14 +99,13 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     }
 
     private fun addPolls(polls: List<Poll>) {
-        val fragments = polls.map {
-            val pollVoteFragment = PollVoteFragment()
-            pollVoteFragment.arguments = bundleOf(ACTIVITY_EXTRA_POLL to it)
-
-            pollVoteFragment
+        val newFragments = polls.map {
+            PollVoteFragment().apply {
+                arguments = bundleOf(ACTIVITY_EXTRA_POLL to it)
+            }
         }
 
-        this.fragments.addAll(fragments)
+        fragments.addAll(newFragments)
 
         activity?.runOnUiThread {
             updateTabs()

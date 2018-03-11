@@ -34,18 +34,15 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     internal val articleLikedByUser = Transformations.switchMap(articleLikes) { likes ->
-        if (likes != null) {
-            Transformations.switchMap<User, Boolean>(app.loggedInUser, { user ->
-                if (user != null)
-                    likes
-                        .filter { it.email == user.email }
-                        .forEach { SingleLiveData(true) }
+        return@switchMap if (likes == null) {
+            SingleLiveData(false)
 
-                SingleLiveData<Boolean>(false)
+        } else {
+            Transformations.switchMap<User, Boolean>(app.loggedInUser, { user ->
+                val userExistsInLikes = user != null && likes.any { it.email == user.email }
+                SingleLiveData(userExistsInLikes)
             })
         }
-
-        SingleLiveData(false)
     }
 
     override fun onCleared() {
@@ -57,16 +54,18 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
      */
     internal fun likeArticle(): LiveData<Boolean> {
         return Transformations.switchMap<User, Boolean>(app.loggedInUser) { user ->
-            if (user != null)
-                return@switchMap Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
+            return@switchMap if (user == null) {
+                SingleLiveData(false)
+
+            } else {
+                Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
                     val like = RetrofitLiveData(app.api.likeArticle(article.id, user.email))
 
                     Transformations.switchMap(like) {
                         SingleLiveData(it != null && it.success)
                     }
                 })
-
-            SingleLiveData(false)
+            }
         }
     }
 

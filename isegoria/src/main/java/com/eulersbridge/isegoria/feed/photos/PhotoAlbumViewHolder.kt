@@ -44,7 +44,6 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
             imageView.setBackgroundResource(placeholderColourRes)
 
         } else {
-            imageView.setBackgroundResource(placeholderColourRes)
             nameTextView.text = item.name
             descriptionTextView.text = item.description
 

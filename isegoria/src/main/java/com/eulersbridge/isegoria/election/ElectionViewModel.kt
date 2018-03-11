@@ -28,17 +28,19 @@ class ElectionViewModel(application: Application) : AndroidViewModel(application
 
         val app = getApplication<IsegoriaApp>()
         return Transformations.switchMap<User, Election>(app.loggedInUser) { user ->
-            if (user?.institutionId != null) {
+
+            return@switchMap if (user?.institutionId == null) {
+                SingleLiveData(null)
+
+            } else {
                 val electionsList = RetrofitLiveData(app.api.getElections(user.institutionId!!))
 
                 election = Transformations.switchMap(electionsList) election@ {
                     return@election SingleLiveData(it?.firstOrNull())
                 }
 
-                return@switchMap election
+                election
             }
-
-            SingleLiveData(null)
         }
     }
 }

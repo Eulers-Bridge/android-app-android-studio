@@ -56,9 +56,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         aboutButton.setOnClickListener {
-            startActivity(
-                Intent(this, AboutActivity::class.java)
-            )
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
         changePhotoButton.setOnClickListener { view ->
@@ -154,22 +152,15 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onActivityResult(
-        requestCode: Int, resultCode: Int,
-        returnedIntent: Intent
-    ) {
-        super.onActivityResult(requestCode, resultCode, returnedIntent)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(returnedIntent)
+            val result = CropImage.getActivityResult(data)
 
-            if (resultCode == Activity.RESULT_OK) {
-                val imageUri = result.uri
-                updateUIWithImage(imageUri)
-
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                error.printStackTrace()
+            when (resultCode) {
+                Activity.RESULT_OK -> updateUIWithImage(result.uri)
+                CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE -> result.error.printStackTrace()
             }
         }
     }

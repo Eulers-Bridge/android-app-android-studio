@@ -77,7 +77,7 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
         childFragmentManager
             .beginTransaction()
             .addToBackStack(null)
-            .add(R.id.candidateFrame, detailFragment)
+            .add(R.id.electionCandidateFrame, detailFragment)
             .commit()
     }
 }

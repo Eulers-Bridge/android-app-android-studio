@@ -79,7 +79,7 @@ class IsegoriaApp : Application() {
     private fun startActivity(activityClass: Class<*>) {
         val activityIntent = Intent(this, activityClass)
 
-        if (Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.O)
+        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
             activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
         startActivity(activityIntent)

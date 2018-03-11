@@ -21,10 +21,13 @@ class PersonalityViewModel(application: Application) : AndroidViewModel(applicat
         val app = getApplication<IsegoriaApp>()
 
         val user = app.loggedInUser.value
-        if (user != null) {
+
+        return if (user == null) {
+            SingleLiveData(false)
+        } else {
             val request = RetrofitLiveData(app.api.addUserPersonality(user.email, userPersonality))
 
-            return Transformations.switchMap(request) { success ->
+            Transformations.switchMap(request) { success ->
                 if (success != null) {
                     userCompletedQuestions.postValue(true)
                     return@switchMap SingleLiveData(true)
@@ -33,7 +36,5 @@ class PersonalityViewModel(application: Application) : AndroidViewModel(applicat
                 SingleLiveData(false)
             }
         }
-
-        return SingleLiveData(false)
     }
 }

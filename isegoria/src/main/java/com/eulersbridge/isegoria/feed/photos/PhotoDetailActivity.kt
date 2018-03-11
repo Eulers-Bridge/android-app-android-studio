@@ -141,11 +141,14 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
     override fun onPageScrollStateChanged(state: Int) {
-        val dragging = state == ViewPager.SCROLL_STATE_DRAGGING
-        val durationMillis = (if (dragging) 100 else 250).toLong()
-        val alpha = if (dragging) 0.3f else 1.0f
+        val isUserDragging = state == ViewPager.SCROLL_STATE_DRAGGING
+        val durationMillis = (if (isUserDragging) 100 else 250).toLong()
+        val alpha = if (isUserDragging) 0.3f else 1.0f
 
-        detailsContainer.animate().setDuration(durationMillis).alpha(alpha)
+        detailsContainer
+            .animate()
+            .setDuration(durationMillis)
+            .alpha(alpha)
     }
 
     private fun onStar(view: View) {

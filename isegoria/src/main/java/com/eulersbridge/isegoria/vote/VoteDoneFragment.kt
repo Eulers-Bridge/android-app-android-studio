@@ -40,10 +40,11 @@ class VoteDoneFragment : Fragment(), TitledFragment {
         addToCalendarButton.isEnabled = false
 
         activity?.let { activity ->
-            val addToCalendarIntent = viewModel.addVoteReminderToCalendarIntent
-            if (addToCalendarIntent?.resolveActivity(activity.packageManager) != null) {
-                activity.startActivity(addToCalendarIntent)
-            }
+            viewModel.addVoteReminderToCalendarIntent
+                ?.takeIf { it.resolveActivity(activity.packageManager) != null }
+                ?.apply {
+                    activity.startActivity(this)
+                }
         }
 
         addToCalendarButton.isEnabled = true

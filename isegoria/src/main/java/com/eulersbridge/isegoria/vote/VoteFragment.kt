@@ -164,9 +164,10 @@ class VoteFragment : Fragment(), TitledFragment {
 
             if (calendar.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR)) {
 
-                dateStr = if (calendar.get(Calendar.WEEK_OF_YEAR) == todayCal.get(Calendar.WEEK_OF_YEAR) && calendar.get(
-                        Calendar.ERA
-                    ) == todayCal.get(Calendar.ERA)) {
+                val isThisWeek = calendar.get(Calendar.WEEK_OF_YEAR) == todayCal.get(Calendar.WEEK_OF_YEAR)
+                val isThisEra =  calendar.get(Calendar.ERA) == todayCal.get(Calendar.ERA)
+
+                dateStr = if (isThisWeek || isThisEra) {
 
                     //If this week, use name of day of week (eg. Friday)
                     calendar.getDisplayName(

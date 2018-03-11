@@ -21,13 +21,12 @@ internal class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun setItem(item: Task?) {
         this.item = item
 
-        if (item == null) {
-            nameTextView.text = null
-            xpTextView.text = null
+        nameTextView.text = item?.action
 
+        if (item == null) {
+            xpTextView.text = null
         } else {
-            nameTextView.text = item.action
-            xpTextView.text = nameTextView.context.getString(R.string.profile_tasks_task_xp, item.xpValue)
+            xpTextView.text = xpTextView.context.getString(R.string.profile_tasks_task_xp, item.xpValue)
         }
     }
 

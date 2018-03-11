@@ -19,12 +19,14 @@ class PhotoAlbumsViewModel(application: Application) : AndroidViewModel(applicat
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap<User, List<PhotoAlbum>>(app.loggedInUser) { user ->
-                if (user != null) {
-                    photoAlbumsList = RetrofitLiveData(app.api.getPhotoAlbums(user.newsFeedId))
-                    return@switchMap photoAlbumsList
-                }
 
-                SingleLiveData(null)
+                return@switchMap if (user == null) {
+                    SingleLiveData(null)
+
+                } else {
+                    photoAlbumsList = RetrofitLiveData(app.api.getPhotoAlbums(user.newsFeedId))
+                    photoAlbumsList
+                }
             }
         }
 

@@ -96,7 +96,7 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
             ?.commitAllowingStateLoss()
 
         observe(viewModel.userCompletedEfficacyQuestions()) {
-            if (it == true) {
+            if (it == false) {
                 overlayView.isVisible = true
 
                 overlaySurveyButton.setOnClickListener {

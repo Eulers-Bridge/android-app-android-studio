@@ -22,12 +22,13 @@ class EmailVerificationViewModel(application: Application) : AndroidViewModel(ap
 
     internal fun resendVerification(): LiveData<Boolean> {
         return Transformations.switchMap(app.loggedInUser) {
-            if (it != null) {
-                val verificationRequest = RetrofitLiveData(app.api.sendVerificationEmail(it.email))
-                return@switchMap Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
-            }
+            return@switchMap if (it == null) {
+                SingleLiveData(false)
 
-            SingleLiveData(false)
+            } else {
+                val verificationRequest = RetrofitLiveData(app.api.sendVerificationEmail(it.email))
+                Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
+            }
         }
 
     }

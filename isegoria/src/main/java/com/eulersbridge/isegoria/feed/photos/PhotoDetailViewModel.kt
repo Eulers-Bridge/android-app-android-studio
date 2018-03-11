@@ -30,11 +30,11 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
             val photoLikes = RetrofitLiveData(app.api.getPhotoLikes(photoId))
 
             Transformations.switchMap<List<Like>, List<Like>>(photoLikes) likes@{ likes ->
-                if (photoId == currentPhoto.value?.id?.toLong()) {
-                    return@likes SingleLiveData(likes)
+                return@likes if (photoId == currentPhoto.value?.id?.toLong()) {
+                    SingleLiveData(likes)
 
                 } else {
-                    return@likes SingleLiveData(null)
+                    SingleLiveData(null)
                 }
             }
         }
@@ -104,9 +104,7 @@ class PhotoDetailViewModel(application: Application) : AndroidViewModel(applicat
         val app = getApplication<IsegoriaApp>()
 
         app.loggedInUser.value?.let { user ->
-            return Transformations.switchMap(
-                currentPhoto
-            ) { (id) ->
+            return Transformations.switchMap(currentPhoto) { (id) ->
                 val unlike = RetrofitLiveData(app.api.unlikePhoto(id.toLong(), user.email))
 
                 Transformations.switchMap(unlike) unlike@ { return@unlike SingleLiveData(true) }

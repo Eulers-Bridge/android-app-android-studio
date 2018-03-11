@@ -150,7 +150,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             val app = getApplication<IsegoriaApp>()
 
             val user = getUser()
-            if (user?.institutionId != null) {
+            return if (user?.institutionId != null) {
 
                 val institutionRequest =
                     RetrofitLiveData(app.api.getInstitution(user.institutionId!!))
@@ -159,8 +159,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     return@request SingleLiveData(institution?.getName())
                 }
 
+                institutionName
+
             } else {
-                return SingleLiveData(null)
+                SingleLiveData(null)
             }
         }
 
@@ -177,16 +179,17 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
-        if (remainingTasks == null || remainingTasks!!.value == null) {
+        if (remainingTasks?.value == null) {
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) {
-                if (it != null) {
-                    remainingTasks = RetrofitLiveData(app.api.getRemainingTasks(it.getId()))
-                    return@switchMap remainingTasks
-                }
+                return@switchMap if (it == null) {
+                    SingleLiveData<List<Task>?>(null)
 
-                return@switchMap SingleLiveData<List<Task>?>(null)
+                } else {
+                    remainingTasks = RetrofitLiveData(app.api.getRemainingTasks(it.getId()))
+                    remainingTasks
+                }
             }
         }
 
@@ -194,22 +197,24 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun getCompletedTasks(): LiveData<List<Task>?>? {
-        if (completedTasks == null || completedTasks!!.value == null) {
+        if (completedTasks?.value == null) {
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) { user ->
-                if (user == null)
-                    return@switchMap SingleLiveData<List<Task>?>(null)
+                return@switchMap if (user == null) {
+                    SingleLiveData<List<Task>?>(null)
 
-                val tasksRequest = RetrofitLiveData(app.api.getCompletedTasks(user.getId()))
+                } else {
+                    val tasksRequest = RetrofitLiveData(app.api.getCompletedTasks(user.getId()))
 
-                completedTasks = Transformations.switchMap(tasksRequest) {
-                    totalXp.value = it?.fold(0L) { sum, task -> sum + task.xpValue } ?: 0
+                    completedTasks = Transformations.switchMap(tasksRequest) {
+                        totalXp.value = it?.fold(0L) { sum, task -> sum + task.xpValue } ?: 0
 
-                    SingleLiveData(it)
+                        SingleLiveData(it)
+                    }
+
+                    completedTasks
                 }
-
-                return@switchMap completedTasks
             }
         }
 
@@ -221,16 +226,18 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) { user ->
-                if (user == null)
-                    return@switchMap SingleLiveData<Photo?>(null)
+                return@switchMap if (user == null) {
+                    SingleLiveData<Photo?>(null)
 
-                val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
+                } else {
+                    val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
 
-                userPhoto = Transformations.switchMap(photosRequest) request@ {
-                    return@request SingleLiveData(it?.photos?.firstOrNull())
+                    userPhoto = Transformations.switchMap(photosRequest) request@ {
+                        return@request SingleLiveData(it?.photos?.firstOrNull())
+                    }
+
+                    userPhoto
                 }
-
-                return@switchMap userPhoto
             }
         }
 

@@ -45,14 +45,10 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
                 viewModel.setUser(it)
         }
 
-        var user: GenericUser? = null
+        val user = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
 
-        if (arguments != null) {
-            user = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
-
-            if (user == null) {
-                val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
-            }
+        if (user == null) {
+            val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
         }
 
         if (user != null)

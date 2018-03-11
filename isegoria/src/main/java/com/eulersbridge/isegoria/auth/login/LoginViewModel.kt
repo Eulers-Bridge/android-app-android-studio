@@ -51,7 +51,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         formEnabled.value = false
 
         if (emailError.value == false && passwordError.value == false) {
-
             if (!app.isNetworkAvailable()) {
                 networkError.value = true
                 formEnabled.value = true
@@ -81,6 +80,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
+
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
             // If email is valid, it is non-null

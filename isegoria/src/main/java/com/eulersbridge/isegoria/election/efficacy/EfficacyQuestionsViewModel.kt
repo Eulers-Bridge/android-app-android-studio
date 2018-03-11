@@ -22,8 +22,8 @@ class EfficacyQuestionsViewModel(application: Application) : AndroidViewModel(ap
         val scores = listOfNotNull(score1.value, score2.value, score3.value, score4.value)
             .map { it.toFloat() }
 
-        if (scores.isEmpty()) {
-            return SingleLiveData(false)
+        return if (scores.isEmpty()) {
+            SingleLiveData(false)
 
         } else {
             val app: IsegoriaApp = getApplication()
@@ -33,7 +33,7 @@ class EfficacyQuestionsViewModel(application: Application) : AndroidViewModel(ap
 
             val efficacyRequest = RetrofitLiveData(app.api.addUserEfficacy(userEmail, answers))
 
-            return Transformations.switchMap(efficacyRequest) {
+            Transformations.switchMap(efficacyRequest) {
                 app.onUserSelfEfficacyCompleted()
                 SingleLiveData(true)
             }

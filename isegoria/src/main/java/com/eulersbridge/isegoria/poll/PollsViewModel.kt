@@ -19,21 +19,22 @@ class PollsViewModel(application: Application) : AndroidViewModel(application) {
 
         return if (polls?.value == null) {
             Transformations.switchMap<User, List<Poll>>(app.loggedInUser) { user ->
+                return@switchMap if (user?.institutionId == null) {
+                    SingleLiveData(null)
 
-                if (user?.institutionId == null)
-                    return@switchMap SingleLiveData(null)
+                } else {
+                    val pollsResponse = RetrofitLiveData(app.api.getPolls(user.institutionId!!))
 
-                val pollsResponse = RetrofitLiveData(app.api.getPolls(user.institutionId!!))
+                    Transformations.switchMap(pollsResponse) { response ->
+                        polls = if (response != null && response.totalPolls > 0) {
+                            SingleLiveData(response.polls)
 
-                Transformations.switchMap(pollsResponse) { response ->
-                    polls = if (response != null && response.totalPolls > 0) {
-                        SingleLiveData(response.polls)
+                        } else {
+                            SingleLiveData(null)
+                        }
 
-                    } else {
-                        SingleLiveData(null)
+                        polls
                     }
-
-                    polls
                 }
             }
         } else polls!!

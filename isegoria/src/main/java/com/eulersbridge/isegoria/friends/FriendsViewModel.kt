@@ -98,8 +98,10 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) { user ->
-                if (user != null) {
+                return@switchMap if (user == null) {
+                    SingleLiveData<List<FriendRequest>?>(null)
 
+                } else {
                     val requests = RetrofitLiveData(app.api.getFriendRequestsSent(user.getId()))
                     sentFriendRequests = Transformations.switchMap(requests) { sentFriendRequests ->
                         sentRequestsVisible.value = sentFriendRequests != null && sentFriendRequests.isNotEmpty()
@@ -108,8 +110,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
 
                     sentFriendRequests
                 }
-
-                SingleLiveData<List<FriendRequest>?>(null)
             }
         }
 
@@ -121,7 +121,10 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) { user ->
-                if (user != null) {
+                return@switchMap if (user == null) {
+                    SingleLiveData<List<FriendRequest>?>(null)
+
+                } else {
                     val requests = RetrofitLiveData(app.api.getFriendRequestsReceived(user.getId()))
                     receivedFriendRequests =
                             Transformations.switchMap(requests) { receivedFriendRequests ->
@@ -136,8 +139,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
 
                     receivedFriendRequests
                 }
-
-                SingleLiveData<List<FriendRequest>?>(null)
             }
         }
 
@@ -146,7 +147,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
         if (!newFriendEmail.isBlank()) {
-
             val app = getApplication<IsegoriaApp>()
 
             return Transformations.switchMap(app.loggedInUser) { (_, _, email) ->
@@ -184,7 +184,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun getInstitution(institutionId: Long): LiveData<Institution> {
         val app = getApplication<IsegoriaApp>()
-
         return RetrofitLiveData(app.api.getInstitution(institutionId))
     }
 

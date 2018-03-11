@@ -21,17 +21,14 @@ class PollViewModel(application: Application) : AndroidViewModel(application) {
     internal val pollResults = MutableLiveData<List<PollResult>>()
 
     internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) { thePoll ->
-        if (thePoll != null) {
-            if (thePoll.creator == null && !thePoll.creatorEmail.isNullOrBlank()) {
-                val app = getApplication<IsegoriaApp>()
-                return@switchMap RetrofitLiveData(app.api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
 
-            } else if (thePoll.creator != null) {
-                return@switchMap SingleLiveData<Contact?>(thePoll.creator)
-            }
+        return@switchMap if (thePoll.creator == null && !thePoll.creatorEmail.isNullOrBlank()) {
+            val app = getApplication<IsegoriaApp>()
+            RetrofitLiveData(app.api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
+
+        } else {
+            SingleLiveData(thePoll?.creator)
         }
-
-        SingleLiveData<Contact?>(null)
     }
 
     internal fun voteForPollOption(optionIndex: Int) {

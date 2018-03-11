@@ -226,21 +226,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             else -> return false
         }
 
-        if (currentFragment == null || fragment::class != currentFragment!!::class) {
+        fragment
+            .takeIf { currentFragment == null || it::class != currentFragment!!::class }
+            ?.let {
+                val app = application as IsegoriaApp
 
-            val app = application as IsegoriaApp
+                if (app.friendsVisible.value == true) {
+                    supportFragmentManager.popBackStackImmediate(
+                        null,
+                        FragmentManager.POP_BACK_STACK_INCLUSIVE
+                    )
+                    tabFragmentsStack.clear()
+                    app.friendsVisible.value = false
+                }
 
-            if (app.friendsVisible.value == true) {
-                supportFragmentManager.popBackStackImmediate(
-                    null,
-                    FragmentManager.POP_BACK_STACK_INCLUSIVE
-                )
-                tabFragmentsStack.clear()
-                app.friendsVisible.value = false
+                presentRootContent(fragment)
             }
-
-            presentRootContent(fragment)
-        }
 
         return true
     }

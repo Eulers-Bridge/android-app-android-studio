@@ -27,10 +27,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     internal val userProfilePhotoURL: LiveData<String?>
         get() {
             val app = getApplication<IsegoriaApp>()
-
-            return Transformations.switchMap(
-                app.loggedInUser
-            ) { SingleLiveData(it.profilePhotoURL) }
+            return Transformations.switchMap(app.loggedInUser) { SingleLiveData(it.profilePhotoURL) }
         }
 
     init {
@@ -119,7 +116,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
         val file = File(imageUri.path)
-
         return IsegoriaApp.networkService.uploadNewUserPhoto(file)
     }
 

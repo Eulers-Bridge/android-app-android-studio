@@ -131,13 +131,11 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     override fun onPause() {
         super.onPause()
-
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
     }
 }
