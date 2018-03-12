@@ -16,8 +16,8 @@ android {
         renderscriptSupportModeEnabled true
         targetSdkVersion 27
         vectorDrawables.useSupportLibrary = true
-        versionCode 20
-        versionName "1.0.19"
+        versionCode 21
+        versionName "1.0.20"
     }
     lintOptions {
         abortOnError false
