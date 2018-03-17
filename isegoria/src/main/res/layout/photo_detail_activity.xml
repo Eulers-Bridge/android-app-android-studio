@@ -95,7 +95,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:contentDescription="@string/photo_detail_view_flag"
-            android:src="@drawable/flagdefault"
+            android:src="@drawable/flag_default"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/starImageView" />
     </android.support.constraint.ConstraintLayout>

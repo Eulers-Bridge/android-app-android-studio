@@ -16,8 +16,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
-import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.auth.onTextChanged
+import com.eulersbridge.isegoria.observe
 import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment() {
@@ -55,11 +55,11 @@ class LoginFragment : Fragment() {
         super.onDestroy()
     }
 
+    @SuppressLint("InflateParams")
     private fun showForgotPasswordDialog() {
         if (viewModel.canShowPasswordResetDialog.value == false)
             return
 
-        @SuppressLint("InflateParams")
         val alertView = layoutInflater.inflate(R.layout.alert_dialog_input_forgot_password, null)
         val alertEmailInput = alertView.findViewById<EditText>(R.id.alert_dialog_email_address_input)
 

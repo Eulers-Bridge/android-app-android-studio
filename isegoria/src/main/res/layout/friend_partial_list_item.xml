@@ -67,6 +67,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/friends_list_image_view"
         android:contentDescription="@null"
-        tools:src="@drawable/profileactive" />
+        tools:src="@drawable/profile_active" />
 
 </android.support.constraint.ConstraintLayout>

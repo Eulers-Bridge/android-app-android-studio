@@ -61,7 +61,7 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.friend_partial_list_item, parent, false)
 
-        return UserViewHolder(itemView, R.drawable.addedinactive, this)
+        return UserViewHolder(itemView, R.drawable.added_inactive, this)
     }
 
     override fun onBindViewHolder(viewHolder: UserViewHolder, position: Int) {

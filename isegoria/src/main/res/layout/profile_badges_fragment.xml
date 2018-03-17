@@ -2,6 +2,7 @@
 <android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/badgesGridView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -16,4 +17,5 @@
     android:clipToPadding="false"
     android:layoutAnimation="@anim/layout_animation_fade_in"
     app:layoutManager="android.support.v7.widget.GridLayoutManager"
-    app:spanCount="3"/>
+    app:spanCount="3"
+    tools:targetApi="o" />

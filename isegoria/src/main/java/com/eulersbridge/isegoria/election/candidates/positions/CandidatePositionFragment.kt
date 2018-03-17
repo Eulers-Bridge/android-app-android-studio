@@ -103,7 +103,7 @@ class CandidatePositionFragment : Fragment() {
             )
 
             scaleType = ScaleType.CENTER_CROP
-            setImageResource(R.drawable.profilelight)
+            setImageResource(R.drawable.profile_light)
             setPadding(paddingMargin, 0, paddingMargin, 0)
             setOnClickListener {
 

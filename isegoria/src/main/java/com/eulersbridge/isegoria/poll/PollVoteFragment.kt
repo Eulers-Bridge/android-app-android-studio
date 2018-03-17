@@ -67,8 +67,10 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
                 val answersCount = results.size
 
                 answersCountTextView.text = answersCount.toString()
-                answersCountTextView.contentDescription =
-                        getString(R.string.poll_vote_answers_content_description, answersCount)
+
+                val answersQuantity =
+                    resources.getQuantityString(R.plurals.poll_vote_answers_content_description, answersCount)
+                answersCountTextView.contentDescription = answersQuantity
 
                 populatePollOptions()
             }

@@ -99,7 +99,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             }?.let {
                 activity?.runOnUiThread {
-                    ticketSupportButton.text = "Unsupport"
+                    ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
                 }
             }
         }
@@ -108,21 +108,24 @@ class CandidateTicketDetailFragment : Fragment() {
 
             val userEmail = app!!.loggedInUser.value!!.email
 
-            if (ticketSupportButton.text == "Support") {
+            val supportStr = getString(R.string.candidate_ticket_detail_button_support)
+            val unsupportStr = getString(R.string.candidate_ticket_detail_button_unsupport)
+
+            if (ticketSupportButton.text == supportStr) {
 
                 app?.api?.supportTicket(ticketId, userEmail)?.enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
-                ticketSupportButton.text = "Unsupport"
+                ticketSupportButton.text = unsupportStr
 
-            } else if (ticketSupportButton.text == "Unsupport") {
+            } else if (ticketSupportButton.text == unsupportStr) {
 
                 app?.api?.unsupportTicket(ticketId, userEmail)?.enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
-                ticketSupportButton.text = "Support"
+                ticketSupportButton.text = supportStr
             }
         }
 
@@ -185,7 +188,7 @@ class CandidateTicketDetailFragment : Fragment() {
             )
 
             scaleType = ScaleType.CENTER_CROP
-            setImageResource(R.drawable.profilelight)
+            setImageResource(R.drawable.profile_light)
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
 
             setOnClickListener {

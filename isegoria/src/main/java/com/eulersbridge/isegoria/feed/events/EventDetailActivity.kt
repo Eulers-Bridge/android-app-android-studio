@@ -160,7 +160,7 @@ class EventDetailActivity : AppCompatActivity() {
 
             scaleType = ImageView.ScaleType.CENTER_CROP
 
-            setImageResource(R.drawable.profilelight)
+            setImageResource(R.drawable.profile_light)
             setPadding(10, 0, 10, 0)
             setOnClickListener {
                 val profileFragment = ProfileOverviewFragment()

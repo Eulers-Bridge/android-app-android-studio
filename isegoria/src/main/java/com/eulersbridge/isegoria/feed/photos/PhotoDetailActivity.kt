@@ -63,7 +63,7 @@ class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener 
 
                     likesTextView.text = it.likeCount.toString()
 
-                    @DrawableRes val flagImage = if (it.hasInappropriateContent) R.drawable.flag else R.drawable.flagdefault
+                    @DrawableRes val flagImage = if (it.hasInappropriateContent) R.drawable.flag else R.drawable.flag_default
                     flagImageView.setImageResource(flagImage)
                 }
             }

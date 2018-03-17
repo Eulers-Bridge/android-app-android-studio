@@ -22,7 +22,7 @@
 
     <ImageView
         android:id="@+id/poll_vote_option_list_item_check_box"
-        android:src="@drawable/tickempty"
+        android:src="@drawable/tick_empty"
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:layout_marginLeft="16dp"

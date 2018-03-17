@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -42,7 +43,8 @@
             android:paddingEnd="@dimen/activity_horizontal_margin"
             android:paddingHorizontal="@dimen/activity_horizontal_margin"
             android:text="@string/election_efficacy_survey_start_button"
-            android:theme="@style/GreenButton"/>
+            android:theme="@style/GreenButton"
+            tools:targetApi="o" />
     </LinearLayout>
 
 </FrameLayout>

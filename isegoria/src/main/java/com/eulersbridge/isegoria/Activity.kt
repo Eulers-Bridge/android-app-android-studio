@@ -3,10 +3,6 @@
 package com.eulersbridge.isegoria
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.graphics.BitmapFactory
-import android.os.Build
-import android.support.annotation.ColorInt
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 

@@ -52,7 +52,7 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
         if (item == null) {
             textTextView.text = null
             imageView.isGone = true
-            checkBoxImageView.setImageResource(R.drawable.tickempty)
+            checkBoxImageView.setImageResource(R.drawable.tick_empty)
 
         } else {
             textTextView.text = item.text
@@ -69,12 +69,12 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
             }
 
             if (item.hasVoted) {
-                checkBoxImageView.setImageResource(R.drawable.tickgreen)
+                checkBoxImageView.setImageResource(R.drawable.tick_green)
                 checkBoxImageView.contentDescription = checkBoxImageView.context.getString(R.string.checkbox_checked)
 
                 progressBar.progress = progressBar.max
             } else {
-                checkBoxImageView.setImageResource(R.drawable.tickempty)
+                checkBoxImageView.setImageResource(R.drawable.tick_empty)
                 checkBoxImageView.contentDescription = checkBoxImageView.context.getString(R.string.checkbox_unchecked)
             }
 

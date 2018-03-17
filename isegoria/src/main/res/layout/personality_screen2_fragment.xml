@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Extroverted, enthusiastic"
+            android:text="@string/personality_slider_description_1"
             android:layout_marginTop="16dp"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
@@ -32,7 +32,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Critical, quarrelsome"
+            android:text="@string/personality_slider_description_2"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Dependable, self-disciplined"
+            android:text="@string/personality_slider_description_3"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -54,7 +54,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Anxious, easily upset"
+            android:text="@string/personality_slider_description_4"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -65,7 +65,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Open to new experiences"
+            android:text="@string/personality_slider_description_5"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -76,7 +76,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Reserved, quiet"
+            android:text="@string/personality_slider_description_6"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -87,7 +87,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sympathetic, warm"
+            android:text="@string/personality_slider_description_7"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -98,7 +98,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Disorganized, careless"
+            android:text="@string/personality_slider_description_8"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -109,7 +109,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calm, emotionally stable"
+            android:text="@string/personality_slider_description_9"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar
@@ -120,7 +120,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Conventional, uncreative"
+            android:text="@string/personality_slider_description_10"
             android:textAppearance="@style/QuestionSubheadingTextAppearance" />
 
         <com.eulersbridge.isegoria.personality.PersonalitySliderBar

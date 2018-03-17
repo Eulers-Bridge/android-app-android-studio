@@ -78,9 +78,7 @@ class IsegoriaApp : Application() {
 
     private fun startActivity(activityClass: Class<*>) {
         val activityIntent = Intent(this, activityClass)
-
-        if (Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-            activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
         startActivity(activityIntent)
     }
@@ -135,7 +133,7 @@ class IsegoriaApp : Application() {
             val election = ShortcutInfo.Builder(this, SHORTCUT_ACTION_ELECTION)
                 .setShortLabel(getString(R.string.shortcut_view_latest_election_label_short))
                 .setLongLabel(getString(R.string.shortcut_view_latest_election_label_long))
-                .setIcon(Icon.createWithResource(this, R.drawable.electionblue))
+                .setIcon(Icon.createWithResource(this, R.drawable.election_blue))
                 .setRank(1)
                 .setIntent(
                     Intent(this, MainActivity::class.java)

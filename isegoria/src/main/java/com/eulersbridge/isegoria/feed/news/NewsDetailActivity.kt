@@ -94,7 +94,7 @@ class NewsDetailActivity : AppCompatActivity() {
             flagImageView.setOnClickListener { flagImageView.setImageResource(R.drawable.flag) }
 
             if (article.hasInappropriateContent)
-                flagImageView.setImageResource(R.drawable.flagdefault)
+                flagImageView.setImageResource(R.drawable.flag_default)
 
             starImageView.setOnClickListener { view ->
                 userLikedArticle = !userLikedArticle

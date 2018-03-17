@@ -29,6 +29,7 @@ package com.eulersbridge.isegoria.profile
 
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Canvas
@@ -371,6 +372,7 @@ class CircleProgressBar : View {
         return Math.min(Math.max(progress, 0.0f), 1.0f)
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         // getLeft(), getTop(), etc. are 0 until this point.
         if (!this::bounds.isInitialized) {

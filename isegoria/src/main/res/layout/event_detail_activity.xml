@@ -80,7 +80,8 @@
             android:text="@string/event_add_to_calendar"
             android:theme="@style/BlueButton"
             app:layout_constraintBottom_toBottomOf="@+id/eventImageView"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:targetApi="o" />
 
         <TextView
             android:id="@+id/locationTextView"

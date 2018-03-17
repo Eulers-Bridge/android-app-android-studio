@@ -25,7 +25,7 @@ internal class ReceivedFriendRequestViewHolder(
     init {
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
         actionImageView.apply {
-            setImageResource(R.drawable.addedinactive)
+            setImageResource(R.drawable.added_inactive)
             setOnClickListener { dataSource.onActionClick(item) }
         }
     }

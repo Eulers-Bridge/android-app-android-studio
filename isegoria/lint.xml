@@ -3,4 +3,17 @@
     <issue id="IconColors">
         <ignore path="src/main/res/drawable-hdpi/friends.png" />
     </issue>
+    <issue id="IconDipSize">
+        <ignore path="src/main/res/drawable-hdpi/app_icon.png" />
+        <ignore path="src/main/res/drawable-hdpi/profile.png" />
+        <ignore path="src/main/res/drawable-hdpi/ribbon.png" />
+        <ignore path="src/main/res/drawable-mdpi/app_icon.png" />
+        <ignore path="src/main/res/drawable-mdpi/profile.png" />
+        <ignore path="src/main/res/drawable-mdpi/ribbon.png" />
+        <ignore path="src/main/res/drawable-xhdpi/app_icon.png" />
+        <ignore path="src/main/res/drawable-xhdpi/profile.png" />
+        <ignore path="src/main/res/drawable-xhdpi/ribbon.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/app_icon.png" />
+        <ignore path="src/main/res/drawable-xxhdpi/profile.png" />
+    </issue>
 </lint>

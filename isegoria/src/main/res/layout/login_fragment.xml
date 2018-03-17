@@ -69,7 +69,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/white"
-                android:autofillHints="emailAddress"/>
+                android:autofillHints="emailAddress"
+                tools:targetApi="o" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -90,7 +91,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textWebPassword"
                 android:textColor="@color/white"
-                android:autofillHints="password"/>
+                android:autofillHints="password"
+                tools:targetApi="o" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
