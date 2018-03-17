@@ -18,10 +18,6 @@ class PersonalityQuestionsActivity : AppCompatActivity() {
 
         val viewModel = ViewModelProviders.of(this).get(PersonalityViewModel::class.java)
 
-        observe(viewModel.userSkippedQuestions) {
-            if (it == true) finish()
-        }
-
         observe(viewModel.userContinuedQuestions) {
             if (it == true) getViewPager().currentItem = 1
         }

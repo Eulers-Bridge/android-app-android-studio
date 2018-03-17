@@ -20,6 +20,5 @@ class PersonalityPermissionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         takePersonalityButton.setOnClickListener { viewModel.userContinuedQuestions.value = true }
-        skipPersonalityButton.setOnClickListener { viewModel.userSkippedQuestions.value = true }
     }
 }

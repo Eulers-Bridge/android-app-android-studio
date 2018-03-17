@@ -12,7 +12,6 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 
 class PersonalityViewModel(application: Application) : AndroidViewModel(application) {
 
-    internal val userSkippedQuestions = MutableLiveData<Boolean>()
     internal val userContinuedQuestions = MutableLiveData<Boolean>()
     internal val userCompletedQuestions = MutableLiveData<Boolean>()
 
