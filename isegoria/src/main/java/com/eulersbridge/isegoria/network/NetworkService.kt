@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.network
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
+import android.content.Context
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
@@ -28,18 +29,15 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.*
 
-class NetworkService(private val application: IsegoriaApp) {
+class NetworkService constructor(private val app: IsegoriaApp, private val appContext: Context) {
 
     companion object {
         private const val SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/"
-
         private const val S3_PICTURES_BUCKET_NAME = "isegoriauserpics"
         private const val S3_PICTURES_PATH = "https://s3.amazonaws.com/isegoriauserpics/"
 
         private var apiBaseURL = SERVER_URL
-
         private val moshiConverterFactory: MoshiConverterFactory
-
         private var needsSetup = true
 
         init {
@@ -53,9 +51,7 @@ class NetworkService(private val application: IsegoriaApp) {
         }
     }
 
-    private val cacheDirectory = File(application.cacheDir, "network")
     private var httpClient: OkHttpClient? = null
-
     internal lateinit var api: API
 
     internal var email: String? = null
@@ -87,11 +83,10 @@ class NetworkService(private val application: IsegoriaApp) {
         // Force caching of GET requests for 1 minute, or 5 minutes if no network connection.
         val interceptor = Interceptor { chain ->
             val request = chain.request()
-
             val response = chain.proceed(request)
 
             if (request.method() == "GET") {
-                val cacheHeaderValue = if (application.isNetworkAvailable())
+                val cacheHeaderValue = if (appContext.isNetworkAvailable())
                     "public, max-age=60" // 60 seconds / 1 minute
                 else
                     "public, only-if-cached, max-stale=300" // 300 seconds / 5 minutes
@@ -107,7 +102,7 @@ class NetworkService(private val application: IsegoriaApp) {
         }
 
         val cacheSize = 40 * 1024 * 1024 // Maximum cache size of 40 MiB
-        val cache = Cache(cacheDirectory, cacheSize.toLong())
+        val cache = Cache(File(appContext.cacheDir, "network"), cacheSize.toLong())
 
         val httpClientBuilder = OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -157,7 +152,7 @@ class NetworkService(private val application: IsegoriaApp) {
                             //createAPI(institution.apiRoot);
                             createAPI()
 
-                            application.setLoggedInUser(user, password!!)
+                            app.setLoggedInUser(user, password!!)
                         }
                     }
                 }
@@ -222,7 +217,7 @@ class NetworkService(private val application: IsegoriaApp) {
 
     fun uploadNewUserPhoto(imageFile: File): LiveData<Boolean> {
         val credentialsProvider = CognitoCachingCredentialsProvider(
-            application.applicationContext, // Context,
+            appContext, // Context,
             "715927704730",
             "us-east-1:73ae30c9-393c-44cf-a0ac-049cc0838428",
             "arn:aws:iam::715927704730:role/Cognito_isegoriaUnauth_Role",
@@ -234,7 +229,7 @@ class NetworkService(private val application: IsegoriaApp) {
 
         val transferUtility = TransferUtility.builder()
             .s3Client(s3Client)
-            .context(application.applicationContext)
+            .context(appContext)
             .build()
 
         val dotIndex = imageFile.path.lastIndexOf('.')
@@ -263,7 +258,7 @@ class NetworkService(private val application: IsegoriaApp) {
         setup()
 
         val timestamp = System.currentTimeMillis() / 1000L
-        val loggedInUser = application.loggedInUser.value ?: return SingleLiveData(false)
+        val loggedInUser = app.loggedInUser.value ?: return SingleLiveData(false)
 
         val jsonObject = JSONObject()
         try {

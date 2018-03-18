@@ -1,14 +1,24 @@
 package com.eulersbridge.isegoria
 
+import android.content.Context
+import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppModule {
+class AppModule(val app: IsegoriaApp) {
 
-    @Singleton
     @Provides
-    fun provideApiService(application: IsegoriaApp) = application.api
+    @Singleton
+    fun providesApiService() = app.api
+
+    @Provides
+    @Singleton
+    fun providesContext(): Context = app
+
+    @Provides
+    @Singleton
+    fun providesNetworkService() = NetworkService(app, app)
 
 }

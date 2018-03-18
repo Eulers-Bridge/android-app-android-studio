@@ -37,9 +37,11 @@ class IsegoriaApp : Application(), HasActivityInjector {
     override fun activityInjector() = activityInjector
 
     companion object {
-        lateinit var networkService: NetworkService
         private lateinit var securePreferences: SecurePreferences
     }
+
+    @Inject
+    lateinit var networkService: NetworkService
 
     val loggedInUser = MutableLiveData<User>()
     var cachedLoginArticles: List<NewsArticle>? = null
@@ -66,12 +68,12 @@ class IsegoriaApp : Application(), HasActivityInjector {
         DaggerAppComponent
             .builder()
             .application(this)
+            .appModule(AppModule(this))
             .build()
             .inject(this)
 
         createNotificationChannels()
 
-        networkService = NetworkService(this)
         securePreferences = SecurePreferences(this)
 
         val login = login()

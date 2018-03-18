@@ -33,10 +33,6 @@ import java.util.*
 import javax.inject.Inject
 
 
-
-
-
-
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
     FragmentManager.OnBackStackChangedListener {
 

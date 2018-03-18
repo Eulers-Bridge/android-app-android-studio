@@ -7,12 +7,17 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
+
+    @Inject
+    lateinit var networkService: NetworkService
 
     private val countriesData = MutableLiveData<List<Country>>()
 
@@ -52,7 +57,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             signUpUser.value = updatedUser
         }
 
-        return Transformations.switchMap(IsegoriaApp.networkService.signUp(updatedUser)) { success ->
+        return Transformations.switchMap(networkService.signUp(updatedUser)) { success ->
             if (!success)
                 signUpUser.value = null
 

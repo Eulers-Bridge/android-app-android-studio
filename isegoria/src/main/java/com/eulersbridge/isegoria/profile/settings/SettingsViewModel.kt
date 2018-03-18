@@ -14,9 +14,11 @@ import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import java.io.File
+import javax.inject.Inject
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
 
+    @Inject
     lateinit var networkService: NetworkService
 
     private var userPhoto: LiveData<Photo?>? = null
@@ -117,10 +119,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         return userPhoto
     }
 
-    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
-        val file = File(imageUri.path)
-        return IsegoriaApp.networkService.uploadNewUserPhoto(file)
-    }
+    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> =
+        networkService.uploadNewUserPhoto(File(imageUri.path))
 
     override fun onCleared() {
         (userPhoto as? RetrofitLiveData)?.cancel()

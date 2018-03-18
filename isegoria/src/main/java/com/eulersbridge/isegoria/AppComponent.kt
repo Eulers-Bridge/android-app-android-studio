@@ -16,6 +16,8 @@ interface AppComponent {
         @BindsInstance
         fun application(application: IsegoriaApp): Builder
 
+        fun appModule(appModule: AppModule): Builder
+
         fun build(): AppComponent
     }
 
