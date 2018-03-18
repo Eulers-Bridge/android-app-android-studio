@@ -8,6 +8,7 @@ import android.arch.lifecycle.Transformations
 import android.net.Uri
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
@@ -15,6 +16,8 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 import java.io.File
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+
+    lateinit var networkService: NetworkService
 
     private var userPhoto: LiveData<Photo?>? = null
 

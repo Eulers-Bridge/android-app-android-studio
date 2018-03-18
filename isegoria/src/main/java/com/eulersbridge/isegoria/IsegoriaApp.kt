@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -23,9 +24,17 @@ import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.securepreferences.SecurePreferences
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasActivityInjector
 import java.util.*
+import javax.inject.Inject
 
-class IsegoriaApp : Application() {
+class IsegoriaApp : Application(), HasActivityInjector {
+
+    @Inject
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    override fun activityInjector() = activityInjector
 
     companion object {
         lateinit var networkService: NetworkService
@@ -53,6 +62,12 @@ class IsegoriaApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        DaggerAppComponent
+            .builder()
+            .application(this)
+            .build()
+            .inject(this)
 
         createNotificationChannels()
 

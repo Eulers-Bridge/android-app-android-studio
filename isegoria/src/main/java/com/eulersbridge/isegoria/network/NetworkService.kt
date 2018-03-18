@@ -28,9 +28,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.*
 
-
-
-
 class NetworkService(private val application: IsegoriaApp) {
 
     companion object {

@@ -26,14 +26,22 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment
 import com.google.firebase.FirebaseApp
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.main_partial_appbar.*
 import java.util.*
+import javax.inject.Inject
+
+
+
 
 
 
 class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
     FragmentManager.OnBackStackChangedListener {
+
+    @Inject
+    lateinit var app: IsegoriaApp
 
     private var tabFragmentsStack: ArrayDeque<Fragment> = ArrayDeque(4)
 
@@ -50,17 +58,16 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null)
             FirebaseApp.initializeApp(this)
 
         setContentView(R.layout.activity_main)
-
         setupNavigation()
-
-        val application = applicationContext as IsegoriaApp
-        setupApplicationObservers(application)
+        setupApplicationObservers()
     }
 
     override fun onDestroy() {
@@ -82,8 +89,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         supportFragmentManager.addOnBackStackChangedListener(this)
     }
 
-    private fun setupApplicationObservers(application: IsegoriaApp) {
-        observe(application.loggedInUser) {
+    private fun setupApplicationObservers() {
+        observe(app.loggedInUser) {
             val userLoggedOut = it == null
 
             if (userLoggedOut) {
@@ -94,12 +101,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         }
 
-        observe(application.userVerificationVisible) {
+        observe(app.userVerificationVisible) {
             if (it == true)
                 presentRootContent(EmailVerificationFragment())
         }
 
-        observe(application.friendsVisible) {
+        observe(app.friendsVisible) {
             if (it == true)
                 showFriends()
         }
@@ -120,7 +127,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         loginActionsComplete = true
 
-        val app = application as IsegoriaApp
         if (app.loggedInUser.value?.hasPersonality == false)
             startActivity(Intent(this, PersonalityQuestionsActivity::class.java))
     }
@@ -138,7 +144,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     }
 
                     SHORTCUT_ACTION_FRIENDS -> {
-                        val app = application as IsegoriaApp
                         app.friendsVisible.value = true
                         handledShortcut = true
                     }
@@ -229,8 +234,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         fragment
             .takeIf { currentFragment == null || it::class != currentFragment!!::class }
             ?.let {
-                val app = application as IsegoriaApp
-
                 if (app.friendsVisible.value == true) {
                     supportFragmentManager.popBackStackImmediate(
                         null,
