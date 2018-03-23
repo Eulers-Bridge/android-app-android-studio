@@ -11,7 +11,6 @@ import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.content.systemService
@@ -19,21 +18,21 @@ import com.eulersbridge.isegoria.auth.EmailVerificationFragment
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity
+import com.eulersbridge.isegoria.personality.PersonalityActivity
 import com.eulersbridge.isegoria.poll.PollsFragment
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment
 import com.google.firebase.FirebaseApp
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
-import dagger.android.AndroidInjection
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.main_partial_appbar.*
 import java.util.*
 import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
+class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
     FragmentManager.OnBackStackChangedListener {
 
     @Inject
@@ -54,8 +53,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
-
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null)
@@ -63,7 +60,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         setContentView(R.layout.activity_main)
         setupNavigation()
-        setupApplicationObservers()
+        createApplicationObservers()
     }
 
     override fun onDestroy() {
@@ -85,7 +82,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         supportFragmentManager.addOnBackStackChangedListener(this)
     }
 
-    private fun setupApplicationObservers() {
+    private fun createApplicationObservers() {
         observe(app.loggedInUser) {
             val userLoggedOut = it == null
 
@@ -124,7 +121,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         loginActionsComplete = true
 
         if (app.loggedInUser.value?.hasPersonality == false)
-            startActivity(Intent(this, PersonalityQuestionsActivity::class.java))
+            startActivity(Intent(this, PersonalityActivity::class.java))
     }
 
     @SuppressLint("NewApi")

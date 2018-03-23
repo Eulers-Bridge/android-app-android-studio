@@ -15,7 +15,7 @@ import android.view.ViewOutlineProvider
 import com.eulersbridge.isegoria.R
 import java.util.*
 
-open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, attrs) {
+open class BaseSliderBar(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
     protected var parentWidth: Int = 0
         private set
@@ -52,7 +52,7 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
         }
 
     init {
-        setupPaints()
+        createPaints()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             outlineProvider = object : ViewOutlineProvider() {
@@ -86,7 +86,7 @@ open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, 
         points.add(point)
     }
 
-    protected open fun setupPaints() {
+    private fun createPaints() {
         circleFillPaint.apply {
             color = ContextCompat.getColor(context, R.color.white)
             style = Paint.Style.FILL

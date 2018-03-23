@@ -1,7 +1,9 @@
 package com.eulersbridge.isegoria.auth.login
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -18,15 +20,26 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.observe
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
+import javax.inject.Inject
 
 class LoginFragment : Fragment() {
 
-    private val viewModel: LoginViewModel by lazy {
-        ViewModelProviders.of(this).get(LoginViewModel::class.java)
-    }
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: LoginViewModel
+
     private val authViewModel: AuthViewModel by lazy {
         ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+
+        viewModel = ViewModelProviders.of(this, modelFactory)[LoginViewModel::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?

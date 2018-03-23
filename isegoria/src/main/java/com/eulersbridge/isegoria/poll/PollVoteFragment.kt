@@ -1,6 +1,8 @@
 package com.eulersbridge.isegoria.poll
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -11,12 +13,24 @@ import com.eulersbridge.isegoria.ACTIVITY_EXTRA_POLL
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.poll_fragment.*
+import javax.inject.Inject
 
 class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
     private lateinit var viewModel: PollViewModel
+
     private var pollOptionsAdapter: PollOptionAdapter = PollOptionAdapter(this)
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[PollViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

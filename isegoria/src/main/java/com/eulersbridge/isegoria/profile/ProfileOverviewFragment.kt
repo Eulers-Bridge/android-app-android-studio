@@ -14,16 +14,25 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.GenericUser
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity
+import com.eulersbridge.isegoria.personality.PersonalityActivity
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_overview_fragment.*
+import javax.inject.Inject
 
 class ProfileOverviewFragment : Fragment(), TitledFragment {
+
+    @Inject
+    lateinit var app: IsegoriaApp
+
+    @Inject
+    lateinit var networkService: NetworkService
 
     private lateinit var taskAdapter: TaskAdapter
 
@@ -36,11 +45,18 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.profile_overview_fragment, container, false)
+    ): View? = inflater.inflate(R.layout.profile_overview_fragment, container, false)
 
-        val app = activity?.application as IsegoriaApp?
-        observe(app?.loggedInUser) {
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+
+        super.onAttach(context)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        observe(app.loggedInUser) {
             if (it != null && viewModel.user.value == null)
                 viewModel.setUser(it)
         }
@@ -49,21 +65,14 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
         if (user == null) {
             val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
+
+            // ...
         }
 
         if (user != null)
             viewModel.setUser(user)
 
-        return rootView
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        val app: IsegoriaApp = requireActivity().application as IsegoriaApp
-        val api = app.api
-
-        taskAdapter = TaskAdapter(Glide.with(this), api)
+        taskAdapter = TaskAdapter(Glide.with(this), networkService.api)
 
         friendsCountTextView.setOnClickListener({  viewModel.viewFriends() })
         friendsLabel.setOnClickListener({  viewModel.viewFriends() })
@@ -127,7 +136,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
             } else {
                 personalityTestButton.setOnClickListener {
-                    startActivity(Intent(activity, PersonalityQuestionsActivity::class.java))
+                    startActivity(Intent(activity, PersonalityActivity::class.java))
                 }
             }
 

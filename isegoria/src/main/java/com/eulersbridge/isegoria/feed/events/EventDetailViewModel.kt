@@ -1,19 +1,20 @@
 package com.eulersbridge.isegoria.feed.events
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.network.api.models.Ticket
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import javax.inject.Inject
 
-class EventDetailViewModel(application: Application) : AndroidViewModel(application) {
+class EventDetailViewModel
+@Inject constructor (private val networkService: NetworkService) : ViewModel() {
 
     internal val event = MutableLiveData<Event>()
 
@@ -34,15 +35,11 @@ class EventDetailViewModel(application: Application) : AndroidViewModel(applicat
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-    private val app: IsegoriaApp by lazy {
-        getApplication<IsegoriaApp>()
-    }
-
     internal fun getTicket(ticketId: Long): LiveData<Ticket>
-            = RetrofitLiveData(app.api.getTicket(ticketId))
+            = RetrofitLiveData(networkService.api.getTicket(ticketId))
 
     internal fun getPosition(positionId: Long): LiveData<Position>
-            = RetrofitLiveData(app.api.getPosition(positionId))
+            = RetrofitLiveData(networkService.api.getPosition(positionId))
 
     internal fun addToCalendar(context: Context) {
         addToCalendarIntent?.let {

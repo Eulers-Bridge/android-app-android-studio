@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.candidates
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -18,9 +19,12 @@ import android.widget.TableRow.LayoutParams
 import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.candidate_all_fragment.*
+import javax.inject.Inject
 
 class CandidateAllFragment : Fragment() {
     private lateinit var rootView: View
@@ -31,7 +35,16 @@ class CandidateAllFragment : Fragment() {
 
     private var dpWidth: Float = 0.toFloat()
 
-    private var app: IsegoriaApp? = null
+    @Inject
+    internal lateinit var app: IsegoriaApp
+
+    @Inject
+    internal lateinit var networkService: NetworkService
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,12 +74,10 @@ class CandidateAllFragment : Fragment() {
                     = handleSearchQueryTextChange(query)
         })
 
-        app = activity?.application as IsegoriaApp
-
-        app?.loggedInUser?.value?.institutionId?.let {
-            app?.api?.getElections(it)?.onSuccess { elections ->
+        app.loggedInUser.value?.institutionId?.let {
+            networkService.api.getElections(it).onSuccess { elections ->
                 elections.firstOrNull()?.let {
-                    app!!.api.getElectionCandidates(it.id).onSuccess { candidates ->
+                    networkService.api.getElectionCandidates(it.id).onSuccess { candidates ->
                         addCandidates(candidates)
                     }
                 }
@@ -145,7 +156,7 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+        networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.thumbnailUrl)
@@ -154,7 +165,7 @@ class CandidateAllFragment : Fragment() {
             }
         }
 
-        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+        networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.thumbnailUrl)
@@ -202,7 +213,7 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        app?.api?.getTicket(candidate.ticketId)?.onSuccess {
+        networkService.api.getTicket(candidate.ticketId).onSuccess {
             it.let { ticket ->
                 textViewParty.text = ticket.code
                 textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
@@ -253,7 +264,7 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app!!.api.getPosition(candidate.positionId).onSuccess {
+        networkService.api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 

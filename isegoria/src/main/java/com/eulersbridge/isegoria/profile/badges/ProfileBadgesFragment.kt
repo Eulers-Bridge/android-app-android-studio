@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile.badges
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -8,17 +9,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.ProfileViewModel
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_badges_fragment.*
+import javax.inject.Inject
 
 class ProfileBadgesFragment : Fragment(), TitledFragment {
 
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
     private lateinit var viewModel: ProfileViewModel
     private lateinit var badgeAdapter: BadgeAdapter
+
+    @Inject
+    lateinit var networkService: NetworkService
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,8 +42,6 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.profile_badges_fragment, container, false)
-
-        viewModel = ViewModelProviders.of(parentFragment!!).get(ProfileViewModel::class.java)
 
         arguments?.getInt("level")?.let {
             viewModel.setTargetBadgeLevel(it)
@@ -39,9 +53,7 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val api = (requireActivity().application as IsegoriaApp).api
-
-        badgeAdapter = BadgeAdapter(GlideApp.with(this), api)
+        badgeAdapter = BadgeAdapter(GlideApp.with(this), networkService.api)
 
         badgesGridView.apply {
             adapter = badgeAdapter

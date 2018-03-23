@@ -1,18 +1,19 @@
 package com.eulersbridge.isegoria.auth
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class EmailVerificationViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val app: IsegoriaApp by lazy {
-        getApplication<IsegoriaApp>()
-    }
+class EmailVerificationViewModel
+@Inject constructor (
+    private val app: IsegoriaApp,
+    private val networkService: NetworkService
+) : ViewModel() {
 
     internal fun onExit() {
         app.userVerificationVisible.value = false
@@ -26,7 +27,7 @@ class EmailVerificationViewModel(application: Application) : AndroidViewModel(ap
                 SingleLiveData(false)
 
             } else {
-                val verificationRequest = RetrofitLiveData(app.api.sendVerificationEmail(it.email))
+                val verificationRequest = RetrofitLiveData(networkService.api.sendVerificationEmail(it.email))
                 Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
             }
         }

@@ -1,17 +1,22 @@
 package com.eulersbridge.isegoria.auth.login
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class LoginViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val networkService: NetworkService
+) : ViewModel() {
 
     internal val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
@@ -33,14 +38,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         networkError.value = false
         canShowPasswordResetDialog.value = true
 
-        val app = application as IsegoriaApp
-
         app.savedUserEmail?.let { email.value = it }
         app.savedUserPassword?.let { password.value = it }
-    }
-
-    private val app: IsegoriaApp by lazy {
-        getApplication<IsegoriaApp>()
     }
 
     internal fun onExit() {
@@ -84,7 +83,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
             // If email is valid, it is non-null
-            app.api.requestPasswordReset(email!!).enqueue()
+            networkService.api.requestPasswordReset(email!!).enqueue()
             canShowPasswordResetDialog.value = true
 
             return true

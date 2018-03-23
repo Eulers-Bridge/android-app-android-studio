@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.efficacy
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -14,8 +15,21 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    lateinit var viewModel: EfficacyQuestionsViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[EfficacyQuestionsViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,8 +42,6 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
         val sliderBar2 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar2)
         val sliderBar3 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar3)
         val sliderBar4 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar4)
-
-        val viewModel = ViewModelProviders.of(this).get(EfficacyQuestionsViewModel::class.java)
 
         val pairs = mapOf(
             viewModel.score1 to sliderBar1,

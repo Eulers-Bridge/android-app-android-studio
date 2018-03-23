@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.feed.events
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -12,14 +13,25 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.events_fragment.*
+import javax.inject.Inject
 
 class EventsFragment : Fragment(), TitledFragment {
 
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    lateinit var viewModel: EventsViewModel
+
     private val adapter = EventAdapter()
-    private val viewModel: EventsViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(EventsViewModel::class.java)
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[EventsViewModel::class.java]
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.auth
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -7,7 +8,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.target.SimpleTarget
@@ -19,8 +19,15 @@ import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
+import dagger.android.support.DaggerAppCompatActivity
+import javax.inject.Inject
 
-class AuthActivity : AppCompatActivity() {
+class AuthActivity : DaggerAppCompatActivity() {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +44,9 @@ class AuthActivity : AppCompatActivity() {
                     }
                 })
 
-        presentRootContent(LoginFragment())
+        viewModel = ViewModelProviders.of(this, modelFactory)[AuthViewModel::class.java]
 
-        val viewModel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
+        presentRootContent(LoginFragment())
 
         observe(viewModel.signUpVisible) {
             /* If makeVisible is false, allow default behaviour of back button & fragment manager

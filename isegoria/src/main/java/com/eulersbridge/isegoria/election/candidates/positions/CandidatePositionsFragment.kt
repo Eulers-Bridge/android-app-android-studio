@@ -12,15 +12,21 @@ import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import kotlinx.android.synthetic.main.election_positions_fragment.*
+import javax.inject.Inject
 
 class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickListener {
 
-    private var api: API? = null
+    @Inject
+    internal lateinit var app: IsegoriaApp
+
+    @Inject
+    internal lateinit var networkService: NetworkService
+
     private val adapter: PositionAdapter by lazy {
         val glide = GlideApp.with(this).applyDefaultRequestOptions(
             RequestOptions()
@@ -28,34 +34,23 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
                 .transform(TintTransformation())
         )
 
-        PositionAdapter(glide, api, this)
+        PositionAdapter(glide, networkService.api, this)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.election_positions_fragment, container, false)
-
-        val app = activity?.application as IsegoriaApp?
-
-        if (app != null)
-            api = app.api
-
-        return rootView
-    }
+    ): View?  = inflater.inflate(R.layout.election_positions_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         positionsGridView.adapter = adapter
 
-        val app = activity?.application as IsegoriaApp?
-
-        app?.loggedInUser?.value?.institutionId?.let { institutionId ->
-            api?.getElections(institutionId)?.onSuccess { elections ->
+        app.loggedInUser.value?.institutionId?.let { institutionId ->
+            networkService.api.getElections(institutionId).onSuccess { elections ->
 
                 elections.firstOrNull()?.also {
-                    api?.getElectionPositions(it.id)?.onSuccess { positions ->
+                    networkService.api.getElectionPositions(it.id).onSuccess { positions ->
                         setPositions(positions)
                     }
                 }

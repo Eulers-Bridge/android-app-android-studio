@@ -1,17 +1,18 @@
 package com.eulersbridge.isegoria.auth.signup
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import com.eulersbridge.isegoria.IsegoriaApp
+import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class SignUpViewModel(application: Application) : AndroidViewModel(application) {
+class SignUpViewModel
+@Inject constructor(private val networkService: NetworkService) : ViewModel() {
 
     private var countries: LiveData<List<Country>>? = null
 
@@ -26,8 +27,7 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
     val selectedBirthYear = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
-        val app: IsegoriaApp = getApplication()
-        val generalInfo = RetrofitLiveData(app.api.getGeneralInfo())
+        val generalInfo = RetrofitLiveData(networkService.api.getGeneralInfo())
 
         return Transformations.switchMap(generalInfo) {
             return@switchMap SingleLiveData(it?.countries)

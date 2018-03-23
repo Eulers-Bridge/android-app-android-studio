@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -15,7 +16,9 @@ import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_master_layout.*
+import javax.inject.Inject
 
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
@@ -24,9 +27,10 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
     private lateinit var tabLayout: TabLayout
 
-    private val viewModel: ElectionViewModel by lazy {
-        ViewModelProviders.of(this).get(ElectionViewModel::class.java)
-    }
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: ElectionViewModel
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
@@ -43,6 +47,13 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         override fun onTabUnselected(tab: TabLayout.Tab) {}
         override fun onTabReselected(tab: TabLayout.Tab) {}
     }
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

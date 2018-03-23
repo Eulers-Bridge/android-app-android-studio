@@ -1,6 +1,8 @@
 package com.eulersbridge.isegoria.auth
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -9,12 +11,22 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.observeBoolean
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.email_verification.*
+import javax.inject.Inject
 
 class EmailVerificationFragment : Fragment() {
 
-    private val viewModel: EmailVerificationViewModel by lazy {
-        ViewModelProviders.of(this).get(EmailVerificationViewModel::class.java)
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    private lateinit var viewModel: EmailVerificationViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+
+        viewModel = ViewModelProviders.of(this, modelFactory)[EmailVerificationViewModel::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?

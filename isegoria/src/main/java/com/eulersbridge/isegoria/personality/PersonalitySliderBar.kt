@@ -9,20 +9,37 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.ui.BaseSliderBar
 import com.eulersbridge.isegoria.util.ui.SliderBarPoint
 
-class PersonalitySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
+class PersonalitySliderBar @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : BaseSliderBar(context, attrs) {
 
     private val disagreePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val centrePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val agreePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var notchPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    init {
+        disagreePaint.color = ContextCompat.getColor(context, R.color.lightRed)
+        disagreePaint.strokeWidth = 4f
+
+        centrePaint.color = ContextCompat.getColor(context, R.color.lightGrey)
+        centrePaint.strokeWidth = 4f
+
+        agreePaint.color = ContextCompat.getColor(context, R.color.lightGreen)
+        agreePaint.strokeWidth = 4f
+
+        notchPaint.color = ContextCompat.getColor(context, R.color.barBackground)
+        notchPaint.strokeWidth = 4f
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        setupPoints()
+        createPoints()
     }
 
-    private fun setupPoints() {
+    private fun createPoints() {
         val parentWidth = parentWidth
         val pointY = parentHeight / 2
 
@@ -75,22 +92,6 @@ class PersonalitySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBa
                 resources.getString(R.string.personality_slider_agree_strongly)
             )
         )
-    }
-
-    override fun setupPaints() {
-        super.setupPaints()
-
-        disagreePaint.color = ContextCompat.getColor(context, R.color.lightRed)
-        disagreePaint.strokeWidth = 4f
-
-        centrePaint.color = ContextCompat.getColor(context, R.color.lightGrey)
-        centrePaint.strokeWidth = 4f
-
-        agreePaint.color = ContextCompat.getColor(context, R.color.lightGreen)
-        agreePaint.strokeWidth = 4f
-
-        notchPaint.color = ContextCompat.getColor(context, R.color.barBackground)
-        notchPaint.strokeWidth = 4f
     }
 
     override fun onDraw(canvas: Canvas) {

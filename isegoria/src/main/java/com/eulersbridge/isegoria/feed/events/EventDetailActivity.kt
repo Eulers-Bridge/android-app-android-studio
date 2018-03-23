@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria.feed.events
 
-import android.arch.lifecycle.ViewModelProviders
+import android.arch.lifecycle.ViewModelProvider
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -20,16 +19,21 @@ import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.event_detail_activity.*
+import javax.inject.Inject
 
-class EventDetailActivity : AppCompatActivity() {
+class EventDetailActivity : DaggerAppCompatActivity() {
 
     private val dpWidth: Float by lazy {
         val displayMetrics = resources.displayMetrics
         displayMetrics.widthPixels / displayMetrics.density
     }
 
-    private lateinit var viewModel: EventDetailViewModel
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+
+    lateinit var viewModel: EventDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +42,6 @@ class EventDetailActivity : AppCompatActivity() {
 
         window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-
-        viewModel = ViewModelProviders.of(this).get(EventDetailViewModel::class.java)
 
         backButton.setOnClickListener { onBackPressed() }
         addToCalendarButton.setOnClickListener { viewModel.addToCalendar(this) }

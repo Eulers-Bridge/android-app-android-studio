@@ -14,17 +14,23 @@ import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.network.api.models.Position
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
+import javax.inject.Inject
 
 class CandidatePositionFragment : Fragment() {
     private var dpWidth: Float = 0.toFloat()
 
-    private var app: IsegoriaApp? = null
+    @Inject
+    internal lateinit var networkService: NetworkService
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,10 +48,8 @@ class CandidatePositionFragment : Fragment() {
 
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
-        app = activity?.application as IsegoriaApp
-
         position?.id?.let { positionId ->
-            app?.api?.getPositionCandidates(positionId)?.onSuccess { candidates ->
+            networkService.api.getPositionCandidates(positionId).onSuccess { candidates ->
                 addCandidates(candidates)
             }
         }
@@ -87,7 +91,7 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        app?.api?.getPhoto(candidate.userId)?.onSuccess {
+        networkService.api.getPhoto(candidate.userId).onSuccess {
             GlideApp.with(this@CandidatePositionFragment)
                 .load(it.thumbnailUrl)
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -131,7 +135,7 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        app?.api?.getTicket(candidate.ticketId)?.onSuccess {
+        networkService.api.getTicket(candidate.ticketId).onSuccess {
             textViewParty.text = it.code
             textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
         }
@@ -167,7 +171,7 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app?.api?.getPosition(candidate.positionId)?.onSuccess {
+        networkService.api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 

@@ -15,33 +15,38 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.content.systemService
 import com.eulersbridge.isegoria.auth.AuthActivity
+import com.eulersbridge.isegoria.di.DaggerAppComponent
 import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.securepreferences.SecurePreferences
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import dagger.android.support.HasSupportFragmentInjector
 import java.util.*
 import javax.inject.Inject
 
-class IsegoriaApp : Application(), HasActivityInjector {
+class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
 
-    override fun activityInjector() = activityInjector
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
 
-    companion object {
-        private lateinit var securePreferences: SecurePreferences
-    }
+    override fun activityInjector() = activityInjector
+    override fun supportFragmentInjector() = fragmentInjector
 
     @Inject
     lateinit var networkService: NetworkService
+
+    @Inject
+    lateinit var securePreferences: SecurePreferences
 
     val loggedInUser = MutableLiveData<User>()
     var cachedLoginArticles: List<NewsArticle>? = null
@@ -52,7 +57,6 @@ class IsegoriaApp : Application(), HasActivityInjector {
 
     private lateinit var loginObserver: Observer<Boolean>
 
-    val api: API by lazy { networkService.api }
     val savedUserEmail: String? by lazy { securePreferences.getString(USER_EMAIL_KEY, null) }
     val savedUserPassword: String? by lazy { securePreferences.getString(USER_PASSWORD_KEY, null) }
 
@@ -68,13 +72,10 @@ class IsegoriaApp : Application(), HasActivityInjector {
         DaggerAppComponent
             .builder()
             .application(this)
-            .appModule(AppModule(this))
             .build()
             .inject(this)
 
         createNotificationChannels()
-
-        securePreferences = SecurePreferences(this)
 
         val login = login()
 
@@ -144,7 +145,7 @@ class IsegoriaApp : Application(), HasActivityInjector {
     }
 
     @SuppressLint("NewApi")
-    private fun setupAppShortcuts() {
+    private fun createAppShortcuts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
 
             val election = ShortcutInfo.Builder(this, SHORTCUT_ACTION_ELECTION)
@@ -182,12 +183,12 @@ class IsegoriaApp : Application(), HasActivityInjector {
     fun setLoggedInUser(user: User, password: String) {
         loggedInUser.value = user
 
-        SecurePreferences(applicationContext).edit {
+        securePreferences.edit {
             putString(USER_EMAIL_KEY, user.email)
             putString(USER_PASSWORD_KEY, password)
         }
 
-        setupAppShortcuts()
+        createAppShortcuts()
     }
 
     fun login(): LiveData<Boolean> {
@@ -250,12 +251,12 @@ class IsegoriaApp : Application(), HasActivityInjector {
         networkService.email = null
         networkService.password = null
 
-        SecurePreferences(applicationContext).edit {
+        securePreferences.edit {
             remove(USER_PASSWORD_KEY)
         }
 
         // Remove any notifications that are still visible
-        NotificationManagerCompat.from(applicationContext).cancelAll()
+        NotificationManagerCompat.from(this).cancelAll()
 
         // Remove all app long-press shortcuts
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)

@@ -1,31 +1,32 @@
 package com.eulersbridge.isegoria.feed.news
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Like
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class NewsDetailViewModel(application: Application) : AndroidViewModel(application) {
+class NewsDetailViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val networkService: NetworkService
+) : ViewModel() {
 
     internal val newsArticle = MutableLiveData<NewsArticle>()
-
-    private val app: IsegoriaApp by lazy {
-        getApplication<IsegoriaApp>()
-    }
 
     private val articleLikes = Transformations.switchMap<NewsArticle, List<Like>>(newsArticle) { article ->
         if (article == null) {
             SingleLiveData(null)
 
         } else {
-            RetrofitLiveData(app.api.getNewsArticleLikes(article.id))
+            RetrofitLiveData(networkService.api.getNewsArticleLikes(article.id))
         }
     }
 
@@ -59,7 +60,7 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
 
             } else {
                 Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val like = RetrofitLiveData(app.api.likeArticle(article.id, user.email))
+                    val like = RetrofitLiveData(networkService.api.likeArticle(article.id, user.email))
 
                     Transformations.switchMap(like) {
                         SingleLiveData(it != null && it.success)
@@ -76,7 +77,7 @@ class NewsDetailViewModel(application: Application) : AndroidViewModel(applicati
         return Transformations.switchMap<User, Boolean>(app.loggedInUser) { user ->
             if (user != null)
                 Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val unlike = RetrofitLiveData(app.api.unlikeArticle(article.id, user.email))
+                    val unlike = RetrofitLiveData(networkService.api.unlikeArticle(article.id, user.email))
 
                     Transformations.switchMap(unlike) { SingleLiveData(true) }
                 })
