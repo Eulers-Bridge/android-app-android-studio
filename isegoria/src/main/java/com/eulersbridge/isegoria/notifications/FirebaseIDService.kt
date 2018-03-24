@@ -11,12 +11,20 @@ import com.eulersbridge.isegoria.edit
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import com.securepreferences.SecurePreferences
+import dagger.android.AndroidInjection
 import javax.inject.Inject
+
+
 
 class FirebaseIDService : FirebaseInstanceIdService() {
 
     @Inject
     lateinit var securePreferences: SecurePreferences
+
+    override fun onCreate() {
+        AndroidInjection.inject(this)
+        super.onCreate()
+    }
 
     override fun onTokenRefresh() {
         super.onTokenRefresh()

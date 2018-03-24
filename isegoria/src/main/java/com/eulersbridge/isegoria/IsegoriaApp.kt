@@ -1,10 +1,7 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
@@ -27,11 +24,12 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.securepreferences.SecurePreferences
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
 import java.util.*
 import javax.inject.Inject
 
-class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector {
+class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
@@ -39,8 +37,12 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
 
+    @Inject
+    lateinit var serviceInjector: DispatchingAndroidInjector<Service>
+
     override fun activityInjector() = activityInjector
     override fun supportFragmentInjector() = fragmentInjector
+    override fun serviceInjector() = serviceInjector
 
     @Inject
     lateinit var networkService: NetworkService

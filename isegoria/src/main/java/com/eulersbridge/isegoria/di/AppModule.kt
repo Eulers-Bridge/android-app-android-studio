@@ -13,14 +13,14 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providesContext(app: IsegoriaApp): Context = app
+    fun provideContext(app: IsegoriaApp): Context = app
 
     @Provides
     @Singleton
-    fun providesNetworkService(app: IsegoriaApp) = NetworkService(app, app)
+    fun provideNetworkService(app: IsegoriaApp) = NetworkService(app, app)
 
     @Provides
     @Singleton
-    fun providesSecurePreferences(app: IsegoriaApp) = SecurePreferences(app)
+    fun provideSecurePreferences(app: IsegoriaApp) = SecurePreferences(app)
 
 }

@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.di
 
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.notifications.ServicesModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
@@ -9,7 +10,8 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(
-    modules = [(AndroidSupportInjectionModule::class), (AppModule::class), (ActivityBuilder::class)]
+    modules = [(AndroidSupportInjectionModule::class), (AppModule::class),
+        (ServicesModule::class), (ActivityBuilder::class)]
 )
 interface AppComponent {
 

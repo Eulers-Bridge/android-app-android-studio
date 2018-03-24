@@ -20,7 +20,6 @@ class EmailVerificationFragment : Fragment() {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: EmailVerificationViewModel
 
     override fun onAttach(context: Context?) {
