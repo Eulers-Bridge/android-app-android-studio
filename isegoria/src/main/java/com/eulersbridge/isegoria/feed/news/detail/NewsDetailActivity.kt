@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.feed.news
+package com.eulersbridge.isegoria.feed.news.detail
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -10,6 +10,7 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.feed.news.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.toDateString
@@ -23,7 +24,7 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-    lateinit var viewModel: NewsDetailViewModel
+    private lateinit var viewModel: NewsDetailViewModel
 
     private var userLikedArticle = false
 

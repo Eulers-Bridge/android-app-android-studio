@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.candidates.positions
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
 import javax.inject.Inject
 
@@ -31,6 +33,11 @@ class CandidatePositionFragment : Fragment() {
 
     @Inject
     internal lateinit var networkService: NetworkService
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

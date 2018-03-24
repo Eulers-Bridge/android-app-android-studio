@@ -5,15 +5,18 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
-abstract class ProfileFragmentsModule {
+abstract class ProfileFragmentProvider {
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [(ProfileFragmentModule::class)])
+    abstract fun contributeProfileViewPagerFragment() : ProfileViewPagerFragment
+
+    @ContributesAndroidInjector(modules = [(ProfileFragmentModule::class)])
     abstract fun contributeProfileOverviewFragment() : ProfileOverviewFragment
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [(ProfileFragmentModule::class)])
     abstract fun contributeProfileTaskProgressFragment() : ProfileTaskProgressFragment
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [(ProfileFragmentModule::class)])
     abstract fun contributeProfileBadgesFragment() : ProfileBadgesFragment
 
 }

@@ -19,6 +19,7 @@ import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_master_layout.*
 import javax.inject.Inject
+import javax.inject.Named
 
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 

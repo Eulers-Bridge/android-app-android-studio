@@ -21,15 +21,14 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
-    private lateinit var viewModel: PollViewModel
+    private lateinit var viewModel: PollVoteViewModel
 
     private var pollOptionsAdapter: PollOptionAdapter = PollOptionAdapter(this)
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, modelFactory)[PollViewModel::class.java]
+        viewModel = ViewModelProviders.of(this, modelFactory)[PollVoteViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -39,8 +38,6 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
     ): View? {
 
         val rootView = inflater.inflate(R.layout.poll_fragment, container, false)
-
-        viewModel = ViewModelProviders.of(this).get(PollViewModel::class.java)
 
         viewModel.poll.value = arguments?.getParcelable(ACTIVITY_EXTRA_POLL)
 

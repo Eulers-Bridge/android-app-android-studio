@@ -1,5 +1,6 @@
-package com.eulersbridge.isegoria.feed.photos
+package com.eulersbridge.isegoria.feed.photos.detail
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -9,7 +10,6 @@ import android.support.annotation.Px
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -21,22 +21,29 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS
+import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS_POSITION
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.toDateString
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.photo_detail_activity.*
+import javax.inject.Inject
 
-class PhotoDetailActivity : AppCompatActivity(), ViewPager.OnPageChangeListener {
+class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeListener {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: PhotoDetailViewModel
 
     private var userLikedCurrentPhoto: Boolean = false
-    private lateinit var viewModel: PhotoDetailViewModel
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.photo_detail_activity)
 
-        viewModel = ViewModelProviders.of(this).get(PhotoDetailViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, modelFactory)[PhotoDetailViewModel::class.java]
 
         val photosList = intent.getParcelableArrayListExtra<Parcelable>(ACTIVITY_EXTRA_PHOTOS) as? ArrayList<Photo>
         val startIndex = intent.getIntExtra(ACTIVITY_EXTRA_PHOTOS_POSITION, 0)

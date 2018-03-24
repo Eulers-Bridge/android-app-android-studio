@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.vote
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -13,10 +14,16 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.vote_view_pager_fragment.*
 import java.util.*
+import javax.inject.Inject
 
 class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: VoteViewModel
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPagerAdapter: SimpleFragmentPagerAdapter
@@ -27,13 +34,17 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
         override fun onTabReselected(tab: TabLayout.Tab) {}
     }
 
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[VoteViewModel::class.java]
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.vote_view_pager_fragment, container, false)
 
         // Ensure options menu from another fragment is not carried over
         activity?.invalidateOptionsMenu()
-
-        val viewModel = ViewModelProviders.of(this).get(VoteViewModel::class.java)
 
         observe(viewModel.locationAndDateComplete) {
             if (it == true) viewPager.currentItem = 1
@@ -54,10 +65,20 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
 
     private fun setupViewPager() {
         val fragments = ArrayList<Fragment>()
+
+        val voteFragment = VoteFragment()
+        voteFragment.setViewModel(viewModel)
+
+        val pledgeFragment = VotePledgeFragment()
+        pledgeFragment.setViewModel(viewModel)
+
+        val doneFragment = VoteDoneFragment()
+        doneFragment.setViewModel(viewModel)
+
         fragments.apply {
-            add(VoteFragment())
-            add(VotePledgeFragment())
-            add(VoteDoneFragment())
+            add(voteFragment)
+            add(pledgeFragment)
+            add(doneFragment)
         }
 
         viewPagerAdapter = object : SimpleFragmentPagerAdapter(childFragmentManager, fragments) {

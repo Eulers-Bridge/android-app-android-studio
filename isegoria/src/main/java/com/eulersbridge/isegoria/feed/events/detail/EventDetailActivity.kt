@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.feed.events
+package com.eulersbridge.isegoria.feed.events.detail
 
 import android.arch.lifecycle.ViewModelProvider
 import android.graphics.Color
@@ -15,6 +15,7 @@ import androidx.os.bundleOf
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.feed.events.ACTIVITY_EXTRA_EVENT
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment

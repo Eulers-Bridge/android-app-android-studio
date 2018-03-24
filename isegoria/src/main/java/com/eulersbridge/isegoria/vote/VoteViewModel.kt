@@ -3,9 +3,9 @@ package com.eulersbridge.isegoria.vote
 import android.arch.lifecycle.*
 import android.content.Intent
 import android.provider.CalendarContract
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Election
+import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.models.VoteLocation
 import com.eulersbridge.isegoria.network.api.models.VoteReminder
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
@@ -15,8 +15,8 @@ import javax.inject.Inject
 
 class VoteViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val userData: LiveData<User>,
+    private val api: API
 ) : ViewModel() {
 
     private var voteLocations: LiveData<List<VoteLocation>?>? = null
@@ -74,13 +74,13 @@ class VoteViewModel
         if (electionData != null)
             return electionData!!
 
-        val user = app.loggedInUser.value
+        val user = userData.value
 
         return if (user?.institutionId == null) {
             SingleLiveData(null)
 
         } else {
-            val electionsList = RetrofitLiveData(networkService.api.getElections(user.institutionId!!))
+            val electionsList = RetrofitLiveData(api.getElections(user.institutionId!!))
 
             electionData = Transformations.switchMap(electionsList) { elections ->
                 if (elections != null && elections.isNotEmpty()) {
@@ -105,10 +105,10 @@ class VoteViewModel
         if (voteLocations != null)
             voteLocations
 
-        val user = app.loggedInUser.value
+        val user = userData.value
 
         if (user?.institutionId != null) {
-            voteLocations = RetrofitLiveData(networkService.api.getVoteLocations(user.institutionId!!))
+            voteLocations = RetrofitLiveData(api.getVoteLocations(user.institutionId!!))
             voteLocations
         }
 
@@ -119,7 +119,7 @@ class VoteViewModel
         if (pledgeComplete.value != null && pledgeComplete.value == true)
             return pledgeComplete
 
-        app.loggedInUser.value?.let { user ->
+        userData.value?.let { user ->
             val election = this.electionData?.value
             val voteLocation = selectedVoteLocation.value
             val dateTimeCalendar = dateTime.value
@@ -133,7 +133,7 @@ class VoteViewModel
 
                 // Add the vote reminder
                 val reminderRequest =
-                    RetrofitLiveData(networkService.api.addVoteReminder(user.email, reminder))
+                    RetrofitLiveData(api.addVoteReminder(user.email, reminder))
 
                 return Transformations.switchMap(reminderRequest) {
                     pledgeComplete.value = true
@@ -146,8 +146,8 @@ class VoteViewModel
     }
 
     internal fun getLatestVoteReminder(): LiveData<Boolean> {
-        app.loggedInUser.value?.let { user ->
-            val remindersRequest = RetrofitLiveData(networkService.api.getVoteReminders(user.email))
+        userData.value?.let { user ->
+            val remindersRequest = RetrofitLiveData(api.getVoteReminders(user.email))
 
             return Transformations.switchMap(remindersRequest) { reminders ->
                 val latestReminder = reminders?.firstOrNull()

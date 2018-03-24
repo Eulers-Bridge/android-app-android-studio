@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.election.candidates.positions
 
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_positions_fragment.*
 import javax.inject.Inject
 
@@ -26,6 +28,11 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
 
     @Inject
     internal lateinit var networkService: NetworkService
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     private val adapter: PositionAdapter by lazy {
         val glide = GlideApp.with(this).applyDefaultRequestOptions(

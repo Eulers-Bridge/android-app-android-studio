@@ -11,6 +11,7 @@ import androidx.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.feed.events.detail.EventDetailActivity
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.TintTransformation

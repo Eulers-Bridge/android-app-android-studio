@@ -37,11 +37,10 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: ProfileViewModel
 
     private lateinit var completedAdapter: TaskAdapter
     private lateinit var remainingAdapter: TaskAdapter
-
-    private lateinit var viewModel: ProfileViewModel
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)

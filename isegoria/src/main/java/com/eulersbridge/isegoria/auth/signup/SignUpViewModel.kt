@@ -4,7 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
@@ -12,7 +12,7 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
 class SignUpViewModel
-@Inject constructor(private val networkService: NetworkService) : ViewModel() {
+@Inject constructor(private val api: API) : ViewModel() {
 
     private var countries: LiveData<List<Country>>? = null
 
@@ -27,7 +27,7 @@ class SignUpViewModel
     val selectedBirthYear = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
-        val generalInfo = RetrofitLiveData(networkService.api.getGeneralInfo())
+        val generalInfo = RetrofitLiveData(api.getGeneralInfo())
 
         return Transformations.switchMap(generalInfo) {
             return@switchMap SingleLiveData(it?.countries)

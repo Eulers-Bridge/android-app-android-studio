@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria.vote
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -32,6 +31,7 @@ class VoteFragment : Fragment(), TitledFragment {
     private lateinit var voteLocationArrayAdapter: ArrayAdapter<VoteLocation>
 
     private var openDialog: Dialog? = null
+
     private lateinit var viewModel: VoteViewModel
 
     override fun onCreateView(
@@ -41,13 +41,16 @@ class VoteFragment : Fragment(), TitledFragment {
     ): View? {
         val rootView = inflater.inflate(R.layout.vote_fragment, container, false)
 
-        viewModel = ViewModelProviders.of(parentFragment!!).get(VoteViewModel::class.java)
-        createViewModelObservers()
-
         voteLocationArrayAdapter = ArrayAdapter(context!!, R.layout.spinner_layout)
         voteLocationArrayAdapter.setDropDownViewResource(R.layout.spinner_layout)
 
         return rootView
+    }
+
+    fun setViewModel(viewModel: VoteViewModel) {
+        this.viewModel = viewModel
+
+        createViewModelObservers()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

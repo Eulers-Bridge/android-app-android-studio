@@ -38,7 +38,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: FriendsViewModel
 
     private var mainActivity: MainActivity? = null

@@ -8,14 +8,14 @@ import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
 class LoginViewModel
 @Inject constructor(
     private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val api: API
 ) : ViewModel() {
 
     internal val email = MutableLiveData<String>()
@@ -83,7 +83,7 @@ class LoginViewModel
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
             // If email is valid, it is non-null
-            networkService.api.requestPasswordReset(email!!).enqueue()
+            api.requestPasswordReset(email!!).enqueue()
             canShowPasswordResetDialog.value = true
 
             return true

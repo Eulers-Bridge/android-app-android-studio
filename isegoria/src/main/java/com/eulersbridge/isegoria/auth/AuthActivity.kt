@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.auth
 
-import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -8,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.target.SimpleTarget
@@ -17,15 +17,11 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
+import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
-import dagger.android.support.DaggerAppCompatActivity
-import javax.inject.Inject
 
-class AuthActivity : DaggerAppCompatActivity() {
-
-    @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+class AuthActivity : AppCompatActivity() {
 
     private lateinit var viewModel: AuthViewModel
 
@@ -44,7 +40,7 @@ class AuthActivity : DaggerAppCompatActivity() {
                     }
                 })
 
-        viewModel = ViewModelProviders.of(this, modelFactory)[AuthViewModel::class.java]
+        viewModel = ViewModelProviders.of(this)[AuthViewModel::class.java]
 
         presentRootContent(LoginFragment())
 

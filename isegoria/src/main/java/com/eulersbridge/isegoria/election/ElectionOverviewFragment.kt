@@ -2,7 +2,9 @@ package com.eulersbridge.isegoria.election
 
 
 import android.animation.LayoutTransition
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -13,17 +15,27 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Election
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.toDateString
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_overview_fragment.*
+import javax.inject.Inject
 
 class ElectionOverviewFragment : Fragment() {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: ElectionViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.election_overview_fragment, container, false)
-
-        val viewModel = ViewModelProviders.of(this).get(ElectionViewModel::class.java)
 
         observe(viewModel.getElection()) {
             if (it != null)

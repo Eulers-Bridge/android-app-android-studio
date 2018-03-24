@@ -22,8 +22,8 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: ProfileViewModel
+
     private lateinit var badgeAdapter: BadgeAdapter
 
     @Inject
@@ -32,8 +32,12 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
 
+        viewModel = if (parentFragment != null) {
+            ViewModelProviders.of(parentFragment!!)[ProfileViewModel::class.java]
+        } else {
+            ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
+        }
     }
 
     override fun onCreateView(

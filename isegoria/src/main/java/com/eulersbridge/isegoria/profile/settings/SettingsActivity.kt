@@ -1,12 +1,12 @@
 package com.eulersbridge.isegoria.profile.settings
 
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -17,10 +17,15 @@ import com.eulersbridge.isegoria.observeBoolean
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.theartofdev.edmodo.cropper.CropImage
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.settings_activity.*
+import javax.inject.Inject
+import javax.inject.Named
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : DaggerAppCompatActivity() {
 
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +36,7 @@ class SettingsActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 
-        viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, modelFactory)[SettingsViewModel::class.java]
 
         backButton.setOnClickListener { onBackPressed() }
 

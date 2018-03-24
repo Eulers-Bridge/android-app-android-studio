@@ -10,7 +10,7 @@ import com.eulersbridge.isegoria.util.ui.BaseSliderBar
 import com.eulersbridge.isegoria.util.ui.SliderBarPoint
 import java.util.*
 
-class SelfEfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
+class EfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
 
     private val paints = ArrayList<Paint>()
     private val notchPaint = Paint(Paint.ANTI_ALIAS_FLAG)

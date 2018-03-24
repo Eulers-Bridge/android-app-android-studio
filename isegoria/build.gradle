@@ -61,10 +61,6 @@ if (project.hasProperty('devBuild')) {
     }
 }
 
-kapt {
-    generateStubs = true
-}
-
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

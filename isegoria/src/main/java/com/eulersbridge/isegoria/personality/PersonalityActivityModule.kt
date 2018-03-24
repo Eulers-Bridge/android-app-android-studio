@@ -6,9 +6,10 @@ import com.eulersbridge.isegoria.di.ViewModelProviderFactory
 import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 
 @Module
-class PersonalityModule {
+class PersonalityActivityModule {
 
     @Provides
     fun personalityViewModel(

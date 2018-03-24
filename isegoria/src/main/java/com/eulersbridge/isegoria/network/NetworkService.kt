@@ -28,7 +28,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.*
+import javax.inject.Singleton
 
+@Singleton
 class NetworkService constructor(private val app: IsegoriaApp, private val appContext: Context) {
 
     companion object {

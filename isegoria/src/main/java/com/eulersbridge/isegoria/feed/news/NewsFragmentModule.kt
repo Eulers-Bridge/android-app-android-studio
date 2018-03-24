@@ -16,7 +16,7 @@ class NewsFragmentModule {
     fun newsViewModel(
         app: IsegoriaApp,
         networkService: NetworkService
-    ): NewsViewModel = NewsViewModel(app, networkService)
+    ): NewsViewModel = NewsViewModel(app, networkService.api)
 
     @Provides
     fun provideNewsViewModel(newsViewModel: NewsViewModel): ViewModelProvider.Factory

@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.election.candidates
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint.Style
 import android.graphics.drawable.ShapeDrawable
@@ -23,6 +24,7 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.CandidateTicket
 import com.eulersbridge.isegoria.network.api.models.Election
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_candidates_tickets_fragment.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -70,6 +72,11 @@ class CandidateTicketFragment : Fragment() {
         }
 
         override fun onFailure(call: Call<List<CandidateTicket>>, t: Throwable) = t.printStackTrace()
+    }
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(

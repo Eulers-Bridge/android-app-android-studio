@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.feed.photos.detail.PhotoDetailActivity
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 

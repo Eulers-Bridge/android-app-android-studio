@@ -1,11 +1,10 @@
-package com.eulersbridge.isegoria.feed.news
+package com.eulersbridge.isegoria.feed.news.detail
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Like
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
@@ -15,8 +14,8 @@ import javax.inject.Inject
 
 class NewsDetailViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val user: LiveData<User>,
+    private val api: API
 ) : ViewModel() {
 
     internal val newsArticle = MutableLiveData<NewsArticle>()
@@ -26,7 +25,7 @@ class NewsDetailViewModel
             SingleLiveData(null)
 
         } else {
-            RetrofitLiveData(networkService.api.getNewsArticleLikes(article.id))
+            RetrofitLiveData(api.getNewsArticleLikes(article.id))
         }
     }
 
@@ -39,7 +38,7 @@ class NewsDetailViewModel
             SingleLiveData(false)
 
         } else {
-            Transformations.switchMap<User, Boolean>(app.loggedInUser, { user ->
+            Transformations.switchMap<User, Boolean>(user, { user ->
                 val userExistsInLikes = user != null && likes.any { it.email == user.email }
                 SingleLiveData(userExistsInLikes)
             })
@@ -54,13 +53,13 @@ class NewsDetailViewModel
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     internal fun likeArticle(): LiveData<Boolean> {
-        return Transformations.switchMap<User, Boolean>(app.loggedInUser) { user ->
+        return Transformations.switchMap<User, Boolean>(user) { user ->
             return@switchMap if (user == null) {
                 SingleLiveData(false)
 
             } else {
                 Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val like = RetrofitLiveData(networkService.api.likeArticle(article.id, user.email))
+                    val like = RetrofitLiveData(api.likeArticle(article.id, user.email))
 
                     Transformations.switchMap(like) {
                         SingleLiveData(it != null && it.success)
@@ -74,10 +73,10 @@ class NewsDetailViewModel
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     internal fun unlikeArticle(): LiveData<Boolean> {
-        return Transformations.switchMap<User, Boolean>(app.loggedInUser) { user ->
+        return Transformations.switchMap<User, Boolean>(user) { user ->
             if (user != null)
                 Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val unlike = RetrofitLiveData(networkService.api.unlikeArticle(article.id, user.email))
+                    val unlike = RetrofitLiveData(api.unlikeArticle(article.id, user.email))
 
                     Transformations.switchMap(unlike) { SingleLiveData(true) }
                 })

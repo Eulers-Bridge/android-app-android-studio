@@ -24,6 +24,7 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: PhotoAlbumsViewModel
 
     @Inject
     lateinit var app: IsegoriaApp
@@ -32,9 +33,6 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
     lateinit var networkService: NetworkService
 
     private val adapter = PhotoAlbumAdapter(this)
-
-    private lateinit var viewModel: PhotoAlbumsViewModel
-
     private var fetchedPhotos = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?

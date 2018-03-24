@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.enqueue
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.Poll
 import com.eulersbridge.isegoria.network.api.models.PollOption
@@ -15,9 +15,9 @@ import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
-class PollViewModel
+class PollVoteViewModel
 @Inject constructor (
-    private val networkService: NetworkService
+    private val api: API
 ) : ViewModel() {
 
     internal val poll = MutableLiveData<Poll>()
@@ -26,7 +26,7 @@ class PollViewModel
     internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) { thePoll ->
 
         return@switchMap if (thePoll.creator == null && !thePoll.creatorEmail.isNullOrBlank()) {
-            RetrofitLiveData(networkService.api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
+            RetrofitLiveData(api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
 
         } else {
             SingleLiveData(thePoll?.creator)
@@ -38,10 +38,10 @@ class PollViewModel
 
         val (id) = currentPoll.options!![optionIndex]
 
-        networkService.api.answerPoll(currentPoll.id, id).enqueue({
+        api.answerPoll(currentPoll.id, id).enqueue({
 
             // After voting, fetch poll results
-            networkService.api.getPollResults(currentPoll.id) .onSuccess { response ->
+            api.getPollResults(currentPoll.id) .onSuccess { response ->
                 response.results?.let { results ->
                     val updatedPollOptions = currentPoll.options ?: listOf<PollOption>()
                         .mapIndexed { index, pollOption ->

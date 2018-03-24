@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.FriendRequest
 import com.eulersbridge.isegoria.network.api.models.Institution
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class FriendsViewModel
 @Inject constructor(
     private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val api: API
 ) : ViewModel() {
 
     private var searchResults: LiveData<List<User>?>? = null
@@ -78,7 +78,7 @@ class FriendsViewModel
         showSearch()
 
         searchResults = if (!query.isBlank() && query.length > 2) {
-            RetrofitLiveData(networkService.api.searchForUsers(query))
+            RetrofitLiveData(api.searchForUsers(query))
 
         } else {
             SingleLiveData(null)
@@ -89,7 +89,7 @@ class FriendsViewModel
 
     internal fun getFriends(): LiveData<List<Contact>> {
         if (friends == null)
-            friends = RetrofitLiveData(networkService.api.getFriends())
+            friends = RetrofitLiveData(api.getFriends())
 
         return friends!!
     }
@@ -101,7 +101,7 @@ class FriendsViewModel
                     SingleLiveData<List<FriendRequest>?>(null)
 
                 } else {
-                    val requests = RetrofitLiveData(networkService.api.getFriendRequestsSent(user.getId()))
+                    val requests = RetrofitLiveData(api.getFriendRequestsSent(user.getId()))
                     sentFriendRequests = Transformations.switchMap(requests) { sentFriendRequests ->
                         sentRequestsVisible.value = sentFriendRequests != null && sentFriendRequests.isNotEmpty()
                         SingleLiveData(sentFriendRequests)
@@ -122,7 +122,7 @@ class FriendsViewModel
                     SingleLiveData<List<FriendRequest>?>(null)
 
                 } else {
-                    val requests = RetrofitLiveData(networkService.api.getFriendRequestsReceived(user.getId()))
+                    val requests = RetrofitLiveData(api.getFriendRequestsReceived(user.getId()))
                     receivedFriendRequests =
                             Transformations.switchMap(requests) { receivedFriendRequests ->
 
@@ -145,7 +145,7 @@ class FriendsViewModel
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
         if (!newFriendEmail.isBlank())
             return Transformations.switchMap(app.loggedInUser) { (_, _, email) ->
-                val friendRequest = RetrofitLiveData(networkService.api.addFriend(email, newFriendEmail))
+                val friendRequest = RetrofitLiveData(api.addFriend(email, newFriendEmail))
                 Transformations.switchMap(friendRequest) { SingleLiveData(true) }
             }
 
@@ -153,7 +153,7 @@ class FriendsViewModel
     }
 
     internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
-        val friendRequest = RetrofitLiveData(networkService.api.acceptFriendRequest(requestId))
+        val friendRequest = RetrofitLiveData(api.acceptFriendRequest(requestId))
         return Transformations.switchMap(friendRequest) {
             getReceivedFriendRequests()
             getFriends()
@@ -163,7 +163,7 @@ class FriendsViewModel
     }
 
     internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
-        val friendRequest = RetrofitLiveData(networkService.api.rejectFriendRequest(requestId))
+        val friendRequest = RetrofitLiveData(api.rejectFriendRequest(requestId))
         return Transformations.switchMap(friendRequest) {
             getReceivedFriendRequests()
             getFriends()
@@ -173,6 +173,6 @@ class FriendsViewModel
     }
 
     internal fun getInstitution(institutionId: Long): LiveData<Institution>
-        = RetrofitLiveData(networkService.api.getInstitution(institutionId))
+        = RetrofitLiveData(api.getInstitution(institutionId))
 
 }

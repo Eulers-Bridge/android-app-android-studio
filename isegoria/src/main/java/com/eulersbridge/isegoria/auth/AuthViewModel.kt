@@ -1,20 +1,17 @@
 package com.eulersbridge.isegoria.auth
 
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
-import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(
-    private val networkService: NetworkService
-) : ViewModel() {
+class AuthViewModel(application: IsegoriaApp) : AndroidViewModel(application) {
 
     private val countriesData = MutableLiveData<List<Country>>()
 
@@ -24,6 +21,8 @@ class AuthViewModel @Inject constructor(
     val verificationComplete = MutableLiveData<Boolean>()
 
     val userLoggedIn = MutableLiveData<Boolean>()
+
+    private val networkService = application.networkService
 
     init {
         networkService.api.getGeneralInfo().onSuccess {

@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.auth
+package com.eulersbridge.isegoria.auth.verification
 
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.observeBoolean
 import dagger.android.support.AndroidSupportInjection
@@ -36,7 +37,7 @@ class EmailVerificationFragment : Fragment() {
         verifiedButton.setOnClickListener {
             it.isEnabled = false
 
-            val authViewModel = ViewModelProviders.of(requireActivity()).get(AuthViewModel::class.java)
+            val authViewModel = ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
             authViewModel.verificationComplete.value = true
 
             observeBoolean(viewModel.userVerified()) {

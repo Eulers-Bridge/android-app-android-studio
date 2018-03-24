@@ -14,7 +14,7 @@ class EventsFragmentModule {
     fun eventsViewModel(
         app: IsegoriaApp,
         networkService: NetworkService
-    ): EventsViewModel = EventsViewModel(app, networkService)
+    ): EventsViewModel = EventsViewModel(app.loggedInUser, networkService.api)
 
     @Provides
     fun provideEventsViewModel(eventsViewModel: EventsViewModel): ViewModelProvider.Factory

@@ -22,13 +22,12 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
-    lateinit var viewModel: EfficacyQuestionsViewModel
+    private lateinit var viewModel: EfficacyViewModel
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, modelFactory)[EfficacyQuestionsViewModel::class.java]
+        viewModel = ViewModelProviders.of(this, modelFactory)[EfficacyViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -38,10 +37,10 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
     ): View? {
         val rootView = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false)
 
-        val sliderBar1 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar1)
-        val sliderBar2 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar2)
-        val sliderBar3 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar3)
-        val sliderBar4 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar4)
+        val sliderBar1 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar1)
+        val sliderBar2 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar2)
+        val sliderBar3 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar3)
+        val sliderBar4 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar4)
 
         val pairs = mapOf(
             viewModel.score1 to sliderBar1,

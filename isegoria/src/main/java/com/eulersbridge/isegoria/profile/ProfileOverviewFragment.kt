@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -36,10 +37,9 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
     private lateinit var taskAdapter: TaskAdapter
 
-    private val viewModel: ProfileViewModel by lazy {
-        val lifecycleOwner = parentFragment ?: this
-        ViewModelProviders.of(lifecycleOwner).get(ProfileViewModel::class.java)
-    }
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: ProfileViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,8 +49,13 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
-
         super.onAttach(context)
+
+        viewModel = if (parentFragment != null) {
+            ViewModelProviders.of(parentFragment!!)[ProfileViewModel::class.java]
+        } else {
+            ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

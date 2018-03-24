@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
@@ -16,12 +17,17 @@ import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_viewpager_fragment.*
+import javax.inject.Inject
 
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private lateinit var tabLayout: TabLayout
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ProfileViewModel
+
+    private lateinit var tabLayout: TabLayout
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
@@ -33,12 +39,16 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
         override fun onTabReselected(tab: TabLayout.Tab) {}
     }
 
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.profile_viewpager_fragment, container, false)
 
         setHasOptionsMenu(true)
-
-        viewModel = ViewModelProviders.of(this).get(ProfileViewModel::class.java)
 
         observe(viewModel.currentSectionIndex) {
             if (it != null && viewPager.currentItem != it)

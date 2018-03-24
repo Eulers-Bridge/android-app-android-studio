@@ -4,7 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
@@ -14,7 +14,7 @@ import javax.inject.Inject
 class NewsViewModel
 @Inject constructor(
     private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val api: API
 ) : ViewModel() {
 
     private var newsArticlesList: LiveData<List<NewsArticle>>? = null
@@ -25,7 +25,7 @@ class NewsViewModel
 
             return Transformations.switchMap<User, List<NewsArticle>>(app.loggedInUser) { user ->
                 user?.institutionId?.let {
-                    newsArticlesList = RetrofitLiveData(networkService.api.getNewsArticles(it))
+                    newsArticlesList = RetrofitLiveData(api.getNewsArticles(it))
                     return@switchMap newsArticlesList
                 }
 

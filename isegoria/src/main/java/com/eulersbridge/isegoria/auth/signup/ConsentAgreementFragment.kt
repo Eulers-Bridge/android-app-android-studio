@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.consent_agreement_fragment.*
 class ConsentAgreementFragment : Fragment() {
 
     private val authViewModel: AuthViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
+        ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

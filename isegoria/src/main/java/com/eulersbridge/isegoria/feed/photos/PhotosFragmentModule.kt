@@ -15,7 +15,7 @@ class PhotosFragmentModule {
     fun photosViewModel(
         app: IsegoriaApp,
         networkService: NetworkService
-    ): PhotoAlbumsViewModel = PhotoAlbumsViewModel(app, networkService)
+    ): PhotoAlbumsViewModel = PhotoAlbumsViewModel(app.loggedInUser, networkService.api)
 
     @Provides
     fun providePhotoAlbumsViewModel(photoAlbumsViewModel: PhotoAlbumsViewModel): ViewModelProvider.Factory

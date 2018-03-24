@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.*
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class ProfileViewModel
 @Inject constructor(
     private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val api: API
 ) : ViewModel() {
 
     internal val currentSectionIndex = MutableLiveData<Int>()
@@ -73,7 +73,7 @@ class ProfileViewModel
     internal fun fetchUserStats() {
         val (_, _, email) = getUser() ?: return
 
-        networkService.api.getContact(email).onSuccess {
+        api.getContact(email).onSuccess {
             contactsCount.value = it.contactsCount
             totalTasksCount.value = it.totalTasksCount
         }
@@ -105,7 +105,7 @@ class ProfileViewModel
         if (remainingBadges == null) {
             val user = getUser()
             if (user != null) {
-                remainingBadges = RetrofitLiveData(networkService.api.getRemainingBadges(user.getId()))
+                remainingBadges = RetrofitLiveData(api.getRemainingBadges(user.getId()))
             } else {
                 return SingleLiveData(null)
             }
@@ -129,7 +129,7 @@ class ProfileViewModel
         if (completedBadges == null) {
             val user = getUser()
             if (user != null)
-                completedBadges = RetrofitLiveData(networkService.api.getCompletedBadges(user.getId()))
+                completedBadges = RetrofitLiveData(api.getCompletedBadges(user.getId()))
         }
 
         return if (completedBadges == null) {
@@ -147,7 +147,7 @@ class ProfileViewModel
             return if (user?.institutionId != null) {
 
                 val institutionRequest =
-                    RetrofitLiveData(networkService.api.getInstitution(user.institutionId!!))
+                    RetrofitLiveData(api.getInstitution(user.institutionId!!))
 
                 institutionName = Transformations.switchMap(institutionRequest) request@ { institution ->
                     return@request SingleLiveData(institution?.getName())
@@ -165,7 +165,7 @@ class ProfileViewModel
 
     internal fun getTasks(): LiveData<List<Task>> {
         if (tasks == null)
-            tasks = RetrofitLiveData(networkService.api.getTasks())
+            tasks = RetrofitLiveData(api.getTasks())
 
         return tasks!!
     }
@@ -177,7 +177,7 @@ class ProfileViewModel
                     SingleLiveData<List<Task>?>(null)
 
                 } else {
-                    remainingTasks = RetrofitLiveData(networkService.api.getRemainingTasks(it.getId()))
+                    remainingTasks = RetrofitLiveData(api.getRemainingTasks(it.getId()))
                     remainingTasks
                 }
             }
@@ -193,7 +193,7 @@ class ProfileViewModel
                     SingleLiveData<List<Task>?>(null)
 
                 } else {
-                    val tasksRequest = RetrofitLiveData(networkService.api.getCompletedTasks(user.getId()))
+                    val tasksRequest = RetrofitLiveData(api.getCompletedTasks(user.getId()))
 
                     completedTasks = Transformations.switchMap(tasksRequest) {
                         totalXp.value = it?.fold(0L) { sum, task -> sum + task.xpValue } ?: 0
@@ -216,7 +216,7 @@ class ProfileViewModel
                     SingleLiveData<Photo?>(null)
 
                 } else {
-                    val photosRequest = RetrofitLiveData(networkService.api.getPhotos(user.email))
+                    val photosRequest = RetrofitLiveData(api.getPhotos(user.email))
 
                     userPhoto = Transformations.switchMap(photosRequest) request@ {
                         return@request SingleLiveData(it?.photos?.firstOrNull())

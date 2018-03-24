@@ -1,22 +1,22 @@
-package com.eulersbridge.isegoria.feed.photos
+package com.eulersbridge.isegoria.feed.photos.detail
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.IntRange
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Like
 import com.eulersbridge.isegoria.network.api.models.Photo
+import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
 class PhotoDetailViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val networkService: NetworkService
+    private val userData: LiveData<User>,
+    private val api: API
 ) : ViewModel() {
 
     private var photos: List<Photo>? = null
@@ -31,7 +31,7 @@ class PhotoDetailViewModel
     private fun getPhotoLikes(): LiveData<List<Like>> {
         return Transformations.switchMap(currentPhoto) { (id) ->
             val photoId = id.toLong()
-            val photoLikes = RetrofitLiveData(networkService.api.getPhotoLikes(photoId))
+            val photoLikes = RetrofitLiveData(api.getPhotoLikes(photoId))
 
             Transformations.switchMap<List<Like>, List<Like>>(photoLikes) likes@{ likes ->
                 return@likes if (photoId == currentPhoto.value?.id?.toLong()) {
@@ -52,7 +52,7 @@ class PhotoDetailViewModel
 
     internal fun getPhotoLikedByUser(): LiveData<Boolean> {
         return Transformations.switchMap(getPhotoLikes()) { likes ->
-            val user = app.loggedInUser.value
+            val user = userData.value
 
             if (user != null) {
                 val like = likes?.singleOrNull {
@@ -84,10 +84,10 @@ class PhotoDetailViewModel
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     internal fun likePhoto(): LiveData<Boolean> {
-        app.loggedInUser.value?.let { user ->
+        userData.value?.let { user ->
             return Transformations.switchMap(currentPhoto) { (id) ->
                 val newsArticleLike =
-                    RetrofitLiveData(networkService.api.likePhoto(id.toLong(), user.email))
+                    RetrofitLiveData(api.likePhoto(id.toLong(), user.email))
 
                 Transformations.switchMap(
                     newsArticleLike
@@ -102,9 +102,9 @@ class PhotoDetailViewModel
      * @return Boolean.TRUE on success, Boolean.FALSE on failure
      */
     internal fun unlikePhoto(): LiveData<Boolean> {
-        app.loggedInUser.value?.let { user ->
+        userData.value?.let { user ->
             return Transformations.switchMap(currentPhoto) { (id) ->
-                val unlike = RetrofitLiveData(networkService.api.unlikePhoto(id.toLong(), user.email))
+                val unlike = RetrofitLiveData(api.unlikePhoto(id.toLong(), user.email))
 
                 Transformations.switchMap(unlike) unlike@ { return@unlike SingleLiveData(true) }
             }

@@ -29,11 +29,10 @@ class SignUpFragment : Fragment() {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: SignUpViewModel
 
     private val authViewModel: AuthViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
+        ViewModelProviders.of(requireActivity()).get(AuthViewModel::class.java)
     }
 
     private lateinit var countryAdapter: ArrayAdapter<Country>
