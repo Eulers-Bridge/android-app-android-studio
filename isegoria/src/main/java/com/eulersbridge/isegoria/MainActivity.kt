@@ -11,29 +11,32 @@ import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.content.systemService
-import com.eulersbridge.isegoria.auth.EmailVerificationFragment
+import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment
-import com.eulersbridge.isegoria.personality.PersonalityQuestionsActivity
+import com.eulersbridge.isegoria.personality.PersonalityActivity
 import com.eulersbridge.isegoria.poll.PollsFragment
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment
 import com.google.firebase.FirebaseApp
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.main_partial_appbar.*
 import java.util.*
+import javax.inject.Inject
 
 
-
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
+class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
     FragmentManager.OnBackStackChangedListener {
+
+    @Inject
+    lateinit var app: IsegoriaApp
 
     private var tabFragmentsStack: ArrayDeque<Fragment> = ArrayDeque(4)
 
@@ -56,11 +59,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             FirebaseApp.initializeApp(this)
 
         setContentView(R.layout.activity_main)
-
         setupNavigation()
-
-        val application = applicationContext as IsegoriaApp
-        setupApplicationObservers(application)
+        createApplicationObservers()
     }
 
     override fun onDestroy() {
@@ -82,8 +82,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         supportFragmentManager.addOnBackStackChangedListener(this)
     }
 
-    private fun setupApplicationObservers(application: IsegoriaApp) {
-        observe(application.loggedInUser) {
+    private fun createApplicationObservers() {
+        observe(app.loggedInUser) {
             val userLoggedOut = it == null
 
             if (userLoggedOut) {
@@ -94,12 +94,12 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         }
 
-        observe(application.userVerificationVisible) {
+        observe(app.userVerificationVisible) {
             if (it == true)
                 presentRootContent(EmailVerificationFragment())
         }
 
-        observe(application.friendsVisible) {
+        observe(app.friendsVisible) {
             if (it == true)
                 showFriends()
         }
@@ -120,9 +120,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         loginActionsComplete = true
 
-        val app = application as IsegoriaApp
         if (app.loggedInUser.value?.hasPersonality == false)
-            startActivity(Intent(this, PersonalityQuestionsActivity::class.java))
+            startActivity(Intent(this, PersonalityActivity::class.java))
     }
 
     @SuppressLint("NewApi")
@@ -138,7 +137,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     }
 
                     SHORTCUT_ACTION_FRIENDS -> {
-                        val app = application as IsegoriaApp
                         app.friendsVisible.value = true
                         handledShortcut = true
                     }
@@ -229,8 +227,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         fragment
             .takeIf { currentFragment == null || it::class != currentFragment!!::class }
             ?.let {
-                val app = application as IsegoriaApp
-
                 if (app.friendsVisible.value == true) {
                     supportFragmentManager.popBackStackImmediate(
                         null,

@@ -1,20 +1,25 @@
 package com.eulersbridge.isegoria.profile.settings
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import java.io.File
+import javax.inject.Inject
 
-class SettingsViewModel(application: Application) : AndroidViewModel(application) {
+class SettingsViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val networkService: NetworkService
+) : ViewModel() {
 
     private var userPhoto: LiveData<Photo?>? = null
 
@@ -26,7 +31,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     internal val userProfilePhotoURL: LiveData<String?>
         get() {
-            val app = getApplication<IsegoriaApp>()
             return Transformations.switchMap(app.loggedInUser) { SingleLiveData(it.profilePhotoURL) }
         }
 
@@ -34,7 +38,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         optOutDataCollectionSwitchEnabled.value = false
         doNotTrackSwitchEnabled.value = false
 
-        val app = application as IsegoriaApp
         val user = app.loggedInUser.value
         if (user != null) {
             optOutDataCollectionSwitchChecked.value = user.isOptedOutOfDataCollection
@@ -48,13 +51,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     internal fun onOptOutDataCollectionChange(isChecked: Boolean) {
         optOutDataCollectionSwitchEnabled.value = false
 
-        val app = getApplication<IsegoriaApp>()
         val user = app.loggedInUser.value
 
         if (user != null) {
             val userSettings = UserSettings(user.trackingOff, isChecked)
 
-            app.api.updateUserDetails(user.email, userSettings).enqueue({
+            networkService.api.updateUserDetails(user.email, userSettings).enqueue({
                 if (it.isSuccessful) {
                     optOutDataCollectionSwitchChecked.value = isChecked
                     optOutDataCollectionSwitchEnabled.value = true
@@ -71,13 +73,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     internal fun onTrackingChange(isChecked: Boolean) {
         doNotTrackSwitchEnabled.value = false
 
-        val app = getApplication<IsegoriaApp>()
         val user = app.loggedInUser.value
 
         if (user != null) {
             val userSettings = UserSettings(isChecked, user.isOptedOutOfDataCollection)
 
-            app.api.updateUserDetails(user.email, userSettings).enqueue({
+            networkService.api.updateUserDetails(user.email, userSettings).enqueue({
                 if (it.isSuccessful) {
                     doNotTrackSwitchChecked.value = isChecked
 
@@ -99,11 +100,10 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     internal fun getUserPhoto(): LiveData<Photo?>? {
         if (userPhoto == null) {
-            val app = getApplication<IsegoriaApp>()
             val user = app.loggedInUser.value
 
             if (user != null) {
-                val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
+                val photosRequest = RetrofitLiveData(networkService.api.getPhotos(user.email))
 
                 userPhoto = Transformations.switchMap(photosRequest) { response ->
                     return@switchMap SingleLiveData(response?.photos?.firstOrNull())
@@ -114,10 +114,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         return userPhoto
     }
 
-    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
-        val file = File(imageUri.path)
-        return IsegoriaApp.networkService.uploadNewUserPhoto(file)
-    }
+    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> =
+        networkService.uploadNewUserPhoto(File(imageUri.path))
 
     override fun onCleared() {
         (userPhoto as? RetrofitLiveData)?.cancel()

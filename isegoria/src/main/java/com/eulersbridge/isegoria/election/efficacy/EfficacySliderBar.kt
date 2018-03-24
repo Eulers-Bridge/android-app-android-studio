@@ -10,18 +10,37 @@ import com.eulersbridge.isegoria.util.ui.BaseSliderBar
 import com.eulersbridge.isegoria.util.ui.SliderBarPoint
 import java.util.*
 
-class SelfEfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
+class EfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
 
     private val paints = ArrayList<Paint>()
     private val notchPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    init {
+        val lineColours = intArrayOf(
+            ContextCompat.getColor(context, R.color.lightBlue),
+            ContextCompat.getColor(context, R.color.self_efficacy_slider_2),
+            ContextCompat.getColor(context, R.color.self_efficacy_slider_3),
+            ContextCompat.getColor(context, R.color.lightRed)
+        )
+
+        for (i in 0..lineColours.lastIndex) {
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+            paint.color = lineColours[i]
+            paint.strokeWidth = 4f
+            paints + paint
+        }
+
+        notchPaint.color = ContextCompat.getColor(context, R.color.barBackground)
+        notchPaint.strokeWidth = 4f
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        setupPoints()
+        createPoints()
     }
 
-    private fun setupPoints() {
+    private fun createPoints() {
         if (points.size != 5) {
             val parentWidth = parentWidth
             val pointY = parentHeight / 2
@@ -62,27 +81,6 @@ class SelfEfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderB
                 )
             )
         }
-    }
-
-    override fun setupPaints() {
-        super.setupPaints()
-
-        val lineColours = intArrayOf(
-            ContextCompat.getColor(context, R.color.lightBlue),
-            ContextCompat.getColor(context, R.color.self_efficacy_slider_2),
-            ContextCompat.getColor(context, R.color.self_efficacy_slider_3),
-            ContextCompat.getColor(context, R.color.lightRed)
-        )
-
-        for (i in 0..lineColours.lastIndex) {
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-            paint.color = lineColours[i]
-            paint.strokeWidth = 4f
-            paints + paint
-        }
-
-        notchPaint.color = ContextCompat.getColor(context, R.color.barBackground)
-        notchPaint.strokeWidth = 4f
     }
 
     override fun onDraw(canvas: Canvas) {

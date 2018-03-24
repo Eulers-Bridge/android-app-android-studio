@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.personality
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -11,14 +10,20 @@ import kotlinx.android.synthetic.main.personality_screen1_fragment.*
 
 class PersonalityPermissionFragment : Fragment() {
 
-    private val viewModel: PersonalityViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(PersonalityViewModel::class.java)
-    }
+    private lateinit var viewModel: PersonalityViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
         = inflater.inflate(R.layout.personality_screen1_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        takePersonalityButton.setOnClickListener { viewModel.userContinuedQuestions.value = true }
+        takePersonalityButton.setOnClickListener { this.onContinue() }
+    }
+
+    fun setViewModel(viewModel: PersonalityViewModel) {
+        this.viewModel = viewModel
+    }
+
+    private fun onContinue() {
+        viewModel.userContinuedQuestions.value = true
     }
 }

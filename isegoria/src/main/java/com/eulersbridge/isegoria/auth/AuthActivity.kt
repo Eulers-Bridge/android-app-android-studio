@@ -17,10 +17,13 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
+import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 
 class AuthActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +40,9 @@ class AuthActivity : AppCompatActivity() {
                     }
                 })
 
-        presentRootContent(LoginFragment())
+        viewModel = ViewModelProviders.of(this)[AuthViewModel::class.java]
 
-        val viewModel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
+        presentRootContent(LoginFragment())
 
         observe(viewModel.signUpVisible) {
             /* If makeVisible is false, allow default behaviour of back button & fragment manager

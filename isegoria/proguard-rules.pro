@@ -64,3 +64,6 @@
 
 ## Android Support RenderScript ##
 -keep class android.support.v8.renderscript.** { *; }
+
+## Dagger ##
+-dontwarn com.google.errorprone.annotations.**

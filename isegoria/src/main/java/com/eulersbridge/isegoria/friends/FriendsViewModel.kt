@@ -1,19 +1,24 @@
 package com.eulersbridge.isegoria.friends
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.FriendRequest
 import com.eulersbridge.isegoria.network.api.models.Institution
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class FriendsViewModel(application: Application) : AndroidViewModel(application) {
+class FriendsViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val api: API
+) : ViewModel() {
 
     private var searchResults: LiveData<List<User>?>? = null
     private var sentFriendRequests: LiveData<List<FriendRequest>?>? = null
@@ -33,7 +38,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun onExit() {
-        val app = getApplication<IsegoriaApp>()
         app.friendsVisible.value = false
     }
 
@@ -74,8 +78,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
         showSearch()
 
         searchResults = if (!query.isBlank() && query.length > 2) {
-            val app = getApplication<IsegoriaApp>()
-            RetrofitLiveData(app.api.searchForUsers(query))
+            RetrofitLiveData(api.searchForUsers(query))
 
         } else {
             SingleLiveData(null)
@@ -85,24 +88,20 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun getFriends(): LiveData<List<Contact>> {
-        if (friends == null) {
-            val app = getApplication<IsegoriaApp>()
-            friends = RetrofitLiveData(app.api.getFriends())
-        }
+        if (friends == null)
+            friends = RetrofitLiveData(api.getFriends())
 
         return friends!!
     }
 
     internal fun getSentFriendRequests(): LiveData<List<FriendRequest>?>? {
         if (sentFriendRequests == null) {
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap(app.loggedInUser) { user ->
                 return@switchMap if (user == null) {
                     SingleLiveData<List<FriendRequest>?>(null)
 
                 } else {
-                    val requests = RetrofitLiveData(app.api.getFriendRequestsSent(user.getId()))
+                    val requests = RetrofitLiveData(api.getFriendRequestsSent(user.getId()))
                     sentFriendRequests = Transformations.switchMap(requests) { sentFriendRequests ->
                         sentRequestsVisible.value = sentFriendRequests != null && sentFriendRequests.isNotEmpty()
                         SingleLiveData(sentFriendRequests)
@@ -118,14 +117,12 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun getReceivedFriendRequests(): LiveData<List<FriendRequest>?>? {
         if (receivedFriendRequests == null) {
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap(app.loggedInUser) { user ->
                 return@switchMap if (user == null) {
                     SingleLiveData<List<FriendRequest>?>(null)
 
                 } else {
-                    val requests = RetrofitLiveData(app.api.getFriendRequestsReceived(user.getId()))
+                    val requests = RetrofitLiveData(api.getFriendRequestsReceived(user.getId()))
                     receivedFriendRequests =
                             Transformations.switchMap(requests) { receivedFriendRequests ->
 
@@ -146,22 +143,17 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
-        if (!newFriendEmail.isBlank()) {
-            val app = getApplication<IsegoriaApp>()
-
+        if (!newFriendEmail.isBlank())
             return Transformations.switchMap(app.loggedInUser) { (_, _, email) ->
-                val friendRequest = RetrofitLiveData(app.api.addFriend(email, newFriendEmail))
+                val friendRequest = RetrofitLiveData(api.addFriend(email, newFriendEmail))
                 Transformations.switchMap(friendRequest) { SingleLiveData(true) }
             }
-        }
 
         return SingleLiveData(false)
     }
 
     internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
-        val app = getApplication<IsegoriaApp>()
-
-        val friendRequest = RetrofitLiveData(app.api.acceptFriendRequest(requestId))
+        val friendRequest = RetrofitLiveData(api.acceptFriendRequest(requestId))
         return Transformations.switchMap(friendRequest) {
             getReceivedFriendRequests()
             getFriends()
@@ -171,9 +163,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
-        val app = getApplication<IsegoriaApp>()
-
-        val friendRequest = RetrofitLiveData(app.api.rejectFriendRequest(requestId))
+        val friendRequest = RetrofitLiveData(api.rejectFriendRequest(requestId))
         return Transformations.switchMap(friendRequest) {
             getReceivedFriendRequests()
             getFriends()
@@ -182,9 +172,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    internal fun getInstitution(institutionId: Long): LiveData<Institution> {
-        val app = getApplication<IsegoriaApp>()
-        return RetrofitLiveData(app.api.getInstitution(institutionId))
-    }
+    internal fun getInstitution(institutionId: Long): LiveData<Institution>
+        = RetrofitLiveData(api.getInstitution(institutionId))
 
 }

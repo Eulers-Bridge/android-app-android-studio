@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile
 
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.Color
@@ -18,17 +19,34 @@ import android.widget.LinearLayout
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Task
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_task_progress_fragment.*
+import javax.inject.Inject
 
 class ProfileTaskProgressFragment : Fragment(), TitledFragment {
+
+    @Inject
+    lateinit var app: IsegoriaApp
+
+    @Inject
+    lateinit var networkService: NetworkService
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: ProfileViewModel
 
     private lateinit var completedAdapter: TaskAdapter
     private lateinit var remainingAdapter: TaskAdapter
 
-    private lateinit var viewModel: ProfileViewModel
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,8 +54,6 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.profile_task_progress_fragment, container, false)
-
-        viewModel = ViewModelProviders.of(parentFragment!!).get(ProfileViewModel::class.java)
 
         observe(viewModel.totalXp) {
             if (it != null)
@@ -56,8 +72,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         )
 
         val glide = GlideApp.with(this)
-        val app = requireActivity().application as IsegoriaApp
-        val api = app.api
+        val api = networkService.api
 
         completedAdapter = TaskAdapter(glide, api)
         remainingAdapter = TaskAdapter(glide, api)

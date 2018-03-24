@@ -1,6 +1,8 @@
 package com.eulersbridge.isegoria.auth.signup
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,21 +20,30 @@ import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.setKeyboardVisible
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.sign_up_fragment.*
 import java.util.*
+import javax.inject.Inject
 
 class SignUpFragment : Fragment() {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: SignUpViewModel
+
+    private val authViewModel: AuthViewModel by lazy {
+        ViewModelProviders.of(requireActivity()).get(AuthViewModel::class.java)
+    }
 
     private lateinit var countryAdapter: ArrayAdapter<Country>
     private lateinit var institutionAdapter: ArrayAdapter<Institution>
 
-    private val viewModel: SignUpViewModel by lazy {
-        ViewModelProviders.of(this).get(SignUpViewModel::class.java)
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[SignUpViewModel::class.java]
     }
 
-    private val authViewModel: AuthViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
             = inflater.inflate(R.layout.sign_up_fragment, container, false)
@@ -68,7 +79,7 @@ class SignUpFragment : Fragment() {
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         birthYearSpinner.adapter = spinnerYearOfBirthArrayAdapter
 
-        setupViewListeners()
+        createViewListeners()
 
         observe(viewModel.getCountries()) {
             it?.let { setCountries(it) }
@@ -77,7 +88,7 @@ class SignUpFragment : Fragment() {
         activity?.setKeyboardVisible(true)
     }
 
-    private fun setupViewListeners() {
+    private fun createViewListeners() {
         backButton.setOnClickListener {
             activity?.let {
                 authViewModel.onSignUpBackPressed()

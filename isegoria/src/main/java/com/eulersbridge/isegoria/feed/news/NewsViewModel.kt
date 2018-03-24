@@ -1,16 +1,21 @@
 package com.eulersbridge.isegoria.feed.news
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class NewsViewModel(application: Application) : AndroidViewModel(application) {
+class NewsViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val api: API
+) : ViewModel() {
 
     private var newsArticlesList: LiveData<List<NewsArticle>>? = null
 
@@ -18,11 +23,9 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
         get() {
             newsArticlesList?.takeIf { it.value != null } ?: newsArticlesList
 
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap<User, List<NewsArticle>>(app.loggedInUser) { user ->
                 user?.institutionId?.let {
-                    newsArticlesList = RetrofitLiveData(app.api.getNewsArticles(it))
+                    newsArticlesList = RetrofitLiveData(api.getNewsArticles(it))
                     return@switchMap newsArticlesList
                 }
 
@@ -31,8 +34,6 @@ class NewsViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     init {
-        val app = application as IsegoriaApp
-
         app.cachedLoginArticles?.let {
             newsArticlesList = SingleLiveData(it)
         }

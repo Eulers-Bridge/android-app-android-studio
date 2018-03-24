@@ -1,17 +1,22 @@
 package com.eulersbridge.isegoria.profile
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.*
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+class ProfileViewModel
+@Inject constructor(
+    private val app: IsegoriaApp,
+    private val api: API
+) : ViewModel() {
 
     internal val currentSectionIndex = MutableLiveData<Int>()
 
@@ -41,10 +46,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     internal fun viewFriends() {
         val isAnotherUser = user.value is Contact
 
-        if (!isAnotherUser) {
-            val app = getApplication<IsegoriaApp>()
+        if (!isAnotherUser)
             app.friendsVisible.value = true
-        }
     }
 
     fun setTargetBadgeLevel(targetBadgeLevel: Int) {
@@ -60,7 +63,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun logOut() {
-        val app = getApplication<IsegoriaApp>()
         app.logOut()
     }
 
@@ -71,9 +73,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     internal fun fetchUserStats() {
         val (_, _, email) = getUser() ?: return
 
-        val app = getApplication<IsegoriaApp>()
-
-        app.api.getContact(email).onSuccess {
+        api.getContact(email).onSuccess {
             contactsCount.value = it.contactsCount
             totalTasksCount.value = it.totalTasksCount
         }
@@ -103,11 +103,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      */
     fun getRemainingBadges(limitToLevel: Boolean): LiveData<List<Badge>?>? {
         if (remainingBadges == null) {
-            val app = getApplication<IsegoriaApp>()
-
             val user = getUser()
             if (user != null) {
-                remainingBadges = RetrofitLiveData(app.api.getRemainingBadges(user.getId()))
+                remainingBadges = RetrofitLiveData(api.getRemainingBadges(user.getId()))
             } else {
                 return SingleLiveData(null)
             }
@@ -129,11 +127,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      */
     fun getCompletedBadges(): LiveData<List<Badge>?>? {
         if (completedBadges == null) {
-            val app = getApplication<IsegoriaApp>()
-
             val user = getUser()
             if (user != null)
-                completedBadges = RetrofitLiveData(app.api.getCompletedBadges(user.getId()))
+                completedBadges = RetrofitLiveData(api.getCompletedBadges(user.getId()))
         }
 
         return if (completedBadges == null) {
@@ -147,13 +143,11 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun getInstitutionName(): LiveData<String?>? {
         if (institutionName == null) {
-            val app = getApplication<IsegoriaApp>()
-
             val user = getUser()
             return if (user?.institutionId != null) {
 
                 val institutionRequest =
-                    RetrofitLiveData(app.api.getInstitution(user.institutionId!!))
+                    RetrofitLiveData(api.getInstitution(user.institutionId!!))
 
                 institutionName = Transformations.switchMap(institutionRequest) request@ { institution ->
                     return@request SingleLiveData(institution?.getName())
@@ -170,24 +164,20 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     internal fun getTasks(): LiveData<List<Task>> {
-        if (tasks == null) {
-            val app = getApplication<IsegoriaApp>()
-            tasks = RetrofitLiveData(app.api.getTasks())
-        }
+        if (tasks == null)
+            tasks = RetrofitLiveData(api.getTasks())
 
         return tasks!!
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
         if (remainingTasks?.value == null) {
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap(app.loggedInUser) {
                 return@switchMap if (it == null) {
                     SingleLiveData<List<Task>?>(null)
 
                 } else {
-                    remainingTasks = RetrofitLiveData(app.api.getRemainingTasks(it.getId()))
+                    remainingTasks = RetrofitLiveData(api.getRemainingTasks(it.getId()))
                     remainingTasks
                 }
             }
@@ -198,14 +188,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun getCompletedTasks(): LiveData<List<Task>?>? {
         if (completedTasks?.value == null) {
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap(app.loggedInUser) { user ->
                 return@switchMap if (user == null) {
                     SingleLiveData<List<Task>?>(null)
 
                 } else {
-                    val tasksRequest = RetrofitLiveData(app.api.getCompletedTasks(user.getId()))
+                    val tasksRequest = RetrofitLiveData(api.getCompletedTasks(user.getId()))
 
                     completedTasks = Transformations.switchMap(tasksRequest) {
                         totalXp.value = it?.fold(0L) { sum, task -> sum + task.xpValue } ?: 0
@@ -223,14 +211,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     internal fun getUserPhoto(): LiveData<Photo?>? {
         if (userPhoto == null) {
-            val app = getApplication<IsegoriaApp>()
-
             return Transformations.switchMap(app.loggedInUser) { user ->
                 return@switchMap if (user == null) {
                     SingleLiveData<Photo?>(null)
 
                 } else {
-                    val photosRequest = RetrofitLiveData(app.api.getPhotos(user.email))
+                    val photosRequest = RetrofitLiveData(api.getPhotos(user.email))
 
                     userPhoto = Transformations.switchMap(photosRequest) request@ {
                         return@request SingleLiveData(it?.photos?.firstOrNull())

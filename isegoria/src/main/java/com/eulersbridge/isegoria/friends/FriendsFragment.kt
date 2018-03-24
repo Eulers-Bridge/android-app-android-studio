@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.friends
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -22,8 +23,10 @@ import com.eulersbridge.isegoria.network.api.models.FriendRequest
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.friends_fragment.*
 import java.lang.ref.WeakReference
+import javax.inject.Inject
 
 class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     FriendAdapter.Delegate, SearchAdapter.UserDelegate, FriendRequestAdapter.Delegate {
@@ -33,6 +36,8 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     private val sentAdapter = FriendRequestAdapter(SENT, this)
     private var friendsAdapter: FriendAdapter = FriendAdapter(this)
 
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
 
     private var mainActivity: MainActivity? = null
@@ -40,6 +45,12 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     @IntDef(RECEIVED, SENT)
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class FriendRequestType
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[FriendsViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,8 +63,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         mainActivity?.invalidateOptionsMenu()
 
         setHasOptionsMenu(true)
-
-        viewModel = ViewModelProviders.of(this).get(FriendsViewModel::class.java)
 
         observeBoolean(viewModel.searchSectionVisible) {
             searchContainer.isVisible = it

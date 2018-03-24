@@ -11,8 +11,12 @@ import com.eulersbridge.isegoria.edit
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import com.securepreferences.SecurePreferences
+import javax.inject.Inject
 
 class FirebaseIDService : FirebaseInstanceIdService() {
+
+    @Inject
+    lateinit var securePreferences: SecurePreferences
 
     override fun onTokenRefresh() {
         super.onTokenRefresh()
@@ -28,7 +32,7 @@ class FirebaseIDService : FirebaseInstanceIdService() {
         }
 
         snsClient.createPlatformEndpoint(request)?.let {
-            SecurePreferences(applicationContext).edit {
+            securePreferences.edit {
                 putString(ENDPOINT_ARN_KEY, it.endpointArn)
             }
         }

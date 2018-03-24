@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.vote
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -15,16 +14,15 @@ class VotePledgeFragment : Fragment(), TitledFragment {
 
     private lateinit var viewModel: VoteViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.vote_fragment_pledge, container, false)
-
-        viewModel = ViewModelProviders.of(parentFragment!!).get(VoteViewModel::class.java)
-
-        return rootView
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.vote_fragment_pledge, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         votePledgeNextButton.setOnClickListener { val data = viewModel.setPledgeComplete() }
+    }
+
+    fun setViewModel(viewModel: VoteViewModel) {
+        this.viewModel = viewModel
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.vote_tab_2)

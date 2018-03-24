@@ -1,30 +1,32 @@
 package com.eulersbridge.isegoria.feed.photos
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import com.eulersbridge.isegoria.IsegoriaApp
+import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class PhotoAlbumsViewModel(application: Application) : AndroidViewModel(application) {
+class PhotoAlbumsViewModel
+@Inject constructor(
+    private val user: LiveData<User>,
+    private val api: API
+) : ViewModel() {
 
     private var photoAlbumsList: LiveData<List<PhotoAlbum>>? = null
 
     internal val photoAlbums: LiveData<List<PhotoAlbum>>
         get() {
-            val app = getApplication<IsegoriaApp>()
-
-            return Transformations.switchMap<User, List<PhotoAlbum>>(app.loggedInUser) { user ->
+            return Transformations.switchMap<User, List<PhotoAlbum>>(user) { user ->
 
                 return@switchMap if (user == null) {
                     SingleLiveData(null)
 
                 } else {
-                    photoAlbumsList = RetrofitLiveData(app.api.getPhotoAlbums(user.newsFeedId))
+                    photoAlbumsList = RetrofitLiveData(api.getPhotoAlbums(user.newsFeedId))
                     photoAlbumsList
                 }
             }

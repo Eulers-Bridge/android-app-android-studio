@@ -1,25 +1,27 @@
 package com.eulersbridge.isegoria.feed.events
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Transformations
-import com.eulersbridge.isegoria.IsegoriaApp
+import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import javax.inject.Inject
 
-class EventsViewModel(application: Application) : AndroidViewModel(application) {
+class EventsViewModel
+@Inject constructor(
+    private val user: LiveData<User>,
+    private val api: API
+) : ViewModel() {
 
     private var eventsList: LiveData<List<Event>?>? = null
 
     fun getEvents() : LiveData<List<Event>?> {
-        val app = getApplication<IsegoriaApp>()
-
-        return Transformations.switchMap<User, List<Event>>(app.loggedInUser) { user ->
+        return Transformations.switchMap<User, List<Event>>(user) { user ->
             if (user.institutionId != null) {
-                eventsList = RetrofitLiveData(app.api.getEvents(user.institutionId!!))
+                eventsList = RetrofitLiveData(api.getEvents(user.institutionId!!))
                 eventsList
             } else {
                 SingleLiveData(null)

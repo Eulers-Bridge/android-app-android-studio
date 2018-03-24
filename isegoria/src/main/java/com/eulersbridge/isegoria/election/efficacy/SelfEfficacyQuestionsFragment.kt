@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.efficacy
 
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
@@ -14,8 +15,20 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: EfficacyViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[EfficacyViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,12 +37,10 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
     ): View? {
         val rootView = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false)
 
-        val sliderBar1 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar1)
-        val sliderBar2 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar2)
-        val sliderBar3 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar3)
-        val sliderBar4 = rootView.findViewById<SelfEfficacySliderBar>(R.id.selfEfficacySliderBar4)
-
-        val viewModel = ViewModelProviders.of(this).get(EfficacyQuestionsViewModel::class.java)
+        val sliderBar1 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar1)
+        val sliderBar2 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar2)
+        val sliderBar3 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar3)
+        val sliderBar4 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar4)
 
         val pairs = mapOf(
             viewModel.score1 to sliderBar1,

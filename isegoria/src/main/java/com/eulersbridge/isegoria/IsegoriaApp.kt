@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,23 +15,38 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.content.systemService
 import com.eulersbridge.isegoria.auth.AuthActivity
+import com.eulersbridge.isegoria.di.DaggerAppComponent
 import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.securepreferences.SecurePreferences
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.HasActivityInjector
+import dagger.android.support.HasSupportFragmentInjector
 import java.util.*
+import javax.inject.Inject
 
-class IsegoriaApp : Application() {
+class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector {
 
-    companion object {
-        lateinit var networkService: NetworkService
-        private lateinit var securePreferences: SecurePreferences
-    }
+    @Inject
+    lateinit var activityInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun activityInjector() = activityInjector
+    override fun supportFragmentInjector() = fragmentInjector
+
+    @Inject
+    lateinit var networkService: NetworkService
+
+    @Inject
+    lateinit var securePreferences: SecurePreferences
 
     val loggedInUser = MutableLiveData<User>()
     var cachedLoginArticles: List<NewsArticle>? = null
@@ -41,7 +57,6 @@ class IsegoriaApp : Application() {
 
     private lateinit var loginObserver: Observer<Boolean>
 
-    val api: API by lazy { networkService.api }
     val savedUserEmail: String? by lazy { securePreferences.getString(USER_EMAIL_KEY, null) }
     val savedUserPassword: String? by lazy { securePreferences.getString(USER_PASSWORD_KEY, null) }
 
@@ -54,10 +69,13 @@ class IsegoriaApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        createNotificationChannels()
+        DaggerAppComponent
+            .builder()
+            .application(this)
+            .build()
+            .inject(this)
 
-        networkService = NetworkService(this)
-        securePreferences = SecurePreferences(this)
+        createNotificationChannels()
 
         val login = login()
 
@@ -127,7 +145,7 @@ class IsegoriaApp : Application() {
     }
 
     @SuppressLint("NewApi")
-    private fun setupAppShortcuts() {
+    private fun createAppShortcuts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
 
             val election = ShortcutInfo.Builder(this, SHORTCUT_ACTION_ELECTION)
@@ -165,12 +183,12 @@ class IsegoriaApp : Application() {
     fun setLoggedInUser(user: User, password: String) {
         loggedInUser.value = user
 
-        SecurePreferences(applicationContext).edit {
+        securePreferences.edit {
             putString(USER_EMAIL_KEY, user.email)
             putString(USER_PASSWORD_KEY, password)
         }
 
-        setupAppShortcuts()
+        createAppShortcuts()
     }
 
     fun login(): LiveData<Boolean> {
@@ -233,12 +251,12 @@ class IsegoriaApp : Application() {
         networkService.email = null
         networkService.password = null
 
-        SecurePreferences(applicationContext).edit {
+        securePreferences.edit {
             remove(USER_PASSWORD_KEY)
         }
 
         // Remove any notifications that are still visible
-        NotificationManagerCompat.from(applicationContext).cancelAll()
+        NotificationManagerCompat.from(this).cancelAll()
 
         // Remove all app long-press shortcuts
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)

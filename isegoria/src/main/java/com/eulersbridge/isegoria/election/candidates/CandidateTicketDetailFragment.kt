@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.candidates
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -23,10 +24,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.*
+import javax.inject.Inject
 
 class CandidateTicketDetailFragment : Fragment() {
 
@@ -38,7 +42,16 @@ class CandidateTicketDetailFragment : Fragment() {
     private var partyColour: String? = ""
     private var partyLogo: String? = ""
 
-    private var app: IsegoriaApp? = null
+    @Inject
+    lateinit var app: IsegoriaApp
+
+    @Inject
+    lateinit var networkService: NetworkService
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,12 +92,11 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        app = activity?.application as IsegoriaApp
-        app?.api?.getTicketCandidates(ticketId)?.onSuccess { candidates ->
+        networkService.api.getTicketCandidates(ticketId).onSuccess { candidates ->
             addCandidates(candidates)
         }
 
-        app?.api?.getPhotos(ticketId)?.onSuccess {
+        networkService.api.getPhotos(ticketId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.thumbnailUrl)
@@ -93,7 +105,7 @@ class CandidateTicketDetailFragment : Fragment() {
             }
         }
 
-        app?.api?.getUserSupportedTickets(app!!.loggedInUser.value!!.email)?.onSuccess {
+        networkService.api.getUserSupportedTickets(app.loggedInUser.value!!.email).onSuccess {
             it.singleOrNull { ticket ->
                 ticket.id == ticketId
 
@@ -106,14 +118,14 @@ class CandidateTicketDetailFragment : Fragment() {
 
         ticketSupportButton.setOnClickListener {
 
-            val userEmail = app!!.loggedInUser.value!!.email
+            val userEmail = app.loggedInUser.value!!.email
 
             val supportStr = getString(R.string.candidate_ticket_detail_button_support)
             val unsupportStr = getString(R.string.candidate_ticket_detail_button_unsupport)
 
             if (ticketSupportButton.text == supportStr) {
 
-                app?.api?.supportTicket(ticketId, userEmail)?.enqueue()
+                networkService.api.supportTicket(ticketId, userEmail).enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
@@ -121,7 +133,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             } else if (ticketSupportButton.text == unsupportStr) {
 
-                app?.api?.unsupportTicket(ticketId, userEmail)?.enqueue()
+                networkService.api.unsupportTicket(ticketId, userEmail).enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
@@ -171,7 +183,7 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        app?.api?.getPhotos(candidate.userId)?.onSuccess {
+        networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.thumbnailUrl)
@@ -254,7 +266,7 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        app!!.api.getPosition(candidate.positionId).onSuccess {
+        networkService.api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 
