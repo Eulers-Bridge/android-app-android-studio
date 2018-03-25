@@ -14,7 +14,7 @@ import javax.inject.Inject
 class SignUpViewModel
 @Inject constructor(private val api: API) : ViewModel() {
 
-    private var countries: LiveData<List<Country>>? = null
+    private var countries: LiveData<List<Country>?>? = null
 
     val givenName = MutableLiveData<String>()
     val familyName = MutableLiveData<String>()
@@ -29,9 +29,11 @@ class SignUpViewModel
     fun getCountries(): LiveData<List<Country>?> {
         val generalInfo = RetrofitLiveData(api.getGeneralInfo())
 
-        return Transformations.switchMap(generalInfo) {
+        countries = Transformations.switchMap(generalInfo) {
             return@switchMap SingleLiveData(it?.countries)
         }
+
+        return countries!!
     }
 
     fun onCountrySelected(index: Int) : List<Institution>? {

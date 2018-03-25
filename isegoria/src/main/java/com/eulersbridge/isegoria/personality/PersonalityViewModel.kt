@@ -4,8 +4,8 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.models.UserPersonality
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 class PersonalityViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
+    private val userData: LiveData<User>,
     private val networkService: NetworkService
 ) : ViewModel() {
 
@@ -22,7 +22,7 @@ class PersonalityViewModel
 
     internal fun setUserCompletedQuestions(userPersonality: UserPersonality): LiveData<Boolean> {
 
-        val user = app.loggedInUser.value
+        val user = userData.value
 
         return if (user == null) {
             SingleLiveData(false)

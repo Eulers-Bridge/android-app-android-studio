@@ -20,7 +20,6 @@ import com.theartofdev.edmodo.cropper.CropImage
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.settings_activity.*
 import javax.inject.Inject
-import javax.inject.Named
 
 class SettingsActivity : DaggerAppCompatActivity() {
 

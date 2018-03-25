@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.profile;
+package com.eulersbridge.isegoria.profile
 
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import dagger.Module

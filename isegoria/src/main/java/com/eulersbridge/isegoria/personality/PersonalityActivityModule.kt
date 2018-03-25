@@ -6,7 +6,6 @@ import com.eulersbridge.isegoria.di.ViewModelProviderFactory
 import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides
-import javax.inject.Named
 
 @Module
 class PersonalityActivityModule {
@@ -15,7 +14,7 @@ class PersonalityActivityModule {
     fun personalityViewModel(
         app: IsegoriaApp,
         networkService: NetworkService
-    ): PersonalityViewModel = PersonalityViewModel(app, networkService)
+    ): PersonalityViewModel = PersonalityViewModel(app.loggedInUser, networkService)
 
     @Provides
     fun providePersonalityViewModel(personalityViewModel: PersonalityViewModel): ViewModelProvider.Factory

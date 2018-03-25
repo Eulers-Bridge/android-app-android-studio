@@ -1,7 +1,6 @@
 package com.eulersbridge.isegoria.election
 
 import com.eulersbridge.isegoria.election.candidates.CandidateAllFragment
-import com.eulersbridge.isegoria.election.candidates.CandidateFragmentsModule
 import com.eulersbridge.isegoria.election.candidates.CandidateTicketDetailFragment
 import com.eulersbridge.isegoria.election.candidates.CandidateTicketFragment
 import com.eulersbridge.isegoria.election.candidates.positions.CandidatePositionFragment
@@ -23,19 +22,19 @@ abstract class ElectionFragmentProvider {
     @ContributesAndroidInjector(modules = [(ElectionFragmentModule::class)])
     internal abstract fun provideElectionOverviewFragment(): ElectionOverviewFragment
 
-    @ContributesAndroidInjector(modules = [(CandidateFragmentsModule::class)])
+    @ContributesAndroidInjector
     internal abstract fun provideCandidateAllFragment(): CandidateAllFragment
 
-    @ContributesAndroidInjector(modules = [(CandidateFragmentsModule::class)])
+    @ContributesAndroidInjector
     internal abstract fun provideCandidateTicketFragment(): CandidateTicketFragment
 
-    @ContributesAndroidInjector(modules = [(CandidateFragmentsModule::class)])
+    @ContributesAndroidInjector
     internal abstract fun provideCandidateTicketDetailFragment(): CandidateTicketDetailFragment
 
-    @ContributesAndroidInjector(modules = [(CandidateFragmentsModule::class)])
+    @ContributesAndroidInjector
     internal abstract fun provideCandidatePositionFragment(): CandidatePositionFragment
 
-    @ContributesAndroidInjector(modules = [(CandidateFragmentsModule::class)])
+    @ContributesAndroidInjector
     internal abstract fun provideCandidatePositionsFragment(): CandidatePositionsFragment
 
 }

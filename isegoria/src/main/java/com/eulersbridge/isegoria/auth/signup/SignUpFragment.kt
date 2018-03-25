@@ -44,7 +44,6 @@ class SignUpFragment : Fragment() {
         viewModel = ViewModelProviders.of(this, modelFactory)[SignUpViewModel::class.java]
     }
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
             = inflater.inflate(R.layout.sign_up_fragment, container, false)
 
