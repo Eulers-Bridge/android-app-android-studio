@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
@@ -113,6 +114,14 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
     }
 
+    private fun ProgressBar.setCompatProgress(progress: Int, animate: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            setProgress(progress, animate)
+        } else {
+            setProgress(progress)
+        }
+    }
+
     @UiThread
     private fun setLevel(totalXp: Long) {
         activity?.runOnUiThread {
@@ -124,12 +133,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
             if (nextLevelPoints == 0) nextLevelPoints = 1000
 
             progressBar.max = nextLevelPoints
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                progressBar.setProgress(totalXp.toInt(), true)
-            } else {
-                progressBar.progress = totalXp.toInt()
-            }
+            progressBar.setCompatProgress(totalXp.toInt(), true)
 
             descriptionTextView.text = getString(
                 R.string.profile_tasks_progress_description,

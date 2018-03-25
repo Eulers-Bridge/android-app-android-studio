@@ -17,7 +17,6 @@ const val SERVER_URL_KEY = "serverURL"
 const val SHORTCUT_ACTION_ELECTION = "SHORTCUT_ELECTION"
 const val SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS"
 
-const val ACTIVITY_EXTRA_POLL = "poll"
 const val FRAGMENT_EXTRA_USER = "user"
 const val FRAGMENT_EXTRA_CONTACT = "contact"
 const val FRAGMENT_EXTRA_PROFILE_ID = "profileId"

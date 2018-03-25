@@ -50,8 +50,8 @@ class ProfileViewModel
             app.friendsVisible.value = true
     }
 
-    fun setTargetBadgeLevel(targetBadgeLevel: Int) {
-        this.targetBadgeLevel.value = targetBadgeLevel
+    fun setTargetBadgeLevel(targetBadgeLevel: Int?) {
+        this.targetBadgeLevel.value = targetBadgeLevel ?: 0
     }
 
     internal fun onSectionIndexChanged(newIndex: Int) {

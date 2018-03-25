@@ -50,6 +50,10 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
     override fun setItem(item: PollOption?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: PollOption?) {
         if (item == null) {
             textTextView.text = null
             imageView.isGone = true
@@ -62,9 +66,9 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
                 imageView.isVisible = true
 
                 GlideApp.with(imageView.context)
-                        .load(item.photo.getPhotoUrl())
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(imageView)
+                    .load(item.photo.getPhotoUrl())
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView)
             } else {
                 imageView.isGone = true
             }

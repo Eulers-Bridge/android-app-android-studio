@@ -28,6 +28,7 @@ import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
 import java.util.*
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
 
@@ -96,21 +97,21 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
         login.observeForever(loginObserver)
     }
 
-    private fun startActivity(activityClass: Class<*>) {
-        val activityIntent = Intent(this, activityClass)
+    private fun startActivity(activityClass: KClass<*>) {
+        val activityIntent = Intent(this, activityClass.java)
         activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
         startActivity(activityIntent)
     }
 
     private fun showMainActivity() {
-        startActivity(MainActivity::class.java)
+        startActivity(MainActivity::class)
     }
 
     private fun showLoginScreen() {
         if (loginVisible.value == null || loginVisible.value == false) {
             loginVisible.value = true
-            startActivity(AuthActivity::class.java)
+            startActivity(AuthActivity::class)
         }
     }
 
@@ -125,7 +126,7 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 
             val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                systemService<NotificationManager>(Context.NOTIFICATION_SERVICE)
 
             //Simple map of channel names (Strings) to their importance level (Integer)
             mapOf(
@@ -141,7 +142,7 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
 
                 /*`createNotificationChannel` is no-op if the channels have already
                 been created from a previous launch. */
-                notificationManager.createNotificationChannel(notificationChannel)
+                notificationManager?.createNotificationChannel(notificationChannel)
             }
         }
     }

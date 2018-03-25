@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.election.candidates
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
@@ -204,7 +205,10 @@ class CandidateAllFragment : Fragment() {
         textViewParty.apply {
             setTextColor(Color.parseColor("#FFFFFF"))
             setTextSize(TypedValue.COMPLEX_UNIT_DIP, 10.0f)
+
+            @SuppressLint("SetTextI18n")
             text = "GRN"
+
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT

@@ -18,3 +18,12 @@ inline fun <T> LifecycleOwner.observeBoolean(data: LiveData<T>, crossinline onCh
         onChanged(it == true)
     })
 }
+
+/**
+ * Convenience function to execute a function only if a Boolean LiveData object resolves to True.
+ */
+inline fun <T> LifecycleOwner.ifTrue(data: LiveData<T>, crossinline onTrue: () -> Unit) {
+    this.observeBoolean(data) {
+        if (it) onTrue()
+    }
+}

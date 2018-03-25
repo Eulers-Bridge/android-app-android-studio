@@ -8,12 +8,9 @@ import android.view.View
 import androidx.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.feed.news.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.toDateString
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.DaggerAppCompatActivity
@@ -57,13 +54,12 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
                 runOnUiThread { likesTextView.text = it.toString() }
             }
 
-            observe(articleLikedByUser) {
-                if (it == true)
-                    runOnUiThread {
-                        userLikedArticle = true
-                        starImageView.setImageResource(R.drawable.star)
-                        starImageView.isEnabled = true
-                    }
+            ifTrue(articleLikedByUser) {
+                runOnUiThread {
+                    userLikedArticle = true
+                    starImageView.setImageResource(R.drawable.star)
+                    starImageView.isEnabled = true
+                }
             }
         }
     }
@@ -108,10 +104,10 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
                 view.isEnabled = false
 
                 if (userLikedArticle) {
-                    observe(viewModel.likeArticle()) { success ->
+                    observeBoolean(viewModel.likeArticle()) { success ->
                         view.isEnabled = true
 
-                        if (success == true) {
+                        if (success) {
                             starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
 
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) + 1
@@ -120,10 +116,10 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
                     }
 
                 } else {
-                    observe(viewModel.unlikeArticle()) {success ->
+                    observeBoolean(viewModel.unlikeArticle()) {success ->
                         view.isEnabled = true
 
-                        if (success == true) {
+                        if (success) {
                             starImageView.colorFilter = null
 
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) - 1

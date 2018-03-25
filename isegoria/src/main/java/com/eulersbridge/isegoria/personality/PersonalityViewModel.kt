@@ -17,8 +17,8 @@ class PersonalityViewModel
     private val networkService: NetworkService
 ) : ViewModel() {
 
-    internal val userContinuedQuestions = MutableLiveData<Boolean>()
-    internal val userCompletedQuestions = MutableLiveData<Boolean>()
+    internal val questionsContinued = MutableLiveData<Boolean>()
+    internal val questionsComplete = MutableLiveData<Boolean>()
 
     internal fun setUserCompletedQuestions(userPersonality: UserPersonality): LiveData<Boolean> {
 
@@ -31,7 +31,7 @@ class PersonalityViewModel
 
             Transformations.switchMap(request) { success ->
                 if (success != null) {
-                    userCompletedQuestions.postValue(true)
+                    questionsComplete.postValue(true)
                     return@switchMap SingleLiveData(true)
                 }
 

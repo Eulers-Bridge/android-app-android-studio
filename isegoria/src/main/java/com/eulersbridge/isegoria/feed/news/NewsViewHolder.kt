@@ -61,6 +61,10 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
     override fun setItem(item: NewsArticle?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: NewsArticle?) {
         @DrawableRes val placeholderRes = R.drawable.round_rect_placeholder
 
         if (item == null) {
@@ -71,11 +75,11 @@ class NewsViewHolder internal constructor(itemView: View) : LoadingAdapter.ItemV
             dateTextView.text = item.date.toDateString(dateTextView.context)
 
             GlideApp.with(imageView.context)
-                    .load(item.getPhotoUrl())
-                    .placeholder(placeholderRes)
-                    .transforms(CenterCrop(), TintTransformation(), RoundedCornersTransformation())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(imageView)
+                .load(item.getPhotoUrl())
+                .placeholder(placeholderRes)
+                .transforms(CenterCrop(), TintTransformation(), RoundedCornersTransformation())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView)
 
             isImageLoadStarted = true
         }

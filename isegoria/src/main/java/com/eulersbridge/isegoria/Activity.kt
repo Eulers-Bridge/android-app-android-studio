@@ -12,8 +12,8 @@ fun Activity.setKeyboardVisible(visible: Boolean) {
 
     } else {
         currentFocus?.let {
-            val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputMethodManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+            val inputMethodManager = systemService<InputMethodManager>(Activity.INPUT_METHOD_SERVICE)
+            inputMethodManager?.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         }
     }
 }

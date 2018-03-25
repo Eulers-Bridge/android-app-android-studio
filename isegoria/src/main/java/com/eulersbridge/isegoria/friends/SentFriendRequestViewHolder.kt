@@ -33,6 +33,10 @@ internal class SentFriendRequestViewHolder(
     fun setItem(item: FriendRequest?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    fun bindItem(item: FriendRequest?) {
         if (item == null) {
             nameTextView.text = null
             institutionTextView.text = null

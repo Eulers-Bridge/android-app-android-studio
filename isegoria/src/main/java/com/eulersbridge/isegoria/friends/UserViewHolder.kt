@@ -45,6 +45,10 @@ class UserViewHolder(
     fun setItem(item: GenericUser?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: GenericUser?) {
         if (item == null) {
             nameTextView.text = null
             institutionTextView.text = null

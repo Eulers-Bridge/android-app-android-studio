@@ -94,14 +94,12 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
             }
         }
 
-        observe(app.userVerificationVisible) {
-            if (it == true)
-                presentRootContent(EmailVerificationFragment())
+        ifTrue(app.userVerificationVisible) {
+            presentRootContent(EmailVerificationFragment())
         }
 
-        observe(app.friendsVisible) {
-            if (it == true)
-                showFriends()
+        ifTrue(app.friendsVisible) {
+            showFriends()
         }
     }
 

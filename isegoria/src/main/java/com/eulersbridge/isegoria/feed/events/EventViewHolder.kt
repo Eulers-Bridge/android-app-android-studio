@@ -34,6 +34,10 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
     override fun setItem(item: Event?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: Event?) {
         @ColorRes val placeholderRes = R.color.lightGrey
 
         if (item == null) {
@@ -44,11 +48,11 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
             detailsTextView.text = item.createdDate.toDateString(detailsTextView.context)
 
             GlideApp.with(imageView.context)
-                    .load(item.getPhotoUrl())
-                    .placeholder(placeholderRes)
-                    .transform(TintTransformation())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(imageView)
+                .load(item.getPhotoUrl())
+                .placeholder(placeholderRes)
+                .transform(TintTransformation())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView)
 
             isImageLoadStarted = true
         }

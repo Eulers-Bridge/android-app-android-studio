@@ -24,6 +24,6 @@ class PersonalityPermissionFragment : Fragment() {
     }
 
     private fun onContinue() {
-        viewModel.userContinuedQuestions.value = true
+        viewModel.questionsContinued.value = true
     }
 }

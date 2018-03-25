@@ -108,7 +108,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
     override fun onDestroy() {
         super.onDestroy()
-
         viewModel.onExit()
     }
 

@@ -31,7 +31,10 @@ import java.util.*
 import javax.inject.Singleton
 
 @Singleton
-class NetworkService constructor(private val app: IsegoriaApp, private val appContext: Context) {
+class NetworkService constructor(
+    private val app: IsegoriaApp,
+    private val appContext: Context
+) {
 
     companion object {
         private const val SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/"
@@ -53,7 +56,7 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
         }
     }
 
-    private var httpClient: OkHttpClient? = null
+    private lateinit var httpClient: OkHttpClient
     internal lateinit var api: API
 
     internal var email: String? = null
@@ -72,7 +75,7 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
     private fun createAPI() {
         val retrofit = Retrofit.Builder()
-            .client(httpClient!!)
+            .client(httpClient)
             .baseUrl(apiBaseURL)
             .addConverterFactory(UnwrapConverterFactory())
             .addConverterFactory(moshiConverterFactory)
@@ -80,6 +83,11 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
         api = retrofit.create(API::class.java)
     }
+
+    private fun Request.Builder.addAppHeaders()
+     = this.addHeader("Accept", "application/json")
+            .addHeader("Content-Type", "application/json")
+            .addHeader("User-Agent", "IsegoriaApp Android")
 
     private fun createHttpClient() {
         // Force caching of GET requests for 1 minute, or 5 minutes if no network connection.
@@ -109,9 +117,7 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
         val httpClientBuilder = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("User-Agent", "IsegoriaApp Android")
+                    .addAppHeaders()
 
                 chain.proceed(request.build())
             }
@@ -121,10 +127,10 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor()
-//            logging.level = HttpLoggingInterceptor.Level.BASIC
+            logging.level = HttpLoggingInterceptor.Level.BASIC
 
 //            For more detailed debug logging, uncomment the following line:
-            logging.level = HttpLoggingInterceptor.Level.BODY
+//            logging.level = HttpLoggingInterceptor.Level.BODY
 
             httpClientBuilder.addInterceptor(logging)
         }
@@ -143,15 +149,16 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
                 it.getName()?.let { institutionName ->
 
                     api.getInstitutionURLs().onSuccess { urls ->
-                        val institution = urls.singleOrNull {
-                            it.name == institutionName && !it.apiRoot.isNullOrBlank()
-                        }
+                        // Find the matching ClientInstitution, and use its `apiRoot`
 
-                        institution?.let {
-                            apiBaseURL = it.apiRoot!! + "api/"
+                        urls.singleOrNull {
+                            it.name == institutionName && !it.apiRoot.isNullOrBlank()
+
+                        }?.apiRoot?.let {
+                            apiBaseURL = it + "api/"
 
                             // Recreate the API with the new base URL
-                            //createAPI(institution.apiRoot);
+                            //createAPI(institution.apiRoot)
                             createAPI()
 
                             app.setLoggedInUser(user, password!!)
@@ -172,30 +179,35 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
         val deviceToken = FirebaseInstanceId.getInstance().token
 
         return if (deviceToken != null) {
-            val snsPlatformArn = SNS_PLATFORM_APPLICATION_ARN
-            RetrofitLiveData(api.login(snsPlatformArn, deviceToken))
+            RetrofitLiveData(api.login(SNS_PLATFORM_APPLICATION_ARN, deviceToken))
 
         } else {
             SingleLiveData(null)
         }
     }
 
+    private fun jsonObjectOf(vararg pairs: Pair<String, Any?>) = JSONObject().apply {
+        for ((key, value) in pairs)
+            put(key, value)
+    }
+
     fun signUp(user: SignUpUser): LiveData<Boolean> {
 
-        val jsonObject = JSONObject()
+        lateinit var jsonObject: JSONObject
+
         try {
-            jsonObject.apply {
-                put("email", user.email)
-                put("givenName", user.givenName)
-                put("familyName", user.familyName)
-                put("gender", user.gender)
-                put("nationality", user.nationality)
-                put("yearOfBirth", user.yearOfBirth)
-                put("accountVerified", user.accountVerified.toString())
-                put("password", user.password)
-                put("institutionId", user.institutionId.toString())
-                put("hasPersonality", user.hasPersonality.toString())
-            }
+            jsonObject = jsonObjectOf(
+                "email" to user.email,
+                "givenName" to user.givenName,
+                "familyName" to user.familyName,
+                "gender" to user.gender,
+                "nationality" to user.nationality,
+                "yearOfBirth" to user.yearOfBirth,
+                "accountVerified" to user.accountVerified.toString(),
+                "password" to user.password,
+                "institutionId" to user.institutionId.toString(),
+                "hasPersonality" to user.hasPersonality.toString()
+            )
 
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -207,14 +219,22 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
         val request = okhttp3.Request.Builder()
             .url(SERVER_URL + "signUp")
-            .addHeader("Accept", "application/json")
-            .addHeader("Content-type", "application/json")
-            .addHeader("User-Agent", "IsegoriaApp Android")
+            .addAppHeaders()
             .post(requestBody)
             .build()
 
         // Create new HTTP client rather than using application's, as no auth is required
         return OkHttpLiveData(OkHttpClient().newCall(request))
+    }
+
+    private fun fileExtension(imageFile: File): String {
+        val dotIndex = imageFile.path.lastIndexOf('.')
+
+        return if (dotIndex > -1) {
+            imageFile.path.substring(dotIndex + 1)
+        } else {
+            "jpg"
+        }
     }
 
     fun uploadNewUserPhoto(imageFile: File): LiveData<Boolean> {
@@ -234,14 +254,7 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
             .context(appContext)
             .build()
 
-        val dotIndex = imageFile.path.lastIndexOf('.')
-
-        val imageFileExtension = if (dotIndex > -1) {
-            imageFile.path.substring(dotIndex + 1)
-        } else {
-            "jpg"
-        }
-
+        val imageFileExtension = fileExtension(imageFile)
         val key = "${UUID.randomUUID()}.$imageFileExtension"
 
         val transfer =
@@ -262,17 +275,17 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
         val timestamp = System.currentTimeMillis() / 1000L
         val loggedInUser = app.loggedInUser.value ?: return SingleLiveData(false)
 
-        val jsonObject = JSONObject()
+        lateinit var jsonObject: JSONObject
         try {
-            jsonObject.apply {
-                put("url", pictureURL)
-                put("thumbNailUrl", pictureURL)
-                put("title", "Profile Picture")
-                put("description", "Profile Picture")
-                put("date", timestamp.toString())
-                put("ownerId", loggedInUser.email)
-                put("sequence", "0")
-            }
+            jsonObject = jsonObjectOf(
+                "url" to pictureURL,
+                "thumbNailUrl" to pictureURL,
+                "title" to "Profile Picture",
+                "description" to "Profile Picture",
+                "date" to timestamp.toString(),
+                "ownerId" to loggedInUser.email,
+                "sequence" to "0"
+            )
 
         } catch (e: JSONException) {
             e.printStackTrace()
@@ -284,12 +297,10 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
         val request = okhttp3.Request.Builder()
             .url(apiBaseURL + "photo")
-            .addHeader("Accept", "application/json")
-            .addHeader("Content-type", "application/json")
-            .addHeader("User-Agent", "IsegoriaApp Android")
+            .addAppHeaders()
             .post(requestBody)
             .build()
 
-        return OkHttpLiveData(httpClient!!.newCall(request))
+        return OkHttpLiveData(httpClient.newCall(request))
     }
 }

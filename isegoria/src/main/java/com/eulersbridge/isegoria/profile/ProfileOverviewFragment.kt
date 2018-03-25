@@ -116,7 +116,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
             observe(viewModel.getRemainingBadges()) { remainingBadges ->
                 if (remainingBadges != null)
-                    updateBadgesCount(user.completedBadgesCount!!, remainingBadges.size.toLong())
+                    updateBadgesCount(user.completedBadgesCount, remainingBadges.size.toLong())
             }
 
             observe(viewModel.getTasks()) { tasks ->
@@ -151,7 +151,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
                 viewProgressTextView.setOnClickListener { viewModel.viewTasksProgress() }
             }
 
-            updateCompletedTasksCount(user.completedTasksCount!!)
+            updateCompletedTasksCount(user.completedTasksCount)
             updateExperience(user.level, user.experience)
         }
 

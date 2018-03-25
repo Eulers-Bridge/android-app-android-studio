@@ -31,7 +31,7 @@ class FirebaseIDService : FirebaseInstanceIdService() {
 
         // Get updated InstanceID token.
         val refreshedToken = FirebaseInstanceId.getInstance().token
-        //Log.d(getClass().getSimpleName(), "Refreshed token: " + refreshedToken);
+        // Log.d(javaClass.simpleName, "Refreshed token: " + refreshedToken);
 
         val request = CreatePlatformEndpointRequest()
         request.apply {

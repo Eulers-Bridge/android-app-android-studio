@@ -47,9 +47,7 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     ): View? {
         val rootView = inflater.inflate(R.layout.profile_badges_fragment, container, false)
 
-        arguments?.getInt("level")?.let {
-            viewModel.setTargetBadgeLevel(it)
-        }
+        viewModel.setTargetBadgeLevel(arguments?.getInt("level"))
 
         return rootView
     }

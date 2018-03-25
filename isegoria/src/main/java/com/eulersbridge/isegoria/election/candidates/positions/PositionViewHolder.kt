@@ -31,6 +31,10 @@ internal class PositionViewHolder(itemView: View, private val listener: Position
     override fun setItem(item: Position?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: Position?) {
         imageView.setImageResource(R.color.lightGrey)
 
         if (item == null) {

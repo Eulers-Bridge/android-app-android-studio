@@ -4,8 +4,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.util.ui.NonSwipeableViewPager
+import com.eulersbridge.isegoria.ifTrue
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.personality_questions_activity.*
@@ -24,18 +23,16 @@ class PersonalityActivity : DaggerAppCompatActivity() {
 
         viewModel = ViewModelProviders.of(this, modelFactory)[PersonalityViewModel::class.java]
 
-        observe(viewModel.userContinuedQuestions) {
-            if (it == true) getViewPager().currentItem = 1
+        ifTrue(viewModel.questionsContinued) {
+            viewPager.currentItem = 1
         }
 
-        observe(viewModel.userCompletedQuestions) {
-            if (it == true) finish()
+        ifTrue(viewModel.questionsComplete) {
+            finish()
         }
 
         setupViewPager()
     }
-
-    private fun getViewPager() = viewPager as NonSwipeableViewPager
 
     private fun setupViewPager() {
         val permissionFragment = PersonalityPermissionFragment()
@@ -51,7 +48,7 @@ class PersonalityActivity : DaggerAppCompatActivity() {
 
         val viewPagerAdapter = SimpleFragmentPagerAdapter(supportFragmentManager, fragments)
 
-        getViewPager().apply {
+        viewPager.apply {
             adapter = viewPagerAdapter
             currentItem = 0
         }

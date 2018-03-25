@@ -38,6 +38,10 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
     override fun setItem(item: PhotoAlbum?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: PhotoAlbum?) {
         @ColorRes val placeholderColourRes = R.color.lightGrey
 
         if (item == null) {
@@ -48,10 +52,10 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
             descriptionTextView.text = item.description
 
             GlideApp.with(imageView.context)
-                    .load(item.thumbnailUrl)
-                    .placeholder(placeholderColourRes)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(imageView)
+                .load(item.thumbnailUrl)
+                .placeholder(placeholderColourRes)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView)
 
             isImageLoadStarted = true
         }

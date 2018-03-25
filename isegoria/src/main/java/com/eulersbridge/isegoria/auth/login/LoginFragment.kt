@@ -19,7 +19,9 @@ import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
+import com.eulersbridge.isegoria.ifTrue
 import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
@@ -105,8 +107,8 @@ class LoginFragment : Fragment() {
                 passwordField.setText(it)
             }
 
-            observe(emailError) {
-                if (it == true) {
+            observeBoolean(emailError) {
+                if (it) {
                     emailLayout.error = getString(R.string.user_login_email_error_required)
                     emailLayout.isErrorEnabled = true
                     emailField.requestFocus()
@@ -116,8 +118,8 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            observe(passwordError) {
-                if (it == true) {
+            observeBoolean(passwordError) {
+                if (it) {
                     passwordLayout.error = getString(R.string.user_login_password_error_required)
                     passwordLayout.isErrorEnabled = true
 
@@ -126,20 +128,18 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            observe(networkError) {
-                if (it == true) {
-                    Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
-                        .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
-                        .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
-                        .show()
+            ifTrue(networkError) {
+                Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
+                    .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
+                    .show()
 
-                    setNetworkErrorShown()
-                }
+                setNetworkErrorShown()
             }
 
-            observe(formEnabled) { enabled ->
+            observeBoolean(formEnabled) { enabled ->
                 arrayOf(emailLayout, passwordLayout, loginButton, signUpButton).forEach {
-                    it.isEnabled = enabled == true
+                    it.isEnabled = enabled
                 }
             }
         }

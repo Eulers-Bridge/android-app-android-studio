@@ -31,13 +31,17 @@ internal class PhotoViewHolder(itemView: View, private val clickListener: ClickL
     }
 
     override fun setItem(item: Photo?) {
+        bindItem(item)
+    }
+
+    private fun bindItem(item: Photo?) {
         if (item != null) {
             imageView.contentDescription = item.title
 
             GlideApp.with(imageView.context)
-                    .load(item.getPhotoUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(imageView)
+                .load(item.getPhotoUrl())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imageView)
 
             isImageLoadStarted = true
         }

@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
+import com.eulersbridge.isegoria.ifTrue
 import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.email_verification.*
 import javax.inject.Inject
@@ -39,9 +39,8 @@ class EmailVerificationFragment : Fragment() {
             val authViewModel = ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
             authViewModel.verificationComplete.value = true
 
-            observeBoolean(viewModel.userVerified()) {
-                if (it)
-                    verifiedButton.isEnabled = true
+            ifTrue(viewModel.userVerified()) {
+                verifiedButton.isEnabled = true
             }
         }
 

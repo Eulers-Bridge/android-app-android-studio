@@ -11,13 +11,11 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
-import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.DaggerAppCompatActivity
 
@@ -44,11 +42,8 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         presentRootContent(LoginFragment())
 
-        observe(viewModel.signUpVisible) {
-            /* If makeVisible is false, allow default behaviour of back button & fragment manager
-                to pop the stack, removing the sign up fragment. */
-            if (it == true)
-                presentContent(SignUpFragment())
+        ifTrue(viewModel.signUpVisible) {
+            presentContent(SignUpFragment())
         }
 
         observe(viewModel.signUpUser) {
@@ -56,33 +51,31 @@ class AuthActivity : DaggerAppCompatActivity() {
                 presentContent(ConsentAgreementFragment())
         }
 
-        observe(viewModel.signUpConsentGiven) {
-            if (it == true)
-                observe(viewModel.signUp()) { signUpSuccess ->
-                    if (signUpSuccess == true) {
-                        presentRootContent(LoginFragment())
-                        presentContent(EmailVerificationFragment())
+        ifTrue(viewModel.signUpConsentGiven) {
+            observeBoolean(viewModel.signUp()) { signUpSuccess ->
+                if (signUpSuccess) {
+                    presentRootContent(LoginFragment())
+                    presentContent(EmailVerificationFragment())
 
-                    } else {
-                        presentRootContent(LoginFragment())
-                        presentContent(SignUpFragment())
+                } else {
+                    presentRootContent(LoginFragment())
+                    presentContent(SignUpFragment())
 
-                        AlertDialog.Builder(this)
-                            .setTitle(getString(R.string.user_sign_up_error_title))
-                            .setMessage(getString(R.string.user_sign_up_error_message))
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show()
-                    }
+                    AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.user_sign_up_error_title))
+                        .setMessage(getString(R.string.user_sign_up_error_message))
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
                 }
+            }
         }
 
-        observe(viewModel.verificationComplete) {
-            if (it == true)
-                presentRootContent(LoginFragment())
+        ifTrue(viewModel.verificationComplete) {
+            presentRootContent(LoginFragment())
         }
 
-        observe(viewModel.userLoggedIn) {
-            if (it == true) finish()
+        ifTrue(viewModel.userLoggedIn) {
+            finish()
         }
     }
 

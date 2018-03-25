@@ -22,16 +22,20 @@ internal class BadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun setItem(item: Badge?, completed: Boolean) {
         this.item = item
 
+        bindItem(item, completed)
+    }
+
+    private fun bindItem(item: Badge?, completed: Boolean) {
         if (item == null) {
             nameTextView.text = null
             descriptionTextView.text = null
             imageView.setImageDrawable(null)
 
         } else {
-            if (!completed) {
-                imageView.setColorFilter(Color.argb(125, 35, 35, 35))
-            } else {
+            if (completed) {
                 imageView.clearColorFilter()
+            } else {
+                imageView.setColorFilter(Color.argb(125, 35, 35, 35))
             }
 
             nameTextView.text = item.name

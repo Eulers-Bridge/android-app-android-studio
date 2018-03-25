@@ -21,6 +21,10 @@ internal class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun setItem(item: Task?) {
         this.item = item
 
+        bindItem(item)
+    }
+
+    private fun bindItem(item: Task?) {
         nameTextView.text = item?.action
 
         if (item == null) {
