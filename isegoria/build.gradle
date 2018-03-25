@@ -85,8 +85,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:0.2'
 
     // ViewModel and LiveData
-    implementation 'android.arch.lifecycle:extensions:1.1.0'
-    kapt 'android.arch.lifecycle:common-java8:1.1.0'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+    kapt 'android.arch.lifecycle:common-java8:1.1.1'
 
     implementation 'com.google.dagger:dagger:2.15'
     kapt 'com.google.dagger:dagger-compiler:2.15'
@@ -97,8 +97,8 @@ dependencies {
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 
     // Used in Candidate fragment for bottom tabs

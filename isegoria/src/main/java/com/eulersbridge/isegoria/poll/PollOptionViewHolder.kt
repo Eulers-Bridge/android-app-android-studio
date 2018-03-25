@@ -10,6 +10,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.PollOption
+import com.eulersbridge.isegoria.setCompatTooltipText
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PollOptionViewHolder(itemView: View, private val clickListener: ClickListener?)
@@ -70,12 +71,19 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
 
             if (item.hasVoted) {
                 checkBoxImageView.setImageResource(R.drawable.tick_green)
-                checkBoxImageView.contentDescription = checkBoxImageView.context.getString(R.string.checkbox_checked)
+
+                val contentDescription = checkBoxImageView.context.getString(R.string.checkbox_checked)
+                checkBoxImageView.contentDescription = contentDescription
+                checkBoxImageView.setCompatTooltipText(contentDescription)
 
                 progressBar.progress = progressBar.max
             } else {
+
                 checkBoxImageView.setImageResource(R.drawable.tick_empty)
-                checkBoxImageView.contentDescription = checkBoxImageView.context.getString(R.string.checkbox_unchecked)
+
+                val contentDescription = checkBoxImageView.context.getString(R.string.checkbox_unchecked)
+                checkBoxImageView.contentDescription = contentDescription
+                checkBoxImageView.setCompatTooltipText(contentDescription)
             }
 
             item.result?.let {

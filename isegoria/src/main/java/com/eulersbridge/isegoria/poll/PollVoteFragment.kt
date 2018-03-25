@@ -9,10 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.ACTIVITY_EXTRA_POLL
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.*
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.poll_fragment.*
 import javax.inject.Inject
@@ -75,13 +72,14 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
         observe(viewModel.pollResults) { results ->
             results?.let {
-                val answersCount = results.size
+                val answerCount = results.size
 
-                answersCountTextView.text = answersCount.toString()
+                answersCountTextView.text = answerCount.toString()
 
                 val answersQuantity =
-                    resources.getQuantityString(R.plurals.poll_vote_answers_content_description, answersCount)
+                    resources.getQuantityString(R.plurals.poll_vote_answers_content_description, answerCount)
                 answersCountTextView.contentDescription = answersQuantity
+                answersCountTextView.setCompatTooltipText(answersQuantity)
 
                 populatePollOptions()
             }
