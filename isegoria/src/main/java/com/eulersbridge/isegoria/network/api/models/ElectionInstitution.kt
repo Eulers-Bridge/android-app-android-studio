@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.network.api.models
 import com.squareup.moshi.Json
 
 data class ElectionInstitution (
-    @Json(name = "institutionId")
+    @field:Json(name = "institutionId")
     var id: Long = 0,
 
     val name: String?,

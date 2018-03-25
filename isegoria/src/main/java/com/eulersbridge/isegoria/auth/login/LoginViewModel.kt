@@ -38,8 +38,8 @@ class LoginViewModel
         networkError.value = false
         canShowPasswordResetDialog.value = true
 
-        app.savedUserEmail?.let { email.value = it }
-        app.savedUserPassword?.let { password.value = it }
+        email.value = app.savedUserEmail
+        password.value = app.savedUserPassword
     }
 
     internal fun onExit() {

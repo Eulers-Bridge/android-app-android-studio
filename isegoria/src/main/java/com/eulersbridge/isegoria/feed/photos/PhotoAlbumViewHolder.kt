@@ -48,7 +48,7 @@ internal class PhotoAlbumViewHolder(itemView: View, private val clickListener: C
             descriptionTextView.text = item.description
 
             GlideApp.with(imageView.context)
-                    .load(item.thumbnailPhotoUrl)
+                    .load(item.thumbnailUrl)
                     .placeholder(placeholderColourRes)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)

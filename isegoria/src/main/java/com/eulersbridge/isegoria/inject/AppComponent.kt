@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.di
+package com.eulersbridge.isegoria.inject
 
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.notifications.ServicesModule

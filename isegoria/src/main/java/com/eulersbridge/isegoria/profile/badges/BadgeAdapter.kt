@@ -61,7 +61,9 @@ internal class BadgeAdapter(
                 item = completedItems[index]
                 completed = true
             }
-            (index < remainingItems.size) -> item = remainingItems[index]
+            (index < remainingItems.size) -> {
+                item = remainingItems[index]
+            }
             else -> {
                 viewHolder.setItem(null, false)
                 return
@@ -75,17 +77,16 @@ internal class BadgeAdapter(
 
         val weakViewHolder = WeakReference(viewHolder)
 
-        api.getPhotos(itemId).onSuccess {
+        api.getPhotos(itemId).onSuccess{
             if (it.totalPhotos > imageIndex + 1) {
                 val innerViewHolder = weakViewHolder.get()
 
-                if (innerViewHolder != null) {
-                    it.photos?.get(imageIndex)?.thumbnailUrl
+                if (innerViewHolder != null)
+                    it.photos?.get(imageIndex)?.getPhotoUrl()
                         ?.takeUnless { it.isBlank() }
                         ?.also {
                             innerViewHolder.setImageUrl(glide, item.id, it)
                         }
-                }
             }
         }
     }

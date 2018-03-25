@@ -84,8 +84,8 @@ class VoteFragment : Fragment(), TitledFragment {
                                 viewModel.dateTime.value = it
                             }
                         },
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
+                        calendar[Calendar.HOUR_OF_DAY],
+                        calendar[Calendar.MINUTE],
                         DateFormat.is24HourFormat(context)
                     )
                     openDialog?.show()
@@ -110,9 +110,9 @@ class VoteFragment : Fragment(), TitledFragment {
                                 viewModel.dateTime.value = it
                             }
                         },
-                        calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
+                        calendar[Calendar.YEAR],
+                        calendar[Calendar.MONTH],
+                        calendar[Calendar.DAY_OF_MONTH]
                     )
 
                     val election = viewModel.electionData?.value?.takeIf { it.startVoting < it.endVoting }
@@ -165,10 +165,10 @@ class VoteFragment : Fragment(), TitledFragment {
         } else {
             val todayCal = Calendar.getInstance()
 
-            if (calendar.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR)) {
+            if (calendar[Calendar.YEAR] == todayCal[Calendar.YEAR]) {
 
-                val isThisWeek = calendar.get(Calendar.WEEK_OF_YEAR) == todayCal.get(Calendar.WEEK_OF_YEAR)
-                val isThisEra =  calendar.get(Calendar.ERA) == todayCal.get(Calendar.ERA)
+                val isThisWeek = calendar[Calendar.WEEK_OF_YEAR] == todayCal[Calendar.WEEK_OF_YEAR]
+                val isThisEra =  calendar[Calendar.ERA] == todayCal[Calendar.ERA]
 
                 dateStr = if (isThisWeek || isThisEra) {
 

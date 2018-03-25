@@ -5,5 +5,7 @@ data class UserPersonality(
     val conscientiousness: Float,
     val emotionalStability: Float,
     val extroversion: Float,
+
+    // Mis-spelled, matching API mistake
     val openess: Float
 )

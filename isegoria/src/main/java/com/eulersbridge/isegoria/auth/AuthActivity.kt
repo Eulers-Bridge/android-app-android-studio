@@ -40,7 +40,7 @@ class AuthActivity : DaggerAppCompatActivity() {
                     }
                 })
 
-        viewModel = ViewModelProviders.of(this).get(AuthViewModel::class.java)
+        viewModel = ViewModelProviders.of(this)[AuthViewModel::class.java]
 
         presentRootContent(LoginFragment())
 

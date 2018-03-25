@@ -1,7 +1,7 @@
 package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.di.ViewModelProviderFactory
+import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
 import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides

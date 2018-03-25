@@ -41,8 +41,7 @@ internal class EventViewHolder(view: View) : LoadingAdapter.ItemViewHolder<Event
 
         } else {
             titleTextView.text = item.name
-
-            detailsTextView.text = item.date.toDateString(detailsTextView.context)
+            detailsTextView.text = item.createdDate.toDateString(detailsTextView.context)
 
             GlideApp.with(imageView.context)
                     .load(item.getPhotoUrl())

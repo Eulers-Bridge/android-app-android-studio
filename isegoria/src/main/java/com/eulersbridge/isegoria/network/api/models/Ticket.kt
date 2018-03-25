@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 
 data class Ticket (
 
-    @Json(name = "ticketId")
+    @field:Json(name = "ticketId")
     val id: Long = 0,
 
     val electionId: Long = 0,
@@ -16,16 +16,10 @@ data class Ticket (
     val code: String?,
     val logo: String?,
 
-    @Json(name = "numberOfSupporters")
+    @field:Json(name = "numberOfSupporters")
     val supporterCount: Long = 0
 
 ) {
-    fun getColour(): String {
-        return if (!colour.isNullOrBlank()) {
-            colour!!
-
-        } else {
-            "#000000"
-        }
-    }
+    fun getColour()
+        = colour?.takeUnless { it.isBlank() } ?: "#000000"
 }

@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.network.api.models
 import com.squareup.moshi.Json
 
 data class Institution (
-    @Json(name = "institutionId") var id: Long = 0,
+    @field:Json(name = "institutionId") var id: Long = 0,
     var newsFeedId: Long = 0,
 
     // Different JSON names used depending on API endpoint.

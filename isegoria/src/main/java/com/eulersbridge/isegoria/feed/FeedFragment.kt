@@ -28,7 +28,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private var tabLayout: TabLayout? = null
 
     private val viewModel: FeedViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(FeedViewModel::class.java)
+        ViewModelProviders.of(requireActivity())[FeedViewModel::class.java]
     }
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {

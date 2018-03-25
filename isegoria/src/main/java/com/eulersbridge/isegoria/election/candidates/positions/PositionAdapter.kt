@@ -40,7 +40,7 @@ internal class PositionAdapter(
             val weakViewHolder = WeakReference(viewHolder)
 
             api.getPhotos(itemId).onSuccess {
-                it.photos?.firstOrNull()?.thumbnailUrl?.let { photoThumbnailUrl ->
+                it.photos?.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
                     weakViewHolder.get()?.apply {
                         setImageUrl(glide, photoThumbnailUrl, itemId)
                     }

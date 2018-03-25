@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.di
+package com.eulersbridge.isegoria.inject
 
 import android.arch.lifecycle.ViewModel
 import dagger.MapKey

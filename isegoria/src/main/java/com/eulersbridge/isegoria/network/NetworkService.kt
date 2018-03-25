@@ -121,10 +121,10 @@ class NetworkService constructor(private val app: IsegoriaApp, private val appCo
 
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor()
-            logging.level = HttpLoggingInterceptor.Level.BASIC
+//            logging.level = HttpLoggingInterceptor.Level.BASIC
 
-            //For more detailed debug logging, uncomment the following line:
-            //logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+//            For more detailed debug logging, uncomment the following line:
+            logging.level = HttpLoggingInterceptor.Level.BODY
 
             httpClientBuilder.addInterceptor(logging)
         }

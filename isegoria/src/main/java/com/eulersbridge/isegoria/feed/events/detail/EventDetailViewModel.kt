@@ -25,8 +25,8 @@ class EventDetailViewModel
 
             return Intent(Intent.ACTION_INSERT)
                     .setData(CalendarContract.Events.CONTENT_URI)
-                    .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.date)
-                    .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.date + 60 * 60 * 1000)
+                    .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.createdDate)
+                    .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.createdDate + 60 * 60 * 1000)
                     .putExtra(CalendarContract.Events.ALL_DAY, false)
 
                     .putExtra(CalendarContract.Events.TITLE, event.name)

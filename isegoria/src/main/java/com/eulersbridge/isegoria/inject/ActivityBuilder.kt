@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.di
+package com.eulersbridge.isegoria.inject
 
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.auth.AuthActivity

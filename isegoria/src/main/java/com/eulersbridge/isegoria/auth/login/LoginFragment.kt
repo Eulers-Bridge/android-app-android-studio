@@ -32,7 +32,7 @@ class LoginFragment : Fragment() {
     private lateinit var viewModel: LoginViewModel
 
     private val authViewModel: AuthViewModel by lazy {
-        ViewModelProviders.of(activity!!).get(AuthViewModel::class.java)
+        ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
     }
 
     override fun onAttach(context: Context?) {

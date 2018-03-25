@@ -159,7 +159,7 @@ class CandidateAllFragment : Fragment() {
         networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
-                    .load(it.thumbnailUrl)
+                    .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(candidateProfileView)
             }
@@ -168,7 +168,7 @@ class CandidateAllFragment : Fragment() {
         networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
-                    .load(it.thumbnailUrl)
+                    .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(candidateProfileView)
             }

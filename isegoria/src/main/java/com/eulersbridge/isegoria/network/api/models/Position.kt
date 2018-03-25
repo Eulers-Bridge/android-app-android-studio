@@ -8,8 +8,8 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class Position (
-    @Json(name = "positionId") var id: Long = 0,
-    @Json(name = "electionId") val electionId: Long?,
+    @field:Json(name = "positionId") var id: Long = 0,
+    @field:Json(name = "electionId") val electionId: Long?,
     val name: String?,
     val description: String?
 ) : Parcelable

@@ -1,7 +1,7 @@
 package com.eulersbridge.isegoria.feed.events.detail
 
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.di.ViewModelProviderFactory
+import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
 import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides

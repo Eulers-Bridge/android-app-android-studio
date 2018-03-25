@@ -99,7 +99,7 @@ class CandidateTicketDetailFragment : Fragment() {
         networkService.api.getPhotos(ticketId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
-                    .load(it.thumbnailUrl)
+                    .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(partyDetailLogoImageView)
             }
@@ -186,7 +186,7 @@ class CandidateTicketDetailFragment : Fragment() {
         networkService.api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
-                    .load(it.thumbnailUrl)
+                    .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(candidateProfileView)
             }

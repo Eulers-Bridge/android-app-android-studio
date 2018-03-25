@@ -47,7 +47,7 @@ class PhotoAlbumFragment : Fragment() {
             descriptionTextView.text = it.description
 
             GlideApp.with(this)
-                    .load(it.thumbnailPhotoUrl)
+                    .load(it.thumbnailUrl)
                     .placeholder(R.color.lightGrey)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(thumbnailImageView)

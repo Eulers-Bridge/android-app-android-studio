@@ -62,7 +62,7 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
                 imageView.isVisible = true
 
                 GlideApp.with(imageView.context)
-                        .load(item.photo.thumbnailUrl)
+                        .load(item.photo.getPhotoUrl())
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(imageView)
             } else {

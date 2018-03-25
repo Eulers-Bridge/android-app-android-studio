@@ -26,7 +26,7 @@ class PhotoDetailViewModel
         return@switchMap SingleLiveData(photos?.get(index))
     }
 
-    internal fun getPhotoUrl(position: Int): String? = photos?.get(position)?.thumbnailUrl
+    internal fun getPhotoUrl(position: Int): String? = photos?.get(position)?.getPhotoUrl()
 
     private fun getPhotoLikes(): LiveData<List<Like>> {
         return Transformations.switchMap(currentPhoto) { (id) ->

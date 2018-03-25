@@ -14,15 +14,10 @@ data class Event(
     val description: String?,
     val organizer: String?,
     val organizerEmail: String?,
-    @Json(name = "created") @Timestamp val date: Long = 0,
+    @field:Json(name = "created") @Timestamp val createdDate: Long = 0,
     val photos: List<Photo>?
 ) : Parcelable {
 
-    fun getPhotoUrl(): String? {
-        return if (photos != null && photos.isNotEmpty()) {
-            photos[0].thumbnailUrl
-        } else {
-            null
-        }
-    }
+    fun getPhotoUrl()
+        = photos?.firstOrNull()?.getPhotoUrl()
 }

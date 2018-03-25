@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class NewsArticle(
-        @Json(name = "articleId")
+        @field:Json(name = "articleId")
         val id: Long,
 
         val institutionId: Long?,
@@ -20,17 +20,18 @@ data class NewsArticle(
         @Timestamp
         val date: Long,
 
-        @Json(name = "likes")
+        @field:Json(name = "likes")
         val likeCount: Int = 0,
 
-        @Json(name = "creatorProfile")
+        val creatorEmail: String?,
+
+        @field:Json(name = "creatorProfile")
         val creator: Contact,
 
-        @Json(name = "inappropriateContent")
+        @field:Json(name = "inappropriateContent")
         val hasInappropriateContent: Boolean
 
 ) : Parcelable {
-    internal fun getPhotoUrl(): String? {
-        return photos?.firstOrNull()?.thumbnailUrl
-    }
+    internal fun getPhotoUrl()
+        = photos?.firstOrNull()?.getPhotoUrl()
 }

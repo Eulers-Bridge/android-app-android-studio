@@ -100,7 +100,7 @@ class CandidatePositionFragment : Fragment() {
 
         networkService.api.getPhoto(candidate.userId).onSuccess {
             GlideApp.with(this@CandidatePositionFragment)
-                .load(it.thumbnailUrl)
+                .load(it.getPhotoUrl())
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(candidateProfileView)
         }

@@ -20,13 +20,13 @@ data class User (
     override var level: Long = 0,
     override var experience: Long = 0,
 
-    @Json(name = "numOfCompTasks")
+    @field:Json(name = "numOfCompTasks")
     override var completedTasksCount: Long = 0,
 
-    @Json(name = "numOfCompBadges")
+    @field:Json(name = "numOfCompBadges")
     override var completedBadgesCount: Long = 0,
 
-    @Json(name = "profilePhoto")
+    @field:Json(name = "profilePhoto")
     override var profilePhotoURL: String?,
 
     // Subclass-specific
@@ -37,7 +37,7 @@ data class User (
     val hasPersonality: Boolean = false,
 
     var trackingOff: Boolean = false,
-    @Json(name = "optOutDataCollection")
+    @field:Json(name = "optOutDataCollection")
     var isOptedOutOfDataCollection: Boolean = false,
 
     val yearOfBirth: String,

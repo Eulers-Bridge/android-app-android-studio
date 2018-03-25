@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class PollResult (
-    @Json(name = "answer")
+    @field:Json(name = "answer")
     val id: Long = 0,
 
     val count: Long = 0

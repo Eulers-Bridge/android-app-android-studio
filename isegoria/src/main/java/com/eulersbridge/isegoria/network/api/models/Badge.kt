@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class Badge(
-    @Json(name = "badgeId")
+    @field:Json(name = "badgeId")
     val id: Long = 0,
 
     val name: String?,

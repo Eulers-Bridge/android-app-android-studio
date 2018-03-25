@@ -49,7 +49,7 @@ internal class TaskAdapter(
                 val innerViewHolder = weakViewHolder.get()
 
                 if (innerViewHolder != null) {
-                    val imageUrl = it.photos?.get(imageIndex)?.thumbnailUrl
+                    val imageUrl = it.photos?.get(imageIndex)?.getPhotoUrl()
 
                     if (!imageUrl.isNullOrBlank())
                         innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)

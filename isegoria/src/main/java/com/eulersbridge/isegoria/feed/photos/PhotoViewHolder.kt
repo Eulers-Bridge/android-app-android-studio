@@ -35,7 +35,7 @@ internal class PhotoViewHolder(itemView: View, private val clickListener: ClickL
             imageView.contentDescription = item.title
 
             GlideApp.with(imageView.context)
-                    .load(item.thumbnailUrl)
+                    .load(item.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
 

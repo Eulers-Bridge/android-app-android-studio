@@ -11,15 +11,15 @@ data class PollOption (
 
     val id: Long,
 
-    @Json(name = "txt")
+    @field:Json(name = "txt")
     val text: String?,
 
     val photo: Photo?,
 
-    @Json(name = "numOfVoters")
-    val votersCount: Long?,
+    @field:Json(name = "numOfVoters")
+    val voterCount: Long?,
 
-    @Json(name = "voted")
+    @field:Json(name = "voted")
     var hasVoted: Boolean,
 
     @Transient

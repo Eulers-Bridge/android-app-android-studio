@@ -20,27 +20,27 @@ class Contact (
     override var level: Long = 0,
     override var experience: Long = 0,
 
-    @Json(name = "numOfCompTasks")
+    @field:Json(name = "numOfCompTasks")
     override var completedTasksCount: Long = 0,
 
-    @Json(name = "numOfCompBadges")
+    @field:Json(name = "numOfCompBadges")
     override var completedBadgesCount: Long = 0,
 
-    @Json(name = "profilePhoto")
+    @field:Json(name = "profilePhoto")
     override var profilePhotoURL: String?,
 
     // Subclass-specific
 
-    @Json(name = "numOfContacts")
+    @field:Json(name = "numOfContacts")
     val contactsCount: Long?,
 
-    @Json(name = "totalTasks")
+    @field:Json(name = "totalTasks")
     var totalTasksCount: Long?,
 
-    @Json(name = "totalBadges")
+    @field:Json(name = "totalBadges")
     var totalBadgesCount: Long?,
 
-    @Json(name = "userId")
+    @field:Json(name = "userId")
     val id: Long?
 
 ) : GenericUser, Parcelable

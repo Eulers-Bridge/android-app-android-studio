@@ -16,7 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.content.systemService
 import com.eulersbridge.isegoria.auth.AuthActivity
-import com.eulersbridge.isegoria.di.DaggerAppComponent
+import com.eulersbridge.isegoria.inject.DaggerAppComponent
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User

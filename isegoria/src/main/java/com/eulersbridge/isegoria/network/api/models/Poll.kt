@@ -10,7 +10,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Poll (
 
-    @Json(name = "nodeId")
+    @field:Json(name = "nodeId")
     val id: Long,
 
     val creatorEmail: String?,
@@ -19,7 +19,7 @@ data class Poll (
 
     val question: String?,
 
-    @Json(name = "pollOptions")
+    @field:Json(name = "pollOptions")
     var options: List<PollOption>?,
 
     val closed: Boolean = false

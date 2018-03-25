@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class Candidate (
-    @Json(name = "candidateId")
+    @field:Json(name = "candidateId")
     val id: Long = 0,
 
     val ticketId: Long = 0,

@@ -4,7 +4,7 @@ import com.eulersbridge.isegoria.network.adapters.Timestamp
 import com.squareup.moshi.Json
 
 data class Election (
-    @Json(name = "electionId")
+    @field:Json(name = "electionId")
     val id: Long,
 
     @Timestamp
@@ -23,6 +23,6 @@ data class Election (
     val introduction: String?,
     val process: String?,
 
-    @Json(name = "institutionDomain")
+    @field:Json(name = "institutionDomain")
     private val electionInstitution: ElectionInstitution? = null
 )

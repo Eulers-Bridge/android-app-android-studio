@@ -32,7 +32,7 @@ class SignUpFragment : Fragment() {
     private lateinit var viewModel: SignUpViewModel
 
     private val authViewModel: AuthViewModel by lazy {
-        ViewModelProviders.of(requireActivity()).get(AuthViewModel::class.java)
+        ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
     }
 
     private lateinit var countryAdapter: ArrayAdapter<Country>
@@ -54,7 +54,7 @@ class SignUpFragment : Fragment() {
             container.updatePadding(top = container.paddingTop + additionalTopPadding)
         }
 
-        countryAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_item)
+        countryAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
         countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         countrySpinner.apply {
             isEnabled = false
@@ -67,14 +67,16 @@ class SignUpFragment : Fragment() {
 
         val spinnerYearOfBirthArrayAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item)
 
-        val year = Calendar.getInstance().get(Calendar.YEAR)
+        val year = Calendar.getInstance()[Calendar.YEAR]
 
         // Allow users to be in the age range 12 to 100
         for (i in year - 100..year - 12) {
             spinnerYearOfBirthArrayAdapter.add(i.toString())
 
-            if (i == 1990) birthYearSpinner.setSelection(i)
+            if (i == 1990)
+                birthYearSpinner.setSelection(i)
         }
+
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         birthYearSpinner.adapter = spinnerYearOfBirthArrayAdapter
 

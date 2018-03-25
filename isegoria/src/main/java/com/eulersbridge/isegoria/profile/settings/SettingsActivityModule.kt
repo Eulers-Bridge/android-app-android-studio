@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.profile.settings
 
 import android.arch.lifecycle.ViewModelProvider
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.di.ViewModelProviderFactory
+import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
 import com.eulersbridge.isegoria.network.NetworkService
 import dagger.Module
 import dagger.Provides

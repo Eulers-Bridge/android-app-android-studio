@@ -105,7 +105,7 @@ class SettingsActivity : DaggerAppCompatActivity() {
         observe(viewModel.getUserPhoto()) {
             if (it != null)
                 GlideApp.with(this)
-                    .load(it.thumbnailUrl)
+                    .load(it.getPhotoUrl())
                     .transforms(BlurTransformation(this), TintTransformation(0.1))
                     .priority(Priority.HIGH)
                     .transition(DrawableTransitionOptions.withCrossFade())

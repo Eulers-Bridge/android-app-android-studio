@@ -8,9 +8,9 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class PhotoAlbum (
-    @Json(name = "nodeId") val id: Long = 0,
+    @field:Json(name = "nodeId") val id: Long = 0,
     val name: String? = null,
     val description: String?,
     val location: String?,
-    @Json(name = "thumbNailUrl") var thumbnailPhotoUrl: String?
+    @field:Json(name = "thumbNailUrl") var thumbnailUrl: String?
 ) : Parcelable

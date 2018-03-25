@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.feed.events.detail
 
 import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -33,7 +34,6 @@ class EventDetailActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     lateinit var viewModel: EventDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +43,8 @@ class EventDetailActivity : DaggerAppCompatActivity() {
 
         window.decorView.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+
+        viewModel = ViewModelProviders.of(this, modelFactory)[EventDetailViewModel::class.java]
 
         backButton.setOnClickListener { onBackPressed() }
         addToCalendarButton.setOnClickListener { viewModel.addToCalendar(this) }
@@ -66,7 +68,7 @@ class EventDetailActivity : DaggerAppCompatActivity() {
     private fun populateContent(event: Event) {
         runOnUiThread {
             titleTextView.text = event.name
-            timeTextView.text = event.date.toDateString(this)
+            timeTextView.text = event.createdDate.toDateString(this)
             locationTextView.text = event.location
             detailsTextView.text = event.description
 

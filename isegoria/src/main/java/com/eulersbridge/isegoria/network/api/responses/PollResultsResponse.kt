@@ -4,11 +4,11 @@ import com.eulersbridge.isegoria.network.api.models.PollResult
 import com.squareup.moshi.Json
 
 data class PollResultsResponse (
-    @Json(name = "nodeId")
+    @field:Json(name = "nodeId")
     val id: Long,
 
     val pollId: Long,
 
-    @Json(name = "answers")
+    @field:Json(name = "answers")
     val results: List<PollResult>?
 )

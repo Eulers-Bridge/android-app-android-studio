@@ -7,9 +7,9 @@ class FriendRequest (
     val accepted: Boolean?,
     val rejected: Boolean?,
 
-    @Json(name = "requesterProfile")
+    @field:Json(name = "requesterProfile")
     val requester: User?,
 
-    @Json(name = "requestReceiverProfile")
+    @field:Json(name = "requestReceiverProfile")
     val requestReceiver: User?
 )
