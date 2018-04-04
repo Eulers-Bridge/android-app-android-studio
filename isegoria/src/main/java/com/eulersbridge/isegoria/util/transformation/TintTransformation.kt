@@ -7,7 +7,7 @@ import android.graphics.PorterDuff
 import android.support.annotation.ColorInt
 import android.support.annotation.FloatRange
 import android.support.v4.graphics.ColorUtils
-import androidx.graphics.applyCanvas
+import androidx.core.graphics.applyCanvas
 import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation

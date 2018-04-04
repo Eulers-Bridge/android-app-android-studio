@@ -4,8 +4,8 @@ import android.content.res.Resources
 import android.graphics.*
 import android.support.annotation.IntRange
 import android.support.annotation.Px
-import androidx.graphics.applyCanvas
-import androidx.graphics.toXfermode
+import androidx.core.graphics.applyCanvas
+import androidx.core.graphics.toXfermode
 import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation

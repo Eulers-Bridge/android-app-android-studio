@@ -14,7 +14,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
-import androidx.content.systemService
+import androidx.core.content.systemService
 import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.inject.DaggerAppComponent
 import com.eulersbridge.isegoria.network.NetworkService

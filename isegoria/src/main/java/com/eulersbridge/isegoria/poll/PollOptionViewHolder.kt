@@ -4,8 +4,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.view.isGone
-import androidx.view.isVisible
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R

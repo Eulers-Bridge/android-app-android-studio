@@ -17,7 +17,7 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
-import androidx.os.bundleOf
+import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.NetworkService

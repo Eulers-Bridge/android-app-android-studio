@@ -48,12 +48,12 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import androidx.animation.doOnEnd
-import androidx.graphics.component1
-import androidx.graphics.component2
-import androidx.graphics.component3
-import androidx.graphics.component4
-import androidx.os.bundleOf
+import androidx.core.animation.doOnEnd
+import androidx.core.graphics.component1
+import androidx.core.graphics.component2
+import androidx.core.graphics.component3
+import androidx.core.graphics.component4
+import androidx.core.os.bundleOf
 import com.eulersbridge.isegoria.R
 
 class CircleProgressBar : View {

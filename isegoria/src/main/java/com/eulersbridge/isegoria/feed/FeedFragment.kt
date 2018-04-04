@@ -14,8 +14,8 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.*
-import androidx.graphics.toColorFilter
-import androidx.view.isVisible
+import androidx.core.graphics.toColorFilter
+import androidx.core.view.isVisible
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.setKeyboardVisible

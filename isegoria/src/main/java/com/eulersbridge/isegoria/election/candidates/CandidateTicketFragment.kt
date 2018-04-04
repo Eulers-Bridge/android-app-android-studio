@@ -18,7 +18,7 @@ import android.widget.RelativeLayout
 import android.widget.TableRow
 import android.widget.TableRow.LayoutParams
 import android.widget.TextView
-import androidx.os.bundleOf
+import androidx.core.os.bundleOf
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.NetworkService

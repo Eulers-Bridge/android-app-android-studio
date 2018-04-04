@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.view.postDelayed
+import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.observe

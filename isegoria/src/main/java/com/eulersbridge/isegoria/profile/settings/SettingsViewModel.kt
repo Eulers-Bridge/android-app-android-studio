@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.net.Uri
+import androidx.core.net.toFile
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.network.NetworkService
@@ -115,7 +116,7 @@ class SettingsViewModel
     }
 
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> =
-        networkService.uploadNewUserPhoto(File(imageUri.path))
+        networkService.uploadNewUserPhoto(imageUri.toFile())
 
     override fun onCleared() {
         (userPhoto as? RetrofitLiveData)?.cancel()

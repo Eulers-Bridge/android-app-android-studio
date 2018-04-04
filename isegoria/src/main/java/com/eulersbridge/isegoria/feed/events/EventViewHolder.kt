@@ -7,7 +7,7 @@ import android.support.v4.app.ActivityOptionsCompat
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.os.bundleOf
+import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R

@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.view.Menu
 import android.view.MenuItem
-import androidx.content.systemService
+import androidx.core.content.systemService
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment

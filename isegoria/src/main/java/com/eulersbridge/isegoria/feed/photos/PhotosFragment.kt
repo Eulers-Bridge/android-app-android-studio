@@ -10,8 +10,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.os.bundleOf
-import androidx.view.postDelayed
+import androidx.core.os.bundleOf
+import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum

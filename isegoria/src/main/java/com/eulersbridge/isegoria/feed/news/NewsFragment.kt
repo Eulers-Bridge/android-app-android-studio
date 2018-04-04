@@ -9,7 +9,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.view.postDelayed
+import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.observe

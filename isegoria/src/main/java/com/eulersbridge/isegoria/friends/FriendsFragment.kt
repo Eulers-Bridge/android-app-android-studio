@@ -14,9 +14,10 @@ import android.text.InputType
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.os.bundleOf
-import androidx.view.isGone
-import androidx.view.isVisible
+import androidx.core.os.bundleOf
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.core.widget.toast
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.FriendRequest
@@ -270,7 +271,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun showMessage(message: String)
-            = Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            = context?.toast(message, Toast.LENGTH_LONG)?.show()
 
     private fun showAddedMessage()
             = showMessage(getString(R.string.friend_request_sent_message))
