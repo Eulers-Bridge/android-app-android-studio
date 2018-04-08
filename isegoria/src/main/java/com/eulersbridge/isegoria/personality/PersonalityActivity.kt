@@ -34,6 +34,10 @@ class PersonalityActivity : DaggerAppCompatActivity() {
         setupViewPager()
     }
 
+    override fun onBackPressed() {
+        // Disable back to exit personality screen
+    }
+
     private fun setupViewPager() {
         val permissionFragment = PersonalityPermissionFragment()
         permissionFragment.setViewModel(viewModel)

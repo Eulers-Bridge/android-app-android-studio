@@ -14,7 +14,7 @@ class PersonalityActivityModule {
     fun personalityViewModel(
         app: IsegoriaApp,
         networkService: NetworkService
-    ): PersonalityViewModel = PersonalityViewModel(app.loggedInUser, networkService)
+    ): PersonalityViewModel = PersonalityViewModel(app.loggedInUser, networkService.api)
 
     @Provides
     fun providePersonalityViewModel(personalityViewModel: PersonalityViewModel): ViewModelProvider.Factory

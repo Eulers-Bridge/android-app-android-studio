@@ -101,7 +101,7 @@ class SignUpFragment : Fragment() {
             it.isEnabled = false
             backButton.isEnabled = false
 
-            val newUser = viewModel.signUpUser
+            val newUser = viewModel.getSignUpUser()
             if (newUser == null) {
                 backButton.isEnabled = true
                 it.isEnabled = true

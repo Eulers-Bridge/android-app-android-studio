@@ -54,7 +54,7 @@ interface API {
     fun addUserEfficacy(@Path("userEmail") userEmail: String, @Body ppseQuestions: UserSelfEfficacy): Call<Void>
 
     @PUT("user/{userEmail}/personality")
-    fun addUserPersonality(@Path("userEmail") userEmail: String, @Body personality: UserPersonality): Call<Void>
+    fun addUserPersonality(@Path("userEmail") userEmail: String, @Body personality: UserPersonality): Call<PersonalityResponse>
 
     @GET("user/{userEmail}/support/")
     fun getUserSupportedTickets(@Path("userEmail") userEmail: String): Call<List<Ticket>>

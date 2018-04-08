@@ -34,6 +34,8 @@ class ConsentAgreementFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         agreeButton.setOnClickListener {
             it.isEnabled = false
+            disagreeButton.isEnabled = false
+
             authViewModel.signUpConsentGiven.value = true
         }
 

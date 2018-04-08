@@ -63,12 +63,6 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         createApplicationObservers()
     }
 
-    override fun onDestroy() {
-        GlideApp.with(this).onDestroy()
-
-        super.onDestroy()
-    }
-
     private fun setupNavigation() {
         setSupportActionBar(toolbar)
 

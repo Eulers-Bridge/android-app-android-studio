@@ -33,6 +33,8 @@ class PersonalityQuestionsFragment : Fragment() {
         )
 
         doneButton.setOnClickListener {
+            doneButton.isEnabled = false
+
             val extroversion =
                 ((sliderBars[0].score + (8 - sliderBars[5].score)) / 2).toFloat()
             val agreeableness =

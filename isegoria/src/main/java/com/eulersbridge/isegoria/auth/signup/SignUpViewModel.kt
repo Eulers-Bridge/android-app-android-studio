@@ -56,7 +56,7 @@ class SignUpViewModel
         }
     }
 
-    val signUpUser: SignUpUser? by lazy {
+    fun getSignUpUser(): SignUpUser? {
         val givenName = givenName.value
         val givenNameValid = !givenName.isNullOrBlank()
 
@@ -89,10 +89,10 @@ class SignUpViewModel
                 && institutionValid && birthYearValid && genderValid
 
         if (allFieldsValid)
-            SignUpUser(givenName!!, familyName!!, gender!!, country!!.name, birthYear!!,
+            return SignUpUser(givenName!!, familyName!!, gender!!, country!!.name, birthYear!!,
                     email!!, password!!, institution!!.getName())
 
-        null
+        return null
     }
 
 }
