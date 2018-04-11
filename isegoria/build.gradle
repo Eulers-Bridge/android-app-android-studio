@@ -71,12 +71,10 @@ dependencies {
 
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
 
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
 
-    implementation 'com.android.support:support-fragment:27.1.1'
-    // core-ui in order to access `ViewPager` (does not affect APK size)
     implementation 'com.android.support:support-core-ui:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:support-fragment:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta6'

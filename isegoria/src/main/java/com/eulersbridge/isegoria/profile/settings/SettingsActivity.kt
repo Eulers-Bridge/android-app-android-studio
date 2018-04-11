@@ -118,18 +118,10 @@ class SettingsActivity : DaggerAppCompatActivity() {
             .setAspectRatio(1, 1) // Force a square aspect ratio
             .setBackgroundColor(Color.BLACK)
             .setActivityTitle(getString(R.string.image_crop_title))
-
-            // Minimum size (pixels)
-            .setMinCropResultSize(150, 150)
-
-            // Maximum size (pixels)
-            .setMaxCropResultSize(1280, 1280)
-
-            //Dimensions (dp)
-            .setMinCropWindowSize(128, 128)
-
+            .setMinCropResultSize(150, 150) // Minimum size (pixels)
+            .setMaxCropResultSize(1280, 1280) // Maximum size (pixels)
+            .setMinCropWindowSize(128, 128) //Dimensions (dp)
             .setOutputCompressQuality(60)
-
             .start(this)
     }
 
@@ -150,9 +142,8 @@ class SettingsActivity : DaggerAppCompatActivity() {
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(backgroundImageView)
 
-        observe(viewModel.updateUserPhoto(imageUri)) { success ->
-            if (success != null)
-                changePhotoButton.isEnabled = true
+        observe(viewModel.updateUserPhoto(imageUri)) {
+            changePhotoButton.isEnabled = true
         }
     }
 
@@ -164,7 +155,11 @@ class SettingsActivity : DaggerAppCompatActivity() {
 
             when (resultCode) {
                 Activity.RESULT_OK -> updateUIWithImage(result.uri)
-                CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE -> result.error.printStackTrace()
+                Activity.RESULT_CANCELED -> changePhotoButton.isEnabled = true
+                CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE -> {
+                    changePhotoButton.isEnabled = true
+                    result.error.printStackTrace()
+                }
             }
         }
     }
