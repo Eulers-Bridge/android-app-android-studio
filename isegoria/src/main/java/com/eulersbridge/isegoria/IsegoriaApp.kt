@@ -81,7 +81,10 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
         createNotificationChannels()
 
         val login = login()
+        createLoginObserver(login)
+    }
 
+    private fun createLoginObserver(login: LiveData<Boolean>) {
         loginObserver = Observer { loginSuccess ->
             if (loginSuccess != null) {
                 if (loginSuccess == false) {
@@ -99,8 +102,7 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
 
     private fun startActivity(activityClass: KClass<*>) {
         val activityIntent = Intent(this, activityClass.java)
-        activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-
+        activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(activityIntent)
     }
 
@@ -215,7 +217,7 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
     fun login(email: String, password: String): LiveData<Boolean> {
         val login = networkService.login(email, password)
 
-        return Transformations.switchMap(login) { response ->
+        val liveData = Transformations.switchMap(login) { response ->
             if (response == null) {
                 SingleLiveData(false)
 
@@ -245,14 +247,17 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
                 SingleLiveData(false)
             }
         }
+
+        createLoginObserver(liveData)
+
+        return liveData
     }
 
     @SuppressLint("NewApi")
     fun logOut() {
         loggedInUser.value = null
 
-        networkService.email = null
-        networkService.password = null
+        networkService.setUserCredentials(null, null)
 
         securePreferences.edit {
             remove(USER_PASSWORD_KEY)

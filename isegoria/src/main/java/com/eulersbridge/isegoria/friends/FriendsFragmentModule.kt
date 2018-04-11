@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.friends
 import android.arch.lifecycle.ViewModelProvider
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -13,8 +13,8 @@ class FriendsFragmentModule {
     @Provides
     fun friendsViewModel(
         app: IsegoriaApp,
-        networkService: NetworkService
-    ): FriendsViewModel = FriendsViewModel(app, networkService.api)
+        api: API
+    ): FriendsViewModel = FriendsViewModel(app, api)
 
     @Provides
     fun provideFriendsViewModel(friendsViewModel: FriendsViewModel): ViewModelProvider.Factory

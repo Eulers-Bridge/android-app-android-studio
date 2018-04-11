@@ -6,28 +6,31 @@ import okhttp3.Response
 import java.io.IOException
 
 /**
- * For all methods that are not annotated with a "No Authentication" header,
- * add basic username/password credentials "Authorization" header.
+ * Adds a basic username/password credentials "Authorization" header to all Retrofit request methods
+ * that are not annotated with a "No Authentication" header.
  */
-internal class AuthenticationInterceptor(
-        private val username: String,
-        private val password: String
-) : Interceptor {
+class AuthenticationInterceptor : Interceptor {
 
-    private val base64EncodedCredentials: String by lazy {
+    companion object {
+        var username: String? = null
+        var password: String? = null
+    }
+
+    private fun getBase64EncodedCredentials(): String {
         val credentials = "$username:$password"
-        Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
+        return Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
     }
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
 
         var request = chain.request()
+        val haveCreds = username != null && password != null
 
-        if (request.header("No-Authentication") == null)
+        if (request.header("No-Authentication") == null && haveCreds)
             request = request.newBuilder()
                     .removeHeader("No-Authentication")
-                    .addHeader("Authorization", "Basic $base64EncodedCredentials")
+                    .addHeader("Authorization", "Basic ${getBase64EncodedCredentials()}")
                     .build()
 
         return chain.proceed(request)

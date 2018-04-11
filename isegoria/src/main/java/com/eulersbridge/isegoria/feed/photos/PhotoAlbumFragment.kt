@@ -8,9 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
 import com.eulersbridge.isegoria.onSuccess
@@ -21,7 +20,7 @@ import javax.inject.Inject
 class PhotoAlbumFragment : Fragment() {
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     private val adapter: PhotoAdapter = PhotoAdapter()
     private var album: PhotoAlbum? = null
@@ -52,9 +51,7 @@ class PhotoAlbumFragment : Fragment() {
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(thumbnailImageView)
 
-            val app: IsegoriaApp? = activity?.application as? IsegoriaApp
-
-            networkService.api.getAlbumPhotos(it.id).onSuccess {
+            api.getAlbumPhotos(it.id).onSuccess {
                 setPhotos(it.photos)
             }
         }

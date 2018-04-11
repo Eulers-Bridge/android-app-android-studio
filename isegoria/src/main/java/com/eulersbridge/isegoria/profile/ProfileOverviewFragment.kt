@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Contact
 import com.eulersbridge.isegoria.network.api.models.GenericUser
 import com.eulersbridge.isegoria.network.api.models.User
@@ -33,7 +33,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     private lateinit var taskAdapter: TaskAdapter
 
@@ -77,7 +77,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         if (user != null)
             viewModel.setUser(user)
 
-        taskAdapter = TaskAdapter(Glide.with(this), networkService.api)
+        taskAdapter = TaskAdapter(Glide.with(this), api)
 
         friendsCountTextView.setOnClickListener({  viewModel.viewFriends() })
         friendsLabel.setOnClickListener({  viewModel.viewFriends() })

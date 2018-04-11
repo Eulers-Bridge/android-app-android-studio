@@ -8,24 +8,22 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.SNS_PLATFORM_APPLICATION_ARN
+import com.eulersbridge.isegoria.addAppHeaders
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
-import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
-import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter
-import com.eulersbridge.isegoria.network.adapters.TimestampAdapter
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.responses.LoginResponse
+import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.google.firebase.iid.FirebaseInstanceId
-import com.squareup.moshi.Moshi
-import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import java.util.*
 import javax.inject.Singleton
@@ -33,112 +31,21 @@ import javax.inject.Singleton
 @Singleton
 class NetworkService constructor(
     private val app: IsegoriaApp,
-    private val appContext: Context
+    private val appContext: Context,
+    private val httpClient: OkHttpClient,
+    private val api: API,
+    private val networkConfig: NetworkConfig
 ) {
 
-    companion object {
-        private const val SERVER_URL = "http://54.79.70.241:8080/dbInterface/api/"
-        private const val S3_PICTURES_BUCKET_NAME = "isegoriauserpics"
-        private const val S3_PICTURES_PATH = "https://s3.amazonaws.com/isegoriauserpics/"
+    private var email: String? = null
+    private var password: String? = null
 
-        private var apiBaseURL = SERVER_URL
-        private val moshiConverterFactory: MoshiConverterFactory
-        private var needsSetup = true
+    fun setUserCredentials(email: String?, password: String?) {
+        this.email = email
+        this.password = password
 
-        init {
-            val moshi = Moshi.Builder()
-                .add(LenientLongAdapter())
-                .add(NullPrimitiveAdapter())
-                .add(TimestampAdapter())
-                .build()
-
-            moshiConverterFactory = MoshiConverterFactory.create(moshi)
-        }
-    }
-
-    private lateinit var httpClient: OkHttpClient
-    internal lateinit var api: API
-
-    internal var email: String? = null
-    internal var password: String? = null
-
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        if (needsSetup) {
-            createHttpClient()
-            createAPI()
-        }
-    }
-
-    private fun createAPI() {
-        val retrofit = Retrofit.Builder()
-            .client(httpClient)
-            .baseUrl(apiBaseURL)
-            .addConverterFactory(UnwrapConverterFactory())
-            .addConverterFactory(moshiConverterFactory)
-            .build()
-
-        api = retrofit.create(API::class.java)
-    }
-
-    private fun Request.Builder.addAppHeaders()
-     = this.addHeader("Accept", "application/json")
-            .addHeader("Content-Type", "application/json")
-            .addHeader("User-Agent", "IsegoriaApp Android")
-
-    private fun createHttpClient() {
-        // Force caching of GET requests for 1 minute, or 5 minutes if no network connection.
-        val interceptor = Interceptor { chain ->
-            val request = chain.request()
-            val response = chain.proceed(request)
-
-            if (request.method() == "GET") {
-                val cacheHeaderValue = if (appContext.isNetworkAvailable())
-                    "public, max-age=60" // 60 seconds / 1 minute
-                else
-                    "public, only-if-cached, max-stale=300" // 300 seconds / 5 minutes
-
-                response.newBuilder()
-                    .removeHeader("Pragma")
-                    .removeHeader("Cache-Control")
-                    .header("Cache-Control", cacheHeaderValue)
-                    .build()
-            }
-
-            response
-        }
-
-        val cacheSize = 40 * 1024 * 1024 // Maximum cache size of 40 MiB
-        val cache = Cache(File(appContext.cacheDir, "network"), cacheSize.toLong())
-
-        val httpClientBuilder = OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
-                    .addAppHeaders()
-
-                chain.proceed(request.build())
-            }
-            .addInterceptor(interceptor)
-            .addNetworkInterceptor(interceptor)
-            .cache(cache)
-
-        if (BuildConfig.DEBUG) {
-            val logging = HttpLoggingInterceptor()
-            logging.level = HttpLoggingInterceptor.Level.BASIC
-
-//            For more detailed debug logging, uncomment the following line:
-//            logging.level = HttpLoggingInterceptor.Level.BODY
-
-            httpClientBuilder.addInterceptor(logging)
-        }
-
-        if (!password.isNullOrBlank())
-            httpClientBuilder.addInterceptor(AuthenticationInterceptor(email!!, password!!))
-
-        httpClient = httpClientBuilder.build()
+        if (email.isNullOrBlank() && password.isNullOrBlank())
+            networkConfig.resetBaseUrl()
     }
 
     // Updates the base URL of the API by fetching the API root for the user's institution
@@ -155,11 +62,7 @@ class NetworkService constructor(
                             it.name == institutionName && !it.apiRoot.isNullOrBlank()
 
                         }?.apiRoot?.let {
-                            apiBaseURL = it + "api/"
-
-                            // Recreate the API with the new base URL
-                            //createAPI(institution.apiRoot)
-                            createAPI()
+                            networkConfig.baseUrl = it + "api/"
 
                             app.setLoggedInUser(user, password!!)
                         }
@@ -172,9 +75,9 @@ class NetworkService constructor(
     fun login(email: String, password: String): LiveData<LoginResponse?> {
         this.email = email
         this.password = password
-        needsSetup = true
 
-        setup()
+        AuthenticationInterceptor.username = email
+        AuthenticationInterceptor.password = password
 
         val deviceToken = FirebaseInstanceId.getInstance().token
 
@@ -197,16 +100,16 @@ class NetworkService constructor(
 
         try {
             jsonObject = jsonObjectOf(
-                "email" to user.email,
-                "givenName" to user.givenName,
-                "familyName" to user.familyName,
-                "gender" to user.gender,
-                "nationality" to user.nationality,
-                "yearOfBirth" to user.yearOfBirth,
-                "accountVerified" to user.accountVerified.toString(),
-                "password" to user.password,
-                "institutionId" to user.institutionId.toString(),
-                "hasPersonality" to user.hasPersonality.toString()
+                    "email" to user.email,
+                    "givenName" to user.givenName,
+                    "familyName" to user.familyName,
+                    "gender" to user.gender,
+                    "nationality" to user.nationality,
+                    "yearOfBirth" to user.yearOfBirth,
+                    "accountVerified" to user.accountVerified.toString(),
+                    "password" to user.password,
+                    "institutionId" to user.institutionId.toString(),
+                    "hasPersonality" to user.hasPersonality.toString()
             )
 
         } catch (e: JSONException) {
@@ -218,7 +121,7 @@ class NetworkService constructor(
         val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
-            .url(SERVER_URL + "signUp")
+            .url(networkConfig.baseUrl + "signUp")
             .addAppHeaders()
             .post(requestBody)
             .build()
@@ -258,11 +161,11 @@ class NetworkService constructor(
         val key = "${UUID.randomUUID()}.$imageFileExtension"
 
         val transfer =
-            AWSTransferLiveData(transferUtility.upload(S3_PICTURES_BUCKET_NAME, key, imageFile))
+            AWSTransferLiveData(transferUtility.upload(networkConfig.s3PicturesBucketName, key, imageFile))
 
         return Transformations.switchMap(transfer) {
             if (it == TransferState.COMPLETED) {
-                updateDisplayPicturePhoto(S3_PICTURES_PATH + key)
+                updateDisplayPicturePhoto(networkConfig.s3PicturesPath + key)
             } else {
                 SingleLiveData(false)
             }
@@ -270,21 +173,19 @@ class NetworkService constructor(
     }
 
     private fun updateDisplayPicturePhoto(pictureURL: String): LiveData<Boolean> {
-        setup()
-
         val timestamp = System.currentTimeMillis() / 1000L
         val loggedInUser = app.loggedInUser.value ?: return SingleLiveData(false)
 
         lateinit var jsonObject: JSONObject
         try {
             jsonObject = jsonObjectOf(
-                "url" to pictureURL,
-                "thumbNailUrl" to pictureURL,
-                "title" to "Profile Picture",
-                "description" to "Profile Picture",
-                "date" to timestamp.toString(),
-                "ownerId" to loggedInUser.email,
-                "sequence" to "0"
+                    "url" to pictureURL,
+                    "thumbNailUrl" to pictureURL,
+                    "title" to "Profile Picture",
+                    "description" to "Profile Picture",
+                    "date" to timestamp.toString(),
+                    "ownerId" to loggedInUser.email,
+                    "sequence" to "0"
             )
 
         } catch (e: JSONException) {
@@ -296,7 +197,7 @@ class NetworkService constructor(
         val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
-            .url(apiBaseURL + "photo")
+            .url(networkConfig.baseUrl + "photo")
             .addAppHeaders()
             .post(requestBody)
             .build()

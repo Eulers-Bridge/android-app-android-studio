@@ -9,16 +9,17 @@ import androidx.core.net.toFile
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import java.io.File
 import javax.inject.Inject
 
 class SettingsViewModel
 @Inject constructor(
     private val app: IsegoriaApp,
+    private val api: API,
     private val networkService: NetworkService
 ) : ViewModel() {
 
@@ -57,7 +58,7 @@ class SettingsViewModel
         if (user != null) {
             val userSettings = UserSettings(user.trackingOff, isChecked)
 
-            networkService.api.updateUserDetails(user.email, userSettings).enqueue({
+            api.updateUserDetails(user.email, userSettings).enqueue({
                 if (it.isSuccessful) {
                     optOutDataCollectionSwitchChecked.value = isChecked
                     optOutDataCollectionSwitchEnabled.value = true
@@ -79,7 +80,7 @@ class SettingsViewModel
         if (user != null) {
             val userSettings = UserSettings(isChecked, user.isOptedOutOfDataCollection)
 
-            networkService.api.updateUserDetails(user.email, userSettings).enqueue({
+            api.updateUserDetails(user.email, userSettings).enqueue({
                 if (it.isSuccessful) {
                     doNotTrackSwitchChecked.value = isChecked
 
@@ -104,7 +105,7 @@ class SettingsViewModel
             val user = app.loggedInUser.value
 
             if (user != null) {
-                val photosRequest = RetrofitLiveData(networkService.api.getPhotos(user.email))
+                val photosRequest = RetrofitLiveData(api.getPhotos(user.email))
 
                 userPhoto = Transformations.switchMap(photosRequest) { response ->
                     return@switchMap SingleLiveData(response?.photos?.firstOrNull())

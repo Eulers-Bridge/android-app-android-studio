@@ -20,7 +20,6 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.ifTrue
-import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
@@ -66,7 +65,6 @@ class LoginFragment : Fragment() {
 
     override fun onDestroy() {
         viewModel.onExit()
-
         super.onDestroy()
     }
 
@@ -146,9 +144,8 @@ class LoginFragment : Fragment() {
     }
 
     private fun onLoginClicked() {
-        observe(viewModel.login()) { success ->
-            if (success == true)
-                authViewModel.userLoggedIn.value = true
+        ifTrue(viewModel.login()) {
+            authViewModel.userLoggedIn.value = true
         }
     }
 

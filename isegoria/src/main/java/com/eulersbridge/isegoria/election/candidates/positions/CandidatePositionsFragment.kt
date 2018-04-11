@@ -13,7 +13,7 @@ import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
@@ -27,7 +27,7 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
     internal lateinit var app: IsegoriaApp
 
     @Inject
-    internal lateinit var networkService: NetworkService
+    internal lateinit var api: API
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -41,7 +41,7 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
                 .transform(TintTransformation())
         )
 
-        PositionAdapter(glide, networkService.api, this)
+        PositionAdapter(glide, api, this)
     }
 
     override fun onCreateView(
@@ -54,10 +54,10 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
         positionsGridView.adapter = adapter
 
         app.loggedInUser.value?.institutionId?.let { institutionId ->
-            networkService.api.getElections(institutionId).onSuccess { elections ->
+            api.getElections(institutionId).onSuccess { elections ->
 
                 elections.firstOrNull()?.also {
-                    networkService.api.getElectionPositions(it.id).onSuccess { positions ->
+                    api.getElectionPositions(it.id).onSuccess { positions ->
                         setPositions(positions)
                     }
                 }

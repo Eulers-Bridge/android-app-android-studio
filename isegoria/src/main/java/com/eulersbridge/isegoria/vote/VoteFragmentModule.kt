@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.vote
 import android.arch.lifecycle.ViewModelProvider
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -13,8 +13,8 @@ class VoteFragmentModule {
     @Provides
     fun voteViewModel(
         app: IsegoriaApp,
-        networkService: NetworkService
-    ): VoteViewModel = VoteViewModel(app.loggedInUser, networkService.api)
+        api: API
+    ): VoteViewModel = VoteViewModel(app.loggedInUser, api)
 
     @Provides
     fun provideVoteViewModel(voteViewModel: VoteViewModel): ViewModelProvider.Factory

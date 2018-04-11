@@ -20,7 +20,7 @@ import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import dagger.android.support.AndroidSupportInjection
@@ -40,7 +40,7 @@ class CandidateAllFragment : Fragment() {
     internal lateinit var app: IsegoriaApp
 
     @Inject
-    internal lateinit var networkService: NetworkService
+    internal lateinit var api: API
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -76,9 +76,9 @@ class CandidateAllFragment : Fragment() {
         })
 
         app.loggedInUser.value?.institutionId?.let {
-            networkService.api.getElections(it).onSuccess { elections ->
+            api.getElections(it).onSuccess { elections ->
                 elections.firstOrNull()?.let {
-                    networkService.api.getElectionCandidates(it.id).onSuccess { candidates ->
+                    api.getElectionCandidates(it.id).onSuccess { candidates ->
                         addCandidates(candidates)
                     }
                 }
@@ -157,7 +157,7 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        networkService.api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.getPhotoUrl())
@@ -166,7 +166,7 @@ class CandidateAllFragment : Fragment() {
             }
         }
 
-        networkService.api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.getPhotoUrl())
@@ -217,7 +217,7 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        networkService.api.getTicket(candidate.ticketId).onSuccess {
+        api.getTicket(candidate.ticketId).onSuccess {
             it.let { ticket ->
                 textViewParty.text = ticket.code
                 textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
@@ -268,7 +268,7 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        networkService.api.getPosition(candidate.positionId).onSuccess {
+        api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 

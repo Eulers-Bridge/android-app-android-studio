@@ -21,7 +21,7 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.CandidateTicket
 import com.eulersbridge.isegoria.network.api.models.Election
 import dagger.android.support.AndroidSupportInjection
@@ -37,7 +37,7 @@ class CandidateTicketFragment : Fragment() {
     lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     private var dpWidth: Float = 0.toFloat()
 
@@ -54,7 +54,7 @@ class CandidateTicketFragment : Fragment() {
     private val electionsCallback = object : Callback<List<Election>> {
         override fun onResponse(call: Call<List<Election>>, response: Response<List<Election>>) {
             response.body()?.firstOrNull()?.let {
-                networkService.api.getTickets(it.id).enqueue(ticketsCallback)
+                api.getTickets(it.id).enqueue(ticketsCallback)
             }
         }
 
@@ -92,7 +92,7 @@ class CandidateTicketFragment : Fragment() {
         dpWidth = displayMetrics.widthPixels / displayMetrics.density
 
         app.loggedInUser.value?.institutionId?.let {
-            networkService.api.getElections(it).enqueue(electionsCallback)
+            api.getElections(it).enqueue(electionsCallback)
         }
 
         return rootView

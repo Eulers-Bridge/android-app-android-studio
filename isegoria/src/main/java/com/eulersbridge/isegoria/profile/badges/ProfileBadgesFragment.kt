@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.ProfileViewModel
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -27,7 +27,7 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     private lateinit var badgeAdapter: BadgeAdapter
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -55,7 +55,7 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        badgeAdapter = BadgeAdapter(GlideApp.with(this), networkService.api)
+        badgeAdapter = BadgeAdapter(GlideApp.with(this), api)
 
         badgesGridView.apply {
             adapter = badgeAdapter

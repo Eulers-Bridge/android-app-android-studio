@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.models.UserPersonality

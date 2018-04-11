@@ -20,7 +20,7 @@ import android.widget.ProgressBar
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Task
 import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -34,7 +34,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
     lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
@@ -73,7 +73,6 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         )
 
         val glide = GlideApp.with(this)
-        val api = networkService.api
 
         completedAdapter = TaskAdapter(glide, api)
         remainingAdapter = TaskAdapter(glide, api)

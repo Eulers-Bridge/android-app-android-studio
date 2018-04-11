@@ -13,7 +13,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -30,7 +30,7 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
     lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     private val adapter = PhotoAlbumAdapter(this)
     private var fetchedPhotos = false
@@ -75,7 +75,7 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
         if (user?.institutionId != null) {
 
             if (user.newsFeedId == 0L) {
-                networkService.api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { response ->
+                api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { response ->
                     val updatedUser = user.copy()
                     updatedUser.newsFeedId = response.newsFeedId
                     app.updateLoggedInUser(updatedUser)

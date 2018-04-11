@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.feed.events.detail
 
 import android.arch.lifecycle.ViewModelProvider
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -10,10 +10,7 @@ import dagger.Provides
 class EventDetailModule {
 
     @Provides
-    fun eventDetailViewModel(
-        networkService: NetworkService
-    ): EventDetailViewModel =
-        EventDetailViewModel(networkService.api)
+    fun eventDetailViewModel(api: API): EventDetailViewModel = EventDetailViewModel(api)
 
     @Provides
     fun provideEventDetailViewModel(eventDetailViewModel: EventDetailViewModel): ViewModelProvider.Factory

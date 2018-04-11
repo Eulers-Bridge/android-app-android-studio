@@ -26,7 +26,7 @@ class PollVoteViewModel
     internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) { thePoll ->
 
         return@switchMap if (thePoll.creator == null && !thePoll.creatorEmail.isNullOrBlank()) {
-            RetrofitLiveData(api.getContact(thePoll.creatorEmail!!)) as RetrofitLiveData<Contact?>
+            RetrofitLiveData(api.getContact(thePoll.creatorEmail!!))
 
         } else {
             SingleLiveData(thePoll?.creator)

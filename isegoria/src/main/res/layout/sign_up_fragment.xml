@@ -59,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/white"
+            android:inputType="textPersonName"
             android:hint="@string/user_sign_up_first_name_hint"
             android:maxLines="1"
             android:minHeight="40dp"
@@ -83,6 +84,7 @@
             app:layout_constraintStart_toStartOf="@id/guidelineStart"
             android:layout_marginTop="1dp"
             android:background="@color/white"
+            android:inputType="textPersonName"
             android:hint="@string/user_sign_up_last_name_hint"
             android:minHeight="40dp"
             android:paddingLeft="8dp"
@@ -90,7 +92,8 @@
             android:paddingRight="8dp"
             android:paddingEnd="8dp"
             android:maxLines="1"
-            android:textColor="@color/grey" />
+            android:textColor="@color/grey"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/email"
@@ -109,7 +112,8 @@
             android:paddingEnd="8dp"
             android:maxLines="1"
             android:textColor="@color/grey"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/newPassword"
@@ -128,7 +132,8 @@
             android:paddingRight="8dp"
             android:paddingEnd="8dp"
             android:maxLines="1"
-            android:textColor="@color/grey" />
+            android:textColor="@color/grey"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/confirmNewPassword"
@@ -147,7 +152,8 @@
             android:paddingRight="8dp"
             android:paddingEnd="8dp"
             android:maxLines="1"
-            android:textColor="@color/grey" />
+            android:textColor="@color/grey"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/gender"
@@ -164,7 +170,8 @@
             android:paddingStart="8dp"
             android:paddingRight="8dp"
             android:paddingEnd="8dp"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:importantForAutofill="no" />
 
         <Spinner
             android:id="@+id/birthYearSpinner"

@@ -11,8 +11,6 @@ interface API {
     @GET("general-info")
     fun getGeneralInfo(): Call<GeneralInfoResponse>
 
-
-    // Note: Specifying a full absolute path ignores Retrofit's base API URL
     @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
     fun getInstitutionURLs(): Call<List<ClientInstitution>>
 
@@ -68,7 +66,7 @@ interface API {
 
 
     @GET("contact/{userEmail}/")
-    fun getContact(@Path("userEmail") userEmail: String): Call<Contact>
+    fun getContact(@Path("userEmail") userEmail: String): Call<Contact?>
 
     @POST("user/{userEmail}/contactRequest/{targetUserEmail}")
     fun addFriend(@Path("userEmail") userEmail: String, @Path("targetUserEmail") targetUserEmail: String): Call<Void>

@@ -24,7 +24,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
@@ -46,7 +46,7 @@ class CandidateTicketDetailFragment : Fragment() {
     lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var api: API
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -92,11 +92,11 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        networkService.api.getTicketCandidates(ticketId).onSuccess { candidates ->
+        api.getTicketCandidates(ticketId).onSuccess { candidates ->
             addCandidates(candidates)
         }
 
-        networkService.api.getPhotos(ticketId).onSuccess {
+        api.getPhotos(ticketId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
@@ -105,7 +105,7 @@ class CandidateTicketDetailFragment : Fragment() {
             }
         }
 
-        networkService.api.getUserSupportedTickets(app.loggedInUser.value!!.email).onSuccess {
+        api.getUserSupportedTickets(app.loggedInUser.value!!.email).onSuccess {
             it.singleOrNull { ticket ->
                 ticket.id == ticketId
 
@@ -125,7 +125,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             if (ticketSupportButton.text == supportStr) {
 
-                networkService.api.supportTicket(ticketId, userEmail).enqueue()
+                api.supportTicket(ticketId, userEmail).enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
@@ -133,7 +133,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             } else if (ticketSupportButton.text == unsupportStr) {
 
-                networkService.api.unsupportTicket(ticketId, userEmail).enqueue()
+                api.unsupportTicket(ticketId, userEmail).enqueue()
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
@@ -183,7 +183,7 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        networkService.api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).onSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
@@ -266,7 +266,7 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        networkService.api.getPosition(candidate.positionId).onSuccess {
+        api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 

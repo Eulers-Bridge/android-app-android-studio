@@ -19,7 +19,7 @@ import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
-import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.onSuccess
@@ -32,7 +32,7 @@ class CandidatePositionFragment : Fragment() {
     private var dpWidth: Float = 0.toFloat()
 
     @Inject
-    internal lateinit var networkService: NetworkService
+    internal lateinit var api: API
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -56,7 +56,7 @@ class CandidatePositionFragment : Fragment() {
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         position?.id?.let { positionId ->
-            networkService.api.getPositionCandidates(positionId).onSuccess { candidates ->
+            api.getPositionCandidates(positionId).onSuccess { candidates ->
                 addCandidates(candidates)
             }
         }
@@ -98,7 +98,7 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        networkService.api.getPhoto(candidate.userId).onSuccess {
+        api.getPhoto(candidate.userId).onSuccess {
             GlideApp.with(this@CandidatePositionFragment)
                 .load(it.getPhotoUrl())
                 .transition(DrawableTransitionOptions.withCrossFade())
@@ -142,7 +142,7 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        networkService.api.getTicket(candidate.ticketId).onSuccess {
+        api.getTicket(candidate.ticketId).onSuccess {
             textViewParty.text = it.code
             textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
         }
@@ -178,7 +178,7 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        networkService.api.getPosition(candidate.positionId).onSuccess {
+        api.getPosition(candidate.positionId).onSuccess {
             textViewPosition.text = it.name
         }
 

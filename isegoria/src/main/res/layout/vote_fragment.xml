@@ -86,7 +86,8 @@
         android:focusable="false"
         android:longClickable="false"
         tools:ignore="TextFields"
-        tools:text="11:15 AM" />
+        tools:text="11:15 AM"
+        android:importantForAutofill="no" />
 
     <EditText
         android:id="@+id/dateTextView"
@@ -106,7 +107,8 @@
         android:focusable="false"
         android:longClickable="false"
         tools:ignore="TextFields"
-        tools:text="October 26" />
+        tools:text="October 26"
+        android:importantForAutofill="no" />
 
     <Button
         android:id="@+id/completeButton"

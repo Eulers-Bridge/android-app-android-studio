@@ -1,5 +1,7 @@
 package com.eulersbridge.isegoria.auth
 
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,12 +18,33 @@ import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
+import com.eulersbridge.isegoria.network.NetworkService
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.DaggerAppCompatActivity
+import javax.inject.Inject
 
 class AuthActivity : DaggerAppCompatActivity() {
 
+    @Inject
+    lateinit var api: API
+
+    @Inject
+    lateinit var networkService: NetworkService
+
     private lateinit var viewModel: AuthViewModel
+
+    private class ViewModelProviderFactory(
+            private val api: API,
+            private val networkService: NetworkService
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return AuthViewModel(api, networkService) as T
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +61,7 @@ class AuthActivity : DaggerAppCompatActivity() {
                     }
                 })
 
-        viewModel = ViewModelProviders.of(this)[AuthViewModel::class.java]
+        viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(api, networkService))[AuthViewModel::class.java]
 
         presentRootContent(LoginFragment())
 

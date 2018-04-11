@@ -9,24 +9,24 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class Photo(
-    @field:Json(name = "nodeId")
+        @field:Json(name = "nodeId")
     val id: Int = 0,
 
-    val title: String?,
-    val description: String?,
+        val title: String?,
+        val description: String?,
 
-    val url: String?,
+        private val url: String?,
 
-    @field:Json(name = "thumbNailUrl")
-    val thumbnailUrl: String?,
+        @field:Json(name = "thumbNailUrl")
+        private val thumbnailUrl: String?,
 
-    @Timestamp
+        @Timestamp
     val date: Long = 0,
 
-    @field:Json(name = "numOfLikes")
+        @field:Json(name = "numOfLikes")
     val likeCount: Int = 0,
 
-    @field:Json(name = "inappropriateContent")
+        @field:Json(name = "inappropriateContent")
     val hasInappropriateContent: Boolean = false
 ) : Parcelable {
     internal fun getPhotoUrl(): String? {

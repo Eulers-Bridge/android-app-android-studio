@@ -74,8 +74,8 @@ class ProfileViewModel
         val (_, _, email) = getUser() ?: return
 
         api.getContact(email).onSuccess {
-            contactsCount.value = it.contactsCount
-            totalTasksCount.value = it.totalTasksCount
+            contactsCount.value = it?.contactsCount
+            totalTasksCount.value = it?.totalTasksCount
         }
     }
 
