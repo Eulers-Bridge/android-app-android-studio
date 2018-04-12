@@ -63,12 +63,13 @@
         android:id="@+id/gridView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         android:layoutAnimation="@anim/layout_animation_fade_in"
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="4" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
+        app:spanCount="4"
+        tools:listitem="@layout/photo_grid_item" />
 
 </android.support.constraint.ConstraintLayout>

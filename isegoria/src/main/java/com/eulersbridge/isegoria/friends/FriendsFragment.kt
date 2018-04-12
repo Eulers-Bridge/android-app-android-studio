@@ -155,7 +155,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
             // Show accept/reject dialog
             context?.let {
                 AlertDialog.Builder(it)
-                    .setTitle(getString(R.string.friend_request_action_dialog_title) + request.requester!!.fullName)
+                    .setTitle(getString(R.string.friend_request_action_dialog_title, request.requester!!.fullName))
                     .setPositiveButton(
                         R.string.friend_request_action_dialog_positive
                     ) { _, _ -> acceptFriendRequest(request) }

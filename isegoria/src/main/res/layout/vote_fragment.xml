@@ -85,7 +85,7 @@
         android:focusableInTouchMode="false"
         android:focusable="false"
         android:longClickable="false"
-        tools:ignore="TextFields"
+        tools:ignore="LabelFor,TextFields"
         tools:text="11:15 AM"
         android:importantForAutofill="no" />
 
@@ -106,7 +106,7 @@
         android:focusableInTouchMode="false"
         android:focusable="false"
         android:longClickable="false"
-        tools:ignore="TextFields"
+        tools:ignore="LabelFor,TextFields"
         tools:text="October 26"
         android:importantForAutofill="no" />
 

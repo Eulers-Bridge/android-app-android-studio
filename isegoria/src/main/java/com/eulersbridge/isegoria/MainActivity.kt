@@ -134,10 +134,8 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                     }
                 }
 
-                if (handledShortcut) {
-                    val shortcutManager: ShortcutManager = systemService<ShortcutManager>()
-                    shortcutManager.reportShortcutUsed(it)
-                }
+                if (handledShortcut)
+                    systemService<ShortcutManager>().reportShortcutUsed(it)
             }
         }
 

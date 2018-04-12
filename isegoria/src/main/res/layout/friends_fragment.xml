@@ -29,16 +29,29 @@
             android:id="@+id/searchResultsList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendsSearchLabel"
-            android:layoutAnimation="@anim/layout_animation_fade_in"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            tools:listitem="@layout/friend_partial_list_item" />
+
+        <!-- Divider -->
+        <View
+            android:id="@+id/friendsDivider1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="#E0E0E0"
+            app:layout_constraintBottom_toTopOf="@+id/receivedRequestsLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchResultsList" />
 
         <android.support.constraint.Group
             android:id="@+id/searchContainer"
@@ -46,7 +59,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone"
             tools:visibility="visible"
-            app:constraint_referenced_ids="friendsSearchLabel,friendsSearchList" />
+            app:constraint_referenced_ids="friendsSearchLabel,searchResultsList,friendsDivider1" />
 
         <TextView
             android:id="@+id/receivedRequestsLabel"
@@ -61,25 +74,28 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/receivedRequestsList"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/searchResultsList" />
+            app:layout_constraintTop_toBottomOf="@+id/friendsDivider1" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/receivedRequestsList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/receivedRequestsLabel"
-            android:layoutAnimation="@anim/layout_animation_fade_in"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+            tools:listitem="@layout/friend_partial_list_item" />
 
         <!-- Divider -->
         <View
             android:id="@+id/friendsDivider2"
             android:layout_width="0dp"
             android:layout_height="1dp"
+            android:layout_marginTop="16dp"
             android:background="#E0E0E0"
             app:layout_constraintBottom_toTopOf="@+id/sentRequestsLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -101,35 +117,36 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            app:layout_goneMarginTop="0dp"
             android:text="@string/friends_subheading_friend_requests_sent"
             android:textColor="#ff575757"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/sentRequestsList"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friendsDivider3" />
+            app:layout_constraintTop_toBottomOf="@+id/friendsDivider2" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/sentRequestsList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sentRequestsLabel"
-            android:layoutAnimation="@anim/layout_animation_fade_in"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+            tools:listitem="@layout/friend_partial_list_item" />
 
         <!-- Divider -->
         <View
             android:id="@+id/friendsDivider3"
             android:layout_width="0dp"
             android:layout_height="1dp"
+            android:layout_marginTop="16dp"
             android:background="#E0E0E0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -141,7 +158,7 @@
             android:layout_width="wrap_content"
             android:visibility="gone"
             tools:visibility="visible"
-            app:constraint_referenced_ids="sendRequestsLabel,sentRequestsList,friendsDivider3" />
+            app:constraint_referenced_ids="sentRequestsLabel,sentRequestsList,friendsDivider3" />
 
         <TextView
             android:id="@+id/friendsLabel"
@@ -161,15 +178,16 @@
             android:id="@+id/friendsList"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendsLabel"
-            android:layoutAnimation="@anim/layout_animation_fade_in"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"/>
+            tools:listitem="@layout/friend_partial_list_item" />
 
         <android.support.constraint.Group
             android:id="@+id/friendsContainer"
