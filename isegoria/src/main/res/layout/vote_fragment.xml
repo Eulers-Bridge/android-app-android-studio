@@ -86,7 +86,7 @@
         android:focusable="false"
         android:longClickable="false"
         tools:ignore="LabelFor,TextFields"
-        tools:text="11:15 AM"
+        tools:text="@tools:sample/date/hhmm"
         android:importantForAutofill="no" />
 
     <EditText

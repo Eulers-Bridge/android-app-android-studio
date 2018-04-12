@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendsSearchLabel"
-            tools:listitem="@layout/friend_partial_list_item" />
+            tools:listitem="@layout/friend_partial_list_item"/>
 
         <!-- Divider -->
         <View

@@ -10,7 +10,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:background="@drawable/tumblr_static_aphc"/>
+        tools:background="@tools:sample/backgrounds/scenic"/>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/detailsContainer"

@@ -36,7 +36,7 @@
             android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@id/creatorImageView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lorem ipsum question here?" />
+            tools:text="Lorem ipsum?" />
 
         <TextView
             android:id="@+id/creatorNameTextView"
