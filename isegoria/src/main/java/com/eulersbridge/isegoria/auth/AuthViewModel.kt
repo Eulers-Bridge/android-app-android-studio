@@ -2,13 +2,13 @@ package com.eulersbridge.isegoria.auth
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -51,11 +51,11 @@ class AuthViewModel @Inject constructor(api: API, private val networkService: Ne
             signUpUser.value = updatedUser
         }
 
-        return Transformations.switchMap(networkService.signUp(updatedUser)) { success ->
-            if (!success)
-                signUpUser.value = null
-
-            SingleLiveData(success)
-        }
+        return networkService.signUp(updatedUser)
+                .doOnSuccess { success ->
+                    if (!success)
+                        signUpUser.value = null
+                }
+                .toLiveData()
     }
 }

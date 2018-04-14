@@ -1,17 +1,18 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
-import android.app.*
-import android.arch.lifecycle.LiveData
+import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.Transformations
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.core.content.systemService
@@ -20,17 +21,18 @@ import com.eulersbridge.isegoria.inject.DaggerAppComponent
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.securepreferences.SecurePreferences
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import java.util.*
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
+class IsegoriaApp : MultiDexApplication(), HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
@@ -58,8 +60,6 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
     val userVerificationVisible = MutableLiveData<Boolean>()
     val friendsVisible = MutableLiveData<Boolean>()
 
-    private lateinit var loginObserver: Observer<Boolean>
-
     val savedUserEmail: String? by lazy { securePreferences.getString(USER_EMAIL_KEY, null) }
     val savedUserPassword: String? by lazy { securePreferences.getString(USER_PASSWORD_KEY, null) }
 
@@ -84,20 +84,14 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
         createLoginObserver(login)
     }
 
-    private fun createLoginObserver(login: LiveData<Boolean>) {
-        loginObserver = Observer { loginSuccess ->
-            if (loginSuccess != null) {
-                if (loginSuccess == false) {
-                    showLoginScreen()
-                } else {
-                    showMainActivity()
-                }
+    private fun createLoginObserver(loginSuccess: Single<Boolean>) {
+        loginSuccess.subscribeBy {
+            if (it) {
+                showMainActivity()
+            } else {
+                showLoginScreen()
             }
-
-            login.removeObserver(loginObserver)
         }
-
-        login.observeForever(loginObserver)
     }
 
     private fun startActivity(activityClass: KClass<*>) {
@@ -196,7 +190,7 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
         createAppShortcuts()
     }
 
-    fun login(): LiveData<Boolean> {
+    fun login(): Single<Boolean> {
         if (loggedInUser.value == null) {
             val email = savedUserEmail
             val password = savedUserPassword
@@ -207,50 +201,44 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
                 login(email!!, password!!)
 
             } else {
-                return SingleLiveData(false)
+                return Single.just(false)
             }
         }
 
-        return SingleLiveData(false)
+        return Single.just(false)
     }
 
-    fun login(email: String, password: String): LiveData<Boolean> {
-        val login = networkService.login(email, password)
+    fun login(email: String, password: String): Single<Boolean> {
+        val loginSuccess = networkService.login(email, password)
+                .map { response ->
+                    val user = response.user
+                    cachedLoginArticles = response.articles
 
-        val liveData = Transformations.switchMap(login) { response ->
-            if (response == null) {
-                SingleLiveData(false)
+                    if (user != null) {
+                        user.id = response.userId
 
-            } else {
-                val user = response.user
-                cachedLoginArticles = response.articles
+                        hideLoginScreen()
 
-                if (user != null) {
-                    user.id = response.userId
+                        if (user.accountVerified) {
+                            networkService.updateAPIBaseURL(user)
 
-                    hideLoginScreen()
+                        } else {
+                            hideLoginScreen()
+                            userVerificationVisible.value = true
+                        }
 
-                    if (user.accountVerified) {
-                        networkService.updateAPIBaseURL(user)
+                        return@map true
 
                     } else {
-                        hideLoginScreen()
-                        userVerificationVisible.value = true
+                        loginVisible.value = true
                     }
 
-                    return@switchMap SingleLiveData(true)
-
-                } else {
-                    loginVisible.value = true
+                    false
                 }
 
-                SingleLiveData(false)
-            }
-        }
+        createLoginObserver(loginSuccess)
 
-        createLoginObserver(liveData)
-
-        return liveData
+        return loginSuccess
     }
 
     @SuppressLint("NewApi")

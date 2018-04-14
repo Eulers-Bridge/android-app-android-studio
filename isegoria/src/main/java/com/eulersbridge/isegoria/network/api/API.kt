@@ -3,6 +3,8 @@ package com.eulersbridge.isegoria.network.api
 import com.eulersbridge.isegoria.network.Paginated
 import com.eulersbridge.isegoria.network.api.models.*
 import com.eulersbridge.isegoria.network.api.responses.*
+import io.reactivex.Completable
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -12,7 +14,7 @@ interface API {
     fun getGeneralInfo(): Call<GeneralInfoResponse>
 
     @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
-    fun getInstitutionURLs(): Call<List<ClientInstitution>>
+    fun getInstitutionURLs(): Single<List<ClientInstitution>>
 
     @Paginated
     @GET("contacts")
@@ -25,7 +27,7 @@ interface API {
 
 
     @GET("login")
-    fun login(@Query("topicArn") snsTopicArn: String, @Query("deviceToken") deviceToken: String): Call<LoginResponse?>
+    fun login(@Query("topicArn") snsTopicArn: String, @Query("deviceToken") deviceToken: String): Single<LoginResponse?>
 
     @GET("logout")
     fun logout(): Call<Void>
@@ -137,13 +139,13 @@ interface API {
     fun getPhotos(@Path("userEmail") userEmail: String): Call<PhotosResponse>
 
     @GET("photo/{photoId}/likes")
-    fun getPhotoLikes(@Path("photoId") photoId: Long): Call<List<Like>?>
+    fun getPhotoLikes(@Path("photoId") photoId: Long): Single<List<Like>?>
 
     @PUT("photo/{photoId}/likedBy/{userEmail}/")
-    fun likePhoto(@Path("photoId") photoId: Long, @Path("userEmail") userEmail: String): Call<LikeResponse>
+    fun likePhoto(@Path("photoId") photoId: Long, @Path("userEmail") userEmail: String): Single<LikeResponse>
 
     @DELETE("photo/{photoId}/likedBy/{userEmail}/")
-    fun unlikePhoto(@Path("photoId") photoId: Long, @Path("userEmail") userEmail: String): Call<Void>
+    fun unlikePhoto(@Path("photoId") photoId: Long, @Path("userEmail") userEmail: String): Completable
 
 
     @Paginated

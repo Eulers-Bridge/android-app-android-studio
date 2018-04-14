@@ -17,6 +17,7 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.io.File
 import javax.inject.Singleton
@@ -115,6 +116,7 @@ class AppModule {
             = Retrofit.Builder()
             .client(httpClient)
             .baseUrl(networkConfig.baseUrl)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
             .addConverterFactory(UnwrapConverterFactory())
             .addConverterFactory(moshi)
             .build()

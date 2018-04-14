@@ -5,5 +5,5 @@ import com.squareup.moshi.Json
 
 data class GeneralInfoResponse (
     @field:Json(name = "countrys")
-    val countries: List<Country>?
+    val countries: List<Country>
 )

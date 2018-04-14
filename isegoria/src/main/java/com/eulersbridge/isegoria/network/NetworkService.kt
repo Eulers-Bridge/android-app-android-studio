@@ -1,24 +1,19 @@
 package com.eulersbridge.isegoria.network
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
 import android.content.Context
 import com.amazonaws.auth.CognitoCachingCredentialsProvider
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.SNS_PLATFORM_APPLICATION_ARN
-import com.eulersbridge.isegoria.addAppHeaders
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.responses.LoginResponse
-import com.eulersbridge.isegoria.onSuccess
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.google.firebase.iid.FirebaseInstanceId
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -55,7 +50,7 @@ class NetworkService constructor(
             api.getInstitution(institutionId).onSuccess {
                 it.getName()?.let { institutionName ->
 
-                    api.getInstitutionURLs().onSuccess { urls ->
+                    api.getInstitutionURLs().observeOn(AndroidSchedulers.mainThread()).subscribe { urls ->
                         // Find the matching ClientInstitution, and use its `apiRoot`
 
                         urls.singleOrNull {
@@ -72,7 +67,7 @@ class NetworkService constructor(
         }
     }
 
-    fun login(email: String, password: String): LiveData<LoginResponse?> {
+    fun login(email: String, password: String): Single<LoginResponse?> {
         this.email = email
         this.password = password
 
@@ -81,11 +76,11 @@ class NetworkService constructor(
 
         val deviceToken = FirebaseInstanceId.getInstance().token
 
-        return if (deviceToken != null) {
-            RetrofitLiveData(api.login(SNS_PLATFORM_APPLICATION_ARN, deviceToken))
-
+        return if (deviceToken == null) {
+            Single.just(null)
         } else {
-            SingleLiveData(null)
+            api.login(SNS_PLATFORM_APPLICATION_ARN, deviceToken)
+                    .observeOn(AndroidSchedulers.mainThread())
         }
     }
 
@@ -94,7 +89,7 @@ class NetworkService constructor(
             put(key, value)
     }
 
-    fun signUp(user: SignUpUser): LiveData<Boolean> {
+    fun signUp(user: SignUpUser): Single<Boolean> {
 
         lateinit var jsonObject: JSONObject
 
@@ -114,7 +109,7 @@ class NetworkService constructor(
 
         } catch (e: JSONException) {
             e.printStackTrace()
-            return SingleLiveData(false)
+            return Single.just(false)
         }
 
         val json = MediaType.parse("application/json; charset=utf-8")
@@ -127,7 +122,7 @@ class NetworkService constructor(
             .build()
 
         // Create new HTTP client rather than using application's, as no auth is required
-        return OkHttpLiveData(OkHttpClient().newCall(request))
+        return httpClient.newCall(request).execute().toSingle()
     }
 
     private fun fileExtension(imageFile: File): String {
@@ -140,7 +135,7 @@ class NetworkService constructor(
         }
     }
 
-    fun uploadNewUserPhoto(imageFile: File): LiveData<Boolean> {
+    fun uploadNewUserPhoto(imageFile: File): Completable {
         val credentialsProvider = CognitoCachingCredentialsProvider(
             appContext, // Context,
             "715927704730",
@@ -160,21 +155,16 @@ class NetworkService constructor(
         val imageFileExtension = fileExtension(imageFile)
         val key = "${UUID.randomUUID()}.$imageFileExtension"
 
-        val transfer =
-            AWSTransferLiveData(transferUtility.upload(networkConfig.s3PicturesBucketName, key, imageFile))
+        val transfer = transferUtility.upload(networkConfig.s3PicturesBucketName, key, imageFile)
 
-        return Transformations.switchMap(transfer) {
-            if (it == TransferState.COMPLETED) {
-                updateDisplayPicturePhoto(networkConfig.s3PicturesPath + key)
-            } else {
-                SingleLiveData(false)
-            }
+        return transfer.toCompletable().doOnComplete {
+            updateDisplayPicturePhoto(networkConfig.s3PicturesPath + key)
         }
     }
 
-    private fun updateDisplayPicturePhoto(pictureURL: String): LiveData<Boolean> {
+    private fun updateDisplayPicturePhoto(pictureURL: String): Single<Boolean> {
         val timestamp = System.currentTimeMillis() / 1000L
-        val loggedInUser = app.loggedInUser.value ?: return SingleLiveData(false)
+        val loggedInUser = app.loggedInUser.value ?: return Single.just(false)
 
         lateinit var jsonObject: JSONObject
         try {
@@ -190,7 +180,7 @@ class NetworkService constructor(
 
         } catch (e: JSONException) {
             e.printStackTrace()
-            return SingleLiveData(false)
+            return Single.just(false)
         }
 
         val json = MediaType.parse("application/json; charset=utf-8")
@@ -202,6 +192,6 @@ class NetworkService constructor(
             .post(requestBody)
             .build()
 
-        return OkHttpLiveData(httpClient.newCall(request))
+        return httpClient.newCall(request).execute().toSingle()
     }
 }

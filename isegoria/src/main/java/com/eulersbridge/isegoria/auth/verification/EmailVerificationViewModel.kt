@@ -5,6 +5,7 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class EmailVerificationViewModel
         app.userVerificationVisible.value = false
     }
 
-    internal fun userVerified(): LiveData<Boolean> = app.login()
+    internal fun userVerified(): LiveData<Boolean> = app.login().toLiveData()
 
     internal fun resendVerification(): LiveData<Boolean> {
         return Transformations.switchMap(app.loggedInUser) {
@@ -31,6 +32,5 @@ class EmailVerificationViewModel
                 Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
             }
         }
-
     }
 }

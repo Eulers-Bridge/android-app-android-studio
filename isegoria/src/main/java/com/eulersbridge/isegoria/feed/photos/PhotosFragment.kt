@@ -42,7 +42,7 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
         refreshLayout.setOnRefreshListener {
             refreshLayout.isRefreshing = true
             refresh()
-            refreshLayout.postDelayed(6000) { refreshLayout.isRefreshing = false }
+            refreshLayout?.postDelayed(6000) { refreshLayout?.isRefreshing = false }
         }
 
         albumsListView.apply {

@@ -46,7 +46,7 @@ class EventsFragment : Fragment(), TitledFragment {
             refresh()
 
             refreshLayout.isRefreshing = true
-            refreshLayout.postDelayed(7000) { refreshLayout.isRefreshing = false }
+            refreshLayout?.postDelayed(7000) { refreshLayout?.isRefreshing = false }
         }
 
         refresh()

@@ -9,6 +9,7 @@ import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -57,16 +58,15 @@ class LoginViewModel
             } else {
                 networkError.value = false
 
-                // Not null as email & password validation checks test for null
-                val loginRequest = app.login(email.value!!, password.value!!)
+                // Email/password not null as validation checks for null
+                val loginSuccess = app.login(email.value!!, password.value!!).map { success ->
+                    if (!success)
+                        formEnabled.value = true
 
-                return Transformations.switchMap(loginRequest) { success ->
-                    if (success == true)
-                        return@switchMap SingleLiveData(true)
-
-                    formEnabled.value = true
-                    SingleLiveData(false)
+                    return@map success
                 }
+
+                return loginSuccess.toLiveData()
             }
         }
 

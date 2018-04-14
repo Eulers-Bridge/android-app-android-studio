@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.annotation.Px
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
 import android.util.TypedValue
@@ -55,21 +54,19 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.currentPhoto) {
+        observe(viewModel.getPhoto()) {
             userLikedCurrentPhoto = false
 
             runOnUiThread {
-                if (it != null) {
-                    titleTextView.text = it.title
+                titleTextView.text = it?.title
 
-                    val dateStr = it.date.toDateString(this)
-                    dateTextView.text = dateStr.toUpperCase()
+                val dateStr = it?.date?.toDateString(this)
+                dateTextView.text = dateStr?.toUpperCase()
 
-                    likesTextView.text = it.likeCount.toString()
+                likesTextView.text = it?.likeCount?.toString()
 
-                    @DrawableRes val flagImage = if (it.hasInappropriateContent) R.drawable.flag else R.drawable.flag_default
-                    flagImageView.setImageResource(flagImage)
-                }
+                @DrawableRes val flagImage = if (it?.hasInappropriateContent == true) R.drawable.flag else R.drawable.flag_default
+                flagImageView.setImageResource(flagImage)
             }
         }
 
@@ -77,10 +74,12 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
             runOnUiThread { likesTextView.text = it.toString() }
         }
 
-        ifTrue(viewModel.getPhotoLikedByUser()) {
+        observeBoolean(viewModel.getPhotoLikedByUser()) {
             runOnUiThread {
-                userLikedCurrentPhoto = true
-                starImageView.setImageResource(R.drawable.star)
+                userLikedCurrentPhoto = it
+
+                val starImage = if (it) R.drawable.star else R.drawable.star_default
+                starImageView.setImageResource(starImage)
             }
         }
     }
@@ -164,7 +163,7 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
                 view.isEnabled = true
 
                 if (success) {
-                    starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
+                    starImageView.setImageResource(R.drawable.star)
 
                     val likes = Integer.parseInt(likesTextView.text.toString()) + 1
                     likesTextView.text = likes.toString()
@@ -175,7 +174,7 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
                 view.isEnabled = true
 
                 if (success) {
-                    starImageView.colorFilter = null
+                    starImageView.setImageResource(R.drawable.star_default)
 
                     val likes = Integer.parseInt(likesTextView.text.toString()) - 1
                     likesTextView.text = likes.toString()

@@ -1,12 +1,15 @@
 package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.LiveDataReactiveStreams.fromPublisher
+import android.arch.lifecycle.LiveDataReactiveStreams.toPublisher
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject

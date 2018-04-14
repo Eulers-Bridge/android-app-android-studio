@@ -12,6 +12,7 @@ import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.UserSettings
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
@@ -116,8 +117,10 @@ class SettingsViewModel
         return userPhoto
     }
 
-    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> =
-        networkService.uploadNewUserPhoto(imageUri.toFile())
+    internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
+        val file = imageUri.toFile()
+        return networkService.uploadNewUserPhoto(file).toLiveData()
+    }
 
     override fun onCleared() {
         (userPhoto as? RetrofitLiveData)?.cancel()
