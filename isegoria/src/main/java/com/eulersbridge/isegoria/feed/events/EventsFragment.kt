@@ -32,7 +32,6 @@ class EventsFragment : Fragment(), TitledFragment {
         viewModel = ViewModelProviders.of(this, modelFactory)[EventsViewModel::class.java]
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,9 +54,7 @@ class EventsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "Events"
 
     private fun refresh() {
-        observe(viewModel.getEvents()) {
-            setEvents(it)
-        }
+        observe(viewModel.getEvents()) { setEvents(it) }
     }
 
     private fun setEvents(events: List<Event>?) {

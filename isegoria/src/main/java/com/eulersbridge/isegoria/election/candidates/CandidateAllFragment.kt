@@ -24,6 +24,8 @@ import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_all_fragment.*
 import javax.inject.Inject
 
@@ -42,6 +44,8 @@ class CandidateAllFragment : Fragment() {
     @Inject
     internal lateinit var api: API
 
+    private val compositeDisposable = CompositeDisposable()
+
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
@@ -59,6 +63,11 @@ class CandidateAllFragment : Fragment() {
         }
 
         return rootView
+    }
+
+    override fun onPause() {
+        super.onPause()
+        compositeDisposable.dispose()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -217,12 +226,12 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).onSuccess {
-            it.let { ticket ->
-                textViewParty.text = ticket.code
-                textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        api.getTicket(candidate.ticketId).subscribe { ticket ->
+            ticket.let { it ->
+                textViewParty.text = it.code
+                textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
             }
-        }
+        }.addTo(compositeDisposable)
 
         val rect = RectShape()
         val rectShapeDrawable = ShapeDrawable(rect)
@@ -268,9 +277,9 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).onSuccess {
-            textViewPosition.text = it.name
-        }
+        api.getPosition(candidate.positionId).subscribe { position ->
+            textViewPosition.text = position?.name
+        }.addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.apply {

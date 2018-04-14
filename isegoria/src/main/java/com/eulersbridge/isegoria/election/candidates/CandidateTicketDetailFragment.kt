@@ -29,6 +29,8 @@ import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.*
 import javax.inject.Inject
 
@@ -47,6 +49,8 @@ class CandidateTicketDetailFragment : Fragment() {
 
     @Inject
     lateinit var api: API
+
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -145,6 +149,11 @@ class CandidateTicketDetailFragment : Fragment() {
         partyNameTextView.text = ticketName
 
         return rootView
+    }
+
+    override fun onPause() {
+        super.onPause()
+        compositeDisposable.dispose()
     }
 
     private fun addCandidates(candidates: List<Candidate>) {
@@ -266,9 +275,9 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).onSuccess {
-            textViewPosition.text = it.name
-        }
+        api.getPosition(candidate.positionId).subscribe { position ->
+            textViewPosition.text = position?.name
+        }.addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.apply {

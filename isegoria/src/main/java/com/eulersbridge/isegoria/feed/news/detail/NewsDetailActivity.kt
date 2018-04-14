@@ -37,29 +37,26 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
         val article = intent.getParcelableExtra<NewsArticle>(ACTIVITY_EXTRA_NEWS_ARTICLE)
 
         viewModel = ViewModelProviders.of(this, modelFactory)[NewsDetailViewModel::class.java]
-        viewModel.newsArticle.value = article
-
+        viewModel.setNewsArticle(article)
         createViewModelObservers()
     }
 
     private fun createViewModelObservers() {
-        viewModel.apply {
-            observe(newsArticle) {
-                it?.let {
-                    populateUIWithArticle(it)
-                }
+        observe(viewModel.newsArticle) {
+            it?.let {
+                populateUIWithArticle(it)
             }
+        }
 
-            observe(articleLikeCount) {
-                runOnUiThread { likesTextView.text = it.toString() }
-            }
+        observe(viewModel.likeCount) {
+            runOnUiThread { likesTextView.text = it.toString() }
+        }
 
-            ifTrue(articleLikedByUser) {
-                runOnUiThread {
-                    userLikedArticle = true
-                    starImageView.setImageResource(R.drawable.star)
-                    starImageView.isEnabled = true
-                }
+        ifTrue(viewModel.likedByUser) {
+            runOnUiThread {
+                userLikedArticle = true
+                starImageView.setImageResource(R.drawable.star)
+                starImageView.isEnabled = true
             }
         }
     }

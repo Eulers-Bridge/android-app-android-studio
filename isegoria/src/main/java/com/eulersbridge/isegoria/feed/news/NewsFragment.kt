@@ -64,9 +64,7 @@ class NewsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "News"
 
     private fun refresh() {
-        observe(viewModel.newsArticles) {
-            setNewsArticles(it)
-        }
+        observe(viewModel.getNewsArticles()) { setNewsArticles(it) }
     }
 
     private fun setNewsArticles(articles: List<NewsArticle>?) {

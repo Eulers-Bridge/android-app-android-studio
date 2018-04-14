@@ -7,7 +7,7 @@ import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -17,30 +17,27 @@ class NewsViewModel
     private val api: API
 ) : ViewModel() {
 
-    private var newsArticlesList: LiveData<List<NewsArticle>>? = null
+    private var newsArticlesList: List<NewsArticle>? = null
 
-    internal val newsArticles: LiveData<List<NewsArticle>>
-        get() {
-            newsArticlesList?.takeIf { it.value != null } ?: newsArticlesList
+    internal fun getNewsArticles(): LiveData<List<NewsArticle>> {
+        return newsArticlesList?.let {
+            SingleLiveData(it)
 
-            return Transformations.switchMap<User, List<NewsArticle>>(app.loggedInUser) { user ->
-                user?.institutionId?.let {
-                    newsArticlesList = RetrofitLiveData(api.getNewsArticles(it))
-                    return@switchMap newsArticlesList
-                }
-
-                SingleLiveData(null)
+        } ?: Transformations.switchMap<User, List<NewsArticle>>(app.loggedInUser) { user ->
+            user?.institutionId?.let {
+                api.getNewsArticles(it)
+                        .doOnSuccess {
+                            newsArticlesList = it
+                        }
+                        .toLiveData()
             }
-        }
 
-    init {
-        app.cachedLoginArticles?.let {
-            newsArticlesList = SingleLiveData(it)
+            SingleLiveData(null)
         }
     }
 
-    override fun onCleared() {
-        (newsArticlesList as? RetrofitLiveData)?.cancel()
+    init {
+        newsArticlesList = app.cachedLoginArticles
     }
 
 }

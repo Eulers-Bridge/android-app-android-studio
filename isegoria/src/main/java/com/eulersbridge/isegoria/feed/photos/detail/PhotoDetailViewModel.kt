@@ -7,6 +7,7 @@ import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Like
 import com.eulersbridge.isegoria.network.api.models.Photo
 import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.toBooleanSingle
 import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import io.reactivex.BackpressureStrategy
@@ -73,7 +74,7 @@ class PhotoDetailViewModel
     internal fun getPhotoUrl(position: Int): String? = photos?.get(position)?.getPhotoUrl()
 
     /**
-     * @return true on success, false on failure
+     * @return LiveData whose value is true on success, false on failure
      */
     internal fun likePhoto(): LiveData<Boolean> {
         return userData.value?.let { user ->
@@ -86,14 +87,13 @@ class PhotoDetailViewModel
     }
 
     /**
-     * @return true on success, false on failure
+     * @return LiveData whose value is true on success, false on failure
      */
     internal fun unlikePhoto(): LiveData<Boolean> {
         return userData.value?.let { user ->
             photo.blockingFirst()
                     .flatMapCompletable { api.unlikePhoto(it.id, user.email) }
-                    .toSingleDefault(true)
-                    .onErrorReturnItem(false)
+                    .toBooleanSingle()
                     .toLiveData()
         } ?: SingleLiveData(false)
     }

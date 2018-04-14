@@ -110,16 +110,16 @@ interface API {
 
     @Paginated
     @GET("newsArticles/{institutionId}")
-    fun getNewsArticles(@Path("institutionId") institutionId: Long): Call<List<NewsArticle>>
+    fun getNewsArticles(@Path("institutionId") institutionId: Long): Single<List<NewsArticle>>
 
     @GET("newsArticle/{articleId}/likes")
-    fun getNewsArticleLikes(@Path("articleId") articleId: Long): Call<List<Like>>
+    fun getNewsArticleLikes(@Path("articleId") articleId: Long): Single<List<Like>>
 
     @PUT("newsArticle/{articleId}/likedBy/{userEmail}/")
-    fun likeArticle(@Path("articleId") photoId: Long, @Path("userEmail") userEmail: String): Call<LikeResponse>
+    fun likeArticle(@Path("articleId") articleId: Long, @Path("userEmail") userEmail: String): Single<LikeResponse>
 
     @DELETE("newsArticle/{articleId}/likedBy/{userEmail}/")
-    fun unlikeArticle(@Path("articleId") photoId: Long, @Path("userEmail") userEmail: String): Call<Void>
+    fun unlikeArticle(@Path("articleId") articleId: Long, @Path("userEmail") userEmail: String): Completable
 
 
     @Paginated
@@ -150,11 +150,11 @@ interface API {
 
     @Paginated
     @GET("events/{institutionId}")
-    fun getEvents(@Path("institutionId") institutionId: Long): Call<List<Event>?>
+    fun getEvents(@Path("institutionId") institutionId: Long): Single<List<Event>?>
 
 
     @GET("ticket/{ticketId}")
-    fun getTicket(@Path("ticketId") ticketId: Long): Call<Ticket>
+    fun getTicket(@Path("ticketId") ticketId: Long): Single<Ticket>
 
     @Paginated
     @GET("tickets/{electionId}")
@@ -172,7 +172,7 @@ interface API {
 
 
     @GET("position/{positionId}")
-    fun getPosition(@Path("positionId") positionId: Long): Call<Position>
+    fun getPosition(@Path("positionId") positionId: Long): Single<Position>
 
     @Paginated
     @GET("positions/{electionId}")

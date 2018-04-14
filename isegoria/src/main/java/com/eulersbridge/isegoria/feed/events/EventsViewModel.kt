@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -16,20 +16,13 @@ class EventsViewModel
     private val api: API
 ) : ViewModel() {
 
-    private var eventsList: LiveData<List<Event>?>? = null
-
     fun getEvents() : LiveData<List<Event>?> {
         return Transformations.switchMap<User, List<Event>>(user) { user ->
-            if (user.institutionId != null) {
-                eventsList = RetrofitLiveData(api.getEvents(user.institutionId!!))
-                eventsList
-            } else {
-                SingleLiveData(null)
-            }
-        }
-    }
 
-    override fun onCleared() {
-        (eventsList as? RetrofitLiveData)?.cancel()
+            user.institutionId?.let {
+                api.getEvents(user.institutionId!!).toLiveData()
+
+            } ?: SingleLiveData<List<Event>?>(null)
+        }
     }
 }

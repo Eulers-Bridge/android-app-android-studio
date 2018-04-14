@@ -10,7 +10,7 @@ import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Event
 import com.eulersbridge.isegoria.network.api.models.Position
 import com.eulersbridge.isegoria.network.api.models.Ticket
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import javax.inject.Inject
 
 class EventDetailViewModel
@@ -36,10 +36,10 @@ class EventDetailViewModel
         }
 
     internal fun getTicket(ticketId: Long): LiveData<Ticket>
-            = RetrofitLiveData(api.getTicket(ticketId))
+            = api.getTicket(ticketId).toLiveData()
 
     internal fun getPosition(positionId: Long): LiveData<Position>
-            = RetrofitLiveData(api.getPosition(positionId))
+            = api.getPosition(positionId).toLiveData()
 
     internal fun addToCalendar(context: Context) {
         addToCalendarIntent?.let {
@@ -47,5 +47,4 @@ class EventDetailViewModel
                 context.startActivity(it)
         }
     }
-
 }
