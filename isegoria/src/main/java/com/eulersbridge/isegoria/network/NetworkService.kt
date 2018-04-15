@@ -47,10 +47,10 @@ class NetworkService constructor(
     fun updateAPIBaseURL(user: User) {
         user.institutionId?.let { institutionId ->
 
-            api.getInstitution(institutionId).onSuccess {
+            api.getInstitution(institutionId).subscribeSuccess {
                 it.getName()?.let { institutionName ->
 
-                    api.getInstitutionURLs().observeOn(AndroidSchedulers.mainThread()).subscribe { urls ->
+                    api.getInstitutionURLs().subscribeSuccess { urls ->
                         // Find the matching ClientInstitution, and use its `apiRoot`
 
                         urls.singleOrNull {

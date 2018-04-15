@@ -11,14 +11,14 @@ import retrofit2.http.*
 interface API {
 
     @GET("general-info")
-    fun getGeneralInfo(): Call<GeneralInfoResponse>
+    fun getGeneralInfo(): Single<GeneralInfoResponse>
 
     @GET("https://www.isegoria.com.au/26af2fdb70869d7a57ebbd65afde108fd92a9367/institutions.json")
     fun getInstitutionURLs(): Single<List<ClientInstitution>>
 
     @Paginated
     @GET("contacts")
-    fun getFriends(): Call<List<Contact>>
+    fun getFriends(): Single<List<Contact>>
 
 
     @Paginated
@@ -30,37 +30,37 @@ interface API {
     fun login(@Query("topicArn") snsTopicArn: String, @Query("deviceToken") deviceToken: String): Single<LoginResponse?>
 
     @GET("logout")
-    fun logout(): Call<Void>
+    fun logout(): Completable
 
 
     @GET("emailVerification/{userEmail}/resend")
-    fun sendVerificationEmail(@Path("userEmail") userEmail: String): Call<Void>
+    fun sendVerificationEmail(@Path("userEmail") userEmail: String): Completable
 
     @POST("requestPwdReset/{userEmail}/")
-    fun requestPasswordReset(@Path("userEmail") userEmail: String): Call<Void>
+    fun requestPasswordReset(@Path("userEmail") userEmail: String): Completable
 
     @PUT("user/{userEmail}")
-    fun updateUserDetails(@Path("userEmail") userEmail: String, @Body user: UserSettings): Call<Void>
+    fun updateUserDetails(@Path("userEmail") userEmail: String, @Body user: UserSettings): Completable
 
     @Paginated
     @GET("user/{userId}/contactRequests")
-    fun getFriendRequestsSent(@Path("userId") userId: Long): Call<List<FriendRequest>>
+    fun getFriendRequestsSent(@Path("userId") userId: Long): Single<List<FriendRequest>>
 
     @Paginated
     @GET("user/{userId}/contactRequests/rec")
-    fun getFriendRequestsReceived(@Path("userId") userId: Long): Call<List<FriendRequest>>
+    fun getFriendRequestsReceived(@Path("userId") userId: Long): Single<List<FriendRequest>>
 
     @PUT("user/{userEmail}/PPSEQuestions")
-    fun addUserEfficacy(@Path("userEmail") userEmail: String, @Body ppseQuestions: UserSelfEfficacy): Call<Void>
+    fun addUserEfficacy(@Path("userEmail") userEmail: String, @Body ppseQuestions: UserSelfEfficacy): Completable
 
     @PUT("user/{userEmail}/personality")
-    fun addUserPersonality(@Path("userEmail") userEmail: String, @Body personality: UserPersonality): Call<PersonalityResponse>
+    fun addUserPersonality(@Path("userEmail") userEmail: String, @Body personality: UserPersonality): Single<PersonalityResponse>
 
     @GET("user/{userEmail}/support/")
     fun getUserSupportedTickets(@Path("userEmail") userEmail: String): Call<List<Ticket>>
 
     @PUT("user/{userEmail}/voteReminder")
-    fun addVoteReminder(@Path("userEmail") userEmail: String, @Body voteReminder: VoteReminder): Call<Void>
+    fun addVoteReminder(@Path("userEmail") userEmail: String, @Body voteReminder: VoteReminder): Completable
 
     @Paginated
     @GET("user/{userEmail}/voteReminders")
@@ -68,20 +68,20 @@ interface API {
 
 
     @GET("contact/{userEmail}/")
-    fun getContact(@Path("userEmail") userEmail: String): Call<Contact?>
+    fun getContact(@Path("userEmail") userEmail: String): Single<Contact>
 
     @POST("user/{userEmail}/contactRequest/{targetUserEmail}")
-    fun addFriend(@Path("userEmail") userEmail: String, @Path("targetUserEmail") targetUserEmail: String): Call<Void>
+    fun addFriend(@Path("userEmail") userEmail: String, @Path("targetUserEmail") targetUserEmail: String): Completable
 
     @PUT("user/contactRequest/{contactRequestId}/accept")
-    fun acceptFriendRequest(@Path("contactRequestId") contactRequestId: Long): Call<Void>
+    fun acceptFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
 
     @PUT("user/contactRequest/{contactRequestId}/reject")
-    fun rejectFriendRequest(@Path("contactRequestId") contactRequestId: Long): Call<Void>
+    fun rejectFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
 
 
     @GET("searchUserProfile/{query}/")
-    fun searchForUsers(@Path("query") query: String): Call<List<User>?>
+    fun searchForUsers(@Path("query") query: String): Single<List<User>>
 
 
     @Paginated
@@ -102,7 +102,7 @@ interface API {
 
 
     @GET("institution/{institutionId}")
-    fun getInstitution(@Path("institutionId") institutionId: Long): Call<Institution>
+    fun getInstitution(@Path("institutionId") institutionId: Long): Single<Institution>
 
     @GET("institution/{institutionId}/newsFeed")
     fun getInstitutionNewsFeed(@Path("institutionId") institutionId: Long): Call<NewsFeedResponse>
@@ -165,10 +165,10 @@ interface API {
     fun getTicketCandidates(@Path("ticketId") ticketId: Long): Call<List<Candidate>>
 
     @PUT("ticket/{ticketId}/support/{userEmail}")
-    fun supportTicket(@Path("ticketId") ticketId: Long, @Path("userEmail") userEmail: String): Call<Void>
+    fun supportTicket(@Path("ticketId") ticketId: Long, @Path("userEmail") userEmail: String): Completable
 
     @DELETE("ticket/{ticketId}/support/{userEmail}")
-    fun unsupportTicket(@Path("ticketId") ticketId: Long, @Path("userEmail") userEmail: String): Call<Void>
+    fun unsupportTicket(@Path("ticketId") ticketId: Long, @Path("userEmail") userEmail: String): Completable
 
 
     @GET("position/{positionId}")
@@ -192,13 +192,13 @@ interface API {
 
 
     @GET("polls/{ownerId}")
-    fun getPolls(@Path("ownerId") ownerId: Long): Call<PollsResponse>
+    fun getPolls(@Path("ownerId") ownerId: Long): Single<PollsResponse>
 
     @PUT("poll/{pollId}/vote/{optionId}")
-    fun answerPoll(@Path("pollId") pollId: Long, @Path("optionId") optionId: Long): Call<Void>
+    fun answerPoll(@Path("pollId") pollId: Long, @Path("optionId") optionId: Long): Completable
 
     @GET("poll/{pollId}/results")
-    fun getPollResults(@Path("pollId") pollId: Long): Call<PollResultsResponse>
+    fun getPollResults(@Path("pollId") pollId: Long): Single<PollResultsResponse>
 
 
     @Paginated

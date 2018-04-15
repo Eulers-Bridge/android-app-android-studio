@@ -129,7 +129,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             if (ticketSupportButton.text == supportStr) {
 
-                api.supportTicket(ticketId, userEmail).enqueue()
+                api.supportTicket(ticketId, userEmail).subscribe().addTo(compositeDisposable)
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
@@ -137,7 +137,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
             } else if (ticketSupportButton.text == unsupportStr) {
 
-                api.unsupportTicket(ticketId, userEmail).enqueue()
+                api.unsupportTicket(ticketId, userEmail).subscribe().addTo(compositeDisposable)
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
@@ -275,8 +275,8 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribe { position ->
-            textViewPosition.text = position?.name
+        api.getPosition(candidate.positionId).subscribeSuccess {
+            textViewPosition.text = it?.name
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

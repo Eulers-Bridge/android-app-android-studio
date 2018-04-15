@@ -226,8 +226,8 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).subscribe { ticket ->
-            ticket.let { it ->
+        api.getTicket(candidate.ticketId).subscribeSuccess {
+            it.let {
                 textViewParty.text = it.code
                 textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
             }
@@ -277,8 +277,8 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribe { position ->
-            textViewPosition.text = position?.name
+        api.getPosition(candidate.positionId).subscribeSuccess {
+            textViewPosition.text = it?.name
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

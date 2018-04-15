@@ -15,14 +15,11 @@ import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Candidate
 import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.onSuccess
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -151,7 +148,7 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).subscribe { ticket ->
+        api.getTicket(candidate.ticketId).subscribeSuccess { ticket ->
             ticket?.let {
                 textViewParty.text = it.code
                 textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
@@ -189,8 +186,8 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribe { position ->
-            textViewPosition.text = position?.name
+        api.getPosition(candidate.positionId).subscribeSuccess {
+            textViewPosition.text = it?.name
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

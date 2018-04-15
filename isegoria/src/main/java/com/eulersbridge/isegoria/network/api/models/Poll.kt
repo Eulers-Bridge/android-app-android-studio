@@ -20,7 +20,7 @@ data class Poll (
     val question: String?,
 
     @field:Json(name = "pollOptions")
-    var options: List<PollOption>?,
+    var options: List<PollOption>,
 
     val closed: Boolean = false
 ) : Parcelable

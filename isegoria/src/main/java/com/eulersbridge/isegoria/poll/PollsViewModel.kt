@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Poll
 import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -16,29 +16,26 @@ class PollsViewModel
     private val api: API
 ) : ViewModel() {
 
-    private var polls: LiveData<List<Poll>?>? = null
+    private var polls: List<Poll>? = null
 
     internal fun getPolls(): LiveData<List<Poll>?> {
-        return if (polls?.value == null) {
-            Transformations.switchMap<User, List<Poll>>(userData) { user ->
-                return@switchMap if (user?.institutionId == null) {
-                    SingleLiveData(null)
+        return polls?.let {
+            SingleLiveData<List<Poll>?>(it)
 
-                } else {
-                    val pollsResponse = RetrofitLiveData(api.getPolls(user.institutionId!!))
+        } ?: Transformations.switchMap<User, List<Poll>>(userData) { user ->
+            if (user?.institutionId == null) {
+                SingleLiveData(null)
 
-                    Transformations.switchMap(pollsResponse) { response ->
-                        polls = if (response != null && response.totalPolls > 0) {
-                            SingleLiveData(response.polls)
+            } else {
+                api.getPolls(user.institutionId!!)
+                        .map { (polls, totalPolls) ->
+                            if (totalPolls > 0) {
+                                this.polls = polls
+                            }
 
-                        } else {
-                            SingleLiveData(null)
-                        }
-
-                        polls
-                    }
-                }
+                            this.polls
+                        }.toLiveData()
             }
-        } else polls!!
+        }
     }
 }

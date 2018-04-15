@@ -54,8 +54,7 @@ class EmailVerificationFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        viewModel.onExit()
-
+        viewModel.onDestroy()
         super.onDestroy()
     }
 }

@@ -26,12 +26,6 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         fun onSearchedUserActionClick(user: User?)
     }
 
-    fun clearItems() {
-        val oldItemCount = items.size
-        items.clear()
-        notifyItemRangeRemoved(0, oldItemCount)
-    }
-
     fun setItems(newItems: List<User>) {
         val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = items.size

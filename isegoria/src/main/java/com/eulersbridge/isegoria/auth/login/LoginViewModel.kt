@@ -6,11 +6,12 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.isNetworkAvailable
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class LoginViewModel
@@ -18,6 +19,8 @@ class LoginViewModel
     private val app: IsegoriaApp,
     private val api: API
 ) : ViewModel() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     internal val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
@@ -43,6 +46,11 @@ class LoginViewModel
         password.value = app.savedUserPassword
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
+    }
+
     internal fun onExit() {
         app.hideLoginScreen()
     }
@@ -59,18 +67,17 @@ class LoginViewModel
                 networkError.value = false
 
                 // Email/password not null as validation checks for null
-                val loginSuccess = app.login(email.value!!, password.value!!).map { success ->
+                return app.login(email.value!!, password.value!!).map { success ->
                     if (!success)
                         formEnabled.value = true
 
-                    return@map success
-                }
-
-                return loginSuccess.toLiveData()
+                    success
+                }.toLiveData()
             }
         }
 
         formEnabled.value = true
+
         return SingleLiveData(false)
     }
 
@@ -79,11 +86,10 @@ class LoginViewModel
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
-
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
             // If email is valid, it is non-null
-            api.requestPasswordReset(email!!).enqueue()
+            api.requestPasswordReset(email!!).subscribe().addTo(compositeDisposable)
             canShowPasswordResetDialog.value = true
 
             return true

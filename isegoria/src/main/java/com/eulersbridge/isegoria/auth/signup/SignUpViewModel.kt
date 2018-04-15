@@ -1,23 +1,19 @@
 package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.LiveDataReactiveStreams.fromPublisher
-import android.arch.lifecycle.LiveDataReactiveStreams.toPublisher
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Country
 import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.network.api.responses.GeneralInfoResponse
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
 class SignUpViewModel
 @Inject constructor(private val api: API) : ViewModel() {
 
-    private var countries: LiveData<List<Country>?>? = null
+    private var countries: List<Country>? = null
 
     val givenName = MutableLiveData<String>()
     val familyName = MutableLiveData<String>()
@@ -30,30 +26,29 @@ class SignUpViewModel
     val selectedBirthYear = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
-        val generalInfo = RetrofitLiveData(api.getGeneralInfo())
-
-        countries = Transformations.switchMap(generalInfo) {
-            return@switchMap SingleLiveData(it?.countries)
+        countries?.let {
+            return SingleLiveData(it)
         }
 
-        return countries!!
+        return api.getGeneralInfo()
+                .doOnSuccess { countries = it.countries }
+                .map { it.countries }
+                .toLiveData()
     }
 
     fun onCountrySelected(index: Int) : List<Institution>? {
         selectedInstitution.value = null
 
-        countries?.value?.let {
+        return countries?.let {
             val country = it[index]
             selectedCountry.value = country
 
-            return country.institutions
+            country.institutions
         }
-
-        return null
     }
 
     fun onInstitutionSelected(index: Int) {
-        countries?.value?.let { countries ->
+        countries?.let { countries ->
             val institution = countries[index].institutions?.get(index)
             selectedInstitution.value = institution
         }

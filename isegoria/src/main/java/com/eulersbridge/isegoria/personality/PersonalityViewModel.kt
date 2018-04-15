@@ -2,12 +2,11 @@ package com.eulersbridge.isegoria.personality
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.models.UserPersonality
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -21,23 +20,21 @@ class PersonalityViewModel
     internal val questionsComplete = MutableLiveData<Boolean>()
 
     internal fun setUserCompletedQuestions(userPersonality: UserPersonality): LiveData<Boolean> {
-
         val user = userData.value
 
         if (user == null) {
             return SingleLiveData(false)
 
         } else {
-            val request = RetrofitLiveData(api.addUserPersonality(user.email, userPersonality))
+            return api.addUserPersonality(user.email, userPersonality)
+                    .map {
+                        if (it != null) {
+                            questionsComplete.postValue(true)
+                            return@map true
+                        }
 
-            return Transformations.switchMap(request) { result ->
-                if (result != null) {
-                    questionsComplete.postValue(true)
-                    return@switchMap SingleLiveData(true)
-                }
-
-                SingleLiveData(false)
-            }
+                        false
+                    }.toLiveData()
         }
     }
 }

@@ -5,7 +5,7 @@ import okhttp3.Request
 import okhttp3.Response
 
 fun Request.Builder.addAppHeaders(): Request.Builder
-        = this.addHeader("Accept", "application/json")
+        = addHeader("Accept", "application/json")
         .addHeader("Content-Type", "application/json")
         .addHeader("User-Agent", "IsegoriaApp Android")
 

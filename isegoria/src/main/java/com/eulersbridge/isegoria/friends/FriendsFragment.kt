@@ -65,37 +65,14 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
         setHasOptionsMenu(true)
 
-        observeBoolean(viewModel.searchSectionVisible) {
-            searchContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.friendsVisible) {
-            friendsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.sentRequestsVisible) {
-            sentRequestsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.receivedRequestsVisible) {
-            receivedRequestsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.receivedRequestsVisible) {
-            receivedRequestsContainer.isVisible = it
-        }
-
-        observe(viewModel.getFriends()) { friends ->
-            if (friends != null)
-                friendsAdapter.setItems(friends)
-        }
-
-        observe(viewModel.getSentFriendRequests()) { requests ->
-            if (requests != null)
-                sentAdapter.setItems(requests)
-        }
-
-        getReceivedFriendRequests()
+        observeBoolean(viewModel.searchSectionVisible) { searchContainer.isVisible = it }
+        observeBoolean(viewModel.friendsVisible) { friendsContainer.isVisible = it }
+        observeBoolean(viewModel.receivedRequestsVisible) { receivedRequestsContainer.isVisible = it }
+        observeBoolean(viewModel.sentRequestsVisible) { sentRequestsContainer.isVisible = it }
+        observe(viewModel.friends) { friendsAdapter.setItems(it!!) }
+        observe(viewModel.receivedFriendRequests) { receivedAdapter.setItems(it!!) }
+        observe(viewModel.sentFriendRequests) { sentAdapter.setItems(it!!) }
+        observe(viewModel.searchResults) { searchAdapter.setItems(it!!) }
 
         return rootView
     }
@@ -113,10 +90,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun getReceivedFriendRequests() {
-        observe(viewModel.getReceivedFriendRequests()) { requests ->
-            if (requests != null)
-                receivedAdapter.setItems(requests)
-        }
+        // TODO: Fix
     }
 
     override fun getContactInstitution(
@@ -258,12 +232,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun searchQueryChanged(query: String) {
-        observe(viewModel.onSearchQueryChanged(query)) { searchResults ->
-            searchAdapter.clearItems()
-
-            if (searchResults != null)
-                searchAdapter.setItems(searchResults)
-        }
+        viewModel.onSearchQueryChanged(query)
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {

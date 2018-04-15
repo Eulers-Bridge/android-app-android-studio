@@ -85,13 +85,19 @@ class IsegoriaApp : MultiDexApplication(), HasActivityInjector, HasSupportFragme
     }
 
     private fun createLoginObserver(loginSuccess: Single<Boolean>) {
-        loginSuccess.subscribeBy {
-            if (it) {
-                showMainActivity()
-            } else {
-                showLoginScreen()
-            }
-        }
+        loginSuccess.subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        showMainActivity()
+                    } else {
+                        showLoginScreen()
+                    }
+                },
+                onError = {
+                    it.printStackTrace()
+                    showLoginScreen()
+                }
+        )
     }
 
     private fun startActivity(activityClass: KClass<*>) {
@@ -180,7 +186,7 @@ class IsegoriaApp : MultiDexApplication(), HasActivityInjector, HasSupportFragme
     }
 
     fun setLoggedInUser(user: User, password: String) {
-        loggedInUser.value = user
+        loggedInUser.postValue(user)
 
         securePreferences.edit {
             putString(USER_EMAIL_KEY, user.email)

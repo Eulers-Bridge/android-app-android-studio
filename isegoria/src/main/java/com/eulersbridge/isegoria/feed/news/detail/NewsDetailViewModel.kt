@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.NewsArticle
 import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.subscribeSuccess
 import com.eulersbridge.isegoria.toBooleanSingle
 import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
@@ -40,9 +41,10 @@ class NewsDetailViewModel
     private fun fetchArticleLikes(articleId: Long) {
         likesRequest = api.getNewsArticleLikes(articleId)
                 .onErrorReturnItem(emptyList())
-                .subscribe { likes ->
-                    likeCount.postValue(likes.size)
-                    likedByUser.postValue(likes.any { it.email == userData.value?.email })
+                .subscribeSuccess {
+                    likeCount.postValue(it.size)
+                    val likesContainUser = it.any { it.email == userData.value?.email }
+                    likedByUser.postValue(likesContainUser)
                 }
     }
 

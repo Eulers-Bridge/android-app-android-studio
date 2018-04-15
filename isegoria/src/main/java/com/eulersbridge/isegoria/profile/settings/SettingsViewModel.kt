@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import androidx.core.net.toFile
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.enqueue
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.Photo
@@ -15,6 +14,8 @@ import com.eulersbridge.isegoria.network.api.models.UserSettings
 import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class SettingsViewModel
@@ -23,6 +24,8 @@ class SettingsViewModel
     private val api: API,
     private val networkService: NetworkService
 ) : ViewModel() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     private var userPhoto: LiveData<Photo?>? = null
 
@@ -51,6 +54,11 @@ class SettingsViewModel
         }
     }
 
+    override fun onCleared() {
+        (userPhoto as? RetrofitLiveData)?.cancel()
+        compositeDisposable.dispose()
+    }
+
     internal fun onOptOutDataCollectionChange(isChecked: Boolean) {
         optOutDataCollectionSwitchEnabled.value = false
 
@@ -59,17 +67,15 @@ class SettingsViewModel
         if (user != null) {
             val userSettings = UserSettings(user.trackingOff, isChecked)
 
-            api.updateUserDetails(user.email, userSettings).enqueue({
-                if (it.isSuccessful) {
-                    optOutDataCollectionSwitchChecked.value = isChecked
-                    optOutDataCollectionSwitchEnabled.value = true
+            api.updateUserDetails(user.email, userSettings).subscribe({
+                optOutDataCollectionSwitchChecked.value = isChecked
+                optOutDataCollectionSwitchEnabled.value = true
 
-                    app.setOptedOutOfDataCollection(isChecked)
-                }
+                app.setOptedOutOfDataCollection(isChecked)
             }, {
                 optOutDataCollectionSwitchChecked.value = !isChecked
                 optOutDataCollectionSwitchEnabled.value = true
-            })
+            }).addTo(compositeDisposable)
         }
     }
 
@@ -81,23 +87,15 @@ class SettingsViewModel
         if (user != null) {
             val userSettings = UserSettings(isChecked, user.isOptedOutOfDataCollection)
 
-            api.updateUserDetails(user.email, userSettings).enqueue({
-                if (it.isSuccessful) {
-                    doNotTrackSwitchChecked.value = isChecked
-
-                    app.setTrackingOff(isChecked)
-
-                } else {
-                    doNotTrackSwitchChecked.value = !isChecked
-                }
-
-                doNotTrackSwitchEnabled.value = true
+            api.updateUserDetails(user.email, userSettings).subscribe({
+                doNotTrackSwitchChecked.value = isChecked
+                app.setTrackingOff(isChecked)
 
             }, {
                 // Restore to previous checked state
                 doNotTrackSwitchChecked.value = !isChecked
                 doNotTrackSwitchEnabled.value = true
-            })
+            }).addTo(compositeDisposable)
         }
     }
 
@@ -120,9 +118,5 @@ class SettingsViewModel
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
         val file = imageUri.toFile()
         return networkService.uploadNewUserPhoto(file).toLiveData()
-    }
-
-    override fun onCleared() {
-        (userPhoto as? RetrofitLiveData)?.cancel()
     }
 }

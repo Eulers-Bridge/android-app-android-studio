@@ -2,12 +2,12 @@ package com.eulersbridge.isegoria.election.efficacy
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.UserSelfEfficacy
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.toBooleanSingle
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -34,12 +34,10 @@ class EfficacyViewModel
             val userEmail = app.loggedInUser.value!!.email
             val answers = UserSelfEfficacy(scores[0], scores[1], scores[2], scores[3])
 
-            val efficacyRequest = RetrofitLiveData(api.addUserEfficacy(userEmail, answers))
-
-            Transformations.switchMap(efficacyRequest) {
-                app.onUserSelfEfficacyCompleted()
-                SingleLiveData(true)
-            }
+            api.addUserEfficacy(userEmail, answers)
+                    .doOnComplete { app.onUserSelfEfficacyCompleted() }
+                    .toBooleanSingle()
+                    .toLiveData()
         }
     }
 

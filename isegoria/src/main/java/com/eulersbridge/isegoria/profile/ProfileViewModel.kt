@@ -7,9 +7,12 @@ import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.models.*
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.subscribeSuccess
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class ProfileViewModel
@@ -17,6 +20,8 @@ class ProfileViewModel
     private val app: IsegoriaApp,
     private val api: API
 ) : ViewModel() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     internal val currentSectionIndex = MutableLiveData<Int>()
 
@@ -26,7 +31,7 @@ class ProfileViewModel
     private var remainingBadges: LiveData<List<Badge>?>? = null
     private var completedBadges: LiveData<List<Badge>?>? = null
 
-    private var institutionName: LiveData<String?>? = null
+    private var institutionName = MutableLiveData<String>()
 
     private var tasks: LiveData<List<Task>>? = null
     private var remainingTasks: LiveData<List<Task>?>? = null
@@ -41,6 +46,24 @@ class ProfileViewModel
     init {
         currentSectionIndex.value = 0
         targetBadgeLevel.value = 0
+    }
+
+    /**
+     * Convenience method to cancel a LiveData object if it exists and is a Retrofit API request.
+     */
+    private fun cancelIfPossible(liveData: LiveData<*>?) {
+        (liveData as? RetrofitLiveData)?.cancel()
+    }
+
+    override fun onCleared() {
+        cancelIfPossible(remainingBadges)
+        cancelIfPossible(completedBadges)
+        cancelIfPossible(institutionName)
+        cancelIfPossible(tasks)
+        cancelIfPossible(remainingTasks)
+        cancelIfPossible(completedTasks)
+        cancelIfPossible(userPhoto)
+        compositeDisposable.dispose()
     }
 
     internal fun viewFriends() {
@@ -73,10 +96,10 @@ class ProfileViewModel
     internal fun fetchUserStats() {
         val (_, _, email) = getUser() ?: return
 
-        api.getContact(email).onSuccess {
-            contactsCount.value = it?.contactsCount
-            totalTasksCount.value = it?.totalTasksCount
-        }
+        api.getContact(email).subscribeSuccess {
+            contactsCount.postValue(it?.contactsCount)
+            totalTasksCount.postValue(it?.totalTasksCount)
+        }.addTo(compositeDisposable)
     }
 
     private fun getUser(): User? {
@@ -142,18 +165,18 @@ class ProfileViewModel
     }
 
     internal fun getInstitutionName(): LiveData<String?>? {
-        if (institutionName == null) {
+        if (institutionName.value == null) {
             val user = getUser()
             return if (user?.institutionId != null) {
 
-                val institutionRequest =
-                    RetrofitLiveData(api.getInstitution(user.institutionId!!))
-
-                institutionName = Transformations.switchMap(institutionRequest) request@ { institution ->
-                    return@request SingleLiveData(institution?.getName())
-                }
-
-                institutionName
+                api.getInstitution(user.institutionId!!)
+                        .map { it.getName() }
+                        .onErrorReturnItem("")
+                        .map {
+                            institutionName.postValue(it)
+                            it
+                        }
+                        .toLiveData()
 
             } else {
                 SingleLiveData(null)
@@ -228,22 +251,5 @@ class ProfileViewModel
         }
 
         return userPhoto
-    }
-
-    /**
-     * Convenience method to cancel a LiveData object if it exists and is a Retrofit API request.
-     */
-    private fun cancelIfPossible(liveData: LiveData<*>?) {
-        (liveData as? RetrofitLiveData)?.cancel()
-    }
-
-    override fun onCleared() {
-        cancelIfPossible(remainingBadges)
-        cancelIfPossible(completedBadges)
-        cancelIfPossible(institutionName)
-        cancelIfPossible(tasks)
-        cancelIfPossible(remainingTasks)
-        cancelIfPossible(completedTasks)
-        cancelIfPossible(userPhoto)
     }
 }

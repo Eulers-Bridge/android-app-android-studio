@@ -5,8 +5,8 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.toBooleanSingle
 import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class EmailVerificationViewModel
     private val api: API
 ) : ViewModel() {
 
-    internal fun onExit() {
+    internal fun onDestroy() {
         app.userVerificationVisible.value = false
     }
 
@@ -28,8 +28,7 @@ class EmailVerificationViewModel
                 SingleLiveData(false)
 
             } else {
-                val verificationRequest = RetrofitLiveData(api.sendVerificationEmail(it.email))
-                Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
+                api.sendVerificationEmail(it.email).toBooleanSingle().toLiveData()
             }
         }
     }

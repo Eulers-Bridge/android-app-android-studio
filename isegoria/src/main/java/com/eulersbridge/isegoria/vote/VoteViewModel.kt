@@ -8,6 +8,8 @@ import com.eulersbridge.isegoria.network.api.models.Election
 import com.eulersbridge.isegoria.network.api.models.User
 import com.eulersbridge.isegoria.network.api.models.VoteLocation
 import com.eulersbridge.isegoria.network.api.models.VoteReminder
+import com.eulersbridge.isegoria.toBooleanSingle
+import com.eulersbridge.isegoria.toLiveData
 import com.eulersbridge.isegoria.util.data.RetrofitLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import java.util.*
@@ -132,13 +134,9 @@ class VoteViewModel
                 )
 
                 // Add the vote reminder
-                val reminderRequest =
-                    RetrofitLiveData(api.addVoteReminder(user.email, reminder))
-
-                return Transformations.switchMap(reminderRequest) {
+                return api.addVoteReminder(user.email, reminder).doOnComplete {
                     pledgeComplete.value = true
-                    SingleLiveData(true)
-                }
+                }.toBooleanSingle().toLiveData()
             }
         }
 
