@@ -2,32 +2,21 @@ package com.eulersbridge.isegoria.profile.settings
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.net.Uri
-import androidx.core.net.toFile
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Photo
-import com.eulersbridge.isegoria.network.api.models.UserSettings
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.Photo
+import com.eulersbridge.isegoria.util.extension.map
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
-class SettingsViewModel
-@Inject constructor(
-    private val app: IsegoriaApp,
-    private val api: API,
-    private val networkService: NetworkService
-) : ViewModel() {
+class SettingsViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
-
-    private var userPhoto: LiveData<Photo?>? = null
 
     internal val optOutDataCollectionSwitchChecked = MutableLiveData<Boolean>()
     internal val optOutDataCollectionSwitchEnabled = MutableLiveData<Boolean>()
@@ -35,88 +24,59 @@ class SettingsViewModel
     internal val doNotTrackSwitchChecked = MutableLiveData<Boolean>()
     internal val doNotTrackSwitchEnabled = MutableLiveData<Boolean>()
 
-    internal val userProfilePhotoURL: LiveData<String?>
-        get() {
-            return Transformations.switchMap(app.loggedInUser) { SingleLiveData(it.profilePhotoURL) }
-        }
-
     init {
         optOutDataCollectionSwitchEnabled.value = false
         doNotTrackSwitchEnabled.value = false
 
-        val user = app.loggedInUser.value
-        if (user != null) {
-            optOutDataCollectionSwitchChecked.value = user.isOptedOutOfDataCollection
-            optOutDataCollectionSwitchEnabled.value = true
+        val user = repository.getUser()
 
-            doNotTrackSwitchChecked.value = user.trackingOff
-            doNotTrackSwitchEnabled.value = true
-        }
+        optOutDataCollectionSwitchChecked.value = user.isOptedOutOfDataCollection
+        optOutDataCollectionSwitchEnabled.value = true
+
+        doNotTrackSwitchChecked.value = user.trackingOff
+        doNotTrackSwitchEnabled.value = true
     }
 
     override fun onCleared() {
-        (userPhoto as? RetrofitLiveData)?.cancel()
         compositeDisposable.dispose()
     }
+
+    internal fun getProfilePhotoUrl(): String? = repository.getUserProfilePhotoUrl()
 
     internal fun onOptOutDataCollectionChange(isChecked: Boolean) {
         optOutDataCollectionSwitchEnabled.value = false
 
-        val user = app.loggedInUser.value
-
-        if (user != null) {
-            val userSettings = UserSettings(user.trackingOff, isChecked)
-
-            api.updateUserDetails(user.email, userSettings).subscribe({
-                optOutDataCollectionSwitchChecked.value = isChecked
-                optOutDataCollectionSwitchEnabled.value = true
-
-                app.setOptedOutOfDataCollection(isChecked)
-            }, {
-                optOutDataCollectionSwitchChecked.value = !isChecked
-                optOutDataCollectionSwitchEnabled.value = true
-            }).addTo(compositeDisposable)
-        }
+        repository.setUserOptedOutOfDataCollection(isChecked).subscribeBy(
+                onComplete = {
+                    optOutDataCollectionSwitchChecked.postValue(isChecked)
+                },
+                onError = {
+                    optOutDataCollectionSwitchChecked.postValue(!isChecked)
+                }
+        ).addTo(compositeDisposable)
     }
 
     internal fun onTrackingChange(isChecked: Boolean) {
         doNotTrackSwitchEnabled.value = false
 
-        val user = app.loggedInUser.value
-
-        if (user != null) {
-            val userSettings = UserSettings(isChecked, user.isOptedOutOfDataCollection)
-
-            api.updateUserDetails(user.email, userSettings).subscribe({
-                doNotTrackSwitchChecked.value = isChecked
-                app.setTrackingOff(isChecked)
-
-            }, {
-                // Restore to previous checked state
-                doNotTrackSwitchChecked.value = !isChecked
-                doNotTrackSwitchEnabled.value = true
-            }).addTo(compositeDisposable)
-        }
+        repository.setUserTrackingOff(isChecked).subscribeBy(
+                onComplete = {
+                    doNotTrackSwitchChecked.postValue(isChecked)
+                },
+                onError = {
+                    // Restore to previous checked state
+                    doNotTrackSwitchChecked.postValue(!isChecked)
+                }
+        ).addTo(compositeDisposable)
     }
 
-    internal fun getUserPhoto(): LiveData<Photo?>? {
-        if (userPhoto == null) {
-            val user = app.loggedInUser.value
-
-            if (user != null) {
-                val photosRequest = RetrofitLiveData(api.getPhotos(user.email))
-
-                userPhoto = Transformations.switchMap(photosRequest) { response ->
-                    return@switchMap SingleLiveData(response?.photos?.firstOrNull())
-                }
-            }
+    internal fun getUserPhoto(): LiveData<Photo?> {
+        return repository.getUserPhoto().toLiveData().map {
+            it.value
         }
-
-        return userPhoto
     }
 
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
-        val file = imageUri.toFile()
-        return networkService.uploadNewUserPhoto(file).toLiveData()
+        return repository.setUserPhoto(imageUri).toBooleanSingle().toLiveData()
     }
 }

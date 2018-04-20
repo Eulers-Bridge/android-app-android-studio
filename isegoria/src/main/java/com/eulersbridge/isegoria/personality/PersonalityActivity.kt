@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.ifTrue
+import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.personality_questions_activity.*

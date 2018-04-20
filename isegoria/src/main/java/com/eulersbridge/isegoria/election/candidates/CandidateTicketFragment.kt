@@ -19,25 +19,19 @@ import android.widget.TableRow
 import android.widget.TableRow.LayoutParams
 import android.widget.TextView
 import androidx.core.os.bundleOf
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.CandidateTicket
-import com.eulersbridge.isegoria.network.api.models.Election
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.CandidateTicket
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_candidates_tickets_fragment.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 class CandidateTicketFragment : Fragment() {
 
     @Inject
-    lateinit var app: IsegoriaApp
-
-    @Inject
-    lateinit var api: API
+    lateinit var repository: Repository
 
     private var dpWidth: Float = 0.toFloat()
 
@@ -50,29 +44,6 @@ class CandidateTicketFragment : Fragment() {
 
     private var added = false
     private var addedCounter = 0
-
-    private val electionsCallback = object : Callback<List<Election>> {
-        override fun onResponse(call: Call<List<Election>>, response: Response<List<Election>>) {
-            response.body()?.firstOrNull()?.let {
-                api.getTickets(it.id).enqueue(ticketsCallback)
-            }
-        }
-
-        override fun onFailure(call: Call<List<Election>>, t: Throwable) = t.printStackTrace()
-    }
-
-    private val ticketsCallback = object : Callback<List<CandidateTicket>> {
-        override fun onResponse(
-            call: Call<List<CandidateTicket>>,
-            response: Response<List<CandidateTicket>>
-        ) {
-            response.body()?.let { tickets ->
-                addTickets(tickets)
-            }
-        }
-
-        override fun onFailure(call: Call<List<CandidateTicket>>, t: Throwable) = t.printStackTrace()
-    }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -91,8 +62,8 @@ class CandidateTicketFragment : Fragment() {
         val displayMetrics = activity!!.resources.displayMetrics
         dpWidth = displayMetrics.widthPixels / displayMetrics.density
 
-        app.loggedInUser.value?.institutionId?.let {
-            api.getElections(it).enqueue(electionsCallback)
+        repository.getLatestElectionTickets().subscribeSuccess { tickets ->
+            addTickets(tickets)
         }
 
         return rootView
@@ -102,7 +73,7 @@ class CandidateTicketFragment : Fragment() {
         if (tickets == null)
             return
 
-        activity?.runOnUiThread {
+        runOnUiThread {
 
             for (ticket in tickets) {
                 addedCounter += 1

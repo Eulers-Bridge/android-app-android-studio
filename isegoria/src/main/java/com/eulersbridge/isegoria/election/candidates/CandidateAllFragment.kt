@@ -21,8 +21,10 @@ import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Candidate
+import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -43,6 +45,9 @@ class CandidateAllFragment : Fragment() {
 
     @Inject
     internal lateinit var api: API
+
+    @Inject
+    internal lateinit var repository: Repository
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -84,14 +89,8 @@ class CandidateAllFragment : Fragment() {
                     = handleSearchQueryTextChange(query)
         })
 
-        app.loggedInUser.value?.institutionId?.let {
-            api.getElections(it).onSuccess { elections ->
-                elections.firstOrNull()?.let {
-                    api.getElectionCandidates(it.id).onSuccess { candidates ->
-                        addCandidates(candidates)
-                    }
-                }
-            }
+        repository.getLatestElectionCandidates().subscribeSuccess { candidates ->
+            addCandidates(candidates)
         }
     }
 
@@ -126,7 +125,7 @@ class CandidateAllFragment : Fragment() {
     }
 
     private fun addCandidates(candidates: List<Candidate>) {
-        activity?.runOnUiThread {
+        runOnUiThread {
             for (candidate in candidates)
                 addTableRow(candidate)
         }
@@ -166,16 +165,16 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).subscribeSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
-                    .load(it.getPhotoUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(candidateProfileView)
+                        .load(it.getPhotoUrl())
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(candidateProfileView)
             }
-        }
+        }.addTo(compositeDisposable)
 
-        api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).subscribeSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.getPhotoUrl())
@@ -227,7 +226,7 @@ class CandidateAllFragment : Fragment() {
         }
 
         api.getTicket(candidate.ticketId).subscribeSuccess {
-            it.let {
+            runOnUiThread {
                 textViewParty.text = it.code
                 textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
             }
@@ -278,7 +277,9 @@ class CandidateAllFragment : Fragment() {
         }
 
         api.getPosition(candidate.positionId).subscribeSuccess {
-            textViewPosition.text = it?.name
+            runOnUiThread {
+                textViewPosition.text = it.name
+            }
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

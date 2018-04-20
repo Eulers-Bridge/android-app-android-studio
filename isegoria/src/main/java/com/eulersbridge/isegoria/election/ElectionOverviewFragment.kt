@@ -12,9 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Election
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.toDateString
+import com.eulersbridge.isegoria.network.api.model.Election
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.toDateString
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_overview_fragment.*
 import javax.inject.Inject

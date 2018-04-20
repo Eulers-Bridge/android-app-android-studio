@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observeBoolean
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.vote_fragment_done.*
 
@@ -38,7 +38,7 @@ class VoteDoneFragment : Fragment(), TitledFragment {
         addToCalendarButton.isEnabled = false
 
         activity?.let { activity ->
-            viewModel.addVoteReminderToCalendarIntent
+            viewModel.getAddReminderToCalendarIntent()
                 ?.takeIf { it.resolveActivity(activity.packageManager) != null }
                 ?.apply {
                     activity.startActivity(this)

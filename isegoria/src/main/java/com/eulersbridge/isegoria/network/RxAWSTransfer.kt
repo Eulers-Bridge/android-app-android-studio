@@ -18,7 +18,7 @@ fun TransferObserver.toCompletable(): Completable {
                 if (state == TransferState.COMPLETED) {
                     emitter.onComplete()
                 } else if (state == TransferState.FAILED) {
-                    emitter.onError(Throwable("transfer failed"))
+                    emitter.onError(Throwable("Transfer failed"))
                 }
             }
 

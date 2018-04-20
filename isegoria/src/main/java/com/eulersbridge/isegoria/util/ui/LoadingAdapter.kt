@@ -20,6 +20,8 @@ protected constructor(private val loadingItemCount: Int) : RecyclerView.Adapter<
     }
 
     fun replaceItems(newItems: List<I>) {
+        isLoading = false
+
         if (newItems.isEmpty()) {
             val oldItemCount = items.size
             items.clear()

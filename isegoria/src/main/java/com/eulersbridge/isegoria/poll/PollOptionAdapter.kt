@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.poll
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.PollOption
+import com.eulersbridge.isegoria.network.api.model.PollOption
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 // A poll must have at least 2 options to choose between

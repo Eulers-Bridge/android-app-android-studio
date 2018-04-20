@@ -1,14 +1,16 @@
 package com.eulersbridge.isegoria.inject
 
 import android.content.Context
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.BuildConfig
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.addAppHeaders
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.network.*
 import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
 import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter
 import com.eulersbridge.isegoria.network.adapters.TimestampAdapter
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.util.extension.addAppHeaders
 import com.securepreferences.SecurePreferences
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -99,7 +101,6 @@ class AppModule {
                 .addInterceptor { chain ->
                     val request = chain.request().newBuilder()
                             .addAppHeaders()
-
                     chain.proceed(request.build())
                 }
                 .addInterceptor(cacheInterceptor)
@@ -128,7 +129,16 @@ class AppModule {
     @Provides
     @Singleton
     fun provideNetworkService(
-            app: IsegoriaApp, appContext: Context, httpClient: OkHttpClient, api: API, networkConfig: NetworkConfig
-    ) = NetworkService(app, appContext, httpClient, api, networkConfig)
+            appContext: Context, httpClient: OkHttpClient, api: API, networkConfig: NetworkConfig
+    ) = NetworkService(appContext, httpClient, api, networkConfig)
+
+    @Provides
+    @Singleton
+    fun provideRepository(api: API, networkService: NetworkService, securePreferences: SecurePreferences)
+            = Repository(api, networkService, securePreferences)
+
+    @Provides
+    @Singleton
+    fun provideAppRouter(app: IsegoriaApp): AppRouter = app
 
 }

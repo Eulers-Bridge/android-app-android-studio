@@ -4,10 +4,10 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.toLiveData
+import com.eulersbridge.isegoria.network.api.model.Country
+import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
 class SignUpViewModel
@@ -21,8 +21,8 @@ class SignUpViewModel
     val password = MutableLiveData<String>()
     val confirmPassword = MutableLiveData<String>()
     val gender = MutableLiveData<String>()
-    private val selectedCountry = MutableLiveData<Country>()
-    private val selectedInstitution = MutableLiveData<Institution?>()
+    private var selectedCountry: Country? = null
+    private var selectedInstitution: Institution? = null
     val selectedBirthYear = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
@@ -37,11 +37,11 @@ class SignUpViewModel
     }
 
     fun onCountrySelected(index: Int) : List<Institution>? {
-        selectedInstitution.value = null
+        selectedInstitution = null
 
         return countries?.let {
             val country = it[index]
-            selectedCountry.value = country
+            selectedCountry = country
 
             country.institutions
         }
@@ -50,7 +50,7 @@ class SignUpViewModel
     fun onInstitutionSelected(index: Int) {
         countries?.let { countries ->
             val institution = countries[index].institutions?.get(index)
-            selectedInstitution.value = institution
+            selectedInstitution = institution
         }
     }
 
@@ -70,11 +70,8 @@ class SignUpViewModel
         val confirmPassword = confirmPassword.value
         val passwordsMatch = passwordValid && password == confirmPassword
 
-        val country = selectedCountry.value
-        val countryValid = country != null
-
-        val institution = selectedInstitution.value
-        val institutionValid = institution != null
+        val countryValid = selectedCountry != null
+        val institutionValid = selectedInstitution != null
 
         val birthYear = selectedBirthYear.value
         val birthYearValid = birthYear != null
@@ -87,8 +84,8 @@ class SignUpViewModel
                 && institutionValid && birthYearValid && genderValid
 
         if (allFieldsValid)
-            return SignUpUser(givenName!!, familyName!!, gender!!, country!!.name, birthYear!!,
-                    email!!, password!!, institution!!.getName())
+            return SignUpUser(givenName!!, familyName!!, gender!!, selectedCountry!!.name, birthYear!!,
+                    email!!, password!!, selectedInstitution!!.getName())
 
         return null
     }

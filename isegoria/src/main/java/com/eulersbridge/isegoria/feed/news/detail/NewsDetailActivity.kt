@@ -10,7 +10,11 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.feed.news.ACTIVITY_EXTRA_NEWS_ARTICLE
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.toDateString
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.DaggerAppCompatActivity

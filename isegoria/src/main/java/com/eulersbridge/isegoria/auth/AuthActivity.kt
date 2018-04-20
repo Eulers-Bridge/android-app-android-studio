@@ -13,18 +13,26 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 
 class AuthActivity : DaggerAppCompatActivity() {
+
+    @Inject
+    lateinit var repository: Repository
 
     @Inject
     lateinit var api: API
@@ -35,15 +43,15 @@ class AuthActivity : DaggerAppCompatActivity() {
     private lateinit var viewModel: AuthViewModel
 
     private class ViewModelProviderFactory(
+            private val repository: Repository,
             private val api: API,
             private val networkService: NetworkService
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AuthViewModel(api, networkService) as T
+            return AuthViewModel(repository, api, networkService) as T
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,9 +69,13 @@ class AuthActivity : DaggerAppCompatActivity() {
                     }
                 })
 
-        viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(api, networkService))[AuthViewModel::class.java]
+        viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository, api, networkService))[AuthViewModel::class.java]
 
         presentRootContent(LoginFragment())
+
+        ifTrue(viewModel.authFinished) {
+            finish()
+        }
 
         ifTrue(viewModel.signUpVisible) {
             presentContent(SignUpFragment())

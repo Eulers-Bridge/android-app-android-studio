@@ -1,7 +1,5 @@
 package com.eulersbridge.isegoria.profile.badges
 
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,34 +9,16 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.profile.ProfileViewModel
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_badges_fragment.*
-import javax.inject.Inject
 
 class ProfileBadgesFragment : Fragment(), TitledFragment {
 
-    @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var api: API
     private lateinit var viewModel: ProfileViewModel
-
     private lateinit var badgeAdapter: BadgeAdapter
-
-    @Inject
-    lateinit var api: API
-
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-
-        viewModel = if (parentFragment != null) {
-            ViewModelProviders.of(parentFragment!!)[ProfileViewModel::class.java]
-        } else {
-            ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +35,16 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        setupBadgesGridView()
+        fetchUser()
+    }
+
+    fun provideDependencies(api: API, viewModel: ProfileViewModel) {
+        this.api = api
+        this.viewModel = viewModel
+    }
+
+    private fun setupBadgesGridView() {
         badgeAdapter = BadgeAdapter(GlideApp.with(this), api)
 
         badgesGridView.apply {
@@ -63,13 +53,16 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
             drawingCacheQuality = View.DRAWING_CACHE_QUALITY_AUTO
             setItemViewCacheSize(21)
         }
+    }
 
+    private fun fetchUser() {
         observe(viewModel.user) {
-            if (it != null) getBadges()
+            if (it != null)
+                fetchBadges()
         }
     }
 
-    private fun getBadges() {
+    private fun fetchBadges() {
         observe(viewModel.getRemainingBadges(true)) { remainingBadges ->
             if (remainingBadges != null)
                 badgeAdapter.replaceRemainingItems(remainingBadges)

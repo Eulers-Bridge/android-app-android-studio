@@ -17,9 +17,11 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.feed.events.ACTIVITY_EXTRA_EVENT
-import com.eulersbridge.isegoria.network.api.models.Event
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.network.api.model.Event
+import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.toDateString
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.event_detail_activity.*

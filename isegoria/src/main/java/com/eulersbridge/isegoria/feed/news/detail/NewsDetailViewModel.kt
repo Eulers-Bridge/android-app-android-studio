@@ -3,20 +3,16 @@ package com.eulersbridge.isegoria.feed.news.detail
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.subscribeSuccess
-import com.eulersbridge.isegoria.toBooleanSingle
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class NewsDetailViewModel
 @Inject constructor(
-    private val userData: LiveData<User>,
-    private val api: API
+        private val repository: Repository
 ) : ViewModel() {
 
     private lateinit var _newsArticle: NewsArticle
@@ -39,11 +35,11 @@ class NewsDetailViewModel
     }
 
     private fun fetchArticleLikes(articleId: Long) {
-        likesRequest = api.getNewsArticleLikes(articleId)
-                .onErrorReturnItem(emptyList())
+        likesRequest = repository.getNewsArticleLikes(articleId)
                 .subscribeSuccess {
                     likeCount.postValue(it.size)
-                    val likesContainUser = it.any { it.email == userData.value?.email }
+
+                    val likesContainUser = it.any { it.email == repository.getUser().email }
                     likedByUser.postValue(likesContainUser)
                 }
     }
@@ -52,22 +48,13 @@ class NewsDetailViewModel
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun likeArticle(): LiveData<Boolean> {
-        return userData.value?.let { user ->
-            api.likeArticle(_newsArticle.id, user.email)
-                    .map { it.success }
-                    .onErrorReturnItem(false)
-                    .toLiveData()
-        } ?: SingleLiveData(false)
+        return repository.likeArticle(_newsArticle.id).toLiveData()
     }
 
     /**
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun unlikeArticle(): LiveData<Boolean> {
-        return userData.value?.let { user ->
-            api.unlikeArticle(_newsArticle.id, user.email)
-                    .toBooleanSingle()
-                    .toLiveData()
-        } ?: SingleLiveData(false)
+        return repository.unlikeArticle(_newsArticle.id).toLiveData()
     }
 }

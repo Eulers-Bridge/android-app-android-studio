@@ -1,8 +1,6 @@
 package com.eulersbridge.isegoria.profile
 
 
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -18,50 +16,28 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Task
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.Task
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.ui.TitledFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_task_progress_fragment.*
-import javax.inject.Inject
 
 class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
-    @Inject
-    lateinit var app: IsegoriaApp
-
-    @Inject
-    lateinit var api: API
-
-    @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var api: API
     private lateinit var viewModel: ProfileViewModel
 
     private lateinit var completedAdapter: TaskAdapter
     private lateinit var remainingAdapter: TaskAdapter
-
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.profile_task_progress_fragment, container, false)
-
-        observe(viewModel.totalXp) {
-            if (it != null)
-                setLevel(it)
-        }
-
-        return rootView
+        return inflater.inflate(R.layout.profile_task_progress_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -72,6 +48,16 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
             PorterDuff.Mode.SRC_IN
         )
 
+        createListAdapters()
+        fetchData()
+    }
+
+    fun provideDependencies(api: API, viewModel: ProfileViewModel) {
+        this.api = api
+        this.viewModel = viewModel
+    }
+
+    private fun createListAdapters() {
         val glide = GlideApp.with(this)
 
         completedAdapter = TaskAdapter(glide, api)
@@ -79,11 +65,14 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
         completedTasksListView.adapter = completedAdapter
         remainingTasksListView.adapter = remainingAdapter
-
-        fetchTasks()
     }
 
-    private fun fetchTasks() {
+    private fun fetchData() {
+        observe(viewModel.totalXp) {
+            if (it != null)
+                setLevel(it)
+        }
+
         observe(viewModel.getRemainingTasks()) { remainingTasks ->
             if (remainingTasks != null)
                 setRemainingTasks(remainingTasks)
@@ -99,18 +88,10 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         super.onDetach()
 
         // Work around a child fragment manager bug: https://stackoverflow.com/a/15656428/447697
-        try {
-            val childFragmentManager =
+        val childFragmentManager =
                 Fragment::class.java.getDeclaredField("mChildFragmentManager")
-            childFragmentManager.isAccessible = true
-            childFragmentManager.set(this, null)
-
-        } catch (e: NoSuchFieldException) {
-            throw RuntimeException(e)
-        } catch (e: IllegalAccessException) {
-            throw RuntimeException(e)
-        }
-
+        childFragmentManager.isAccessible = true
+        childFragmentManager.set(this, null)
     }
 
     private fun ProgressBar.setCompatProgress(progress: Int, animate: Boolean) {
@@ -123,7 +104,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
     @UiThread
     private fun setLevel(totalXp: Long) {
-        activity?.runOnUiThread {
+        runOnUiThread {
             val level = totalXp.toInt() / 1000 + 1
 
             levelTextView.text = getString(R.string.profile_tasks_progress_level, level)
@@ -143,24 +124,22 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
     }
 
     private fun setRemainingTasks(remainingTasks: List<Task>) {
-        if (activity != null) {
-            remainingAdapter.setItems(remainingTasks)
+        remainingAdapter.setItems(remainingTasks)
 
-            // Calculate rough new list view size to 'autosize' it
-            activity?.runOnUiThread {
-                val heightDp = 44 * remainingTasks.size
+        // Calculate rough new list view size to 'autosize' it
+        runOnUiThread {
+            val heightDp = 44 * remainingTasks.size
 
-                @Px val heightPx = Math.round(
+            @Px val heightPx = Math.round(
                     TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, heightDp.toFloat(), resources.displayMetrics
+                            TypedValue.COMPLEX_UNIT_DIP, heightDp.toFloat(), resources.displayMetrics
                     )
-                )
+            )
 
-                val layoutParams =
+            val layoutParams =
                     LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
 
-                remainingTasksListView.layoutParams = layoutParams
-            }
+            remainingTasksListView.layoutParams = layoutParams
         }
     }
 

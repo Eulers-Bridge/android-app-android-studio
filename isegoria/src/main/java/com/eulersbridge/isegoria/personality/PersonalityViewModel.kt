@@ -1,40 +1,33 @@
 package com.eulersbridge.isegoria.personality
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.network.api.models.UserPersonality
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.UserPersonality
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class PersonalityViewModel
-@Inject constructor(
-    private val userData: LiveData<User>,
-    private val api: API
-) : ViewModel() {
+@Inject constructor(private val repository: Repository) : ViewModel() {
 
+    internal val doneButtonEnabled = MutableLiveData<Boolean>()
     internal val questionsContinued = MutableLiveData<Boolean>()
     internal val questionsComplete = MutableLiveData<Boolean>()
 
-    internal fun setUserCompletedQuestions(userPersonality: UserPersonality): LiveData<Boolean> {
-        val user = userData.value
+    init {
+        doneButtonEnabled.value = true
+    }
 
-        if (user == null) {
-            return SingleLiveData(false)
+    internal fun setUserCompletedQuestions(userPersonality: UserPersonality) {
+        doneButtonEnabled.value = false
 
-        } else {
-            return api.addUserPersonality(user.email, userPersonality)
-                    .map {
-                        if (it != null) {
-                            questionsComplete.postValue(true)
-                            return@map true
-                        }
+        repository.addUserPersonality(userPersonality).subscribeBy(
+                onComplete = {
+                    questionsComplete.postValue(true)
+                },
+                onError = {
 
-                        false
-                    }.toLiveData()
-        }
+                }
+        )
     }
 }

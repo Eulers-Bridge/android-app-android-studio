@@ -12,8 +12,8 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.observeBoolean
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.theartofdev.edmodo.cropper.CropImage
@@ -94,9 +94,8 @@ class SettingsActivity : DaggerAppCompatActivity() {
 
 
     private fun fetchData() {
-        observe(viewModel.userProfilePhotoURL) {
-            if (!it.isNullOrBlank())
-                GlideApp.with(this)
+        viewModel.getProfilePhotoUrl()?.let {
+            GlideApp.with(this)
                     .load(it)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(smallImageView)

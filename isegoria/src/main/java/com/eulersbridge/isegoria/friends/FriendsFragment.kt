@@ -19,10 +19,13 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.toast
 import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.friends_fragment.*
@@ -40,6 +43,11 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
+
+    @Inject
+    lateinit var api: API
+    @Inject
+    lateinit var repository: Repository
 
     private var mainActivity: MainActivity? = null
 
@@ -60,8 +68,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     ): View? {
         val rootView = inflater.inflate(R.layout.friends_fragment, container, false)
 
-        mainActivity = activity as MainActivity?
-        mainActivity?.invalidateOptionsMenu()
+        activity?.invalidateOptionsMenu()
 
         setHasOptionsMenu(true)
 
@@ -85,8 +92,8 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onDestroy() {
+        viewModel.onDestroy()
         super.onDestroy()
-        viewModel.onExit()
     }
 
     private fun getReceivedFriendRequests() {
@@ -143,7 +150,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         } else if (type == SENT && mainActivity != null) {
             val user = request.requestReceiver
 
-            val profileFragment = ProfileOverviewFragment()
+            val profileFragment = ProfileOverviewFragment.create(api, repository, null)
             profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
             mainActivity?.presentContent(profileFragment)
@@ -165,7 +172,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onSearchedUserClick(user: User?) {
-        val profileFragment = ProfileOverviewFragment()
+        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
         mainActivity?.presentContent(profileFragment)
@@ -177,7 +184,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onContactClick(contact: Contact) {
-        val profileFragment = ProfileOverviewFragment()
+        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
         mainActivity?.presentContent(profileFragment)

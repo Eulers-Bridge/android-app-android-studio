@@ -3,19 +3,31 @@ package com.eulersbridge.isegoria.auth
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.LoginState
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.subscribeSuccess
-import com.eulersbridge.isegoria.toLiveData
+import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(api: API, private val networkService: NetworkService) : ViewModel() {
+class AuthViewModel @Inject constructor(
+        repository: Repository,
+        api: API,
+        private val networkService: NetworkService
+) : ViewModel() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     private var countries: List<Country>? = null
+
+    val authFinished = MutableLiveData<Boolean>()
 
     val signUpVisible = MutableLiveData<Boolean>()
     val signUpUser = MutableLiveData<SignUpUser>()
@@ -28,6 +40,17 @@ class AuthViewModel @Inject constructor(api: API, private val networkService: Ne
         api.getGeneralInfo().subscribeSuccess {
             countries = it.countries
         }
+
+        repository.loginState
+                .filter { it is LoginState.LoggedIn }
+                .subscribe {
+                    authFinished.postValue(true)
+                }
+                .addTo(compositeDisposable)
+    }
+
+    override fun onCleared() {
+        compositeDisposable.dispose()
     }
 
     fun onSignUpBackPressed() {
@@ -55,7 +78,7 @@ class AuthViewModel @Inject constructor(api: API, private val networkService: Ne
         return networkService.signUp(updatedUser)
                 .doOnSuccess { success ->
                     if (!success)
-                        signUpUser.value = null
+                        signUpUser.postValue(null)
                 }
                 .toLiveData()
     }

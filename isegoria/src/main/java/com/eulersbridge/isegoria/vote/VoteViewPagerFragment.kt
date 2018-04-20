@@ -11,7 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -46,12 +46,8 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
         // Ensure options menu from another fragment is not carried over
         activity?.invalidateOptionsMenu()
 
-        ifTrue(viewModel.locationAndDateComplete) {
-            viewPager.currentItem = 1
-        }
-
-        ifTrue(viewModel.pledgeComplete) {
-            viewPager.currentItem = 2
+        observe(viewModel.viewPagerIndex) {
+            viewPager.currentItem = it!!
         }
 
         return rootView

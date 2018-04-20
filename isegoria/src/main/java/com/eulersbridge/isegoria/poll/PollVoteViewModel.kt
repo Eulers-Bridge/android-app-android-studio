@@ -5,13 +5,12 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.Poll
-import com.eulersbridge.isegoria.network.api.models.PollResult
-import com.eulersbridge.isegoria.subscribeSuccess
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.Poll
+import com.eulersbridge.isegoria.network.api.model.PollResult
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
@@ -26,12 +25,12 @@ class PollVoteViewModel
     internal val poll = MutableLiveData<Poll>()
     internal val pollResults = MutableLiveData<List<PollResult>>()
 
-    internal val pollCreator: LiveData<Contact> = Transformations.switchMap(poll) {
+    internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) {
         return@switchMap if (it.creator == null && !it.creatorEmail.isNullOrBlank()) {
-            api.getContact(it.creatorEmail!!).toLiveData()
+            api.getContact(it.creatorEmail!!).toLiveData() as LiveData<Contact?>
 
         } else {
-            SingleLiveData(it?.creator!!)
+            SingleLiveData(it?.creator)
         }
     }
 
@@ -51,15 +50,13 @@ class PollVoteViewModel
                                 }
 
                         val updatedPoll = currentPoll.copy(options = updatedPollOptions)
-                        poll.value = updatedPoll
-
-                        pollResults.value = results
+                        poll.postValue(updatedPoll)
+                        pollResults.postValue(results)
                     }
                 }.addTo(compositeDisposable)
     }
 
     override fun onCleared() {
         compositeDisposable.dispose()
-        (pollCreator as? RetrofitLiveData)?.cancel()
     }
 }

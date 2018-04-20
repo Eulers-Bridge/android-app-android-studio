@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.feed.news
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 class NewsAdapter internal constructor() : LoadingAdapter<NewsArticle, NewsViewHolder>(3) {

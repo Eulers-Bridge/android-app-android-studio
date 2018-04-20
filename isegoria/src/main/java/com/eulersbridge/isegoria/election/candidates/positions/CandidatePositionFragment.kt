@@ -15,12 +15,16 @@ import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Candidate
-import com.eulersbridge.isegoria.network.api.models.Position
+import com.eulersbridge.isegoria.network.api.model.Candidate
+import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -62,16 +66,16 @@ class CandidatePositionFragment : Fragment() {
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         position?.id?.let { positionId ->
-            api.getPositionCandidates(positionId).onSuccess { candidates ->
+            api.getPositionCandidates(positionId).subscribeSuccess { candidates ->
                 addCandidates(candidates)
-            }
+            }.addTo(compositeDisposable)
         }
 
         return rootView
     }
 
     private fun addCandidates(candidates: List<Candidate>?) {
-        activity?.runOnUiThread {
+        runOnUiThread {
             candidates?.forEach { addTableRow(it) }
         }
     }
@@ -104,12 +108,12 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        api.getPhoto(candidate.userId).onSuccess {
+        api.getPhoto(candidate.userId).subscribeSuccess {
             GlideApp.with(this@CandidatePositionFragment)
                 .load(it.getPhotoUrl())
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(candidateProfileView)
-        }
+        }.addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -148,8 +152,8 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).subscribeSuccess { ticket ->
-            ticket?.let {
+        api.getTicket(candidate.ticketId).subscribeSuccess {
+            runOnUiThread {
                 textViewParty.text = it.code
                 textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
             }
@@ -187,7 +191,9 @@ class CandidatePositionFragment : Fragment() {
         }
 
         api.getPosition(candidate.positionId).subscribeSuccess {
-            textViewPosition.text = it?.name
+            runOnUiThread {
+                textViewPosition.text = it.name
+            }
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

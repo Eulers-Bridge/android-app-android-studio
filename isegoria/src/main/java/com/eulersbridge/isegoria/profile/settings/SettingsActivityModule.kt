@@ -1,10 +1,8 @@
 package com.eulersbridge.isegoria.profile.settings
 
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -12,11 +10,7 @@ import dagger.Provides
 class SettingsActivityModule {
 
     @Provides
-    fun settingsViewModel(
-        app: IsegoriaApp,
-        api: API,
-        networkService: NetworkService
-    ): SettingsViewModel = SettingsViewModel(app, api, networkService)
+    fun settingsViewModel(repository: Repository): SettingsViewModel = SettingsViewModel(repository)
 
     @Provides
     fun provideSettingsViewModel(settingsViewModel: SettingsViewModel): ViewModelProvider.Factory

@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.network
 
-
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,

@@ -5,8 +5,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
-import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.Institution
 import java.lang.ref.WeakReference
 import java.util.*
 

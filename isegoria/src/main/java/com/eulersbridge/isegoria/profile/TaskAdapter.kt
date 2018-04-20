@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Task
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Task
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -17,6 +19,8 @@ internal class TaskAdapter(
     private val glide: RequestManager,
     private val api: API
 ) : RecyclerView.Adapter<TaskViewHolder>() {
+
+    private val compositeDisposable = CompositeDisposable()
     private val items = ArrayList<Task>()
 
     fun setItems(newItems: List<Task>) {
@@ -44,7 +48,7 @@ internal class TaskAdapter(
         val itemId = item.id
 
         val weakViewHolder = WeakReference(viewHolder)
-        api.getPhotos(itemId).onSuccess {
+        api.getPhotos(itemId).subscribeSuccess {
             if (it.totalPhotos > imageIndex + 1) {
                 val innerViewHolder = weakViewHolder.get()
 
@@ -55,18 +59,20 @@ internal class TaskAdapter(
                         innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)
                 }
             }
-        }
+        }.addTo(compositeDisposable)
     }
 
     override fun onViewRecycled(holder: TaskViewHolder) {
         holder.onRecycled()
-
-        super.onViewRecycled(holder)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): TaskViewHolder {
         val itemView = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.profile_tasks_list_item, viewGroup, false)
         return TaskViewHolder(itemView)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        compositeDisposable.dispose()
     }
 }

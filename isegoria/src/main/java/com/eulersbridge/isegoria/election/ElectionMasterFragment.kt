@@ -14,7 +14,6 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
-import com.eulersbridge.isegoria.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_master_layout.*
@@ -53,7 +52,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,17 +104,15 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
             ?.replace(R.id.election_frame, fragment)
             ?.commitAllowingStateLoss()
 
-        observe(viewModel.userCompletedEfficacyQuestions()) {
-            if (it == false) {
-                overlayView.isVisible = true
+        if (!viewModel.userCompletedEfficacyQuestions()) {
+            overlayView.isVisible = true
 
-                overlaySurveyButton.setOnClickListener {
-                    activity?.supportFragmentManager
+            overlaySurveyButton.setOnClickListener {
+                activity?.supportFragmentManager
                         ?.beginTransaction()
                         ?.addToBackStack(null)
                         ?.add(R.id.container, SelfEfficacyQuestionsFragment())
                         ?.commit()
-                }
             }
         }
     }

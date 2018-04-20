@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Event
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.Event
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.events_fragment.*
@@ -58,11 +58,7 @@ class EventsFragment : Fragment(), TitledFragment {
     }
 
     private fun setEvents(events: List<Event>?) {
-        adapter.isLoading = false
-
         refreshLayout.post { refreshLayout.isRefreshing = false }
-
-        if (events != null)
-            adapter.replaceItems(events)
+        adapter.replaceItems(events ?: emptyList())
     }
 }

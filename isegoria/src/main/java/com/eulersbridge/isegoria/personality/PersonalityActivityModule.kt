@@ -1,9 +1,8 @@
 package com.eulersbridge.isegoria.personality
 
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -11,10 +10,7 @@ import dagger.Provides
 class PersonalityActivityModule {
 
     @Provides
-    fun personalityViewModel(
-        app: IsegoriaApp,
-        api: API
-    ): PersonalityViewModel = PersonalityViewModel(app.loggedInUser, api)
+    fun personalityViewModel(repository: Repository): PersonalityViewModel = PersonalityViewModel(repository)
 
     @Provides
     fun providePersonalityViewModel(personalityViewModel: PersonalityViewModel): ViewModelProvider.Factory

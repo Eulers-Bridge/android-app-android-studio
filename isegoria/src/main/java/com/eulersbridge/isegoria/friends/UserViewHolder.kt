@@ -9,8 +9,8 @@ import android.widget.TextView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.GenericUser
-import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.network.api.model.GenericUser
+import com.eulersbridge.isegoria.network.api.model.Institution
 
 class UserViewHolder(
     itemView: View, @DrawableRes actionImageDrawableRes: Int,

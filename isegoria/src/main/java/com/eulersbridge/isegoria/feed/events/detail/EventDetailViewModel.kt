@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Event
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.network.api.models.Ticket
-import com.eulersbridge.isegoria.toLiveData
+import com.eulersbridge.isegoria.network.api.model.Event
+import com.eulersbridge.isegoria.network.api.model.Position
+import com.eulersbridge.isegoria.network.api.model.Ticket
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
 class EventDetailViewModel

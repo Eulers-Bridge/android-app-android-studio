@@ -9,7 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.setCompatTooltipText
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.poll_fragment.*
 import javax.inject.Inject
@@ -90,7 +93,6 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
         val poll = viewModel.poll.value
 
         poll?.options?.let {
-            pollOptionsAdapter.isLoading = false
             pollOptionsAdapter.replaceItems(it)
             pollOptionsAdapter.pollVotingEnabled = !poll.closed
         }

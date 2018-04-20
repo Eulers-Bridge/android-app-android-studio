@@ -7,7 +7,7 @@ import android.widget.TextView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Task
+import com.eulersbridge.isegoria.network.api.model.Task
 
 internal class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -38,9 +38,11 @@ internal class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         if (item?.id == itemId && imageView.context != null) {
             this.glide = glide
 
-            glide.load(imageUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+            imageView.post {
+                glide.load(imageUrl)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(imageView)
+            }
         }
     }
 

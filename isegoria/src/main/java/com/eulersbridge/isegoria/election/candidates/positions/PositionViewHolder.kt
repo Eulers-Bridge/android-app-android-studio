@@ -6,7 +6,7 @@ import android.widget.TextView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Position
+import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PositionViewHolder(itemView: View, private val listener: PositionItemListener?) :

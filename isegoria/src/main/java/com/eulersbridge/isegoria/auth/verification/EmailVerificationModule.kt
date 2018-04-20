@@ -1,8 +1,8 @@
 package com.eulersbridge.isegoria.auth.verification
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.AppRouter
+import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -10,8 +10,8 @@ import dagger.Provides
 class EmailVerificationModule {
 
     @Provides
-    fun emailVerificationViewModel(app: IsegoriaApp, api: API): EmailVerificationViewModel
-            = EmailVerificationViewModel(app,api)
+    fun emailVerificationViewModel(appRouter: AppRouter, repository: Repository): EmailVerificationViewModel
+            = EmailVerificationViewModel(appRouter, repository)
 
     @Provides
     fun provideEmailVerificationViewModel(emailVerificationViewModel: EmailVerificationViewModel): ViewModelProvider.Factory

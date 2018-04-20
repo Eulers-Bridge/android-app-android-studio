@@ -13,8 +13,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.feed.news.detail.NewsDetailActivity
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.toDateString
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.toDateString
 import com.eulersbridge.isegoria.util.transformation.RoundedCornersTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter

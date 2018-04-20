@@ -3,13 +3,10 @@ package com.eulersbridge.isegoria.feed.photos.detail
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.IntRange
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Like
-import com.eulersbridge.isegoria.network.api.models.Photo
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.toBooleanSingle
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.Like
+import com.eulersbridge.isegoria.network.api.model.Photo
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -19,8 +16,7 @@ import javax.inject.Inject
 
 class PhotoDetailViewModel
 @Inject constructor(
-    private val userData: LiveData<User>,
-    private val api: API
+        private val repository: Repository
 ) : ViewModel() {
 
     private var photos: List<Photo>? = null
@@ -40,7 +36,7 @@ class PhotoDetailViewModel
 
         photoLikes = photo
                 .mergeAllMaybes()
-                .switchMap { api.getPhotoLikes(it.id).toObservable() }
+                .switchMap { repository.getPhotoLikes(it.id).toObservable() }
     }
 
     internal fun setPhotos(photos: List<Photo>, startIndex: Int) {
@@ -62,12 +58,11 @@ class PhotoDetailViewModel
     }
 
     internal fun getPhotoLikeCount(): LiveData<Int> {
-        val stream = photoLikes.map { it.size }
-        return stream.toLiveData(BackpressureStrategy.LATEST)
+        return photoLikes.map { it.size }.toLiveData(BackpressureStrategy.LATEST)
     }
 
     internal fun getPhotoLikedByUser(): LiveData<Boolean> {
-        val stream = photoLikes.map { it.singleOrNull { it.email == userData.value?.email } != null }
+        val stream = photoLikes.map { it.singleOrNull { it.email == repository.getUser().email } != null }
         return stream.toLiveData(BackpressureStrategy.LATEST)
     }
 
@@ -77,24 +72,13 @@ class PhotoDetailViewModel
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun likePhoto(): LiveData<Boolean> {
-        return userData.value?.let { user ->
-            photo.blockingFirst()
-                    .flatMapSingle { api.likePhoto(it.id, user.email) }
-                    .map { it.success }
-                    .onErrorReturnItem(false)
-                    .toLiveData()
-        } ?: SingleLiveData(false)
+        return photo.blockingFirst().flatMapSingle { repository.likePhoto(it.id) }.toLiveData()
     }
 
     /**
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun unlikePhoto(): LiveData<Boolean> {
-        return userData.value?.let { user ->
-            photo.blockingFirst()
-                    .flatMapCompletable { api.unlikePhoto(it.id, user.email) }
-                    .toBooleanSingle()
-                    .toLiveData()
-        } ?: SingleLiveData(false)
+        return photo.blockingFirst().flatMapSingle { repository.unlikePhoto(it.id) }.toLiveData()
     }
 }

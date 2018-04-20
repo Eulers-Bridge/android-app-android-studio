@@ -18,10 +18,14 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS
 import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS_POSITION
-import com.eulersbridge.isegoria.network.api.models.Photo
+import com.eulersbridge.isegoria.network.api.model.Photo
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.toDateString
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.photo_detail_activity.*
 import javax.inject.Inject

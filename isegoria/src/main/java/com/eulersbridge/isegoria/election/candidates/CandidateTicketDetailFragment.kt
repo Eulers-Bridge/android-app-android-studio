@@ -25,8 +25,11 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Candidate
+import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
@@ -49,6 +52,9 @@ class CandidateTicketDetailFragment : Fragment() {
 
     @Inject
     lateinit var api: API
+
+    @Inject
+    lateinit var repository: Repository
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -96,40 +102,36 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        api.getTicketCandidates(ticketId).onSuccess { candidates ->
+        api.getTicketCandidates(ticketId).subscribeSuccess { candidates ->
             addCandidates(candidates)
-        }
+        }.addTo(compositeDisposable)
 
-        api.getPhotos(ticketId).onSuccess {
+        api.getPhotos(ticketId).subscribeSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(partyDetailLogoImageView)
             }
-        }
+        }.addTo(compositeDisposable)
 
-        api.getUserSupportedTickets(app.loggedInUser.value!!.email).onSuccess {
-            it.singleOrNull { ticket ->
-                ticket.id == ticketId
-
-            }?.let {
-                activity?.runOnUiThread {
-                    ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
-                }
+        repository.getUserSupportedTicket(ticketId).subscribeSuccess {
+            runOnUiThread {
+                ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
             }
         }
 
         ticketSupportButton.setOnClickListener {
-
-            val userEmail = app.loggedInUser.value!!.email
 
             val supportStr = getString(R.string.candidate_ticket_detail_button_support)
             val unsupportStr = getString(R.string.candidate_ticket_detail_button_unsupport)
 
             if (ticketSupportButton.text == supportStr) {
 
-                api.supportTicket(ticketId, userEmail).subscribe().addTo(compositeDisposable)
+                repository.supportTicket(ticketId)
+                        .toBooleanSingle()
+                        .subscribe()
+                        .addTo(compositeDisposable)
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
@@ -137,7 +139,10 @@ class CandidateTicketDetailFragment : Fragment() {
 
             } else if (ticketSupportButton.text == unsupportStr) {
 
-                api.unsupportTicket(ticketId, userEmail).subscribe().addTo(compositeDisposable)
+                repository.unsupportTicket(ticketId)
+                        .toBooleanSingle()
+                        .subscribe()
+                        .addTo(compositeDisposable)
 
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
@@ -158,7 +163,7 @@ class CandidateTicketDetailFragment : Fragment() {
 
     private fun addCandidates(candidates: List<Candidate>) {
         if (candidates.isNotEmpty()) {
-            activity?.runOnUiThread {
+            runOnUiThread {
                 for (candidate in candidates)
                     addTableRow(candidate)
             }
@@ -192,14 +197,14 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        api.getPhotos(candidate.userId).onSuccess {
+        api.getPhotos(candidate.userId).subscribeSuccess {
             it.photos?.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(candidateProfileView)
             }
-        }
+        }.addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -276,7 +281,7 @@ class CandidateTicketDetailFragment : Fragment() {
         }
 
         api.getPosition(candidate.positionId).subscribeSuccess {
-            textViewPosition.text = it?.name
+            textViewPosition.text = it.name
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

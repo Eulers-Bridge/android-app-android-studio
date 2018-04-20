@@ -12,9 +12,11 @@ import android.support.v7.app.AlertDialog
 import android.view.*
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -22,6 +24,11 @@ import kotlinx.android.synthetic.main.profile_viewpager_fragment.*
 import javax.inject.Inject
 
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+
+    @Inject
+    lateinit var api: API
+    @Inject
+    lateinit var repository: Repository
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
@@ -62,7 +69,18 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
     private fun setupViewPager() {
 
-        val fragments = listOf<Fragment>(ProfileOverviewFragment(), ProfileTaskProgressFragment(), ProfileBadgesFragment())
+        val fragments = mutableListOf<Fragment>()
+
+        val overviewFragment = ProfileOverviewFragment.create(api, repository, viewModel)
+        fragments.add(overviewFragment)
+
+        val taskProgressFragment = ProfileTaskProgressFragment()
+        taskProgressFragment.provideDependencies(api, viewModel)
+        fragments.add(taskProgressFragment)
+
+        val badgesFragment = ProfileBadgesFragment()
+        badgesFragment.provideDependencies(api, viewModel)
+        fragments.add(badgesFragment)
 
         val pagerAdapter = object : SimpleFragmentPagerAdapter(childFragmentManager, fragments) {
             override fun getPageTitle(position: Int): CharSequence?

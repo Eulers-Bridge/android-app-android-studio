@@ -6,6 +6,7 @@ import com.eulersbridge.isegoria.feed.events.EventsFragmentModule
 import com.eulersbridge.isegoria.feed.news.NewsFragment
 import com.eulersbridge.isegoria.feed.news.NewsFragmentModule
 import com.eulersbridge.isegoria.feed.photos.PhotoAlbumFragment
+import com.eulersbridge.isegoria.feed.photos.PhotoAlbumFragmentModule
 import com.eulersbridge.isegoria.feed.photos.PhotosFragment
 import com.eulersbridge.isegoria.feed.photos.PhotosFragmentModule
 import dagger.Module
@@ -20,7 +21,7 @@ abstract class FeedFragmentProvider {
     @ContributesAndroidInjector(modules = [(PhotosFragmentModule::class)])
     internal abstract fun providePhotosFragment(): PhotosFragment
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [(PhotoAlbumFragmentModule::class)])
     internal abstract fun providePhotoAlbumsFragment(): PhotoAlbumFragment
 
     @ContributesAndroidInjector(modules = [(EventsFragmentModule::class)])

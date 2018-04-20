@@ -1,43 +1,55 @@
 package com.eulersbridge.isegoria.election.efficacy
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.UserSelfEfficacy
-import com.eulersbridge.isegoria.toBooleanSingle
-import com.eulersbridge.isegoria.toLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.network.api.model.UserSelfEfficacy
+import io.reactivex.Completable
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class EfficacyViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val api: API
+    private val repository: Repository
 ) : ViewModel() {
+
+    internal val doneButtonEnabled = MutableLiveData<Boolean>()
+    internal val efficacyComplete = MutableLiveData<Boolean>()
 
     internal val score1 = MutableLiveData<Int>()
     internal val score2 = MutableLiveData<Int>()
     internal val score3 = MutableLiveData<Int>()
     internal val score4 = MutableLiveData<Int>()
 
-    internal fun addUserEfficacy(): LiveData<Boolean> {
+    init {
+        doneButtonEnabled.value = true
+        efficacyComplete.value = false
+    }
+
+    internal fun onDone() {
+        doneButtonEnabled.value = false
+        addUserEfficacy().subscribeBy(
+                onComplete = {
+                    efficacyComplete.postValue(true)
+                },
+                onError = {
+                    doneButtonEnabled.postValue(true)
+                }
+        )
+    }
+
+    private fun addUserEfficacy(): Completable {
 
         val scores = listOfNotNull(score1.value, score2.value, score3.value, score4.value)
             .map { it.toFloat() }
 
         return if (scores.isEmpty()) {
-            SingleLiveData(false)
+            Completable.error(Exception(""))
 
         } else {
-            val userEmail = app.loggedInUser.value!!.email
             val answers = UserSelfEfficacy(scores[0], scores[1], scores[2], scores[3])
 
-            api.addUserEfficacy(userEmail, answers)
-                    .doOnComplete { app.onUserSelfEfficacyCompleted() }
-                    .toBooleanSingle()
-                    .toLiveData()
+            repository.addUserSelfEfficacyAnswers(answers)
         }
     }
 

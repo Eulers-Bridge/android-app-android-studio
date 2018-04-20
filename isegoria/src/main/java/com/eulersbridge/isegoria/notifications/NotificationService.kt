@@ -6,7 +6,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import com.eulersbridge.isegoria.NOTIFICATION_CHANNEL_FRIENDS
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.notificationChannelIDFromName
+import com.eulersbridge.isegoria.util.extension.notificationChannelIDFromName
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -40,7 +40,7 @@ class NotificationService : FirebaseMessagingService() {
     private fun createNotification(title: String, text: String) {
         val notificationBuilder = NotificationCompat.Builder(
             this,
-            notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS)
+                notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS)
         )
             .setContentTitle(title)
             .setContentText(text)

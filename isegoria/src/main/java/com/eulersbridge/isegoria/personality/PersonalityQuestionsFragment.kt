@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.UserPersonality
-import com.eulersbridge.isegoria.observeBoolean
+import com.eulersbridge.isegoria.network.api.model.UserPersonality
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import kotlinx.android.synthetic.main.personality_screen2_fragment.*
 
 
@@ -33,8 +33,6 @@ class PersonalityQuestionsFragment : Fragment() {
         )
 
         doneButton.setOnClickListener {
-            doneButton.isEnabled = false
-
             val extroversion =
                 ((sliderBars[0].score + (8 - sliderBars[5].score)) / 2).toFloat()
             val agreeableness =
@@ -51,10 +49,11 @@ class PersonalityQuestionsFragment : Fragment() {
                 emotionalStability, extroversion, opennessToExperiences
             )
 
-            observeBoolean(viewModel.setUserCompletedQuestions(personality)) { success ->
-                if (!success)
-                    doneButton.post { doneButton.isEnabled = true }
-            }
+            viewModel.setUserCompletedQuestions(personality)
+        }
+
+        observeBoolean(viewModel.doneButtonEnabled) {
+            doneButton.isEnabled = it
         }
     }
 

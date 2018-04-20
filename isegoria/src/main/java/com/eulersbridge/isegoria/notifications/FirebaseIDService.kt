@@ -7,7 +7,7 @@ import com.amazonaws.services.sns.AmazonSNSClient
 import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest
 import com.eulersbridge.isegoria.ENDPOINT_ARN_KEY
 import com.eulersbridge.isegoria.SNS_PLATFORM_APPLICATION_ARN
-import com.eulersbridge.isegoria.edit
+import com.eulersbridge.isegoria.util.extension.edit
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.FirebaseInstanceIdService
 import com.securepreferences.SecurePreferences

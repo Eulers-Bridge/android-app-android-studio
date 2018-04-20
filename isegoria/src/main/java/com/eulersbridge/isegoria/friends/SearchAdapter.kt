@@ -5,9 +5,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.GenericUser
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.network.api.model.GenericUser
+import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.network.api.model.User
 import java.lang.ref.WeakReference
 import java.util.*
 
