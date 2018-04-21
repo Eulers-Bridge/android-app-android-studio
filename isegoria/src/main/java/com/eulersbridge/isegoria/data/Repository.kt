@@ -1,7 +1,9 @@
-package com.eulersbridge.isegoria
+package com.eulersbridge.isegoria.data
 
 import android.net.Uri
 import androidx.core.net.toFile
+import com.eulersbridge.isegoria.USER_EMAIL_KEY
+import com.eulersbridge.isegoria.USER_PASSWORD_KEY
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.*

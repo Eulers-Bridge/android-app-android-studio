@@ -18,7 +18,11 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.toast
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
+import com.eulersbridge.isegoria.MainActivity
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.FriendRequest

@@ -16,6 +16,8 @@ import android.view.MenuItem
 import androidx.core.content.systemService
 import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment

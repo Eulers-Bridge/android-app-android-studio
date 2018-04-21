@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.election
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toLiveData

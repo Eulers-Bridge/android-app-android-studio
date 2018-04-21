@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.personality
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.UserPersonality
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject

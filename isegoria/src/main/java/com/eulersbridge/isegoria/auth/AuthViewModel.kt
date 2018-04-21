@@ -3,9 +3,9 @@ package com.eulersbridge.isegoria.auth
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.LoginState
-import com.eulersbridge.isegoria.Repository
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Country

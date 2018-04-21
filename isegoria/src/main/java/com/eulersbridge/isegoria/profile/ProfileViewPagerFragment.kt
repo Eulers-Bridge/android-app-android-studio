@@ -12,7 +12,7 @@ import android.support.v7.app.AlertDialog
 import android.view.*
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity

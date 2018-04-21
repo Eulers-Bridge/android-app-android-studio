@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.profile
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.data.SingleLiveData
@@ -17,8 +17,8 @@ import javax.inject.Inject
 
 class ProfileViewModel
 @Inject constructor(
-    private val repository: Repository,
-    private val api: API
+        private val repository: Repository,
+        private val api: API
 ) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()

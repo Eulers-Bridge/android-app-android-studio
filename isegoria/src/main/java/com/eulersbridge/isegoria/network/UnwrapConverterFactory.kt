@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.network
 
+import com.eulersbridge.isegoria.network.api.Paginated
 import com.eulersbridge.isegoria.network.api.response.GenericPaginatedResponse
 import com.squareup.moshi.Types
 import okhttp3.ResponseBody

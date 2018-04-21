@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.friends.FriendsFragment
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Contact

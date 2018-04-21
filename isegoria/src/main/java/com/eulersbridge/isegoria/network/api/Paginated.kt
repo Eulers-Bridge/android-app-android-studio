@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.network
+package com.eulersbridge.isegoria.network.api
 
 @Target(
     AnnotationTarget.FUNCTION,

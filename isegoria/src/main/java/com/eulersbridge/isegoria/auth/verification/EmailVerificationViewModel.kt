@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.auth.verification
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.AppRouter
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 

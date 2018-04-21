@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment

@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.election.efficacy
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.UserSelfEfficacy
 import io.reactivex.Completable
 import io.reactivex.rxkotlin.subscribeBy

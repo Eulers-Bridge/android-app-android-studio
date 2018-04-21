@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria
+package com.eulersbridge.isegoria.data
 
 import com.eulersbridge.isegoria.network.api.model.User
 

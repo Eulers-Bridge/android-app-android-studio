@@ -23,7 +23,11 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment

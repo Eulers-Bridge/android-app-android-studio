@@ -3,6 +3,8 @@ package com.eulersbridge.isegoria
 import android.content.Intent
 import android.os.Bundle
 import com.eulersbridge.isegoria.auth.AuthActivity
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.securepreferences.SecurePreferences
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable

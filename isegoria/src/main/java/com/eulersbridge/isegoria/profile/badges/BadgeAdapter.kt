@@ -10,7 +10,6 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Badge
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import java.lang.ref.WeakReference

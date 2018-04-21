@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.feed.photos.detail
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.IntRange
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Like
 import com.eulersbridge.isegoria.network.api.model.Photo
 import com.eulersbridge.isegoria.util.extension.toLiveData

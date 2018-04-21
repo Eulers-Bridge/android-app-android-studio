@@ -5,7 +5,7 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.Intent
 import android.provider.CalendarContract
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.network.api.model.VoteLocation
 import com.eulersbridge.isegoria.network.api.model.VoteReminder
@@ -33,7 +33,7 @@ class VoteViewModel
     private val selectedVoteLocation = selectedVoteLocationIndex.map { Optional(voteLocations?.value?.get(it)) }
     private val dateTime = BehaviorSubject.createDefault(Optional<Calendar>())
 
-    internal val pledgeComplete = MutableLiveData<Boolean>()
+    private val pledgeComplete = MutableLiveData<Boolean>()
 
     private val latestVoteReminder = MutableLiveData<VoteReminder>()
 

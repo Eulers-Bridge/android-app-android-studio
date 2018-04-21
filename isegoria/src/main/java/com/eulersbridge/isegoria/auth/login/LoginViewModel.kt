@@ -5,8 +5,8 @@ import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.LoginState
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.isNetworkAvailable
@@ -17,9 +17,9 @@ import javax.inject.Inject
 
 class LoginViewModel
 @Inject constructor(
-    private val repository: Repository,
-    private val app: IsegoriaApp,
-    private val api: API
+        private val repository: Repository,
+        private val app: IsegoriaApp,
+        private val api: API
 ) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()

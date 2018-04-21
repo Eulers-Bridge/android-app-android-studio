@@ -20,6 +20,7 @@ import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment

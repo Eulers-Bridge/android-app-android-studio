@@ -20,7 +20,7 @@ import android.widget.TableRow.LayoutParams
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.CandidateTicket
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess

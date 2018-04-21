@@ -15,6 +15,8 @@ import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.core.content.systemService
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.DaggerAppComponent
 import com.eulersbridge.isegoria.util.extension.notificationChannelIDFromName
 import com.eulersbridge.isegoria.util.extension.systemService

@@ -4,7 +4,7 @@ import android.content.Context
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.BuildConfig
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.Repository
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.*
 import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
 import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter

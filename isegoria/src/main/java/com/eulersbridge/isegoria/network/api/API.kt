@@ -1,6 +1,5 @@
 package com.eulersbridge.isegoria.network.api
 
-import com.eulersbridge.isegoria.network.Paginated
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.network.api.response.*
 import io.reactivex.Completable
