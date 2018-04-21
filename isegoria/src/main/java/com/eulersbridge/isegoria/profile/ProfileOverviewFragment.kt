@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.profile
 
+import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -15,31 +16,46 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.friends.FriendsFragment
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.GenericUser
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.GenericUser
+import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.personality.PersonalityActivity
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.TitledFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_overview_fragment.*
-import javax.inject.Inject
 
 class ProfileOverviewFragment : Fragment(), TitledFragment {
 
-    @Inject
-    lateinit var app: IsegoriaApp
+    companion object {
+        fun create(api: API, repository: Repository, viewModel: ProfileViewModel?): ProfileOverviewFragment {
+            val fragment = ProfileOverviewFragment()
+            fragment.provideDependencies(api, repository, viewModel)
+            return fragment
+        }
+    }
 
-    @Inject
-    lateinit var api: API
-
+    private lateinit var api: API
+    private lateinit var repository: Repository
     private lateinit var taskAdapter: TaskAdapter
+    private var viewModel: ProfileViewModel? = null
 
-    @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: ProfileViewModel
+    private class ViewModelProviderFactory(
+            private val repository: Repository,
+            private val api: API
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ProfileViewModel(repository, api) as T
+        }
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,24 +63,17 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.profile_overview_fragment, container, false)
 
-    override fun onAttach(context: Context?) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-
-        viewModel = if (parentFragment != null) {
-            ViewModelProviders.of(parentFragment!!)[ProfileViewModel::class.java]
-        } else {
-            ViewModelProviders.of(this, modelFactory)[ProfileViewModel::class.java]
-        }
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        observe(app.loggedInUser) {
-            if (it != null && viewModel.user.value == null)
-                viewModel.setUser(it)
+        if (viewModel == null) {
+            viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository, api))[ProfileViewModel::class.java]
         }
+
+        requireNotNull(viewModel)
+
+        if (viewModel!!.user.value == null)
+            viewModel!!.setUser(repository.getUser())
 
         val user = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
 
@@ -75,12 +84,23 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         }
 
         if (user != null)
-            viewModel.setUser(user)
+            viewModel!!.setUser(user)
 
+        setupTaskListView()
+        createViewModelObservers()
+    }
+
+    private fun provideDependencies(api: API, repository: Repository, viewModel: ProfileViewModel?) {
+        this.api = api
+        this.repository = repository
+        this.viewModel = viewModel
+    }
+
+    private fun setupTaskListView() {
         taskAdapter = TaskAdapter(Glide.with(this), api)
 
-        friendsCountTextView.setOnClickListener({  viewModel.viewFriends() })
-        friendsLabel.setOnClickListener({  viewModel.viewFriends() })
+        friendsCountTextView.setOnClickListener({  viewModel!!.viewFriends() })
+        friendsLabel.setOnClickListener({  viewModel!!.viewFriends() })
 
         tasksListView.apply {
             adapter = taskAdapter
@@ -88,18 +108,18 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             isDrawingCacheEnabled = true
             drawingCacheQuality = View.DRAWING_CACHE_QUALITY_LOW
         }
-
-        createViewModelObservers()
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.user) { user ->
+        requireNotNull(viewModel)
+
+        observe(viewModel!!.user) { user ->
             if (user == null) {
                 personalityTestButton.isGone = true
                 return@observe
             }
 
-            observe(viewModel.getUserPhoto()) {
+            observe(viewModel!!.getUserPhoto()) {
                 if (it != null)
                     GlideApp.with(this)
                         .load(it.getPhotoUrl())
@@ -110,21 +130,21 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
                         .into(backgroundImageView)
             }
 
-            observe(viewModel.getInstitutionName()) {
+            observe(viewModel!!.getInstitutionName()) {
                 institutionTextView.text = it
             }
 
-            observe(viewModel.getRemainingBadges()) { remainingBadges ->
+            observe(viewModel!!.getRemainingBadges()) { remainingBadges ->
                 if (remainingBadges != null)
                     updateBadgesCount(user.completedBadgesCount, remainingBadges.size.toLong())
             }
 
-            observe(viewModel.getTasks()) { tasks ->
+            observe(viewModel!!.getTasks()) { tasks ->
                 if (tasks != null)
                     taskAdapter.setItems(tasks)
             }
 
-            viewModel.fetchUserStats()
+            viewModel!!.fetchUserStats()
 
             GlideApp.with(this)
                 .load(user.profilePhotoURL)
@@ -148,19 +168,27 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             if (isExternalUser) {
                 viewProgressTextView.isGone = true
             } else {
-                viewProgressTextView.setOnClickListener { viewModel.viewTasksProgress() }
+                viewProgressTextView.setOnClickListener { viewModel!!.viewTasksProgress() }
             }
 
             updateCompletedTasksCount(user.completedTasksCount)
             updateExperience(user.level, user.experience)
         }
 
-        observe(viewModel.contactsCount) {
+        observe(viewModel!!.contactsCount) {
             if (it != null) updateContactsCount(it)
         }
 
-        observe(viewModel.totalTasksCount) {
+        observe(viewModel!!.totalTasksCount) {
             if (it != null) updateTotalTasksCount(it)
+        }
+
+        ifTrue(viewModel!!.friendsScreenVisible) {
+            childFragmentManager
+                    .beginTransaction()
+                    .add(FriendsFragment(), null)
+                    .addToBackStack(null)
+                    .commit()
         }
     }
 

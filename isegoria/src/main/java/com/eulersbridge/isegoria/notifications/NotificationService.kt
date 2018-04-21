@@ -6,7 +6,7 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import com.eulersbridge.isegoria.NOTIFICATION_CHANNEL_FRIENDS
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.notificationChannelIDFromName
+import com.eulersbridge.isegoria.util.extension.notificationChannelIDFromName
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -34,13 +34,13 @@ class NotificationService : FirebaseMessagingService() {
         if (!title.isNullOrBlank() && !text.isNullOrBlank())
             createNotification(title!!, text!!)
 
-        //TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
+        // TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
     }
 
     private fun createNotification(title: String, text: String) {
         val notificationBuilder = NotificationCompat.Builder(
             this,
-            notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS)
+                notificationChannelIDFromName(NOTIFICATION_CHANNEL_FRIENDS)
         )
             .setContentTitle(title)
             .setContentText(text)

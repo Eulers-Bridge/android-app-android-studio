@@ -7,8 +7,8 @@ import android.widget.TextView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
-import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.Institution
 import java.lang.ref.WeakReference
 
 internal class ReceivedFriendRequestViewHolder(

@@ -1,22 +1,28 @@
 package com.eulersbridge.isegoria.auth.login
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import android.util.Patterns
 import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.enqueue
-import com.eulersbridge.isegoria.isNetworkAvailable
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.isNetworkAvailable
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class LoginViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val api: API
+        private val repository: Repository,
+        private val app: IsegoriaApp,
+        private val api: API
 ) : ViewModel() {
+
+    private val compositeDisposable = CompositeDisposable()
 
     internal val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
@@ -38,15 +44,23 @@ class LoginViewModel
         networkError.value = false
         canShowPasswordResetDialog.value = true
 
-        email.value = app.savedUserEmail
-        password.value = app.savedUserPassword
+        email.value = repository.getSavedEmail()
+        email.value = repository.getSavedPassword()
+
+        repository.loginState.subscribe {
+            when (it) {
+                is LoginState.LoginFailure -> {
+                    formEnabled.postValue(true)
+                }
+            }
+        }.addTo(compositeDisposable)
     }
 
-    internal fun onExit() {
-        app.hideLoginScreen()
+    override fun onCleared() {
+        compositeDisposable.dispose()
     }
 
-    internal fun login(): LiveData<Boolean> {
+    internal fun login() {
         formEnabled.value = false
 
         if (emailError.value == false && passwordError.value == false) {
@@ -57,21 +71,12 @@ class LoginViewModel
             } else {
                 networkError.value = false
 
-                // Not null as email & password validation checks test for null
-                val loginRequest = app.login(email.value!!, password.value!!)
-
-                return Transformations.switchMap(loginRequest) { success ->
-                    if (success == true)
-                        return@switchMap SingleLiveData(true)
-
-                    formEnabled.value = true
-                    SingleLiveData(false)
-                }
+                // Email/password not null as validation checks for null
+                repository.login(email.value!!, password.value!!)
             }
         }
 
         formEnabled.value = true
-        return SingleLiveData(false)
     }
 
     internal fun setNetworkErrorShown() {
@@ -79,11 +84,13 @@ class LoginViewModel
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
-
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
             // If email is valid, it is non-null
-            api.requestPasswordReset(email!!).enqueue()
+            api.requestPasswordReset(email!!)
+                    .toBooleanSingle()
+                    .subscribe()
+                    .addTo(compositeDisposable)
             canShowPasswordResetDialog.value = true
 
             return true

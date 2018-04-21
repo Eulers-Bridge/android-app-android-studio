@@ -2,19 +2,18 @@ package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.network.api.model.Country
+import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
 class SignUpViewModel
 @Inject constructor(private val api: API) : ViewModel() {
 
-    private var countries: LiveData<List<Country>?>? = null
+    private var countries: List<Country>? = null
 
     val givenName = MutableLiveData<String>()
     val familyName = MutableLiveData<String>()
@@ -22,37 +21,36 @@ class SignUpViewModel
     val password = MutableLiveData<String>()
     val confirmPassword = MutableLiveData<String>()
     val gender = MutableLiveData<String>()
-    private val selectedCountry = MutableLiveData<Country>()
-    private val selectedInstitution = MutableLiveData<Institution?>()
+    private var selectedCountry: Country? = null
+    private var selectedInstitution: Institution? = null
     val selectedBirthYear = MutableLiveData<String>()
 
     fun getCountries(): LiveData<List<Country>?> {
-        val generalInfo = RetrofitLiveData(api.getGeneralInfo())
-
-        countries = Transformations.switchMap(generalInfo) {
-            return@switchMap SingleLiveData(it?.countries)
+        countries?.let {
+            return SingleLiveData(it)
         }
 
-        return countries!!
+        return api.getGeneralInfo()
+                .doOnSuccess { countries = it.countries }
+                .map { it.countries }
+                .toLiveData()
     }
 
     fun onCountrySelected(index: Int) : List<Institution>? {
-        selectedInstitution.value = null
+        selectedInstitution = null
 
-        countries?.value?.let {
+        return countries?.let {
             val country = it[index]
-            selectedCountry.value = country
+            selectedCountry = country
 
-            return country.institutions
+            country.institutions
         }
-
-        return null
     }
 
     fun onInstitutionSelected(index: Int) {
-        countries?.value?.let { countries ->
+        countries?.let { countries ->
             val institution = countries[index].institutions?.get(index)
-            selectedInstitution.value = institution
+            selectedInstitution = institution
         }
     }
 
@@ -72,11 +70,8 @@ class SignUpViewModel
         val confirmPassword = confirmPassword.value
         val passwordsMatch = passwordValid && password == confirmPassword
 
-        val country = selectedCountry.value
-        val countryValid = country != null
-
-        val institution = selectedInstitution.value
-        val institutionValid = institution != null
+        val countryValid = selectedCountry != null
+        val institutionValid = selectedInstitution != null
 
         val birthYear = selectedBirthYear.value
         val birthYearValid = birthYear != null
@@ -89,8 +84,8 @@ class SignUpViewModel
                 && institutionValid && birthYearValid && genderValid
 
         if (allFieldsValid)
-            return SignUpUser(givenName!!, familyName!!, gender!!, country!!.name, birthYear!!,
-                    email!!, password!!, institution!!.getName())
+            return SignUpUser(givenName!!, familyName!!, gender!!, selectedCountry!!.name, birthYear!!,
+                    email!!, password!!, selectedInstitution!!.getName())
 
         return null
     }

@@ -18,11 +18,18 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.toast
-import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
+import com.eulersbridge.isegoria.MainActivity
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.friends_fragment.*
@@ -40,6 +47,11 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
+
+    @Inject
+    lateinit var api: API
+    @Inject
+    lateinit var repository: Repository
 
     private var mainActivity: MainActivity? = null
 
@@ -60,42 +72,18 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     ): View? {
         val rootView = inflater.inflate(R.layout.friends_fragment, container, false)
 
-        mainActivity = activity as MainActivity?
-        mainActivity?.invalidateOptionsMenu()
+        activity?.invalidateOptionsMenu()
 
         setHasOptionsMenu(true)
 
-        observeBoolean(viewModel.searchSectionVisible) {
-            searchContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.friendsVisible) {
-            friendsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.sentRequestsVisible) {
-            sentRequestsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.receivedRequestsVisible) {
-            receivedRequestsContainer.isVisible = it
-        }
-
-        observeBoolean(viewModel.receivedRequestsVisible) {
-            receivedRequestsContainer.isVisible = it
-        }
-
-        observe(viewModel.getFriends()) { friends ->
-            if (friends != null)
-                friendsAdapter.setItems(friends)
-        }
-
-        observe(viewModel.getSentFriendRequests()) { requests ->
-            if (requests != null)
-                sentAdapter.setItems(requests)
-        }
-
-        getReceivedFriendRequests()
+        observeBoolean(viewModel.searchSectionVisible) { searchContainer.isVisible = it }
+        observeBoolean(viewModel.friendsVisible) { friendsContainer.isVisible = it }
+        observeBoolean(viewModel.receivedRequestsVisible) { receivedRequestsContainer.isVisible = it }
+        observeBoolean(viewModel.sentRequestsVisible) { sentRequestsContainer.isVisible = it }
+        observe(viewModel.friends) { friendsAdapter.setItems(it!!) }
+        observe(viewModel.receivedFriendRequests) { receivedAdapter.setItems(it!!) }
+        observe(viewModel.sentFriendRequests) { sentAdapter.setItems(it!!) }
+        observe(viewModel.searchResults) { searchAdapter.setItems(it!!) }
 
         return rootView
     }
@@ -108,15 +96,12 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onDestroy() {
+        viewModel.onDestroy()
         super.onDestroy()
-        viewModel.onExit()
     }
 
     private fun getReceivedFriendRequests() {
-        observe(viewModel.getReceivedFriendRequests()) { requests ->
-            if (requests != null)
-                receivedAdapter.setItems(requests)
-        }
+        viewModel.refreshReceivedFriendRequests()
     }
 
     override fun getContactInstitution(
@@ -155,7 +140,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
             // Show accept/reject dialog
             context?.let {
                 AlertDialog.Builder(it)
-                    .setTitle(getString(R.string.friend_request_action_dialog_title) + request.requester!!.fullName)
+                    .setTitle(getString(R.string.friend_request_action_dialog_title, request.requester!!.fullName))
                     .setPositiveButton(
                         R.string.friend_request_action_dialog_positive
                     ) { _, _ -> acceptFriendRequest(request) }
@@ -169,7 +154,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         } else if (type == SENT && mainActivity != null) {
             val user = request.requestReceiver
 
-            val profileFragment = ProfileOverviewFragment()
+            val profileFragment = ProfileOverviewFragment.create(api, repository, null)
             profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
             mainActivity?.presentContent(profileFragment)
@@ -191,7 +176,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onSearchedUserClick(user: User?) {
-        val profileFragment = ProfileOverviewFragment()
+        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
         mainActivity?.presentContent(profileFragment)
@@ -203,7 +188,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onContactClick(contact: Contact) {
-        val profileFragment = ProfileOverviewFragment()
+        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
         mainActivity?.presentContent(profileFragment)
@@ -258,12 +243,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun searchQueryChanged(query: String) {
-        observe(viewModel.onSearchQueryChanged(query)) { searchResults ->
-            searchAdapter.clearItems()
-
-            if (searchResults != null)
-                searchAdapter.setItems(searchResults)
-        }
+        viewModel.onSearchQueryChanged(query)
     }
 
     override fun setupTabLayout(tabLayout: TabLayout) {

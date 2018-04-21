@@ -2,7 +2,7 @@ package com.eulersbridge.isegoria.friends
 
 import android.support.v7.widget.RecyclerView
 
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
 
 import java.lang.ref.WeakReference
 

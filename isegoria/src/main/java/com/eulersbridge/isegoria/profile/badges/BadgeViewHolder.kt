@@ -8,7 +8,7 @@ import android.widget.TextView
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Badge
+import com.eulersbridge.isegoria.network.api.model.Badge
 
 internal class BadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -48,9 +48,11 @@ internal class BadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         if (item?.id == itemId) {
             this.glide = glide
 
-            glide.load(imageUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+            imageView.post {
+                glide.load(imageUrl)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(imageView)
+            }
         }
     }
 

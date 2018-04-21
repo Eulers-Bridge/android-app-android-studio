@@ -5,9 +5,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.GenericUser
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.network.api.models.User
+import com.eulersbridge.isegoria.network.api.model.GenericUser
+import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.network.api.model.User
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -24,12 +24,6 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
 
         fun onSearchedUserClick(user: User?)
         fun onSearchedUserActionClick(user: User?)
-    }
-
-    fun clearItems() {
-        val oldItemCount = items.size
-        items.clear()
-        notifyItemRangeRemoved(0, oldItemCount)
     }
 
     fun setItems(newItems: List<User>) {
@@ -61,7 +55,7 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.friend_partial_list_item, parent, false)
 
-        return UserViewHolder(itemView, R.drawable.added_inactive, this)
+        return UserViewHolder(itemView, R.drawable.friends, this)
     }
 
     override fun onBindViewHolder(viewHolder: UserViewHolder, position: Int) {

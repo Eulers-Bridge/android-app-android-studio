@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.news_fragment.*
@@ -64,17 +64,11 @@ class NewsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "News"
 
     private fun refresh() {
-        observe(viewModel.newsArticles) {
-            setNewsArticles(it)
-        }
+        observe(viewModel.getNewsArticles()) { setNewsArticles(it) }
     }
 
     private fun setNewsArticles(articles: List<NewsArticle>?) {
-        newsAdapter.isLoading = false
-
         refreshLayout?.post({ refreshLayout.isRefreshing = false })
-
-        if (articles != null)
-            newsAdapter.replaceItems(articles)
+        newsAdapter.replaceItems(articles ?: emptyList())
     }
 }

@@ -1,39 +1,38 @@
 package com.eulersbridge.isegoria.feed.photos
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.network.api.model.PhotoAlbum
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class PhotoAlbumsViewModel
 @Inject constructor(
-    private val user: LiveData<User>,
-    private val api: API
+        private val repository: Repository
 ) : ViewModel() {
 
-    private var photoAlbumsList: LiveData<List<PhotoAlbum>>? = null
+    internal var photoAlbums = MutableLiveData<List<PhotoAlbum>>()
+    private val compositeDisposable = CompositeDisposable()
 
-    internal val photoAlbums: LiveData<List<PhotoAlbum>>
-        get() {
-            return Transformations.switchMap<User, List<PhotoAlbum>>(user) { user ->
-
-                return@switchMap if (user == null) {
-                    SingleLiveData(null)
-
-                } else {
-                    photoAlbumsList = RetrofitLiveData(api.getPhotoAlbums(user.newsFeedId))
-                    photoAlbumsList
-                }
-            }
-        }
+    init {
+        fetchPhotoAlbums()
+    }
 
     override fun onCleared() {
-        (photoAlbumsList as? RetrofitLiveData)?.cancel()
+        compositeDisposable.dispose()
+    }
+
+    internal fun refresh() {
+        fetchPhotoAlbums()
+    }
+
+    private fun fetchPhotoAlbums() {
+        repository.getPhotoAlbums().subscribeSuccess {
+            photoAlbums.postValue(it)
+        }.addTo(compositeDisposable)
     }
 
 }

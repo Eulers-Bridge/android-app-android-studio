@@ -10,12 +10,13 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.bumptech.glide.request.RequestOptions
 import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Position
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_positions_fragment.*
@@ -24,10 +25,10 @@ import javax.inject.Inject
 class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickListener {
 
     @Inject
-    internal lateinit var app: IsegoriaApp
+    internal lateinit var api: API
 
     @Inject
-    internal lateinit var api: API
+    internal lateinit var repository: Repository
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -53,23 +54,13 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         positionsGridView.adapter = adapter
 
-        app.loggedInUser.value?.institutionId?.let { institutionId ->
-            api.getElections(institutionId).onSuccess { elections ->
-
-                elections.firstOrNull()?.also {
-                    api.getElectionPositions(it.id).onSuccess { positions ->
-                        setPositions(positions)
-                    }
-                }
-            }
+        repository.getLatestElectionPositions().subscribeSuccess {
+            runOnUiThread { setPositions(it) }
         }
     }
 
     private fun setPositions(positions: List<Position>) {
-        adapter.apply {
-            isLoading = false
-            replaceItems(positions)
-        }
+        adapter.replaceItems(positions)
     }
 
     override fun onClick(item: Position) {

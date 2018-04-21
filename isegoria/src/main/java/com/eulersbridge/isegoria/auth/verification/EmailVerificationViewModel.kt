@@ -1,36 +1,45 @@
 package com.eulersbridge.isegoria.auth.verification
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.Transformations
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.AppRouter
+import com.eulersbridge.isegoria.data.Repository
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class EmailVerificationViewModel
 @Inject constructor (
-    private val app: IsegoriaApp,
-    private val api: API
+    private val appRouter: AppRouter,
+    private val repository: Repository
 ) : ViewModel() {
 
-    internal fun onExit() {
-        app.userVerificationVisible.value = false
+    internal val resendVerificationButtonEnabled = MutableLiveData<Boolean>()
+    internal val completeButtonEnabled = MutableLiveData<Boolean>()
+
+    init {
+        completeButtonEnabled.value = true
+        resendVerificationButtonEnabled.value = true
     }
 
-    internal fun userVerified(): LiveData<Boolean> = app.login()
+    internal fun onDestroy() {
+        appRouter.setUserVerificationScreenVisible(false)
+    }
 
-    internal fun resendVerification(): LiveData<Boolean> {
-        return Transformations.switchMap(app.loggedInUser) {
-            return@switchMap if (it == null) {
-                SingleLiveData(false)
+    internal fun onVerificationComplete() {
 
-            } else {
-                val verificationRequest = RetrofitLiveData(api.sendVerificationEmail(it.email))
-                Transformations.switchMap(verificationRequest) { SingleLiveData(true) }
-            }
-        }
+    }
 
+    internal fun onResendVerification() {
+        resendVerificationButtonEnabled.value = false
+
+        repository.resendVerificationEmail()
+                .subscribeBy(
+                        onComplete = {
+
+                        },
+                        onError = {
+                            resendVerificationButtonEnabled.postValue(true)
+                        }
+                )
     }
 }

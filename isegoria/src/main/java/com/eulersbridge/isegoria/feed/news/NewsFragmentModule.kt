@@ -2,9 +2,8 @@ package com.eulersbridge.isegoria.feed.news
 
 
 import android.arch.lifecycle.ViewModelProvider
-import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -13,10 +12,7 @@ import dagger.Provides
 class NewsFragmentModule {
 
     @Provides
-    fun newsViewModel(
-        app: IsegoriaApp,
-        api: API
-    ): NewsViewModel = NewsViewModel(app, api)
+    fun newsViewModel(repository: Repository): NewsViewModel = NewsViewModel(repository)
 
     @Provides
     fun provideNewsViewModel(newsViewModel: NewsViewModel): ViewModelProvider.Factory

@@ -1,43 +1,41 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
-import android.app.*
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.Transformations
+import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.core.content.systemService
-import com.eulersbridge.isegoria.auth.AuthActivity
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.DaggerAppComponent
-import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.securepreferences.SecurePreferences
+import com.eulersbridge.isegoria.util.extension.notificationChannelIDFromName
+import com.eulersbridge.isegoria.util.extension.systemService
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 import javax.inject.Inject
-import kotlin.reflect.KClass
 
-class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
+class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
-
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
-
     @Inject
     lateinit var serviceInjector: DispatchingAndroidInjector<Service>
 
@@ -46,27 +44,19 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
     override fun serviceInjector() = serviceInjector
 
     @Inject
-    lateinit var networkService: NetworkService
+    lateinit var repository: Repository
 
-    @Inject
-    lateinit var securePreferences: SecurePreferences
+    private val compositeDisposable = CompositeDisposable()
 
-    val loggedInUser = MutableLiveData<User>()
-    var cachedLoginArticles: List<NewsArticle>? = null
+    val userVerificationScreenVisible = BehaviorSubject.createDefault(false)!!
+    val friendsScreenVisible = BehaviorSubject.createDefault(false)!!
 
-    private val loginVisible = MutableLiveData<Boolean>()
-    val userVerificationVisible = MutableLiveData<Boolean>()
-    val friendsVisible = MutableLiveData<Boolean>()
+    override fun setUserVerificationScreenVisible(visible: Boolean) {
+        userVerificationScreenVisible.onNext(visible)
+    }
 
-    private lateinit var loginObserver: Observer<Boolean>
-
-    val savedUserEmail: String? by lazy { securePreferences.getString(USER_EMAIL_KEY, null) }
-    val savedUserPassword: String? by lazy { securePreferences.getString(USER_PASSWORD_KEY, null) }
-
-    init {
-        loginVisible.value = false
-        userVerificationVisible.value = false
-        friendsVisible.value = false
+    override fun setFriendsScreenVisible(visible: Boolean) {
+        friendsScreenVisible.onNext(visible)
     }
 
     override fun onCreate() {
@@ -80,46 +70,22 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
 
         createNotificationChannels()
 
-        val login = login()
-        createLoginObserver(login)
-    }
+        repository.loginState.subscribe {
+            when (it) {
+                is LoginState.LoggedIn -> {
+                    createAppShortcuts()
+                }
 
-    private fun createLoginObserver(login: LiveData<Boolean>) {
-        loginObserver = Observer { loginSuccess ->
-            if (loginSuccess != null) {
-                if (loginSuccess == false) {
-                    showLoginScreen()
-                } else {
-                    showMainActivity()
+                is LoginState.LoggedOut -> {
+                    // Remove any notifications that are still visible
+                    NotificationManagerCompat.from(this).cancelAll()
+
+                    // Remove all app long-press shortcuts
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)
+                        systemService<ShortcutManager>().removeAllDynamicShortcuts()
                 }
             }
-
-            login.removeObserver(loginObserver)
-        }
-
-        login.observeForever(loginObserver)
-    }
-
-    private fun startActivity(activityClass: KClass<*>) {
-        val activityIntent = Intent(this, activityClass.java)
-        activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(activityIntent)
-    }
-
-    private fun showMainActivity() {
-        startActivity(MainActivity::class)
-    }
-
-    private fun showLoginScreen() {
-        if (loginVisible.value == null || loginVisible.value == false) {
-            loginVisible.value = true
-            startActivity(AuthActivity::class)
-        }
-    }
-
-    fun hideLoginScreen() {
-        if (loginVisible.value == null || loginVisible.value == true)
-            loginVisible.value = false
+        }.addTo(compositeDisposable)
     }
 
     @SuppressLint("NewApi")
@@ -178,116 +144,6 @@ class IsegoriaApp : Application(), HasActivityInjector, HasSupportFragmentInject
                 .build()
 
             systemService<ShortcutManager>().dynamicShortcuts = Arrays.asList(election, friends)
-        }
-    }
-
-    fun updateLoggedInUser(updatedUser: User) {
-        loggedInUser.value = updatedUser
-    }
-
-    fun setLoggedInUser(user: User, password: String) {
-        loggedInUser.value = user
-
-        securePreferences.edit {
-            putString(USER_EMAIL_KEY, user.email)
-            putString(USER_PASSWORD_KEY, password)
-        }
-
-        createAppShortcuts()
-    }
-
-    fun login(): LiveData<Boolean> {
-        if (loggedInUser.value == null) {
-            val email = savedUserEmail
-            val password = savedUserPassword
-
-            val haveStoredCredentials = email != null && password != null
-
-            return if (haveStoredCredentials) {
-                login(email!!, password!!)
-
-            } else {
-                return SingleLiveData(false)
-            }
-        }
-
-        return SingleLiveData(false)
-    }
-
-    fun login(email: String, password: String): LiveData<Boolean> {
-        val login = networkService.login(email, password)
-
-        val liveData = Transformations.switchMap(login) { response ->
-            if (response == null) {
-                SingleLiveData(false)
-
-            } else {
-                val user = response.user
-                cachedLoginArticles = response.articles
-
-                if (user != null) {
-                    user.id = response.userId
-
-                    hideLoginScreen()
-
-                    if (user.accountVerified) {
-                        networkService.updateAPIBaseURL(user)
-
-                    } else {
-                        hideLoginScreen()
-                        userVerificationVisible.value = true
-                    }
-
-                    return@switchMap SingleLiveData(true)
-
-                } else {
-                    loginVisible.value = true
-                }
-
-                SingleLiveData(false)
-            }
-        }
-
-        createLoginObserver(liveData)
-
-        return liveData
-    }
-
-    @SuppressLint("NewApi")
-    fun logOut() {
-        loggedInUser.value = null
-
-        networkService.setUserCredentials(null, null)
-
-        securePreferences.edit {
-            remove(USER_PASSWORD_KEY)
-        }
-
-        // Remove any notifications that are still visible
-        NotificationManagerCompat.from(this).cancelAll()
-
-        // Remove all app long-press shortcuts
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)
-            systemService<ShortcutManager>().removeAllDynamicShortcuts()
-
-        showLoginScreen()
-    }
-
-    fun setTrackingOff(trackingOff: Boolean) {
-        loggedInUser.value?.let {
-            loggedInUser.value = it.copy(trackingOff = trackingOff)
-        }
-    }
-
-    fun setOptedOutOfDataCollection(isOptedOutOfDataCollection: Boolean) {
-        loggedInUser.value?.let {
-            loggedInUser.value = it.copy(isOptedOutOfDataCollection = isOptedOutOfDataCollection)
-        }
-    }
-
-    fun onUserSelfEfficacyCompleted() {
-        loggedInUser.value?.let {
-            loggedInUser.value = it.copy(hasPersonality = true)
         }
     }
 }

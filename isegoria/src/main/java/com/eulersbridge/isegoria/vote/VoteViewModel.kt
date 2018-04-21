@@ -1,167 +1,130 @@
 package com.eulersbridge.isegoria.vote
 
-import android.arch.lifecycle.*
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.content.Intent
 import android.provider.CalendarContract
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Election
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.network.api.models.VoteLocation
-import com.eulersbridge.isegoria.network.api.models.VoteReminder
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.network.api.model.Election
+import com.eulersbridge.isegoria.network.api.model.VoteLocation
+import com.eulersbridge.isegoria.network.api.model.VoteReminder
+import com.eulersbridge.isegoria.util.data.Optional
+import com.eulersbridge.isegoria.util.extension.map
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.Observables
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 import javax.inject.Inject
 
 class VoteViewModel
 @Inject constructor(
-    private val userData: LiveData<User>,
-    private val api: API
+        private val repository: Repository
 ) : ViewModel() {
 
-    private var voteLocations: LiveData<List<VoteLocation>?>? = null
+    private val compositeDisposable = CompositeDisposable()
+
+    private var voteLocations: LiveData<List<VoteLocation>>? = null
     internal var electionData: LiveData<Election?>? = null
+    private val selectedVoteLocationIndex = BehaviorSubject.createDefault(0)
+    private val selectedVoteLocation = selectedVoteLocationIndex.map { Optional(voteLocations?.value?.get(it)) }
+    private val dateTime = BehaviorSubject.createDefault(Optional<Calendar>())
 
-    private val selectedVoteLocationIndex = MutableLiveData<Int>()
-
-    private val selectedVoteLocation =
-        Transformations.switchMap(selectedVoteLocationIndex) { index ->
-            SingleLiveData(voteLocations?.value?.get(index))
-        }
-
-    internal val dateTime = MutableLiveData<Calendar>()
-
-    internal val locationAndDateComplete = MediatorLiveData<Boolean>()
-    internal val pledgeComplete = MutableLiveData<Boolean>()
+    private val pledgeComplete = MutableLiveData<Boolean>()
 
     private val latestVoteReminder = MutableLiveData<VoteReminder>()
 
-    internal// Make event 1 hour long (add an hour in in milliseconds to start)
-    val addVoteReminderToCalendarIntent: Intent?
-        get() {
-            val (_, _, location, date) = latestVoteReminder.value ?: return null
+    internal val viewPagerIndex = MutableLiveData<Int>()
 
-            return Intent(Intent.ACTION_INSERT)
+    init {
+        viewPagerIndex.value = 0
+
+        Observables.combineLatest(selectedVoteLocation, dateTime) { location, dateTime ->
+            location.value != null && dateTime.value != null
+        }.subscribe {
+            if (it && pledgeComplete.value == false)
+                viewPagerIndex.postValue(1)
+        }.addTo(compositeDisposable)
+    }
+
+    override fun onCleared() {
+        compositeDisposable.dispose()
+    }
+
+    fun getAddReminderToCalendarIntent(): Intent? {
+        val (_, _, location, date) = latestVoteReminder.value ?: return null
+
+        return Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
                 .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date)
+                // Make event 1 hour long (add an hour in in milliseconds to start)
                 .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, date + 60 * 60 * 1000)
                 .putExtra(CalendarContract.Events.ALL_DAY, false)
                 .putExtra(CalendarContract.Events.TITLE, "Voting for Candidate")
                 .putExtra(CalendarContract.Events.DESCRIPTION, location)
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, location)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-    init {
-        selectedVoteLocationIndex.value = 0
-
-        locationAndDateComplete.addSource(selectedVoteLocation) { location ->
-            val complete = location != null && dateTime.value != null
-            locationAndDateComplete.value = complete
-        }
-
-        locationAndDateComplete.addSource(dateTime) { newDateTime ->
-            val complete = newDateTime != null && selectedVoteLocation.value != null
-            locationAndDateComplete.value = complete
-        }
     }
 
     internal fun onVoteLocationChanged(newIndex: Int) {
-        selectedVoteLocationIndex.value = newIndex
+        selectedVoteLocationIndex.onNext(newIndex)
+    }
+
+    internal fun setDateTime(calendar: Calendar) {
+        dateTime.onNext(Optional(calendar))
+    }
+
+    internal fun getDateTime(): Calendar? {
+        return dateTime.value?.value
+    }
+
+    internal fun onVoteComplete() {
+        viewPagerIndex.value = 1
     }
 
     internal fun getElection(): LiveData<Election?> {
         if (electionData != null)
             return electionData!!
 
-        val user = userData.value
-
-        return if (user?.institutionId == null) {
-            SingleLiveData(null)
-
-        } else {
-            val electionsList = RetrofitLiveData(api.getElections(user.institutionId!!))
-
-            electionData = Transformations.switchMap(electionsList) { elections ->
-                if (elections != null && elections.isNotEmpty()) {
-
-                    val election = elections[0]
-
-                    val calendar = Calendar.getInstance()
-                    calendar.timeInMillis = election.startVoting
-                    dateTime.value = calendar
-
-                    return@switchMap SingleLiveData<Election?>(election)
-                }
-
-                SingleLiveData<Election?>(null)
+        electionData = repository.getLatestElection().map {
+            if (it.value != null) {
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = it.value.startVoting
+                dateTime.onNext(Optional(calendar))
             }
 
-            electionData!!
-        }
+            it
+        }.toLiveData().map { it.value }
+
+        return electionData!!
     }
 
-    internal fun getVoteLocations(): LiveData<List<VoteLocation>?> {
-        if (voteLocations != null)
-            voteLocations
-
-        val user = userData.value
-
-        if (user?.institutionId != null) {
-            voteLocations = RetrofitLiveData(api.getVoteLocations(user.institutionId!!))
-            voteLocations
-        }
-
-        return SingleLiveData(null)
+    internal fun getVoteLocations(): LiveData<List<VoteLocation>> {
+        return repository.getVoteLocations().toLiveData()
     }
 
-    internal fun setPledgeComplete(): LiveData<Boolean> {
+    internal fun setPledgeComplete() {
         if (pledgeComplete.value != null && pledgeComplete.value == true)
-            return pledgeComplete
+            return
 
-        userData.value?.let { user ->
-            val election = this.electionData?.value
-            val voteLocation = selectedVoteLocation.value
-            val dateTimeCalendar = dateTime.value
+        val election = this.electionData?.value
+        val voteLocation = selectedVoteLocation.blockingFirst().value
+        val dateTimeCalendar = dateTime.value?.value
 
-            if (election != null && voteLocation != null && dateTimeCalendar != null) {
-                // Create a reminder
-                val reminder = VoteReminder(
-                    user.email, election.id, voteLocation.name!!,
-                    dateTimeCalendar.timeInMillis
-                )
+        if (election != null && voteLocation != null && dateTimeCalendar != null) {
+            repository.createUserVoteReminder(election.id, voteLocation.name!!, dateTimeCalendar.timeInMillis)
+                    .toBooleanSingle()
+                    .subscribe()
+                    .addTo(compositeDisposable)
 
-                // Add the vote reminder
-                val reminderRequest =
-                    RetrofitLiveData(api.addVoteReminder(user.email, reminder))
-
-                return Transformations.switchMap(reminderRequest) {
-                    pledgeComplete.value = true
-                    SingleLiveData(true)
-                }
-            }
+            viewPagerIndex.value = 2
         }
-
-        return SingleLiveData(false)
     }
 
     internal fun getLatestVoteReminder(): LiveData<Boolean> {
-        userData.value?.let { user ->
-            val remindersRequest = RetrofitLiveData(api.getVoteReminders(user.email))
-
-            return Transformations.switchMap(remindersRequest) { reminders ->
-                val latestReminder = reminders?.firstOrNull()
-
-                return@switchMap if (latestReminder == null) {
-                    latestVoteReminder.value = latestReminder
-                    SingleLiveData(true)
-
-                } else {
-                    SingleLiveData(false)
-                }
-            }
-        }
-
-        return SingleLiveData(false)
+        return repository.getUserVoteReminderExists().toLiveData()
     }
 }

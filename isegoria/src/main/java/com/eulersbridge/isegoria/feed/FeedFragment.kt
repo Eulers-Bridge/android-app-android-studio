@@ -18,7 +18,7 @@ import androidx.core.graphics.toColorFilter
 import androidx.core.view.isVisible
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.setKeyboardVisible
+import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.feed_fragment.*
 

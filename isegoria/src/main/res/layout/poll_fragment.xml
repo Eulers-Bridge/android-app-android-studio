@@ -36,7 +36,7 @@
             android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@id/creatorImageView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lorem ipsum question here?" />
+            tools:text="Lorem ipsum?" />
 
         <TextView
             android:id="@+id/creatorNameTextView"
@@ -87,11 +87,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/creatorNameTextView"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            android:layoutAnimation="@anim/layout_animation_fade_in"/>
+            tools:listitem="@layout/poll_vote_option_list_item" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

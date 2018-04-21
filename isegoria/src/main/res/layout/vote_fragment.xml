@@ -85,8 +85,8 @@
         android:focusableInTouchMode="false"
         android:focusable="false"
         android:longClickable="false"
-        tools:ignore="TextFields"
-        tools:text="11:15 AM"
+        tools:ignore="LabelFor,TextFields"
+        tools:text="@tools:sample/date/hhmm"
         android:importantForAutofill="no" />
 
     <EditText
@@ -106,7 +106,7 @@
         android:focusableInTouchMode="false"
         android:focusable="false"
         android:longClickable="false"
-        tools:ignore="TextFields"
+        tools:ignore="LabelFor,TextFields"
         tools:text="October 26"
         android:importantForAutofill="no" />
 

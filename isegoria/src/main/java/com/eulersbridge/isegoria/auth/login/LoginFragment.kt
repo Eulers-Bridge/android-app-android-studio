@@ -19,8 +19,8 @@ import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
-import com.eulersbridge.isegoria.ifTrue
-import com.eulersbridge.isegoria.observeBoolean
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
@@ -61,11 +61,6 @@ class LoginFragment : Fragment() {
         signUpButton.setOnClickListener { authViewModel.signUpVisible.value = true }
 
         createViewModelObservers()
-    }
-
-    override fun onDestroy() {
-        viewModel.onExit()
-        super.onDestroy()
     }
 
     @SuppressLint("InflateParams")
@@ -144,9 +139,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun onLoginClicked() {
-        ifTrue(viewModel.login()) {
-            authViewModel.userLoggedIn.value = true
-        }
+        viewModel.login()
     }
 
 }

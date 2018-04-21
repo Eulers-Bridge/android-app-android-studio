@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:text="@string/user_consent_statement_message"
             android:textSize="16sp"
-            tools:text="Lorem ipsum"/>
+            tools:text="@tools:sample/lorem/random"/>
 
         <Button
             android:id="@+id/disagreeButton"

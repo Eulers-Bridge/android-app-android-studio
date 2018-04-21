@@ -15,8 +15,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.VoteLocation
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.VoteLocation
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import kotlinx.android.synthetic.main.vote_fragment.*
 import java.util.*
@@ -72,16 +72,17 @@ class VoteFragment : Fragment(), TitledFragment {
 
         timeTextView.setOnClickListener {
             if (!it.isEnabled) {
-                viewModel.dateTime.value?.let { calendar ->
+                viewModel.getDateTime()?.let { calendar ->
                     openDialog = TimePickerDialog(
                         context,
                         { _, hourOfDay, minute ->
 
-                            viewModel.dateTime.value?.also {
+                            viewModel.getDateTime()?.also {
                                 it.set(Calendar.HOUR_OF_DAY, hourOfDay)
                                 it.set(Calendar.MINUTE, minute)
 
-                                viewModel.dateTime.value = it
+                                viewModel.setDateTime(it)
+                                updateTimeLabel(timeTextView, it)
                             }
                         },
                         calendar[Calendar.HOUR_OF_DAY],
@@ -97,17 +98,18 @@ class VoteFragment : Fragment(), TitledFragment {
 
         dateTextView.setOnClickListener {
             if (!it.isEnabled) {
-                viewModel.dateTime.value?.let { calendar ->
+                viewModel.getDateTime()?.let { calendar ->
                     val datePickerDialog = DatePickerDialog(
                         context!!,
                         { _, year, monthOfYear, dayOfMonth ->
 
-                            viewModel.dateTime.value?.also {
+                            viewModel.getDateTime()?.also {
                                 it.set(Calendar.YEAR, year)
                                 it.set(Calendar.MONTH, monthOfYear)
                                 it.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                                viewModel.dateTime.value = it
+                                viewModel.setDateTime(it)
+                                updateDateLabel(dateTextView, it)
                             }
                         },
                         calendar[Calendar.YEAR],
@@ -127,17 +129,10 @@ class VoteFragment : Fragment(), TitledFragment {
             }
         }
 
-        completeButton.setOnClickListener { viewModel.locationAndDateComplete.value = true }
+        completeButton.setOnClickListener { viewModel.onVoteComplete() }
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.dateTime) {
-            it?.let {
-                updateDateLabel(dateTextView, it)
-                updateTimeLabel(timeTextView, it)
-            }
-        }
-
         observe(viewModel.getVoteLocations()) { locations ->
             if (locations != null)
                 voteLocationArrayAdapter.addAll(locations)

@@ -1,7 +1,7 @@
 package com.eulersbridge.isegoria.network
 
 import android.content.Context
-import com.eulersbridge.isegoria.isNetworkAvailable
+import com.eulersbridge.isegoria.util.extension.isNetworkAvailable
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException

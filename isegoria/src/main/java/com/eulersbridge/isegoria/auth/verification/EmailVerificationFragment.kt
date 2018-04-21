@@ -10,8 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
-import com.eulersbridge.isegoria.ifTrue
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.email_verification.*
 import javax.inject.Inject
@@ -33,29 +32,28 @@ class EmailVerificationFragment : Fragment() {
         = inflater.inflate(R.layout.email_verification, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        observeBoolean(viewModel.resendVerificationButtonEnabled) {
+            resendVerificationButton.isEnabled = it
+        }
+
+        observeBoolean(viewModel.completeButtonEnabled) {
+            verifiedButton.isEnabled = it
+        }
+
         verifiedButton.setOnClickListener {
-            it.isEnabled = false
+            viewModel.onVerificationComplete()
 
             val authViewModel = ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
             authViewModel.verificationComplete.value = true
-
-            ifTrue(viewModel.userVerified()) {
-                verifiedButton.isEnabled = true
-            }
         }
 
-        resendVerificationButton.setOnClickListener { button ->
-            button.isEnabled = false
-
-            observe(viewModel.resendVerification()) {
-                button.isEnabled = true
-            }
+        resendVerificationButton.setOnClickListener {
+            viewModel.onResendVerification()
         }
     }
 
     override fun onDestroy() {
-        viewModel.onExit()
-
+        viewModel.onDestroy()
         super.onDestroy()
     }
 }

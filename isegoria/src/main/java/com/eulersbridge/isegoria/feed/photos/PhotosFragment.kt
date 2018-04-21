@@ -12,9 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.postDelayed
-import com.eulersbridge.isegoria.*
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
+import com.eulersbridge.isegoria.MainActivity
+import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.network.api.model.PhotoAlbum
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.photos_fragment.*
@@ -26,14 +28,7 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PhotoAlbumsViewModel
 
-    @Inject
-    lateinit var app: IsegoriaApp
-
-    @Inject
-    lateinit var api: API
-
     private val adapter = PhotoAlbumAdapter(this)
-    private var fetchedPhotos = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
             = inflater.inflate(R.layout.photos_fragment, container, false)
@@ -41,8 +36,8 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         refreshLayout.setOnRefreshListener {
             refreshLayout.isRefreshing = true
-            refresh()
-            refreshLayout.postDelayed(6000) { refreshLayout.isRefreshing = false }
+            viewModel.refresh()
+            refreshLayout?.postDelayed(6000) { refreshLayout?.isRefreshing = false }
         }
 
         albumsListView.apply {
@@ -50,7 +45,12 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
             adapter = this@PhotosFragment.adapter
         }
 
-        refresh()
+        observe(viewModel.photoAlbums) { albums ->
+            runOnUiThread {
+                refreshLayout.isRefreshing = false
+            }
+            adapter.replaceItems(albums ?: emptyList())
+        }
     }
 
     override fun onAttach(context: Context?) {
@@ -60,44 +60,6 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
     }
 
     override fun getTitle(context: Context?) = "Photos"
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        super.setUserVisibleHint(isVisibleToUser)
-
-        if (view != null && !fetchedPhotos)
-            refresh()
-    }
-
-    private fun refresh() {
-        fetchedPhotos = true
-
-        val user = app.loggedInUser.value
-        if (user?.institutionId != null) {
-
-            if (user.newsFeedId == 0L) {
-                api.getInstitutionNewsFeed(user.institutionId!!).onSuccess { response ->
-                    val updatedUser = user.copy()
-                    updatedUser.newsFeedId = response.newsFeedId
-                    app.updateLoggedInUser(updatedUser)
-
-                    fetchPhotoAlbums()
-                }
-
-            } else {
-                fetchPhotoAlbums()
-            }
-        }
-    }
-
-    private fun fetchPhotoAlbums() {
-        observe(viewModel.photoAlbums) { albums ->
-            refreshLayout?.isRefreshing = false
-            adapter.isLoading = false
-
-            if (albums != null)
-                adapter.replaceItems(albums)
-        }
-    }
 
     override fun onClick(item: PhotoAlbum) {
         val albumFragment = PhotoAlbumFragment()

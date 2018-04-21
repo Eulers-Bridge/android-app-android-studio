@@ -20,11 +20,14 @@ import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Candidate
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Candidate
+import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
 import javax.inject.Inject
 
@@ -34,9 +37,16 @@ class CandidatePositionFragment : Fragment() {
     @Inject
     internal lateinit var api: API
 
+    private val compositeDisposable = CompositeDisposable()
+
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        compositeDisposable.dispose()
     }
 
     override fun onCreateView(
@@ -56,16 +66,16 @@ class CandidatePositionFragment : Fragment() {
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         position?.id?.let { positionId ->
-            api.getPositionCandidates(positionId).onSuccess { candidates ->
+            api.getPositionCandidates(positionId).subscribeSuccess { candidates ->
                 addCandidates(candidates)
-            }
+            }.addTo(compositeDisposable)
         }
 
         return rootView
     }
 
     private fun addCandidates(candidates: List<Candidate>?) {
-        activity?.runOnUiThread {
+        runOnUiThread {
             candidates?.forEach { addTableRow(it) }
         }
     }
@@ -98,12 +108,12 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        api.getPhoto(candidate.userId).onSuccess {
+        api.getPhoto(candidate.userId).subscribeSuccess {
             GlideApp.with(this@CandidatePositionFragment)
                 .load(it.getPhotoUrl())
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(candidateProfileView)
-        }
+        }.addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -142,10 +152,12 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).onSuccess {
-            textViewParty.text = it.code
-            textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
-        }
+        api.getTicket(candidate.ticketId).subscribeSuccess {
+            runOnUiThread {
+                textViewParty.text = it.code
+                textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
+            }
+        }.addTo(compositeDisposable)
 
         val imageSize2 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -178,9 +190,11 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).onSuccess {
-            textViewPosition.text = it.name
-        }
+        api.getPosition(candidate.positionId).subscribeSuccess {
+            runOnUiThread {
+                textViewPosition.text = it.name
+            }
+        }.addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)

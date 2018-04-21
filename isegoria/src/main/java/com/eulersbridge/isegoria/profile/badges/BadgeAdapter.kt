@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Badge
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Badge
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -18,6 +20,7 @@ internal class BadgeAdapter(
     private val api: API
 ) : RecyclerView.Adapter<BadgeViewHolder>() {
 
+    private val compositeDisposable = CompositeDisposable()
     private val completedItems = ArrayList<Badge>()
     private val remainingItems = ArrayList<Badge>()
 
@@ -77,7 +80,7 @@ internal class BadgeAdapter(
 
         val weakViewHolder = WeakReference(viewHolder)
 
-        api.getPhotos(itemId).onSuccess{
+        api.getPhotos(itemId).subscribeSuccess {
             if (it.totalPhotos > imageIndex + 1) {
                 val innerViewHolder = weakViewHolder.get()
 
@@ -88,12 +91,16 @@ internal class BadgeAdapter(
                             innerViewHolder.setImageUrl(glide, item.id, it)
                         }
             }
-        }
+        }.addTo(compositeDisposable)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BadgeViewHolder {
         val itemView = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.profile_badges_list_item, viewGroup, false)
         return BadgeViewHolder(itemView)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        compositeDisposable.dispose()
     }
 }

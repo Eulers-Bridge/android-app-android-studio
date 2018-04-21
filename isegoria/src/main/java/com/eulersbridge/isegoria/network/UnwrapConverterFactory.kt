@@ -1,13 +1,12 @@
 package com.eulersbridge.isegoria.network
 
-import com.eulersbridge.isegoria.network.api.responses.GenericPaginatedResponse
+import com.eulersbridge.isegoria.network.api.Paginated
+import com.eulersbridge.isegoria.network.api.response.GenericPaginatedResponse
 import com.squareup.moshi.Types
 import okhttp3.ResponseBody
 import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
-
-
 
 /**
  * "Unwraps" API methods annotated with @Paginated by returning the contents of their `foundObjects`

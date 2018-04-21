@@ -3,7 +3,7 @@ package com.eulersbridge.isegoria.feed.photos
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.PhotoAlbum
+import com.eulersbridge.isegoria.network.api.model.PhotoAlbum
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PhotoAlbumAdapter internal constructor(private val clickListener: PhotoAlbumAdapter.PhotoAlbumClickListener)

@@ -9,13 +9,14 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.core.view.isGone
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.self_efficacy_questions_fragment.*
 import javax.inject.Inject
 
 class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
@@ -55,21 +56,23 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
             }
         }
 
-        val doneButton = rootView.findViewById<Button>(R.id.selfEfficacyDoneButton)
-        doneButton.setOnClickListener {
-            it.isEnabled = false
-
-            observe(viewModel.addUserEfficacy()) { success ->
-                if (success == true) {
-                    activity?.supportFragmentManager?.popBackStack()
-
-                } else {
-                    it.isEnabled = true
-                }
-            }
-        }
+        doneButton.setOnClickListener { viewModel.onDone() }
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        createViewModelObservers()
+    }
+
+    private fun createViewModelObservers() {
+        observeBoolean(viewModel.doneButtonEnabled) {
+            doneButton.isEnabled = it
+        }
+
+        observeBoolean(viewModel.efficacyComplete) {
+            activity?.supportFragmentManager?.popBackStack()
+        }
     }
 
     override fun getTitle(context: Context?) =

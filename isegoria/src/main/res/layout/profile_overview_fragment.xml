@@ -31,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:background="@color/grey" />
+            tools:background="@tools:sample/avatars" />
 
         <TextView
             android:id="@+id/nameTextView"
@@ -51,7 +51,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/smallPhotoImageView"
-            tools:text="Jane Doe" />
+            tools:text="@tools:sample/full_names" />
 
         <TextView
             android:id="@+id/institutionTextView"
@@ -416,6 +416,7 @@
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/taskLevelTextView" />
+            app:layout_constraintTop_toBottomOf="@id/taskLevelTextView"
+            tools:listitem="@layout/profile_tasks_list_item" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

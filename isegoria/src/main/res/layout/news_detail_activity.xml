@@ -22,7 +22,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:background="@color/grey" />
+            tools:background="@tools:sample/backgrounds/scenic" />
 
         <ImageView
             android:id="@+id/backButton"
@@ -109,7 +109,9 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/dateTextView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/authorNameTextView"/>
+            app:layout_constraintTop_toTopOf="@+id/authorNameTextView"
+            tools:visibility="visible"
+            tools:src="@tools:sample/avatars"/>
 
         <TextView
             android:id="@+id/authorNameTextView"
@@ -129,7 +131,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/authorImageView"
             app:layout_constraintBottom_toTopOf="@+id/dateTextView"
-            tools:text="Jane Doe" />
+            tools:text="@tools:sample/full_names" />
 
         <TextView
             android:id="@+id/dateTextView"

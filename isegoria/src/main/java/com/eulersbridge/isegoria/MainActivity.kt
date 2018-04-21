@@ -14,7 +14,10 @@ import android.support.v4.app.FragmentManager
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.systemService
+import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.ElectionMasterFragment
 import com.eulersbridge.isegoria.feed.FeedFragment
 import com.eulersbridge.isegoria.friends.FriendsFragment
@@ -26,6 +29,8 @@ import com.eulersbridge.isegoria.vote.VoteViewPagerFragment
 import com.google.firebase.FirebaseApp
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
 import dagger.android.support.DaggerAppCompatActivity
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.main_partial_appbar.*
 import java.util.*
@@ -38,6 +43,9 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
     @Inject
     lateinit var app: IsegoriaApp
 
+    @Inject
+    lateinit var repository: Repository
+
     private var tabFragmentsStack: ArrayDeque<Fragment> = ArrayDeque(4)
 
     private val currentFragment: Fragment?
@@ -47,6 +55,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         get() = navigation
 
     private var loginActionsComplete = false
+    private val compositeDisposable = CompositeDisposable()
 
     interface TabbedFragment {
         fun setupTabLayout(tabLayout: TabLayout)
@@ -63,6 +72,11 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         createApplicationObservers()
     }
 
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
     private fun setupNavigation() {
         setSupportActionBar(toolbar)
 
@@ -77,24 +91,30 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
     }
 
     private fun createApplicationObservers() {
-        observe(app.loggedInUser) {
-            val userLoggedOut = it == null
+        repository.loginState.subscribe {
+            when (it) {
+                is LoginState.LoggedIn -> {
+                    onLoginSuccess()
 
-            if (userLoggedOut) {
-                finish()
-
-            } else {
-                onLoginSuccess()
+                    if (!it.user.hasPersonality) {
+                        startActivity(Intent(this, PersonalityActivity::class.java))
+                    }
+                }
+                is LoginState.LoggedOut -> {
+                    startActivity(Intent(this, AuthActivity::class.java))
+                }
             }
-        }
+        }.addTo(compositeDisposable)
 
-        ifTrue(app.userVerificationVisible) {
-            presentRootContent(EmailVerificationFragment())
-        }
+        app.userVerificationScreenVisible.subscribe {
+            if (it)
+                presentRootContent(EmailVerificationFragment())
+        }.addTo(compositeDisposable)
 
-        ifTrue(app.friendsVisible) {
-            showFriends()
-        }
+        app.friendsScreenVisible.subscribe {
+            if (it)
+                showFriends()
+        }.addTo(compositeDisposable)
     }
 
     private fun onLoginSuccess() {
@@ -111,9 +131,6 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         }
 
         loginActionsComplete = true
-
-        if (app.loggedInUser.value?.hasPersonality == false)
-            startActivity(Intent(this, PersonalityActivity::class.java))
     }
 
     @SuppressLint("NewApi")
@@ -129,15 +146,13 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                     }
 
                     SHORTCUT_ACTION_FRIENDS -> {
-                        app.friendsVisible.value = true
+                        app.setFriendsScreenVisible(true)
                         handledShortcut = true
                     }
                 }
 
-                if (handledShortcut) {
-                    val shortcutManager: ShortcutManager = systemService<ShortcutManager>()
-                    shortcutManager.reportShortcutUsed(it)
-                }
+                if (handledShortcut)
+                    systemService<ShortcutManager>().reportShortcutUsed(it)
             }
         }
 
@@ -219,13 +234,13 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         fragment
             .takeIf { currentFragment == null || it::class != currentFragment!!::class }
             ?.let {
-                if (app.friendsVisible.value == true) {
+                if (app.friendsScreenVisible.value == true) {
                     supportFragmentManager.popBackStackImmediate(
                         null,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
                     tabFragmentsStack.clear()
-                    app.friendsVisible.value = false
+                    app.setFriendsScreenVisible(false)
                 }
 
                 presentRootContent(fragment)

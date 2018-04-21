@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.DrawableRes
 import android.support.annotation.Px
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewPager
 import android.util.TypedValue
@@ -19,10 +18,14 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS
 import com.eulersbridge.isegoria.feed.photos.ACTIVITY_EXTRA_PHOTOS_POSITION
-import com.eulersbridge.isegoria.network.api.models.Photo
+import com.eulersbridge.isegoria.network.api.model.Photo
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.toDateString
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.photo_detail_activity.*
 import javax.inject.Inject
@@ -55,21 +58,19 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.currentPhoto) {
+        observe(viewModel.getPhoto()) {
             userLikedCurrentPhoto = false
 
             runOnUiThread {
-                if (it != null) {
-                    titleTextView.text = it.title
+                titleTextView.text = it?.title
 
-                    val dateStr = it.date.toDateString(this)
-                    dateTextView.text = dateStr.toUpperCase()
+                val dateStr = it?.date?.toDateString(this)
+                dateTextView.text = dateStr?.toUpperCase()
 
-                    likesTextView.text = it.likeCount.toString()
+                likesTextView.text = it?.likeCount?.toString()
 
-                    @DrawableRes val flagImage = if (it.hasInappropriateContent) R.drawable.flag else R.drawable.flag_default
-                    flagImageView.setImageResource(flagImage)
-                }
+                @DrawableRes val flagImage = if (it?.hasInappropriateContent == true) R.drawable.flag else R.drawable.flag_default
+                flagImageView.setImageResource(flagImage)
             }
         }
 
@@ -77,10 +78,12 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
             runOnUiThread { likesTextView.text = it.toString() }
         }
 
-        ifTrue(viewModel.getPhotoLikedByUser()) {
+        observeBoolean(viewModel.getPhotoLikedByUser()) {
             runOnUiThread {
-                userLikedCurrentPhoto = true
-                starImageView.setImageResource(R.drawable.star)
+                userLikedCurrentPhoto = it
+
+                val starImage = if (it) R.drawable.star else R.drawable.star_default
+                starImageView.setImageResource(starImage)
             }
         }
     }
@@ -164,7 +167,7 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
                 view.isEnabled = true
 
                 if (success) {
-                    starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
+                    starImageView.setImageResource(R.drawable.star)
 
                     val likes = Integer.parseInt(likesTextView.text.toString()) + 1
                     likesTextView.text = likes.toString()
@@ -175,7 +178,7 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
                 view.isEnabled = true
 
                 if (success) {
-                    starImageView.colorFilter = null
+                    starImageView.setImageResource(R.drawable.star_default)
 
                     val likes = Integer.parseInt(likesTextView.text.toString()) - 1
                     likesTextView.text = likes.toString()

@@ -2,86 +2,59 @@ package com.eulersbridge.isegoria.feed.news.detail
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Like
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
-import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class NewsDetailViewModel
 @Inject constructor(
-    private val user: LiveData<User>,
-    private val api: API
+        private val repository: Repository
 ) : ViewModel() {
 
+    private lateinit var _newsArticle: NewsArticle
+
     internal val newsArticle = MutableLiveData<NewsArticle>()
+    internal val likeCount = MutableLiveData<Int>()
+    internal val likedByUser = MutableLiveData<Boolean>()
 
-    private val articleLikes = Transformations.switchMap<NewsArticle, List<Like>>(newsArticle) { article ->
-        if (article == null) {
-            SingleLiveData(null)
-
-        } else {
-            RetrofitLiveData(api.getNewsArticleLikes(article.id))
-        }
-    }
-
-    internal val articleLikeCount = Transformations.switchMap(articleLikes) { likes ->
-        return@switchMap SingleLiveData(likes?.size ?: 0)
-    }
-
-    internal val articleLikedByUser = Transformations.switchMap(articleLikes) { likes ->
-        return@switchMap if (likes == null) {
-            SingleLiveData(false)
-
-        } else {
-            Transformations.switchMap<User, Boolean>(user, { user ->
-                val userExistsInLikes = user != null && likes.any { it.email == user.email }
-                SingleLiveData(userExistsInLikes)
-            })
-        }
-    }
+    private lateinit var likesRequest: Disposable
 
     override fun onCleared() {
-        (articleLikes as? RetrofitLiveData)?.cancel()
+        if (!likesRequest.isDisposed) likesRequest.dispose()
+    }
+
+    internal fun setNewsArticle(newsArticle: NewsArticle) {
+        _newsArticle = newsArticle
+        this.newsArticle.value = newsArticle
+
+        fetchArticleLikes(newsArticle.id)
+    }
+
+    private fun fetchArticleLikes(articleId: Long) {
+        likesRequest = repository.getNewsArticleLikes(articleId)
+                .subscribeSuccess {
+                    likeCount.postValue(it.size)
+
+                    val likesContainUser = it.any { it.email == repository.getUser().email }
+                    likedByUser.postValue(likesContainUser)
+                }
     }
 
     /**
-     * @return Boolean.TRUE on success, Boolean.FALSE on failure
+     * @return LiveData whose value is true on success, false on failure
      */
     internal fun likeArticle(): LiveData<Boolean> {
-        return Transformations.switchMap<User, Boolean>(user) { user ->
-            return@switchMap if (user == null) {
-                SingleLiveData(false)
-
-            } else {
-                Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val like = RetrofitLiveData(api.likeArticle(article.id, user.email))
-
-                    Transformations.switchMap(like) {
-                        SingleLiveData(it != null && it.success)
-                    }
-                })
-            }
-        }
+        return repository.likeArticle(_newsArticle.id).toLiveData()
     }
 
     /**
-     * @return Boolean.TRUE on success, Boolean.FALSE on failure
+     * @return LiveData whose value is true on success, false on failure
      */
     internal fun unlikeArticle(): LiveData<Boolean> {
-        return Transformations.switchMap<User, Boolean>(user) { user ->
-            if (user != null)
-                Transformations.switchMap<NewsArticle, Boolean>(newsArticle, { article ->
-                    val unlike = RetrofitLiveData(api.unlikeArticle(article.id, user.email))
-
-                    Transformations.switchMap(unlike) { SingleLiveData(true) }
-                })
-
-            SingleLiveData(false)
-        }
+        return repository.unlikeArticle(_newsArticle.id).toLiveData()
     }
 }

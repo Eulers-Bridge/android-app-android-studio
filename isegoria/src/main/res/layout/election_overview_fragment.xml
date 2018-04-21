@@ -58,7 +58,7 @@
             app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
             app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
             app:layout_constraintTop_toBottomOf="@+id/introductionHeadingTextView"
-            tools:text="Lorem Ipsum"/>
+            tools:text="@tools:sample/lorem/random"/>
 
         <TextView
             android:id="@+id/processHeadingTextView"
@@ -83,7 +83,7 @@
             app:layout_constraintStart_toStartOf="@id/election_overview_guideline_start"
             app:layout_constraintEnd_toEndOf="@id/election_overview_guideline_end"
             android:paddingBottom="16dp"
-            tools:text="Lorem Ipsum"/>
+            tools:text="@tools:sample/lorem/random"/>
 
         <android.support.constraint.Guideline
             android:id="@+id/election_overview_guideline_start"

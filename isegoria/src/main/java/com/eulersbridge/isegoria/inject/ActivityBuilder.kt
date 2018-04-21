@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.inject
 
 import com.eulersbridge.isegoria.MainActivity
+import com.eulersbridge.isegoria.SplashActivity
 import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.auth.login.LoginFragmentProvider
 import com.eulersbridge.isegoria.auth.signup.SignUpFragmentProvider
@@ -28,6 +29,9 @@ import dagger.android.ContributesAndroidInjector
 
 @Module
 abstract class ActivityBuilder {
+
+    @ContributesAndroidInjector
+    internal abstract fun bindSplashActivity(): SplashActivity
 
     @ContributesAndroidInjector(modules = [(SignUpFragmentProvider::class),
         (EmailVerificationFragmentProvider::class),(LoginFragmentProvider::class)])

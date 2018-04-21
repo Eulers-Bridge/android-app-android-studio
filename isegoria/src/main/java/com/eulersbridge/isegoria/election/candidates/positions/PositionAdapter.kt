@@ -1,13 +1,15 @@
 package com.eulersbridge.isegoria.election.candidates.positions
 
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Position
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Position
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
+import io.reactivex.disposables.CompositeDisposable
 import java.lang.ref.WeakReference
 
 internal class PositionAdapter(
@@ -22,6 +24,8 @@ internal class PositionAdapter(
     interface PositionClickListener {
         fun onClick(item: Position)
     }
+
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PositionViewHolder {
         val itemView = LayoutInflater.from(parent.context)
@@ -39,7 +43,7 @@ internal class PositionAdapter(
 
             val weakViewHolder = WeakReference(viewHolder)
 
-            api.getPhotos(itemId).onSuccess {
+            api.getPhotos(itemId).subscribeSuccess {
                 it.photos?.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
                     weakViewHolder.get()?.apply {
                         setImageUrl(glide, photoThumbnailUrl, itemId)
@@ -47,5 +51,9 @@ internal class PositionAdapter(
                 }
             }
         }
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        compositeDisposable.dispose()
     }
 }

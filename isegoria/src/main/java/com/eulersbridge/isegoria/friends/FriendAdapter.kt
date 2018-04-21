@@ -5,9 +5,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.GenericUser
-import com.eulersbridge.isegoria.network.api.models.Institution
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.GenericUser
+import com.eulersbridge.isegoria.network.api.model.Institution
 import java.lang.ref.WeakReference
 
 class FriendAdapter internal constructor(private val delegate: Delegate?) :

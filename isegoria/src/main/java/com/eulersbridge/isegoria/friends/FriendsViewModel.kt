@@ -2,28 +2,34 @@ package com.eulersbridge.isegoria.friends
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.eulersbridge.isegoria.IsegoriaApp
-import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Contact
-import com.eulersbridge.isegoria.network.api.models.FriendRequest
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.network.api.models.User
-import com.eulersbridge.isegoria.util.data.RetrofitLiveData
+import com.eulersbridge.isegoria.AppRouter
+import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.network.api.model.Contact
+import com.eulersbridge.isegoria.network.api.model.FriendRequest
+import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.map
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class FriendsViewModel
 @Inject constructor(
-    private val app: IsegoriaApp,
-    private val api: API
+    private val appRouter: AppRouter,
+    private val repository: Repository
 ) : ViewModel() {
 
-    private var searchResults: LiveData<List<User>?>? = null
-    private var sentFriendRequests: LiveData<List<FriendRequest>?>? = null
-    private var receivedFriendRequests: LiveData<List<FriendRequest>?>? = null
-    private var friends: LiveData<List<Contact>>? = null
+    private val compositeDisposable = CompositeDisposable()
+
+    internal var searchResults = MutableLiveData<List<User>>()
+    internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
+    internal var receivedFriendRequests = MutableLiveData<List<FriendRequest>>()
+    internal var friends = MutableLiveData<List<Contact>>()
 
     internal val searchSectionVisible = MutableLiveData<Boolean>()
     internal val sentRequestsVisible = MutableLiveData<Boolean>()
@@ -35,24 +41,18 @@ class FriendsViewModel
         sentRequestsVisible.value = false
         receivedRequestsVisible.value = false
         friendsVisible.value = true
-    }
 
-    internal fun onExit() {
-        app.friendsVisible.value = false
-    }
-
-    /**
-     * Convenience method to cancel a LiveData object if it exists and is a Retrofit API request.
-     */
-    private fun cancelIfPossible(liveData: LiveData<*>?) {
-        (liveData as? RetrofitLiveData)?.cancel()
+        getFriends()
+        getReceivedFriendRequests()
+        getSentFriendRequests()
     }
 
     override fun onCleared() {
-        cancelIfPossible(friends)
-        cancelIfPossible(sentFriendRequests)
-        cancelIfPossible(receivedFriendRequests)
-        cancelIfPossible(searchResults)
+        compositeDisposable.dispose()
+    }
+
+    internal fun onDestroy() {
+        appRouter.setFriendsScreenVisible(false)
     }
 
     private fun showSearch() {
@@ -65,114 +65,74 @@ class FriendsViewModel
     internal fun hideSearch() {
         searchSectionVisible.value = false
 
-        val haveSentRequests: Boolean = sentFriendRequests?.value?.isNotEmpty() ?: false
+        val haveSentRequests = sentFriendRequests.value?.isNotEmpty() ?: false
         sentRequestsVisible.value = haveSentRequests
 
-        val haveReceivedRequests: Boolean = receivedFriendRequests?.value?.isNotEmpty() ?: false
+        val haveReceivedRequests = receivedFriendRequests.value?.isNotEmpty() ?: false
         receivedRequestsVisible.value = haveReceivedRequests
 
         friendsVisible.value = true
     }
 
-    internal fun onSearchQueryChanged(query: String): LiveData<List<User>?>? {
+    internal fun onSearchQueryChanged(query: String) {
         showSearch()
 
-        searchResults = if (!query.isBlank() && query.length > 2) {
-            RetrofitLiveData(api.searchForUsers(query))
+        if (!query.isBlank() && query.length > 2) {
+            repository.searchForUsers(query).subscribeSuccess {
+                searchResults.postValue(it)
+            }
 
         } else {
-            SingleLiveData(null)
+            searchResults.value = emptyList()
         }
-
-        return searchResults
     }
 
-    internal fun getFriends(): LiveData<List<Contact>> {
-        if (friends == null)
-            friends = RetrofitLiveData(api.getFriends())
-
-        return friends!!
+    private fun getFriends() {
+        repository.getFriends().subscribeSuccess {
+            friends.postValue(it)
+        }.addTo(compositeDisposable)
     }
 
-    internal fun getSentFriendRequests(): LiveData<List<FriendRequest>?>? {
-        if (sentFriendRequests == null) {
-            return Transformations.switchMap(app.loggedInUser) { user ->
-                return@switchMap if (user == null) {
-                    SingleLiveData<List<FriendRequest>?>(null)
-
-                } else {
-                    val requests = RetrofitLiveData(api.getFriendRequestsSent(user.getId()))
-                    sentFriendRequests = Transformations.switchMap(requests) { sentFriendRequests ->
-                        sentRequestsVisible.value = sentFriendRequests != null && sentFriendRequests.isNotEmpty()
-                        SingleLiveData(sentFriendRequests)
-                    }
-
-                    sentFriendRequests
-                }
-            }
-        }
-
-        return sentFriendRequests
+    private fun getSentFriendRequests() {
+        repository.getSentFriendRequests().subscribeSuccess {
+            sentFriendRequests.postValue(it)
+            sentRequestsVisible.postValue(it.isNotEmpty())
+        }.addTo(compositeDisposable)
     }
 
-    internal fun getReceivedFriendRequests(): LiveData<List<FriendRequest>?>? {
-        if (receivedFriendRequests == null) {
-            return Transformations.switchMap(app.loggedInUser) { user ->
-                return@switchMap if (user == null) {
-                    SingleLiveData<List<FriendRequest>?>(null)
+    internal fun refreshReceivedFriendRequests() {
+        this.getReceivedFriendRequests()
+    }
 
-                } else {
-                    val requests = RetrofitLiveData(api.getFriendRequestsReceived(user.getId()))
-                    receivedFriendRequests =
-                            Transformations.switchMap(requests) { receivedFriendRequests ->
-
-                                val filteredRequests = receivedFriendRequests?.filter { it.accepted == null }
-
-                                receivedRequestsVisible.value =
-                                        filteredRequests != null && filteredRequests.isNotEmpty()
-
-                                SingleLiveData(filteredRequests)
-                            }
-
-                    receivedFriendRequests
-                }
-            }
-        }
-
-        return receivedFriendRequests
+    private fun getReceivedFriendRequests() {
+        repository.getReceivedFriendRequests().subscribeSuccess {
+            receivedFriendRequests.postValue(it)
+            receivedRequestsVisible.postValue(it.isNotEmpty())
+        }.addTo(compositeDisposable)
     }
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
         if (!newFriendEmail.isBlank())
-            return Transformations.switchMap(app.loggedInUser) { (_, _, email) ->
-                val friendRequest = RetrofitLiveData(api.addFriend(email, newFriendEmail))
-                Transformations.switchMap(friendRequest) { SingleLiveData(true) }
-            }
+            repository.addFriend(newFriendEmail).toLiveData()
 
         return SingleLiveData(false)
     }
 
     internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
-        val friendRequest = RetrofitLiveData(api.acceptFriendRequest(requestId))
-        return Transformations.switchMap(friendRequest) {
+        return repository.acceptFriendRequest(requestId).doOnComplete {
             getReceivedFriendRequests()
             getFriends()
-
-            SingleLiveData(true)
-        }
+        }.toBooleanSingle().toLiveData()
     }
 
     internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
-        val friendRequest = RetrofitLiveData(api.rejectFriendRequest(requestId))
-        return Transformations.switchMap(friendRequest) {
+        return repository.rejectFriendRequest(requestId).doOnComplete {
             getReceivedFriendRequests()
             getFriends()
-
-            SingleLiveData(true)
-        }
+        }.toBooleanSingle().toLiveData()
     }
 
-    internal fun getInstitution(institutionId: Long): LiveData<Institution>
-        = RetrofitLiveData(api.getInstitution(institutionId))
+    internal fun getInstitution(institutionId: Long): LiveData<Institution?>
+            = repository.getInstitution(institutionId).toLiveData().map { it.value }
 
 }

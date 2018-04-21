@@ -7,7 +7,7 @@ import android.widget.ImageView
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Photo
+import com.eulersbridge.isegoria.network.api.model.Photo
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PhotoViewHolder(itemView: View, private val clickListener: ClickListener?) : LoadingAdapter.ItemViewHolder<Photo>(itemView) {

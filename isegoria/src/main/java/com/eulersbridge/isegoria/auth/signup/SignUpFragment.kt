@@ -16,10 +16,10 @@ import androidx.core.view.updatePadding
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
-import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.network.api.models.Institution
-import com.eulersbridge.isegoria.observe
-import com.eulersbridge.isegoria.setKeyboardVisible
+import com.eulersbridge.isegoria.network.api.model.Country
+import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.sign_up_fragment.*
 import java.util.*

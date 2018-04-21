@@ -2,20 +2,32 @@ package com.eulersbridge.isegoria.auth
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
+import com.eulersbridge.isegoria.data.LoginState
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.NetworkService
 import com.eulersbridge.isegoria.network.api.API
-import com.eulersbridge.isegoria.network.api.models.Country
-import com.eulersbridge.isegoria.onSuccess
+import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(api: API, private val networkService: NetworkService) : ViewModel() {
+class AuthViewModel @Inject constructor(
+        repository: Repository,
+        api: API,
+        private val networkService: NetworkService
+) : ViewModel() {
 
-    private val countriesData = MutableLiveData<List<Country>>()
+    private val compositeDisposable = CompositeDisposable()
+
+    private var countries: List<Country>? = null
+
+    val authFinished = MutableLiveData<Boolean>()
 
     val signUpVisible = MutableLiveData<Boolean>()
     val signUpUser = MutableLiveData<SignUpUser>()
@@ -25,9 +37,20 @@ class AuthViewModel @Inject constructor(api: API, private val networkService: Ne
     val userLoggedIn = MutableLiveData<Boolean>()
 
     init {
-        api.getGeneralInfo().onSuccess {
-            countriesData.value = it.countries
+        api.getGeneralInfo().subscribeSuccess {
+            countries = it.countries
         }
+
+        repository.loginState
+                .filter { it is LoginState.LoggedIn }
+                .subscribe {
+                    authFinished.postValue(true)
+                }
+                .addTo(compositeDisposable)
+    }
+
+    override fun onCleared() {
+        compositeDisposable.dispose()
     }
 
     fun onSignUpBackPressed() {
@@ -36,26 +59,27 @@ class AuthViewModel @Inject constructor(api: API, private val networkService: Ne
     }
 
     fun signUp(): LiveData<Boolean> {
-        val countries = countriesData.value ?: return SingleLiveData(false)
+        if (countries == null)
+            return SingleLiveData(false)
 
         // Not possible for signUpUser's value to be null,
         // as sign-up process is linear and gated.
         val updatedUser = signUpUser.value!!.copy()
 
-        val institution = countries
-            .flatMap { it.institutions.orEmpty()  }
-            .singleOrNull { it.getName() == updatedUser.institutionName }
+        val institution = countries!!
+                .flatMap { it.institutions.orEmpty()  }
+                .singleOrNull { it.getName() == updatedUser.institutionName }
 
         institution?.id?.let {
             updatedUser.institutionId = it
             signUpUser.value = updatedUser
         }
 
-        return Transformations.switchMap(networkService.signUp(updatedUser)) { success ->
-            if (!success)
-                signUpUser.value = null
-
-            SingleLiveData(success)
-        }
+        return networkService.signUp(updatedUser)
+                .doOnSuccess { success ->
+                    if (!success)
+                        signUpUser.postValue(null)
+                }
+                .toLiveData()
     }
 }

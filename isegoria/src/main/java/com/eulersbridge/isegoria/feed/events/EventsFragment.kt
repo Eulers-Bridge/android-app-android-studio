@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Event
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.Event
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.events_fragment.*
@@ -32,7 +32,6 @@ class EventsFragment : Fragment(), TitledFragment {
         viewModel = ViewModelProviders.of(this, modelFactory)[EventsViewModel::class.java]
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +45,7 @@ class EventsFragment : Fragment(), TitledFragment {
             refresh()
 
             refreshLayout.isRefreshing = true
-            refreshLayout.postDelayed(7000) { refreshLayout.isRefreshing = false }
+            refreshLayout?.postDelayed(7000) { refreshLayout?.isRefreshing = false }
         }
 
         refresh()
@@ -55,17 +54,11 @@ class EventsFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = "Events"
 
     private fun refresh() {
-        observe(viewModel.getEvents()) {
-            setEvents(it)
-        }
+        observe(viewModel.getEvents()) { setEvents(it) }
     }
 
     private fun setEvents(events: List<Event>?) {
-        adapter.isLoading = false
-
         refreshLayout.post { refreshLayout.isRefreshing = false }
-
-        if (events != null)
-            adapter.replaceItems(events)
+        adapter.replaceItems(events ?: emptyList())
     }
 }

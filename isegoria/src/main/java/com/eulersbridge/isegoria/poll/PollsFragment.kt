@@ -14,8 +14,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.Poll
-import com.eulersbridge.isegoria.observe
+import com.eulersbridge.isegoria.network.api.model.Poll
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -118,7 +119,7 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         fragments.addAll(newFragments)
 
-        activity?.runOnUiThread {
+        runOnUiThread {
             updateTabs()
         }
     }

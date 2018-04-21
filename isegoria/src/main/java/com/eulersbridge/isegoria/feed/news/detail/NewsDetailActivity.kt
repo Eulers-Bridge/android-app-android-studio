@@ -10,7 +10,11 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.feed.news.ACTIVITY_EXTRA_NEWS_ARTICLE
-import com.eulersbridge.isegoria.network.api.models.NewsArticle
+import com.eulersbridge.isegoria.network.api.model.NewsArticle
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.toDateString
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.DaggerAppCompatActivity
@@ -37,29 +41,26 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
         val article = intent.getParcelableExtra<NewsArticle>(ACTIVITY_EXTRA_NEWS_ARTICLE)
 
         viewModel = ViewModelProviders.of(this, modelFactory)[NewsDetailViewModel::class.java]
-        viewModel.newsArticle.value = article
-
+        viewModel.setNewsArticle(article)
         createViewModelObservers()
     }
 
     private fun createViewModelObservers() {
-        viewModel.apply {
-            observe(newsArticle) {
-                it?.let {
-                    populateUIWithArticle(it)
-                }
+        observe(viewModel.newsArticle) {
+            it?.let {
+                populateUIWithArticle(it)
             }
+        }
 
-            observe(articleLikeCount) {
-                runOnUiThread { likesTextView.text = it.toString() }
-            }
+        observe(viewModel.likeCount) {
+            runOnUiThread { likesTextView.text = it.toString() }
+        }
 
-            ifTrue(articleLikedByUser) {
-                runOnUiThread {
-                    userLikedArticle = true
-                    starImageView.setImageResource(R.drawable.star)
-                    starImageView.isEnabled = true
-                }
+        ifTrue(viewModel.likedByUser) {
+            runOnUiThread {
+                userLikedArticle = true
+                starImageView.setImageResource(R.drawable.star)
+                starImageView.isEnabled = true
             }
         }
     }

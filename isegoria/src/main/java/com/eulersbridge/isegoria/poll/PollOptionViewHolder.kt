@@ -9,8 +9,8 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.models.PollOption
-import com.eulersbridge.isegoria.setCompatTooltipText
+import com.eulersbridge.isegoria.network.api.model.PollOption
+import com.eulersbridge.isegoria.util.extension.setCompatTooltipText
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 
 internal class PollOptionViewHolder(itemView: View, private val clickListener: ClickListener?)
