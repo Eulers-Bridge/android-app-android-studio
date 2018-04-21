@@ -27,18 +27,6 @@ class Repository @Inject constructor(
 
     val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
 
-    /*val loggedInUser: Single<Optional<User>> = PublishSubject.create<Optional<User>>().flatMapSingle {
-        val user = it.value
-        if (user == null || user.newsFeedId != 0L) {
-            Single.just(Optional(user))
-
-        } else {
-            api.getInstitutionNewsFeed(it.value.institutionId!!).map { (newsFeedId) ->
-                Single.just(Optional(user.copy(newsFeedId = newsFeedId)))
-            }
-        }
-    }!!*/
-
     private var cachedLoginArticles: List<NewsArticle>? = null
 
     fun getSavedEmail(): String? = securePreferences.getString(USER_EMAIL_KEY, null)
@@ -344,9 +332,10 @@ class Repository @Inject constructor(
         return api.searchForUsers(query).onErrorReturnItem(emptyList())
     }
 
-    // TODO: Fix
-    fun getInstitution(institutionId: Long): Single<Institution> {
-        return api.getInstitution(institutionId).onErrorReturnItem(Institution(-1,-1,null,null,null, null, null))
+    fun getInstitution(institutionId: Long): Single<Optional<Institution>> {
+        return api.getInstitution(institutionId)
+                .map { Optional(it) }
+                .onErrorReturnItem(Optional())
     }
 
     fun getPolls(): Single<List<Poll>> {

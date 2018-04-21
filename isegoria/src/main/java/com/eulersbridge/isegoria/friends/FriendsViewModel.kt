@@ -10,6 +10,7 @@ import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
@@ -99,6 +100,10 @@ class FriendsViewModel
         }.addTo(compositeDisposable)
     }
 
+    internal fun refreshReceivedFriendRequests() {
+        this.getReceivedFriendRequests()
+    }
+
     private fun getReceivedFriendRequests() {
         repository.getReceivedFriendRequests().subscribeSuccess {
             receivedFriendRequests.postValue(it)
@@ -127,8 +132,7 @@ class FriendsViewModel
         }.toBooleanSingle().toLiveData()
     }
 
-    //TODO: Fix
-    internal fun getInstitution(institutionId: Long): LiveData<Institution>
-            = repository.getInstitution(institutionId).toLiveData()
+    internal fun getInstitution(institutionId: Long): LiveData<Institution?>
+            = repository.getInstitution(institutionId).toLiveData().map { it.value }
 
 }

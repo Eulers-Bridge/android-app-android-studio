@@ -34,7 +34,7 @@ class NotificationService : FirebaseMessagingService() {
         if (!title.isNullOrBlank() && !text.isNullOrBlank())
             createNotification(title!!, text!!)
 
-        //TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
+        // TODO: Determine if notification is friend request or vote reminder, use appropriate notification channel
     }
 
     private fun createNotification(title: String, text: String) {

@@ -101,7 +101,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     private fun getReceivedFriendRequests() {
-        // TODO: Fix
+        viewModel.refreshReceivedFriendRequests()
     }
 
     override fun getContactInstitution(
