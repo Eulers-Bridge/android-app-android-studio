@@ -15,17 +15,17 @@ android {
             storePassword 'EulersBridge88902'
         }
     }
-    compileSdkVersion 27
+    compileSdkVersion Versions.compile_sdk
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "au.com.isegoria.app"
         multiDexEnabled true
-        minSdkVersion 16
+        minSdkVersion Versions.min_sdk
         renderscriptSupportModeEnabled true
-        targetSdkVersion 27
+        targetSdkVersion Versions.target_sdk
         vectorDrawables.useSupportLibrary = true
-        versionCode 15
-        versionName "1.0.14"
+        versionCode Versions.version_code
+        versionName Versions.version_name
     }
     lintOptions {
         abortOnError false
@@ -63,66 +63,58 @@ if (project.hasProperty('devBuild')) {
 }
 
 dependencies {
+    implementation Deps.kotlin_stdlib
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation Deps.multidex
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation Deps.support_core_ui
+    implementation Deps.support_fragment
+    implementation Deps.appcompat_v7
+    implementation Deps.design
+    implementation Deps.recyclerview_v7
+    implementation Deps.support_vector_drawable
 
-    // Image loading / caching
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
-    kapt 'com.github.bumptech.glide:compiler:4.6.1'
+    implementation Deps.constraint_layout
+    implementation Deps.ktx
 
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
-
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
-
-    implementation 'com.android.support:support-core-ui:27.1.1'
-    implementation 'com.android.support:support-fragment:27.1.1'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:support-vector-drawable:27.1.1'
-
-    implementation 'androidx.core:core-ktx:0.3'
-
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
-    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'io.reactivex:rxjava-reactive-streams:1.2.1'
+    implementation Deps.rxjava2
+    implementation Deps.rxkotlin
+    implementation Deps.rxjava_reactive_streams
 
     // ViewModel and LiveData
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation 'android.arch.lifecycle:common-java8:1.1.1'
+    implementation Deps.lifecycle_extensions
+    implementation Deps.lifecycle_java8
     // ReactiveStreams support for LiveData
-    implementation "android.arch.lifecycle:reactivestreams:1.1.1"
+    implementation Deps.lifecycle_reactive_streams
 
-    implementation 'com.google.dagger:dagger:2.15'
-    kapt 'com.google.dagger:dagger-compiler:2.15'
-    implementation 'com.google.dagger:dagger-android:2.15'
-    implementation 'com.google.dagger:dagger-android-support:2.15'
-    kapt 'com.google.dagger:dagger-android-processor:2.15'
+    implementation Deps.dagger
+    kapt Deps.dagger_processor
+    implementation Deps.dagger_android
+    implementation Deps.dagger_android_support
+    kapt Deps.dagger_android_processor
 
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation Deps.okhttp
+    implementation Deps.okhttp_interceptor
+    implementation Deps.retrofit
+    implementation Deps.retrofit_rxjava
+    implementation Deps.retrofit_moshi
 
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
-
-    // Used in Candidate fragment for bottom tabs
-    implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
-
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.18'
-    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.18'
-    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.18'
-
+    implementation Deps.aws_s3
+    implementation Deps.aws_cognito
+    implementation Deps.aws_sns
     // Required for push notifications
-    implementation 'com.google.firebase:firebase-messaging:15.0.0'
-
+    implementation Deps.firebase_messaging
     // Secures/obfuscates user email/password storage for auto-login
-    implementation 'com.github.scottyab:secure-preferences:v0.1.6'
+    implementation Deps.secure_prefs
+
+    implementation Deps.glide
+    kapt Deps.glide_processor
+    implementation Deps.image_view
+    implementation Deps.image_cropper
+
+    implementation Deps.bottom_navigation
+    // Used in Candidate fragment for bottom tabs
+    implementation Deps.view_pager_indicator
 }
 
 apply plugin: 'com.google.gms.google-services'
