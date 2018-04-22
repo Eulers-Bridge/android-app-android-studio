@@ -48,17 +48,24 @@ class EventsFragment : Fragment(), TitledFragment {
             refreshLayout?.postDelayed(7000) { refreshLayout?.isRefreshing = false }
         }
 
+        createViewModelObserver()
         refresh()
     }
 
     override fun getTitle(context: Context?) = "Events"
 
-    private fun refresh() {
-        observe(viewModel.getEvents()) { setEvents(it) }
+    private fun createViewModelObserver() {
+        observe(viewModel.events) {
+            setEvents(it!!)
+        }
     }
 
-    private fun setEvents(events: List<Event>?) {
+    private fun refresh() {
+        viewModel.onRefresh()
+    }
+
+    private fun setEvents(events: List<Event>) {
         refreshLayout.post { refreshLayout.isRefreshing = false }
-        adapter.replaceItems(events ?: emptyList())
+        adapter.replaceItems(events)
     }
 }

@@ -17,7 +17,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Task
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
@@ -26,7 +26,7 @@ import kotlinx.android.synthetic.main.profile_task_progress_fragment.*
 
 class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
-    private lateinit var api: API
+    private lateinit var repository: Repository
     private lateinit var viewModel: ProfileViewModel
 
     private lateinit var completedAdapter: TaskAdapter
@@ -52,16 +52,16 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
         fetchData()
     }
 
-    fun provideDependencies(api: API, viewModel: ProfileViewModel) {
-        this.api = api
+    fun provideDependencies(repository: Repository, viewModel: ProfileViewModel) {
+        this.repository = repository
         this.viewModel = viewModel
     }
 
     private fun createListAdapters() {
         val glide = GlideApp.with(this)
 
-        completedAdapter = TaskAdapter(glide, api)
-        remainingAdapter = TaskAdapter(glide, api)
+        completedAdapter = TaskAdapter(glide, repository)
+        remainingAdapter = TaskAdapter(glide, repository)
 
         completedTasksListView.adapter = completedAdapter
         remainingTasksListView.adapter = remainingAdapter

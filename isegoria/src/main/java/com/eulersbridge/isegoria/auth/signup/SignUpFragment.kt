@@ -82,8 +82,8 @@ class SignUpFragment : Fragment() {
 
         createViewListeners()
 
-        observe(viewModel.getCountries()) {
-            it?.let { setCountries(it) }
+        observe(viewModel.countries) {
+            setCountries(it!!)
         }
 
         activity?.setKeyboardVisible(true)
@@ -111,12 +111,12 @@ class SignUpFragment : Fragment() {
             }
         }
 
-        givenName.onTextChanged { viewModel.givenName.value = it }
-        familyName.onTextChanged { viewModel.familyName.value = it }
-        email.onTextChanged { viewModel.email.value = it }
-        newPassword.onTextChanged { viewModel.password.value = it }
-        confirmNewPassword.onTextChanged { viewModel.confirmPassword.value = it }
-        gender.onTextChanged { viewModel.gender.value = it }
+        givenName.onTextChanged { if (it != null) viewModel.setGivenName(it) }
+        familyName.onTextChanged { if (it != null) viewModel.setFamilyName(it) }
+        email.onTextChanged { if (it != null) viewModel.setEmail(it) }
+        newPassword.onTextChanged { if (it != null) viewModel.setPassword(it) }
+        confirmNewPassword.onTextChanged { if (it != null) viewModel.setConfirmPassword(it) }
+        gender.onTextChanged { if (it != null) viewModel.setGender(it) }
 
         countrySpinner.onItemSelected { position -> updateInstitutionSpinner(position) }
 
@@ -124,7 +124,7 @@ class SignUpFragment : Fragment() {
 
         birthYearSpinner.onItemSelected {
             val birthYear = birthYearSpinner.selectedItem as String
-            viewModel.selectedBirthYear.value = birthYear
+            viewModel.setBirthYear(birthYear)
         }
     }
 

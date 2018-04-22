@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Badge
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import io.reactivex.disposables.CompositeDisposable
@@ -17,7 +17,7 @@ import java.util.*
 
 internal class BadgeAdapter(
     private val glide: RequestManager,
-    private val api: API
+    private val repository: Repository
 ) : RecyclerView.Adapter<BadgeViewHolder>() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -80,12 +80,12 @@ internal class BadgeAdapter(
 
         val weakViewHolder = WeakReference(viewHolder)
 
-        api.getPhotos(itemId).subscribeSuccess {
+        repository.getPhotos(itemId).subscribeSuccess {
             if (it.totalPhotos > imageIndex + 1) {
                 val innerViewHolder = weakViewHolder.get()
 
                 if (innerViewHolder != null)
-                    it.photos?.get(imageIndex)?.getPhotoUrl()
+                    it.photos[imageIndex].getPhotoUrl()
                         ?.takeUnless { it.isBlank() }
                         ?.also {
                             innerViewHolder.setImageUrl(glide, item.id, it)

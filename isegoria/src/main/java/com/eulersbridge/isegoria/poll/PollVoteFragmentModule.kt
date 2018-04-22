@@ -1,8 +1,8 @@
 package com.eulersbridge.isegoria.poll
 
 import android.arch.lifecycle.ViewModelProvider
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -10,7 +10,7 @@ import dagger.Provides
 class PollVoteFragmentModule {
 
     @Provides
-    fun pollsViewModel(api: API): PollVoteViewModel = PollVoteViewModel(api)
+    fun pollsViewModel(repository: Repository): PollVoteViewModel = PollVoteViewModel(repository)
 
     @Provides
     fun providePollVoteViewModel(pollVoteViewModel: PollVoteViewModel): ViewModelProvider.Factory

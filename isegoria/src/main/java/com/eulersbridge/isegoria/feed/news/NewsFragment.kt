@@ -58,17 +58,24 @@ class NewsFragment : Fragment(), TitledFragment {
 
         gridView.adapter = newsAdapter
 
+        createViewModelObserver()
         refresh()
     }
 
     override fun getTitle(context: Context?) = "News"
 
-    private fun refresh() {
-        observe(viewModel.getNewsArticles()) { setNewsArticles(it) }
+    private fun createViewModelObserver() {
+        observe(viewModel.newsArticles) {
+            setNewsArticles(it!!)
+        }
     }
 
-    private fun setNewsArticles(articles: List<NewsArticle>?) {
+    private fun refresh() {
+        viewModel.onRefresh()
+    }
+
+    private fun setNewsArticles(articles: List<NewsArticle>) {
         refreshLayout?.post({ refreshLayout.isRefreshing = false })
-        newsAdapter.replaceItems(articles ?: emptyList())
+        newsAdapter.replaceItems(articles)
     }
 }

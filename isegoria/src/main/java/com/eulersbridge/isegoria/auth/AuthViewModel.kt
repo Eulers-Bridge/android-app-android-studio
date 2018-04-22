@@ -6,22 +6,17 @@ import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(
-        repository: Repository,
-        api: API,
-        private val networkService: NetworkService
-) : ViewModel() {
+class AuthViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -37,9 +32,9 @@ class AuthViewModel @Inject constructor(
     val userLoggedIn = MutableLiveData<Boolean>()
 
     init {
-        api.getGeneralInfo().subscribeSuccess {
-            countries = it.countries
-        }
+        repository.getSignUpCountries().subscribeSuccess {
+            countries = it
+        }.addTo(compositeDisposable)
 
         repository.loginState
                 .filter { it is LoginState.LoggedIn }
@@ -75,11 +70,11 @@ class AuthViewModel @Inject constructor(
             signUpUser.value = updatedUser
         }
 
-        return networkService.signUp(updatedUser)
-                .doOnSuccess { success ->
-                    if (!success)
-                        signUpUser.postValue(null)
+        return repository.signUp(updatedUser)
+                .doOnComplete{
+                    signUpUser.postValue(null)
                 }
+                .toBooleanSingle()
                 .toLiveData()
     }
 }

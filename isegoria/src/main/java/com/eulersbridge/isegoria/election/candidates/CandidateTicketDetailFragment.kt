@@ -28,7 +28,6 @@ import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
@@ -53,9 +52,6 @@ class CandidateTicketDetailFragment : Fragment() {
 
     @Inject
     lateinit var app: IsegoriaApp
-
-    @Inject
-    lateinit var api: API
 
     @Inject
     lateinit var repository: Repository
@@ -106,12 +102,12 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        api.getTicketCandidates(ticketId).subscribeSuccess { candidates ->
-            addCandidates(candidates)
+        repository.getTicketCandidates(ticketId).subscribeSuccess {
+            addCandidates(it)
         }.addTo(compositeDisposable)
 
-        api.getPhotos(ticketId).subscribeSuccess {
-            it.photos?.firstOrNull()?.let {
+        repository.getPhotos(ticketId).subscribeSuccess {
+            it.photos.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -201,8 +197,8 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        api.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos?.firstOrNull()?.let {
+        repository.getPhotos(candidate.userId).subscribeSuccess {
+            it.photos.firstOrNull()?.let {
                 GlideApp.with(this@CandidateTicketDetailFragment)
                     .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -284,8 +280,8 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribeSuccess {
-            textViewPosition.text = it.name
+        repository.getPosition(candidate.positionId).subscribeSuccess {
+            textViewPosition.text = it.value?.name
         }.addTo(compositeDisposable)
 
         val dividerView = View(activity)

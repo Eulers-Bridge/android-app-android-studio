@@ -15,13 +15,11 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
 import com.eulersbridge.isegoria.auth.signup.SignUpFragment
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
-import com.eulersbridge.isegoria.network.NetworkService
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
@@ -34,23 +32,15 @@ class AuthActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var repository: Repository
 
-    @Inject
-    lateinit var api: API
-
-    @Inject
-    lateinit var networkService: NetworkService
-
     private lateinit var viewModel: AuthViewModel
 
     private class ViewModelProviderFactory(
-            private val repository: Repository,
-            private val api: API,
-            private val networkService: NetworkService
+            private val repository: Repository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return AuthViewModel(repository, api, networkService) as T
+            return AuthViewModel(repository) as T
         }
     }
 
@@ -69,7 +59,7 @@ class AuthActivity : DaggerAppCompatActivity() {
                     }
                 })
 
-        viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository, api, networkService))[AuthViewModel::class.java]
+        viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository))[AuthViewModel::class.java]
 
         presentRootContent(LoginFragment())
 

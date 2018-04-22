@@ -10,5 +10,5 @@ data class PollResultsResponse (
     val pollId: Long,
 
     @field:Json(name = "answers")
-    val results: List<PollResult>?
+    val results: List<PollResult>
 )

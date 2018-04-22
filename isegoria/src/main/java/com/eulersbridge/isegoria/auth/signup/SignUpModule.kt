@@ -1,8 +1,8 @@
 package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.ViewModelProvider
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -10,9 +10,7 @@ import dagger.Provides
 class SignUpModule {
 
     @Provides
-    fun signUpViewModel(
-        api: API
-    ): SignUpViewModel = SignUpViewModel(api)
+    fun signUpViewModel(repository: Repository): SignUpViewModel = SignUpViewModel(repository)
 
     @Provides
     fun provideSignUpViewModel(signUpViewModel: SignUpViewModel): ViewModelProvider.Factory

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.profile.ProfileViewModel
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.profile_badges_fragment.*
 
 class ProfileBadgesFragment : Fragment(), TitledFragment {
 
-    private lateinit var api: API
+    private lateinit var repository: Repository
     private lateinit var viewModel: ProfileViewModel
     private lateinit var badgeAdapter: BadgeAdapter
 
@@ -39,13 +39,13 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
         fetchUser()
     }
 
-    fun provideDependencies(api: API, viewModel: ProfileViewModel) {
-        this.api = api
+    fun provideDependencies(repository: Repository, viewModel: ProfileViewModel) {
+        this.repository = repository
         this.viewModel = viewModel
     }
 
     private fun setupBadgesGridView() {
-        badgeAdapter = BadgeAdapter(GlideApp.with(this), api)
+        badgeAdapter = BadgeAdapter(GlideApp.with(this), repository)
 
         badgesGridView.apply {
             adapter = badgeAdapter

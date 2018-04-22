@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 
 internal class PositionAdapter(
     private val glide: RequestManager,
-    private val api: API?,
+    private val repository: Repository?,
     private val clickListener: PositionClickListener
 ) :
     LoadingAdapter<Position,
@@ -39,12 +39,12 @@ internal class PositionAdapter(
     }
 
     override fun getPhoto(viewHolder: PositionViewHolder, itemId: Long) {
-        if (api != null) {
+        if (repository != null) {
 
             val weakViewHolder = WeakReference(viewHolder)
 
-            api.getPhotos(itemId).subscribeSuccess {
-                it.photos?.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
+            repository.getPhotos(itemId).subscribeSuccess {
+                it.photos.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
                     weakViewHolder.get()?.apply {
                         setImageUrl(glide, photoThumbnailUrl, itemId)
                     }

@@ -13,7 +13,6 @@ import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
@@ -23,9 +22,6 @@ import kotlinx.android.synthetic.main.election_positions_fragment.*
 import javax.inject.Inject
 
 class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickListener {
-
-    @Inject
-    internal lateinit var api: API
 
     @Inject
     internal lateinit var repository: Repository
@@ -42,7 +38,7 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
                 .transform(TintTransformation())
         )
 
-        PositionAdapter(glide, api, this)
+        PositionAdapter(glide, repository, this)
     }
 
     override fun onCreateView(

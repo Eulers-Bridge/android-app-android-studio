@@ -12,8 +12,13 @@ import java.io.IOException
 class AuthenticationInterceptor : Interceptor {
 
     companion object {
-        var username: String? = null
-        var password: String? = null
+        private var username: String? = null
+        private var password: String? = null
+
+        fun setCredentials(username: String?, password: String?) {
+            this.username = username
+            this.password = password
+        }
     }
 
     private fun getBase64EncodedCredentials(): String {

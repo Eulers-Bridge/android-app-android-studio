@@ -18,8 +18,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
@@ -35,7 +35,7 @@ class CandidatePositionFragment : Fragment() {
     private var dpWidth: Float = 0.toFloat()
 
     @Inject
-    internal lateinit var api: API
+    internal lateinit var repository: Repository
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -65,9 +65,9 @@ class CandidatePositionFragment : Fragment() {
 
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
-        position?.id?.let { positionId ->
-            api.getPositionCandidates(positionId).subscribeSuccess { candidates ->
-                addCandidates(candidates)
+        position?.id?.let {
+            repository.getPositionCandidates(it).subscribeSuccess {
+                addCandidates(it)
             }.addTo(compositeDisposable)
         }
 
@@ -108,11 +108,13 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        api.getPhoto(candidate.userId).subscribeSuccess {
-            GlideApp.with(this@CandidatePositionFragment)
-                .load(it.getPhotoUrl())
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(candidateProfileView)
+        repository.getPhoto(candidate.userId).subscribeSuccess {
+            it.value?.let {
+                GlideApp.with(this@CandidatePositionFragment)
+                        .load(it.getPhotoUrl())
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(candidateProfileView)
+            }
         }.addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
@@ -152,10 +154,12 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).subscribeSuccess {
-            runOnUiThread {
-                textViewParty.text = it.code
-                textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
+        repository.getTicket(candidate.ticketId).subscribeSuccess {
+            it.value?.let { ticket ->
+                runOnUiThread {
+                    textViewParty.text = ticket.code
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                }
             }
         }.addTo(compositeDisposable)
 
@@ -190,9 +194,9 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribeSuccess {
+        repository.getPosition(candidate.positionId).subscribeSuccess {
             runOnUiThread {
-                textViewPosition.text = it.name
+                textViewPosition.text = it.value?.name
             }
         }.addTo(compositeDisposable)
 

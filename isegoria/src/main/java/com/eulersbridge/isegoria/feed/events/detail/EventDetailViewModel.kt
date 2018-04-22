@@ -6,15 +6,16 @@ import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Event
 import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.network.api.model.Ticket
+import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
 class EventDetailViewModel
-@Inject constructor (private val api: API) : ViewModel() {
+@Inject constructor (private val repository: Repository) : ViewModel() {
 
     internal val event = MutableLiveData<Event>()
 
@@ -35,11 +36,15 @@ class EventDetailViewModel
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-    internal fun getTicket(ticketId: Long): LiveData<Ticket>
-            = api.getTicket(ticketId).toLiveData()
+    internal fun getTicket(ticketId: Long): LiveData<Ticket?>
+            = repository.getTicket(ticketId)
+                .toLiveData()
+                .map { it.value }
 
-    internal fun getPosition(positionId: Long): LiveData<Position>
-            = api.getPosition(positionId).toLiveData()
+    internal fun getPosition(positionId: Long): LiveData<Position?>
+            = repository.getPosition(positionId)
+                .toLiveData()
+                .map { it.value }
 
     internal fun addToCalendar(context: Context) {
         addToCalendarIntent?.let {

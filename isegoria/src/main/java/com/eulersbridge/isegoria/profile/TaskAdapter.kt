@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.RequestManager
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Task
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import io.reactivex.disposables.CompositeDisposable
@@ -17,7 +17,7 @@ import java.util.*
 
 internal class TaskAdapter(
     private val glide: RequestManager,
-    private val api: API
+    private val repository: Repository
 ) : RecyclerView.Adapter<TaskViewHolder>() {
 
     private val compositeDisposable = CompositeDisposable()
@@ -48,12 +48,12 @@ internal class TaskAdapter(
         val itemId = item.id
 
         val weakViewHolder = WeakReference(viewHolder)
-        api.getPhotos(itemId).subscribeSuccess {
+        repository.getPhotos(itemId).subscribeSuccess {
             if (it.totalPhotos > imageIndex + 1) {
                 val innerViewHolder = weakViewHolder.get()
 
                 if (innerViewHolder != null) {
-                    val imageUrl = it.photos?.get(imageIndex)?.getPhotoUrl()
+                    val imageUrl = it.photos[imageIndex].getPhotoUrl()
 
                     if (!imageUrl.isNullOrBlank())
                         innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)

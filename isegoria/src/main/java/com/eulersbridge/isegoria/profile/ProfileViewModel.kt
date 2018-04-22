@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.map
@@ -15,11 +14,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
-class ProfileViewModel
-@Inject constructor(
-        private val repository: Repository,
-        private val api: API
-) : ViewModel() {
+class ProfileViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -78,9 +73,11 @@ class ProfileViewModel
     internal fun fetchUserStats() {
         val (_, _, email) = getUser() ?: return
 
-        api.getContact(email).subscribeSuccess {
-            contactsCount.postValue(it.contactsCount)
-            totalTasksCount.postValue(it.totalTasksCount)
+        repository.getContact(email).subscribeSuccess { result ->
+            result.value?.let {
+                contactsCount.postValue(it.contactsCount)
+                totalTasksCount.postValue(it.totalTasksCount)
+            }
         }.addTo(compositeDisposable)
     }
 
@@ -108,8 +105,7 @@ class ProfileViewModel
      */
     fun getRemainingBadges(limitToLevel: Boolean): LiveData<List<Badge>> {
         return getUser()?.getId()?.let {
-            return api.getRemainingBadges(it)
-                    .onErrorReturnItem(emptyList())
+            return repository.getUserRemainingBadges(it)
                     .map {
                         if (limitToLevel) {
                             it.filter { it.level == targetBadgeLevel }
@@ -128,8 +124,7 @@ class ProfileViewModel
      */
     fun getCompletedBadges(): LiveData<List<Badge>>? {
         return getUser()?.getId()?.let {
-            return api.getCompletedBadges(it)
-                    .onErrorReturnItem(emptyList())
+            return repository.getUserCompletedBadges(it)
                     .map { it.filter { it.level == targetBadgeLevel } }
                     .toLiveData()
         } ?: SingleLiveData(emptyList())
@@ -139,14 +134,9 @@ class ProfileViewModel
         if (institutionName == null) {
 
             getUser()?.institutionId?.let {
-                api.getInstitution(it)
-                        .map { it.getName() }
-                        .onErrorReturnItem("")
-                        .map {
-                            institutionName = it
-                            it
-                        }
+                repository.getInstitutionName(it)
                         .toLiveData()
+                        .map { it.value ?: "" }
 
             } ?: SingleLiveData(null)
         }

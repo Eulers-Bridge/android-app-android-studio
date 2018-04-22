@@ -37,7 +37,7 @@ class ElectionOverviewFragment : Fragment() {
     ): View? {
         val rootView = inflater.inflate(R.layout.election_overview_fragment, container, false)
 
-        observe(viewModel.getElection()) {
+        observe(viewModel.election) {
             if (it != null)
                 populateElectionText(it)
         }

@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria.profile
 import android.arch.lifecycle.ViewModelProvider
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.inject.ViewModelProviderFactory
-import com.eulersbridge.isegoria.network.api.API
 import dagger.Module
 import dagger.Provides
 
@@ -11,8 +10,8 @@ import dagger.Provides
 class ProfileFragmentModule {
 
     @Provides
-    fun profileViewModel(repository: Repository, api: API): ProfileViewModel
-            = ProfileViewModel(repository, api)
+    fun profileViewModel(repository: Repository): ProfileViewModel
+            = ProfileViewModel(repository)
 
     @Provides
     fun provideProfileViewModel(profileViewModel: ProfileViewModel): ViewModelProvider.Factory

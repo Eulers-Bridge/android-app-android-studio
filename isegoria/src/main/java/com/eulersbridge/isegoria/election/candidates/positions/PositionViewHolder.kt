@@ -53,10 +53,11 @@ internal class PositionViewHolder(itemView: View, private val listener: Position
 
     fun setImageUrl(glide: RequestManager, url: String?, itemId: Long) {
         if (itemId == item!!.id && !url.isNullOrBlank()) {
-            glide
-                .load(url)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+            imageView.post {
+                glide.load(url)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(imageView)
+            }
         }
     }
 }

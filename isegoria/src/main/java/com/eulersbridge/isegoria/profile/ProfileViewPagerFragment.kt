@@ -13,7 +13,6 @@ import android.view.*
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity
 import com.eulersbridge.isegoria.util.extension.observe
@@ -25,8 +24,6 @@ import javax.inject.Inject
 
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    @Inject
-    lateinit var api: API
     @Inject
     lateinit var repository: Repository
 
@@ -71,15 +68,15 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
         val fragments = mutableListOf<Fragment>()
 
-        val overviewFragment = ProfileOverviewFragment.create(api, repository, viewModel)
+        val overviewFragment = ProfileOverviewFragment.create(repository, viewModel)
         fragments.add(overviewFragment)
 
         val taskProgressFragment = ProfileTaskProgressFragment()
-        taskProgressFragment.provideDependencies(api, viewModel)
+        taskProgressFragment.provideDependencies(repository, viewModel)
         fragments.add(taskProgressFragment)
 
         val badgesFragment = ProfileBadgesFragment()
-        badgesFragment.provideDependencies(api, viewModel)
+        badgesFragment.provideDependencies(repository, viewModel)
         fragments.add(badgesFragment)
 
         val pagerAdapter = object : SimpleFragmentPagerAdapter(childFragmentManager, fragments) {

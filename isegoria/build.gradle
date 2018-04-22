@@ -24,6 +24,7 @@ android {
         renderscriptSupportModeEnabled true
         targetSdkVersion Versions.target_sdk
         vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionCode Versions.version_code
         versionName Versions.version_name
     }
@@ -41,6 +42,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -115,6 +119,12 @@ dependencies {
     implementation Deps.bottom_navigation
     // Used in Candidate fragment for bottom tabs
     implementation Deps.view_pager_indicator
+
+    // Dependencies for local unit tests
+    testImplementation TestDeps.junit
+    testImplementation TestDeps.mockito
+    testImplementation TestDeps.mockito_kotlin
+    testImplementation TestDeps.livedata_test
 }
 
 apply plugin: 'com.google.gms.google-services'

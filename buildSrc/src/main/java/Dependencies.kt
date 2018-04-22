@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 object Versions {
     const val kotlin = "1.2.40"
     const val android_gradle_plugin = "3.2.0-alpha11"
@@ -35,6 +37,17 @@ object Versions {
 
     const val bottom_navigation = "1.2.4"
     const val view_pager_indicator = "2.4.1"
+
+    const val junit = "4.12"
+    const val mockito = "2.18.3"
+    const val mockito_kotlin = "2.0.0-alpha03"
+}
+
+object TestDeps {
+    const val junit = "junit:junit:${Versions.junit}"
+    const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
+    const val mockito_kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockito_kotlin}"
+    const val livedata_test = "android.arch.core:core-testing:${Versions.arch_components}"
 }
 
 object Deps {

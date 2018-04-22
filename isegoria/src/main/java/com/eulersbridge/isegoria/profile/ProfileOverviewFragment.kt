@@ -15,10 +15,12 @@ import androidx.core.view.isGone
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.friends.FriendsFragment
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.GenericUser
 import com.eulersbridge.isegoria.network.api.model.User
@@ -33,26 +35,24 @@ import kotlinx.android.synthetic.main.profile_overview_fragment.*
 class ProfileOverviewFragment : Fragment(), TitledFragment {
 
     companion object {
-        fun create(api: API, repository: Repository, viewModel: ProfileViewModel?): ProfileOverviewFragment {
+        fun create(repository: Repository, viewModel: ProfileViewModel?): ProfileOverviewFragment {
             val fragment = ProfileOverviewFragment()
-            fragment.provideDependencies(api, repository, viewModel)
+            fragment.provideDependencies(repository, viewModel)
             return fragment
         }
     }
 
-    private lateinit var api: API
     private lateinit var repository: Repository
     private lateinit var taskAdapter: TaskAdapter
     private var viewModel: ProfileViewModel? = null
 
     private class ViewModelProviderFactory(
-            private val repository: Repository,
-            private val api: API
+            private val repository: Repository
     ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileViewModel(repository, api) as T
+            return ProfileViewModel(repository) as T
         }
 
     }
@@ -67,7 +67,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         super.onActivityCreated(savedInstanceState)
 
         if (viewModel == null) {
-            viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository, api))[ProfileViewModel::class.java]
+            viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository))[ProfileViewModel::class.java]
         }
 
         requireNotNull(viewModel)
@@ -90,14 +90,13 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         createViewModelObservers()
     }
 
-    private fun provideDependencies(api: API, repository: Repository, viewModel: ProfileViewModel?) {
-        this.api = api
+    private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?) {
         this.repository = repository
         this.viewModel = viewModel
     }
 
     private fun setupTaskListView() {
-        taskAdapter = TaskAdapter(Glide.with(this), api)
+        taskAdapter = TaskAdapter(Glide.with(this), repository)
 
         friendsCountTextView.setOnClickListener({  viewModel!!.viewFriends() })
         friendsLabel.setOnClickListener({  viewModel!!.viewFriends() })
@@ -114,6 +113,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         requireNotNull(viewModel)
 
         observe(viewModel!!.user) { user ->
+            // TODO: Fetch using below methods inside viewmodel if user not null
             if (user == null) {
                 personalityTestButton.isGone = true
                 return@observe

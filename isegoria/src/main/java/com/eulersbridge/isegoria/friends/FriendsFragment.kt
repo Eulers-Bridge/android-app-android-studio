@@ -23,7 +23,6 @@ import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.User
@@ -48,8 +47,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
 
-    @Inject
-    lateinit var api: API
     @Inject
     lateinit var repository: Repository
 
@@ -154,7 +151,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         } else if (type == SENT && mainActivity != null) {
             val user = request.requestReceiver
 
-            val profileFragment = ProfileOverviewFragment.create(api, repository, null)
+            val profileFragment = ProfileOverviewFragment.create(repository, null)
             profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
             mainActivity?.presentContent(profileFragment)
@@ -176,7 +173,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onSearchedUserClick(user: User?) {
-        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
+        val profileFragment = ProfileOverviewFragment.create(repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
         mainActivity?.presentContent(profileFragment)
@@ -188,7 +185,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onContactClick(contact: Contact) {
-        val profileFragment = ProfileOverviewFragment.create(api, repository, null)
+        val profileFragment = ProfileOverviewFragment.create(repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
         mainActivity?.presentContent(profileFragment)

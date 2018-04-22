@@ -4,6 +4,7 @@ import android.content.Context
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.BuildConfig
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.data.DataRepository
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.*
 import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
@@ -128,14 +129,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideNetworkService(
-            appContext: Context, httpClient: OkHttpClient, api: API, networkConfig: NetworkConfig
-    ) = NetworkService(appContext, httpClient, api, networkConfig)
-
-    @Provides
-    @Singleton
-    fun provideRepository(api: API, networkService: NetworkService, securePreferences: SecurePreferences)
-            = Repository(api, networkService, securePreferences)
+    fun provideRepository(appContext: Context, httpClient: OkHttpClient, api: API, networkConfig: NetworkConfig, securePreferences: SecurePreferences): Repository
+            = DataRepository(appContext, httpClient, api, networkConfig, securePreferences)
 
     @Provides
     @Singleton

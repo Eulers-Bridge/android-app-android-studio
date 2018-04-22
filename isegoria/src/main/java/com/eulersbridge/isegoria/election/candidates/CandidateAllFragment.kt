@@ -19,9 +19,11 @@ import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
@@ -43,9 +45,6 @@ class CandidateAllFragment : Fragment() {
 
     @Inject
     internal lateinit var app: IsegoriaApp
-
-    @Inject
-    internal lateinit var api: API
 
     @Inject
     internal lateinit var repository: Repository
@@ -166,8 +165,8 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        api.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos?.firstOrNull()?.let {
+        repository.getPhotos(candidate.userId).subscribeSuccess {
+            it.photos.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                         .load(it.getPhotoUrl())
                         .transition(DrawableTransitionOptions.withCrossFade())
@@ -175,8 +174,8 @@ class CandidateAllFragment : Fragment() {
             }
         }.addTo(compositeDisposable)
 
-        api.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos?.firstOrNull()?.let {
+        repository.getPhotos(candidate.userId).subscribeSuccess {
+            it.photos.firstOrNull()?.let {
                 GlideApp.with(this@CandidateAllFragment)
                     .load(it.getPhotoUrl())
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -226,10 +225,12 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        api.getTicket(candidate.ticketId).subscribeSuccess {
-            runOnUiThread {
-                textViewParty.text = it.code
-                textViewParty.setBackgroundColor(Color.parseColor(it.getColour()))
+        repository.getTicket(candidate.ticketId).subscribeSuccess {
+            it.value?.let { ticket ->
+                runOnUiThread {
+                    textViewParty.text = ticket.code
+                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                }
             }
         }.addTo(compositeDisposable)
 
@@ -277,9 +278,9 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        api.getPosition(candidate.positionId).subscribeSuccess {
+        repository.getPosition(candidate.positionId).subscribeSuccess {
             runOnUiThread {
-                textViewPosition.text = it.name
+                textViewPosition.text = it.value?.name
             }
         }.addTo(compositeDisposable)
 
