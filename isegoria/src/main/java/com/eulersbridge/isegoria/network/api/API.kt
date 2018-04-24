@@ -28,7 +28,7 @@ interface API {
     fun login(@Query("topicArn") snsTopicArn: String, @Query("deviceToken") deviceToken: String): Single<LoginResponse>
 
     @GET("logout")
-    fun logout(): Completable
+    fun logOut(): Completable
 
 
     @GET("emailVerification/{userEmail}/resend")

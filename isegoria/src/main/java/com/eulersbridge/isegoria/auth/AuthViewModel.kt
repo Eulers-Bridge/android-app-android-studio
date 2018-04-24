@@ -2,23 +2,19 @@ package com.eulersbridge.isegoria.auth
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Country
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 
-class AuthViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-
-    private val compositeDisposable = CompositeDisposable()
+class AuthViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     private var countries: List<Country>? = null
 
@@ -32,20 +28,18 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Vi
     val userLoggedIn = MutableLiveData<Boolean>()
 
     init {
+        authFinished.value = false
+
         repository.getSignUpCountries().subscribeSuccess {
             countries = it
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
 
-        repository.loginState
+        repository.getLoginState()
                 .filter { it is LoginState.LoggedIn }
                 .subscribe {
                     authFinished.postValue(true)
                 }
-                .addTo(compositeDisposable)
-    }
-
-    override fun onCleared() {
-        compositeDisposable.dispose()
+                .addToDisposable()
     }
 
     fun onSignUpBackPressed() {

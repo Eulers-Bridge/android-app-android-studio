@@ -15,6 +15,9 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class FeedFragmentProvider {
 
+    @ContributesAndroidInjector(modules = [(FeedFragmentModule::class)])
+    internal abstract fun provideFeedFragment(): FeedFragment
+
     @ContributesAndroidInjector(modules = [(NewsFragmentModule::class)])
     internal abstract fun provideNewsFragment(): NewsFragment
 

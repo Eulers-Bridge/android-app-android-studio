@@ -2,29 +2,21 @@ package com.eulersbridge.isegoria.friends
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.network.api.model.User
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
-class FriendsViewModel
-@Inject constructor(
-    private val appRouter: AppRouter,
-    private val repository: Repository
-) : ViewModel() {
-
-    private val compositeDisposable = CompositeDisposable()
+class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, private val repository: Repository) : BaseViewModel() {
 
     internal var searchResults = MutableLiveData<List<User>>()
     internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
@@ -45,10 +37,6 @@ class FriendsViewModel
         getFriends()
         getReceivedFriendRequests()
         getSentFriendRequests()
-    }
-
-    override fun onCleared() {
-        compositeDisposable.dispose()
     }
 
     internal fun onDestroy() {
@@ -90,14 +78,14 @@ class FriendsViewModel
     private fun getFriends() {
         repository.getFriends().subscribeSuccess {
             friends.postValue(it)
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
     }
 
     private fun getSentFriendRequests() {
         repository.getSentFriendRequests().subscribeSuccess {
             sentFriendRequests.postValue(it)
             sentRequestsVisible.postValue(it.isNotEmpty())
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
     }
 
     internal fun refreshReceivedFriendRequests() {
@@ -108,7 +96,7 @@ class FriendsViewModel
         repository.getReceivedFriendRequests().subscribeSuccess {
             receivedFriendRequests.postValue(it)
             receivedRequestsVisible.postValue(it.isNotEmpty())
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
     }
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {

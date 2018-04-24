@@ -3,25 +3,18 @@ package com.eulersbridge.isegoria.poll
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.Poll
 import com.eulersbridge.isegoria.network.api.model.PollResult
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
-class PollVoteViewModel
-@Inject constructor (
-    private val repository: Repository
-) : ViewModel() {
-
-    private val compositeDisposable = CompositeDisposable()
+class PollVoteViewModel @Inject constructor (private val repository: Repository) : BaseViewModel() {
 
     internal val poll = MutableLiveData<Poll>()
     internal val pollResults = MutableLiveData<List<PollResult>>()
@@ -51,10 +44,6 @@ class PollVoteViewModel
                     val updatedPoll = currentPoll.copy(options = updatedPollOptions)
                     poll.postValue(updatedPoll)
                     pollResults.postValue(results)
-                }.addTo(compositeDisposable)
-    }
-
-    override fun onCleared() {
-        compositeDisposable.dispose()
+                }.addToDisposable()
     }
 }

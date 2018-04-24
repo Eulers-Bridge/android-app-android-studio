@@ -2,21 +2,17 @@ package com.eulersbridge.isegoria.profile
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
-class ProfileViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
-
-    private val compositeDisposable = CompositeDisposable()
+class ProfileViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     internal val friendsScreenVisible = MutableLiveData<Boolean>()
     internal val currentSectionIndex = MutableLiveData<Int>()
@@ -32,10 +28,6 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     init {
         friendsScreenVisible.value = false
         currentSectionIndex.value = 0
-    }
-
-    override fun onCleared() {
-        compositeDisposable.dispose()
     }
 
     internal fun viewFriends() {
@@ -60,10 +52,10 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     }
 
     internal fun logOut() {
-        repository.logout()
+        repository.logOut()
                 .toBooleanSingle()
                 .subscribe()
-                .addTo(compositeDisposable)
+                .addToDisposable()
     }
 
     internal fun setUser(user: GenericUser) {
@@ -78,7 +70,7 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
                 contactsCount.postValue(it.contactsCount)
                 totalTasksCount.postValue(it.totalTasksCount)
             }
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
     }
 
     private fun getUser(): User? {

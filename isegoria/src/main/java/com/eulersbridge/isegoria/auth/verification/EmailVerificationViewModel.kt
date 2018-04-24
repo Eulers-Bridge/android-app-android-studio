@@ -1,9 +1,9 @@
 package com.eulersbridge.isegoria.auth.verification
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.util.BaseViewModel
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
@@ -11,7 +11,7 @@ class EmailVerificationViewModel
 @Inject constructor (
     private val appRouter: AppRouter,
     private val repository: Repository
-) : ViewModel() {
+) : BaseViewModel() {
 
     internal val resendVerificationButtonEnabled = MutableLiveData<Boolean>()
     internal val completeButtonEnabled = MutableLiveData<Boolean>()

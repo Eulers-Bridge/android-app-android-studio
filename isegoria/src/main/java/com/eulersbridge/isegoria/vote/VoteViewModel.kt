@@ -2,30 +2,23 @@ package com.eulersbridge.isegoria.vote
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.content.Intent
 import android.provider.CalendarContract
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.network.api.model.VoteLocation
 import com.eulersbridge.isegoria.network.api.model.VoteReminder
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.Optional
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 import javax.inject.Inject
 
-class VoteViewModel
-@Inject constructor(
-        private val repository: Repository
-) : ViewModel() {
-
-    private val compositeDisposable = CompositeDisposable()
+class VoteViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     private var voteLocations: LiveData<List<VoteLocation>>? = null
     internal var electionData: LiveData<Election?>? = null
@@ -47,11 +40,7 @@ class VoteViewModel
         }.subscribe {
             if (it && pledgeComplete.value == false)
                 viewPagerIndex.postValue(1)
-        }.addTo(compositeDisposable)
-    }
-
-    override fun onCleared() {
-        compositeDisposable.dispose()
+        }.addToDisposable()
     }
 
     fun getAddReminderToCalendarIntent(): Intent? {
@@ -118,7 +107,7 @@ class VoteViewModel
             repository.createUserVoteReminder(election.id, voteLocation.name!!, dateTimeCalendar.timeInMillis)
                     .toBooleanSingle()
                     .subscribe()
-                    .addTo(compositeDisposable)
+                    .addToDisposable()
 
             viewPagerIndex.value = 2
         }

@@ -21,6 +21,7 @@ import javax.inject.Inject
 
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
+    // TODO: Convert to observing view model for fragment
     private val overviewFragment: ElectionOverviewFragment by lazy { ElectionOverviewFragment() }
     private val candidateFragment: CandidateFragment by lazy { CandidateFragment() }
 
@@ -28,7 +29,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: ElectionViewModel
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
@@ -36,11 +36,10 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
             val subFragment = when (tab.position) {
                 0 -> overviewFragment
                 1 -> candidateFragment
-                else -> null
+                else -> return
             }
 
-            if (subFragment != null && activity != null)
-                showTabFragment(subFragment)
+            showTabFragment(subFragment)
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab) {}

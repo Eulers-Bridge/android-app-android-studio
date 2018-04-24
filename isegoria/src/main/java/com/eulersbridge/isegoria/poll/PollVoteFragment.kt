@@ -39,7 +39,7 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
         val rootView = inflater.inflate(R.layout.poll_fragment, container, false)
 
-        viewModel.poll.value = arguments?.getParcelable(ACTIVITY_EXTRA_POLL)
+        viewModel.poll.value = arguments?.getParcelable(FRAGMENT_EXTRA_POLL)
 
         return rootView
     }

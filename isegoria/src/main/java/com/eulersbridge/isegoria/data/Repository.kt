@@ -10,7 +10,7 @@ import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 
 interface Repository {
-    val loginState: BehaviorSubject<LoginState>
+    fun getLoginState(): BehaviorSubject<LoginState>
 
     fun getSavedEmail(): String?
     fun getSavedPassword(): String?
@@ -19,7 +19,7 @@ interface Repository {
 
     fun resendVerificationEmail(): Completable
     fun login(email: String, password: String)
-    fun logout(): Completable
+    fun logOut(): Completable
     fun signUp(user: SignUpUser): Completable
 
     fun setUserTrackingOff(trackingOff: Boolean): Completable

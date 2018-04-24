@@ -94,14 +94,14 @@ class SettingsActivity : DaggerAppCompatActivity() {
 
 
     private fun fetchData() {
-        viewModel.getProfilePhotoUrl()?.let {
+        viewModel.profilePhotoUrl?.let {
             GlideApp.with(this)
                     .load(it)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(smallImageView)
         }
 
-        observe(viewModel.getUserPhoto()) {
+        observe(viewModel.userPhoto) {
             if (it != null)
                 GlideApp.with(this)
                     .load(it.getPhotoUrl())

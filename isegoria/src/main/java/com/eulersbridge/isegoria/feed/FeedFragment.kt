@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.feed
 
 import android.app.Activity
 import android.app.ActivityManager
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -20,15 +21,23 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.feed_fragment.*
+import javax.inject.Inject
 
 
 class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     private var tabLayout: TabLayout? = null
 
-    private val viewModel: FeedViewModel by lazy {
-        ViewModelProviders.of(requireActivity())[FeedViewModel::class.java]
+    @Inject
+    lateinit var modelFactory: ViewModelProvider.Factory
+    private lateinit var viewModel: FeedViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, modelFactory)[FeedViewModel::class.java]
     }
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {

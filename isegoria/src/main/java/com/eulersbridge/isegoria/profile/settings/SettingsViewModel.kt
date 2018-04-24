@@ -2,21 +2,20 @@ package com.eulersbridge.isegoria.profile.settings
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.net.Uri
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Photo
-import com.eulersbridge.isegoria.util.extension.map
+import com.eulersbridge.isegoria.util.BaseViewModel
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
-class SettingsViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
+class SettingsViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
-    private val compositeDisposable = CompositeDisposable()
+    internal val userPhoto = MutableLiveData<Photo?>()
+    internal val profilePhotoUrl: String? = repository.getUserProfilePhotoUrl()
 
     internal val optOutDataCollectionSwitchChecked = MutableLiveData<Boolean>()
     internal val optOutDataCollectionSwitchEnabled = MutableLiveData<Boolean>()
@@ -35,13 +34,9 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
 
         doNotTrackSwitchChecked.value = user.trackingOff
         doNotTrackSwitchEnabled.value = true
-    }
 
-    override fun onCleared() {
-        compositeDisposable.dispose()
+        fetchUserPhoto()
     }
-
-    internal fun getProfilePhotoUrl(): String? = repository.getUserProfilePhotoUrl()
 
     internal fun onOptOutDataCollectionChange(isChecked: Boolean) {
         optOutDataCollectionSwitchEnabled.value = false
@@ -53,7 +48,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
                 onError = {
                     optOutDataCollectionSwitchChecked.postValue(!isChecked)
                 }
-        ).addTo(compositeDisposable)
+        ).addToDisposable()
     }
 
     internal fun onTrackingChange(isChecked: Boolean) {
@@ -67,16 +62,18 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
                     // Restore to previous checked state
                     doNotTrackSwitchChecked.postValue(!isChecked)
                 }
-        ).addTo(compositeDisposable)
+        ).addToDisposable()
     }
 
-    internal fun getUserPhoto(): LiveData<Photo?> {
-        return repository.getUserPhoto().toLiveData().map {
-            it.value
-        }
+    private fun fetchUserPhoto() {
+        repository.getUserPhoto().subscribeSuccess {
+            userPhoto.postValue(it.value)
+        }.addToDisposable()
     }
 
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {
-        return repository.setUserPhoto(imageUri).toBooleanSingle().toLiveData()
+        return repository.setUserPhoto(imageUri)
+                .toBooleanSingle()
+                .toLiveData()
     }
 }

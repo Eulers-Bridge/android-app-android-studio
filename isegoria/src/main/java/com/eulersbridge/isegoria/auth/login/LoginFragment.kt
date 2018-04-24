@@ -53,8 +53,8 @@ class LoginFragment : Fragment() {
             params.topMargin += Math.round(22.0f * resources.displayMetrics.density)
         }
 
-        emailField.onTextChanged { viewModel.email.value = it }
-        passwordField.onTextChanged { viewModel.password.value = it }
+        emailField.onTextChanged { viewModel.setEmail(it) }
+        passwordField.onTextChanged { viewModel.setPassword(it) }
 
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
@@ -92,14 +92,6 @@ class LoginFragment : Fragment() {
 
     private fun createViewModelObservers() {
         viewModel.apply {
-            email.value?.let {
-                emailField.setText(it)
-            }
-
-            password.value?.let {
-                passwordField.setText(it)
-            }
-
             observeBoolean(emailError) {
                 if (it) {
                     emailLayout.error = getString(R.string.user_login_email_error_required)

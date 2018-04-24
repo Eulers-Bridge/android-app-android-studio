@@ -70,7 +70,7 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
 
         createNotificationChannels()
 
-        repository.loginState.subscribe {
+        repository.getLoginState().subscribe {
             when (it) {
                 is LoginState.LoggedIn -> {
                     createAppShortcuts()

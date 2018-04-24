@@ -1,13 +1,11 @@
 package com.eulersbridge.isegoria.feed
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import com.eulersbridge.isegoria.AppRouter
+import com.eulersbridge.isegoria.util.BaseViewModel
 
-class FeedViewModel(application: Application) : AndroidViewModel(application) {
+class FeedViewModel(private val appRouter: AppRouter) : BaseViewModel() {
 
     internal fun showFriends() {
-        val app = getApplication<Application>() as? AppRouter
-        app!!.setFriendsScreenVisible(true)
+        appRouter.setFriendsScreenVisible(true)
     }
 }

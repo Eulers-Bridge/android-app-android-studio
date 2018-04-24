@@ -1,11 +1,11 @@
 package com.eulersbridge.isegoria.feed.photos.detail
 
 import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
 import android.support.annotation.IntRange
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Like
 import com.eulersbridge.isegoria.network.api.model.Photo
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Maybe
@@ -14,10 +14,7 @@ import io.reactivex.rxkotlin.mergeAllMaybes
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
-class PhotoDetailViewModel
-@Inject constructor(
-        private val repository: Repository
-) : ViewModel() {
+class PhotoDetailViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     private var photos: List<Photo>? = null
     private val visiblePhotoIndex = BehaviorSubject.create<Int>()
@@ -53,17 +50,21 @@ class PhotoDetailViewModel
     }
 
     internal fun getPhoto(): LiveData<Photo?> {
-        val stream = photo.mergeAllMaybes()
-        return stream.toLiveData(BackpressureStrategy.LATEST)
+        return photo
+                .mergeAllMaybes()
+                .toLiveData(BackpressureStrategy.LATEST)
     }
 
     internal fun getPhotoLikeCount(): LiveData<Int> {
-        return photoLikes.map { it.size }.toLiveData(BackpressureStrategy.LATEST)
+        return photoLikes
+                .map { it.size }
+                .toLiveData(BackpressureStrategy.LATEST)
     }
 
     internal fun getPhotoLikedByUser(): LiveData<Boolean> {
-        val stream = photoLikes.map { it.singleOrNull { it.email == repository.getUser().email } != null }
-        return stream.toLiveData(BackpressureStrategy.LATEST)
+        return photoLikes
+                .map { it.singleOrNull { it.email == repository.getUser().email } != null }
+                .toLiveData(BackpressureStrategy.LATEST)
     }
 
     internal fun getPhotoUrl(position: Int): String? = photos?.get(position)?.getPhotoUrl()
@@ -72,13 +73,17 @@ class PhotoDetailViewModel
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun likePhoto(): LiveData<Boolean> {
-        return photo.blockingFirst().flatMapSingle { repository.likePhoto(it.id) }.toLiveData()
+        return photo.blockingFirst()
+                .flatMapSingle { repository.likePhoto(it.id) }
+                .toLiveData()
     }
 
     /**
      * @return LiveData whose value is true on success, false on failure
      */
     internal fun unlikePhoto(): LiveData<Boolean> {
-        return photo.blockingFirst().flatMapSingle { repository.unlikePhoto(it.id) }.toLiveData()
+        return photo.blockingFirst()
+                .flatMapSingle { repository.unlikePhoto(it.id) }
+                .toLiveData()
     }
 }

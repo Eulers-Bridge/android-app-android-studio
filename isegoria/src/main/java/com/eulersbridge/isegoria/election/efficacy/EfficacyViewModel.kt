@@ -1,17 +1,14 @@
 package com.eulersbridge.isegoria.election.efficacy
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.UserSelfEfficacy
+import com.eulersbridge.isegoria.util.BaseViewModel
 import io.reactivex.Completable
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
-class EfficacyViewModel
-@Inject constructor(
-    private val repository: Repository
-) : ViewModel() {
+class EfficacyViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     internal val doneButtonEnabled = MutableLiveData<Boolean>()
     internal val efficacyComplete = MutableLiveData<Boolean>()

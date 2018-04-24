@@ -125,6 +125,9 @@ dependencies {
     testImplementation TestDeps.mockito
     testImplementation TestDeps.mockito_kotlin
     testImplementation TestDeps.livedata_test
+
+    androidTestImplementation TestDeps.espresso
+    androidTestImplementation TestDeps.espresso_intents
 }
 
 apply plugin: 'com.google.gms.google-services'

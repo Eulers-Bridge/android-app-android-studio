@@ -91,7 +91,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
     }
 
     private fun createApplicationObservers() {
-        repository.loginState.subscribe {
+        repository.getLoginState().subscribe {
             when (it) {
                 is LoginState.LoggedIn -> {
                     onLoginSuccess()

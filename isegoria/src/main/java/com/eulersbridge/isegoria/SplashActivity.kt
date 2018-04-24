@@ -5,7 +5,6 @@ import android.os.Bundle
 import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
-import com.securepreferences.SecurePreferences
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -15,15 +14,15 @@ class SplashActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var repository: Repository
-    @Inject
-    lateinit var securePreferences: SecurePreferences
 
     private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        repository.loginState.subscribe {
+        showLoginActivity()
+
+        repository.getLoginState().subscribe {
             when (it) {
                 is LoginState.LoggedIn -> {
                     showMainActivity()
@@ -34,8 +33,8 @@ class SplashActivity : DaggerAppCompatActivity() {
             }
         }.addTo(compositeDisposable)
 
-        val savedEmail = securePreferences.getString(USER_EMAIL_KEY, null)
-        val savedPassword = securePreferences.getString(USER_PASSWORD_KEY, null)
+        val savedEmail = repository.getSavedEmail()
+        val savedPassword = repository.getSavedPassword()
 
         if (savedEmail != null && savedPassword != null) {
             repository.login(savedEmail, savedPassword)

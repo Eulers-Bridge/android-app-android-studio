@@ -2,32 +2,25 @@ package com.eulersbridge.isegoria.auth.login
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.arch.lifecycle.ViewModel
 import android.util.Patterns
-import com.eulersbridge.isegoria.IsegoriaApp
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.extension.isNetworkAvailable
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
 import javax.inject.Inject
 
 class LoginViewModel
 @Inject constructor(
         private val repository: Repository,
-        private val app: IsegoriaApp,
         private val api: API
-) : ViewModel() {
+) : BaseViewModel() {
 
-    private val compositeDisposable = CompositeDisposable()
-
-    internal val email = MutableLiveData<String>()
+    private val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
 
-    internal val password = MutableLiveData<String>()
+    private val password = MutableLiveData<String>()
 
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
@@ -47,33 +40,33 @@ class LoginViewModel
         email.value = repository.getSavedEmail()
         email.value = repository.getSavedPassword()
 
-        repository.loginState.subscribe {
+        repository.getLoginState().subscribe {
             when (it) {
+                is LoginState.LoggingIn -> {
+                    networkError.postValue(false)
+                }
                 is LoginState.LoginFailure -> {
+                    networkError.postValue(true)
                     formEnabled.postValue(true)
                 }
             }
-        }.addTo(compositeDisposable)
+        }.addToDisposable()
     }
 
-    override fun onCleared() {
-        compositeDisposable.dispose()
+    fun setEmail(value: String?) {
+        this.email.value = value
+    }
+
+    fun setPassword(value: String?) {
+        this.password.value = value
     }
 
     internal fun login() {
         formEnabled.value = false
 
         if (emailError.value == false && passwordError.value == false) {
-            if (!app.isNetworkAvailable()) {
-                networkError.value = true
-                formEnabled.value = true
-
-            } else {
-                networkError.value = false
-
-                // Email/password not null as validation checks for null
-                repository.login(email.value!!, password.value!!)
-            }
+            // Email/password not null as validation checks for null
+            repository.login(email.value!!, password.value!!)
         }
 
         formEnabled.value = true
@@ -86,11 +79,13 @@ class LoginViewModel
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
         if (email.isValidEmail) {
             canShowPasswordResetDialog.value = false
+
             // If email is valid, it is non-null
             api.requestPasswordReset(email!!)
                     .toBooleanSingle()
                     .subscribe()
-                    .addTo(compositeDisposable)
+                    .addToDisposable()
+
             canShowPasswordResetDialog.value = true
 
             return true

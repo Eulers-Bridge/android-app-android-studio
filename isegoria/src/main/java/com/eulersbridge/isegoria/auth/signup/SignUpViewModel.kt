@@ -1,15 +1,15 @@
 package com.eulersbridge.isegoria.auth.signup
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import javax.inject.Inject
 
 class SignUpViewModel
-@Inject constructor(private val repository: Repository) : ViewModel() {
+@Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     internal val countries = MutableLiveData<List<Country>>()
 

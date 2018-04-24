@@ -2,7 +2,6 @@ package com.eulersbridge.isegoria.feed.events.detail
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.content.Intent
 import android.provider.CalendarContract
@@ -10,12 +9,12 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Event
 import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.network.api.model.Ticket
+import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
-class EventDetailViewModel
-@Inject constructor (private val repository: Repository) : ViewModel() {
+class EventDetailViewModel @Inject constructor (private val repository: Repository) : BaseViewModel() {
 
     internal val event = MutableLiveData<Event>()
 

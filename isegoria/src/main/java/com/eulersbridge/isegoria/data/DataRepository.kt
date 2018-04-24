@@ -64,7 +64,12 @@ class DataRepository @Inject constructor(
         }
     }
 
-    override val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
+    @get:JvmName("_loginState")
+    private val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
+
+    override fun getLoginState(): BehaviorSubject<LoginState> {
+        return loginState
+    }
 
     private var cachedLoginArticles: List<NewsArticle>? = null
 
@@ -145,7 +150,7 @@ class DataRepository @Inject constructor(
                 )
     }
 
-    override fun logout(): Completable {
+    override fun logOut(): Completable {
         cachedLoginArticles = null
 
         securePreferences.edit {
@@ -157,7 +162,7 @@ class DataRepository @Inject constructor(
         AuthenticationInterceptor.setCredentials(null, null)
         networkConfig.resetBaseUrl()
 
-        return api.logout()
+        return api.logOut()
     }
 
     private fun jsonObjectOf(vararg pairs: Pair<String, Any?>) = JSONObject().apply {

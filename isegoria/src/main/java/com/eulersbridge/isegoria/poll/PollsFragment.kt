@@ -113,7 +113,7 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private fun addPolls(polls: List<Poll>) {
         val newFragments = polls.map {
             PollVoteFragment().apply {
-                arguments = bundleOf(ACTIVITY_EXTRA_POLL to it)
+                arguments = bundleOf(FRAGMENT_EXTRA_POLL to it)
             }
         }
 
