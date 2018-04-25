@@ -11,12 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.PhotoAlbum
 import com.eulersbridge.isegoria.util.extension.observe
-import com.eulersbridge.isegoria.util.extension.runOnUiThread
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.photos_fragment.*
@@ -34,22 +33,11 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
             = inflater.inflate(R.layout.photos_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = true
-            viewModel.refresh()
-            refreshLayout?.postDelayed(6000) { refreshLayout?.isRefreshing = false }
-        }
+        refreshLayout.setOnRefreshListener { viewModel.refresh() }
 
         albumsListView.apply {
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
             adapter = this@PhotosFragment.adapter
-        }
-
-        observe(viewModel.photoAlbums) { albums ->
-            runOnUiThread {
-                refreshLayout.isRefreshing = false
-            }
-            adapter.replaceItems(albums ?: emptyList())
         }
     }
 
@@ -57,6 +45,17 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[PhotoAlbumsViewModel::class.java]
+        createViewModelObservers()
+    }
+
+    private fun createViewModelObservers() {
+        observeBoolean(viewModel.isRefreshing) {
+            refreshLayout.post { refreshLayout?.isRefreshing = it }
+        }
+
+        observe(viewModel.photoAlbums) {
+            adapter.replaceItems(it!!)
+        }
     }
 
     override fun getTitle(context: Context?) = "Photos"

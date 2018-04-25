@@ -1,6 +1,7 @@
 package com.eulersbridge.isegoria.profile.badges
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -36,7 +37,7 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
         super.onActivityCreated(savedInstanceState)
 
         setupBadgesGridView()
-        fetchUser()
+        createViewModelObservers()
     }
 
     fun provideDependencies(repository: Repository, viewModel: ProfileViewModel) {
@@ -49,23 +50,20 @@ class ProfileBadgesFragment : Fragment(), TitledFragment {
 
         badgesGridView.apply {
             adapter = badgeAdapter
-            isDrawingCacheEnabled = true
-            drawingCacheQuality = View.DRAWING_CACHE_QUALITY_AUTO
             setItemViewCacheSize(21)
+
+            // TODO: Change condition when P releases
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 + 1) {
+                isDrawingCacheEnabled = true
+                drawingCacheQuality = View.DRAWING_CACHE_QUALITY_LOW
+            }
         }
     }
 
-    private fun fetchUser() {
-        observe(viewModel.user) {
+    private fun createViewModelObservers() {
+        observe(viewModel.remainingBadges) {
             if (it != null)
-                fetchBadges()
-        }
-    }
-
-    private fun fetchBadges() {
-        observe(viewModel.getRemainingBadges(true)) { remainingBadges ->
-            if (remainingBadges != null)
-                badgeAdapter.replaceRemainingItems(remainingBadges)
+                badgeAdapter.replaceRemainingItems(it)
         }
 
         observe(viewModel.getCompletedBadges()) { completedBadges ->

@@ -3,12 +3,12 @@ package com.eulersbridge.isegoria.feed.news.detail
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.view.View
 import androidx.core.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.*
+import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.feed.news.ACTIVITY_EXTRA_NEWS_ARTICLE
 import com.eulersbridge.isegoria.network.api.model.NewsArticle
 import com.eulersbridge.isegoria.util.extension.ifTrue
@@ -109,7 +109,7 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
                         view.isEnabled = true
 
                         if (success) {
-                            starImageView.setColorFilter(ContextCompat.getColor(this, R.color.star_active))
+                            starImageView.setImageResource(R.drawable.star)
 
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) + 1
                             likesTextView.text = newLikes.toString()
@@ -121,7 +121,7 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
                         view.isEnabled = true
 
                         if (success) {
-                            starImageView.colorFilter = null
+                            starImageView.setImageResource(R.drawable.star_24dp)
 
                             val newLikes = Integer.parseInt(likesTextView.text.toString()) - 1
                             likesTextView.text = newLikes.toString()

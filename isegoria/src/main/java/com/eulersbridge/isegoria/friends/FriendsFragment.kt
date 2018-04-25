@@ -82,6 +82,8 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         observe(viewModel.sentFriendRequests) { sentAdapter.setItems(it!!) }
         observe(viewModel.searchResults) { searchAdapter.setItems(it!!) }
 
+        mainActivity = activity as? MainActivity
+
         return rootView
     }
 
@@ -188,7 +190,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         val profileFragment = ProfileOverviewFragment.create(repository, null)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
-        mainActivity?.presentContent(profileFragment)
+        mainActivity!!.presentContent(profileFragment)
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_friends)

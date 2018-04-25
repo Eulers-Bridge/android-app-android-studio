@@ -20,19 +20,6 @@ class SplashActivity : DaggerAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        showLoginActivity()
-
-        repository.getLoginState().subscribe {
-            when (it) {
-                is LoginState.LoggedIn -> {
-                    showMainActivity()
-                }
-                is LoginState.LoginFailure -> {
-                    showLoginActivity()
-                }
-            }
-        }.addTo(compositeDisposable)
-
         val savedEmail = repository.getSavedEmail()
         val savedPassword = repository.getSavedPassword()
 
@@ -42,6 +29,25 @@ class SplashActivity : DaggerAppCompatActivity() {
         } else {
             showLoginActivity()
         }
+    }
+
+    private fun observeLoginState() {
+        repository.getLoginState().subscribe {
+            when (it) {
+                is LoginState.LoggedIn -> showMainActivity()
+                is LoginState.LoginFailure -> showLoginActivity()
+            }
+        }.addTo(compositeDisposable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observeLoginState()
+    }
+
+    override fun onPause() {
+        compositeDisposable.clear()
+        super.onPause()
     }
 
     override fun onDestroy() {
@@ -56,6 +62,5 @@ class SplashActivity : DaggerAppCompatActivity() {
     private fun showMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
     }
-
 
 }

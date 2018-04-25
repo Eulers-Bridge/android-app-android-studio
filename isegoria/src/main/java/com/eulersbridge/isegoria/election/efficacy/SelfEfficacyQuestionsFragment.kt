@@ -35,20 +35,17 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false)
+    ): View?
+        = inflater.inflate(R.layout.self_efficacy_questions_fragment, container, false)
 
-        val sliderBar1 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar1)
-        val sliderBar2 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar2)
-        val sliderBar3 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar3)
-        val sliderBar4 = rootView.findViewById<EfficacySliderBar>(R.id.selfEfficacySliderBar4)
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val pairs = mapOf(
-            viewModel.score1 to sliderBar1,
-            viewModel.score2 to sliderBar2,
-            viewModel.score3 to sliderBar3,
-            viewModel.score4 to sliderBar4
+                viewModel.score1 to sliderBar1,
+                viewModel.score2 to sliderBar2,
+                viewModel.score3 to sliderBar3,
+                viewModel.score4 to sliderBar4
         )
+
         for ((liveData, sliderBar) in pairs) {
             observe(liveData) {
                 if (it != null)
@@ -58,10 +55,6 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
 
         doneButton.setOnClickListener { viewModel.onDone() }
 
-        return rootView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         createViewModelObservers()
     }
 

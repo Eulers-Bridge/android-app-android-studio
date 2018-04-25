@@ -6,11 +6,11 @@ import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.network.api.response.PhotosResponse
 import com.eulersbridge.isegoria.util.data.Optional
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.subjects.BehaviorSubject
 
 interface Repository {
-    fun getLoginState(): BehaviorSubject<LoginState>
+    fun getLoginState(): Observable<LoginState>
 
     fun getSavedEmail(): String?
     fun getSavedPassword(): String?

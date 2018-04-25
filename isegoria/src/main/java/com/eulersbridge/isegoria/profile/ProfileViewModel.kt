@@ -6,7 +6,6 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
@@ -14,12 +13,22 @@ import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
+    data class BadgeCount(val remaining: Int, val completed: Int)
+
     internal val friendsScreenVisible = MutableLiveData<Boolean>()
     internal val currentSectionIndex = MutableLiveData<Int>()
+
     internal val user = MutableLiveData<GenericUser>()
+    internal val userPhoto = MutableLiveData<Photo?>()
+    internal val institutionName = MutableLiveData<String?>()
+    internal val remainingBadges = MutableLiveData<List<Badge>>()
+    internal val badgeCount = MutableLiveData<BadgeCount?>()
+    internal val tasks = MutableLiveData<List<Task>>()
+
+    internal val personalityTestHintVisible = MutableLiveData<Boolean>()
+    internal val viewProgressHintVisible = MutableLiveData<Boolean>()
 
     private var targetBadgeLevel = 0
-    private var institutionName: String? = null
 
     internal val totalXp = MutableLiveData<Long>()
     internal val contactsCount = MutableLiveData<Long>()
@@ -60,12 +69,41 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
 
     internal fun setUser(user: GenericUser) {
         this.user.value = user
+
+        fetchUserInstitutionName(user)
+        fetchUserStats(user)
+
+        if (user is User) {
+            val isLoggedInUser = user !is Contact
+            val isLoggedInUserWithPersonality = user.hasPersonality
+
+            if (!isLoggedInUser || isLoggedInUserWithPersonality)
+                personalityTestHintVisible.value = false
+
+            if (isLoggedInUser) {
+                fetchBadgeCounts(user)
+                viewProgressHintVisible.value = true
+            }
+
+        } else {
+            viewProgressHintVisible.value = false
+            personalityTestHintVisible.value = false
+        }
+
+        getTasks()
+        fetchUserPhoto()
     }
 
-    internal fun fetchUserStats() {
-        val (_, _, email) = getUser() ?: return
+    private fun fetchUserInstitutionName(user: GenericUser) {
+        user.institutionId?.let {
+            repository.getInstitutionName(it).subscribeSuccess {
+                institutionName.postValue(it.value)
+            }.addToDisposable()
+        }
+    }
 
-        repository.getContact(email).subscribeSuccess { result ->
+    private fun fetchUserStats(user: GenericUser) {
+        repository.getContact(user.email).subscribeSuccess { result ->
             result.value?.let {
                 contactsCount.postValue(it.contactsCount)
                 totalTasksCount.postValue(it.totalTasksCount)
@@ -82,39 +120,21 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
         }
     }
 
-    /**
-     * @return A list of the badges the user has yet to complete, regardless of the badges'
-     * or the user's level.
-     */
-    internal fun getRemainingBadges(): LiveData<List<Badge>> {
-        return getRemainingBadges(false)
-    }
+    private fun fetchBadgeCounts(user: User) {
+        user.id?.let {
+            repository.getUserRemainingBadges(it).subscribeSuccess {
+                remainingBadges.postValue(it.filter { it.level == targetBadgeLevel })
 
-    /**
-     * @param limitToLevel Whether to only include badges matching the user's target level.
-     * @return A list of the badges the user has yet to complete, optionally filtered
-     * by the user's target level.
-     */
-    fun getRemainingBadges(limitToLevel: Boolean): LiveData<List<Badge>> {
-        return getUser()?.getId()?.let {
-            return repository.getUserRemainingBadges(it)
-                    .map {
-                        if (limitToLevel) {
-                            it.filter { it.level == targetBadgeLevel }
-                        } else {
-                            it
-                        }
-                    }
-                    .toLiveData()
-
-        } ?: SingleLiveData(emptyList())
+                badgeCount.postValue(BadgeCount(it.size, user.completedBadgesCount.toInt()))
+            }
+        }
     }
 
     /**
      * @return A list of the user's completed badges, *filtered by those matching their target
      * badge level*.
      */
-    fun getCompletedBadges(): LiveData<List<Badge>>? {
+    fun getCompletedBadges(): LiveData<List<Badge>> {
         return getUser()?.getId()?.let {
             return repository.getUserCompletedBadges(it)
                     .map { it.filter { it.level == targetBadgeLevel } }
@@ -122,22 +142,10 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
         } ?: SingleLiveData(emptyList())
     }
 
-    internal fun getInstitutionName(): LiveData<String?> {
-        if (institutionName == null) {
-
-            getUser()?.institutionId?.let {
-                repository.getInstitutionName(it)
-                        .toLiveData()
-                        .map { it.value ?: "" }
-
-            } ?: SingleLiveData(null)
-        }
-
-        return SingleLiveData(institutionName)
-    }
-
-    internal fun getTasks(): LiveData<List<Task>> {
-        return repository.getTasks().toLiveData()
+    private fun getTasks() {
+        repository.getTasks().subscribeSuccess {
+            tasks.postValue(it)
+        }.addToDisposable()
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
@@ -152,7 +160,9 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
         return repository.getCompletedTasks().toLiveData()
     }
 
-    internal fun getUserPhoto(): LiveData<Photo?> {
-        return repository.getUserPhoto().toLiveData().map { it.value }
+    private fun fetchUserPhoto() {
+        repository.getUserPhoto().subscribeSuccess {
+            userPhoto.postValue(it.value)
+        }.addToDisposable()
     }
 }

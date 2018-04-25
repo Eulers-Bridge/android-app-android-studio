@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
@@ -16,14 +17,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.friends.FriendsFragment
-import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.GenericUser
-import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.personality.PersonalityActivity
 import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
@@ -42,19 +40,16 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         }
     }
 
+    private var wasOpenedByFriendsScreen = false
     private lateinit var repository: Repository
     private lateinit var taskAdapter: TaskAdapter
     private var viewModel: ProfileViewModel? = null
 
-    private class ViewModelProviderFactory(
-            private val repository: Repository
-    ) : ViewModelProvider.Factory {
-
+    private class ViewModelProviderFactory(private val repository: Repository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ProfileViewModel(repository) as T
         }
-
     }
 
     override fun onCreateView(
@@ -72,22 +67,30 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
         requireNotNull(viewModel)
 
-        if (viewModel!!.user.value == null)
-            viewModel!!.setUser(repository.getUser())
-
-        val user = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
-
-        if (user == null) {
-            val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
-
-            // ...
+        personalityTestButton.setOnClickListener {
+            startActivity(Intent(activity, PersonalityActivity::class.java))
         }
 
-        if (user != null)
-            viewModel!!.setUser(user)
+        viewProgressTextView.setOnClickListener { viewModel!!.viewTasksProgress() }
 
         setupTaskListView()
         createViewModelObservers()
+        fetchAndSetViewModelUser()
+    }
+
+    private fun fetchAndSetViewModelUser() {
+        val userArgument = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
+        wasOpenedByFriendsScreen = userArgument != null
+
+        val user = userArgument ?: repository.getUser()
+
+        /*if (user == null) {
+            val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
+
+            // ...
+        }*/
+
+        viewModel!!.setUser(user)
     }
 
     private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?) {
@@ -104,75 +107,63 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         tasksListView.apply {
             adapter = taskAdapter
             isNestedScrollingEnabled = false
-            isDrawingCacheEnabled = true
-            drawingCacheQuality = View.DRAWING_CACHE_QUALITY_LOW
+
+            // TODO: Change condition when P releases
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1 + 1) {
+                isDrawingCacheEnabled = true
+                drawingCacheQuality = View.DRAWING_CACHE_QUALITY_LOW
+            }
         }
     }
 
     private fun createViewModelObservers() {
         requireNotNull(viewModel)
 
-        observe(viewModel!!.user) { user ->
-            // TODO: Fetch using below methods inside viewmodel if user not null
-            if (user == null) {
-                personalityTestButton.isGone = true
-                return@observe
-            }
-
-            observe(viewModel!!.getUserPhoto()) {
-                if (it != null)
-                    GlideApp.with(this)
+        observe(viewModel!!.userPhoto) {
+            if (it != null)
+                GlideApp.with(this)
                         .load(it.getPhotoUrl())
                         .transforms(BlurTransformation(context!!), TintTransformation(0.1))
                         .priority(Priority.HIGH)
                         .placeholder(R.color.profileImageBackground)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(backgroundImageView)
+        }
+
+        observe(viewModel!!.institutionName) {
+            institutionTextView.text = it
+        }
+
+        observe(viewModel!!.badgeCount) {
+            if (it != null)
+                updateBadgeCount(it.remaining, it.completed)
+        }
+
+        observe(viewModel!!.tasks) {
+            taskAdapter.setItems(it!!)
+        }
+
+        observe(viewModel!!.personalityTestHintVisible) {
+            personalityTestButton.isGone = (it == false)
+        }
+
+        observe(viewModel!!.viewProgressHintVisible) {
+            viewProgressTextView.isGone = (it == false)
+        }
+
+        observe(viewModel!!.user) {
+            it?.let { user ->
+                GlideApp.with(this)
+                        .load(user.profilePhotoURL)
+                        .priority(Priority.HIGH)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(smallPhotoImageView)
+
+                nameTextView.text = user.fullName
+
+                updateCompletedTasksCount(user.completedTasksCount)
+                updateExperience(user.level, user.experience)
             }
-
-            observe(viewModel!!.getInstitutionName()) {
-                institutionTextView.text = it
-            }
-
-            observe(viewModel!!.getRemainingBadges()) { remainingBadges ->
-                if (remainingBadges != null)
-                    updateBadgesCount(user.completedBadgesCount, remainingBadges.size.toLong())
-            }
-
-            observe(viewModel!!.getTasks()) { tasks ->
-                if (tasks != null)
-                    taskAdapter.setItems(tasks)
-            }
-
-            viewModel!!.fetchUserStats()
-
-            GlideApp.with(this)
-                .load(user.profilePhotoURL)
-                .priority(Priority.HIGH)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(smallPhotoImageView)
-
-            nameTextView.text = user.fullName
-
-            val isLoggedInUserWithPersonality = user is User && user.hasPersonality
-            val isExternalUser = user is Contact
-            if (isExternalUser || isLoggedInUserWithPersonality) {
-                personalityTestButton.isGone = true
-
-            } else {
-                personalityTestButton.setOnClickListener {
-                    startActivity(Intent(activity, PersonalityActivity::class.java))
-                }
-            }
-
-            if (isExternalUser) {
-                viewProgressTextView.isGone = true
-            } else {
-                viewProgressTextView.setOnClickListener { viewModel!!.viewTasksProgress() }
-            }
-
-            updateCompletedTasksCount(user.completedTasksCount)
-            updateExperience(user.level, user.experience)
         }
 
         observe(viewModel!!.contactsCount) {
@@ -192,12 +183,12 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         }
     }
 
-    private fun updateBadgesCount(completedCount: Long, remainingCount: Long) {
+    private fun updateBadgeCount(remainingCount: Int, completedCount: Int) {
         badgesProgressCircle.post {
             badgesProgressCircle.topText = completedCount.toString()
             badgesProgressCircle.bottomText = "/" + remainingCount.toString()
-            badgesProgressCircle.maximumValue = remainingCount.toInt()
-            badgesProgressCircle.setValue(completedCount.toInt(), true)
+            badgesProgressCircle.maximumValue = remainingCount
+            badgesProgressCircle.setValue(completedCount, true)
         }
     }
 
@@ -246,6 +237,12 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         }
     }
 
-    override fun getTitle(context: Context?)
-            = context?.getString(R.string.profile_overview_section_title)
+    override fun getTitle(context: Context?): String? {
+        return if (wasOpenedByFriendsScreen) {
+            ""
+
+        } else {
+            context?.getString(R.string.profile_overview_section_title)
+        }
+    }
 }

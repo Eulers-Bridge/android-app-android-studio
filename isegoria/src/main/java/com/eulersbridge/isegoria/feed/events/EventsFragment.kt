@@ -8,10 +8,9 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.model.Event
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.events_fragment.*
@@ -21,7 +20,6 @@ class EventsFragment : Fragment(), TitledFragment {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     lateinit var viewModel: EventsViewModel
 
     private val adapter = EventAdapter()
@@ -42,30 +40,21 @@ class EventsFragment : Fragment(), TitledFragment {
         listView.adapter = adapter
 
         refreshLayout.setOnRefreshListener {
-            refresh()
-
-            refreshLayout.isRefreshing = true
-            refreshLayout?.postDelayed(7000) { refreshLayout?.isRefreshing = false }
+            viewModel.refresh()
         }
 
         createViewModelObserver()
-        refresh()
     }
 
     override fun getTitle(context: Context?) = "Events"
 
     private fun createViewModelObserver() {
-        observe(viewModel.events) {
-            setEvents(it!!)
+        observeBoolean(viewModel.isRefreshing) {
+            refreshLayout.post { refreshLayout?.isRefreshing = it }
         }
-    }
 
-    private fun refresh() {
-        viewModel.onRefresh()
-    }
-
-    private fun setEvents(events: List<Event>) {
-        refreshLayout.post { refreshLayout.isRefreshing = false }
-        adapter.replaceItems(events)
+        observe(viewModel.events) {
+            adapter.replaceItems(it!!)
+        }
     }
 }

@@ -22,6 +22,7 @@ import com.eulersbridge.isegoria.util.extension.*
 import com.google.firebase.iid.FirebaseInstanceId
 import com.securepreferences.SecurePreferences
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -67,8 +68,8 @@ class DataRepository @Inject constructor(
     @get:JvmName("_loginState")
     private val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
 
-    override fun getLoginState(): BehaviorSubject<LoginState> {
-        return loginState
+    override fun getLoginState(): Observable<LoginState> {
+        return loginState.distinctUntilChanged()
     }
 
     private var cachedLoginArticles: List<NewsArticle>? = null
@@ -105,10 +106,10 @@ class DataRepository @Inject constructor(
     override fun login(email: String, password: String) {
         loginState.onNext(LoginState.LoggingIn())
 
-        // move to after device token success
-        AuthenticationInterceptor.setCredentials(email, password)
-
         getDeviceToken()
+                .doOnSuccess {
+                    AuthenticationInterceptor.setCredentials(email, password)
+                }
                 .flatMap { api.login(SNS_PLATFORM_APPLICATION_ARN, it) }
                 .doOnSuccess {
                     it.user.takeIf { it.accountVerified }?.let {

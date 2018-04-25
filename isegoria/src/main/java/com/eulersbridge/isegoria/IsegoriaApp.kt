@@ -11,6 +11,7 @@ import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
+import android.os.StrictMode
 import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
@@ -62,6 +63,9 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
     override fun onCreate() {
         super.onCreate()
 
+        if (BuildConfig.DEBUG)
+            setDebugStrictModePolicies()
+
         DaggerAppComponent
             .builder()
             .application(this)
@@ -86,6 +90,46 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
                 }
             }
         }.addTo(compositeDisposable)
+    }
+
+    private fun setDebugStrictModePolicies() {
+        StrictMode.setThreadPolicy(createThreadStrictModePolicy())
+        StrictMode.setVmPolicy(createVmStrictModePolicy())
+    }
+
+    private fun createThreadStrictModePolicy(): StrictMode.ThreadPolicy {
+        var threadPolicy = StrictMode.ThreadPolicy.Builder()
+                .detectCustomSlowCalls()
+                .detectNetwork()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            threadPolicy = threadPolicy.detectResourceMismatches()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            threadPolicy = threadPolicy.detectUnbufferedIo()
+
+        return threadPolicy
+                .penaltyLog()
+                .penaltyDialog()
+                .build()
+    }
+
+    private fun createVmStrictModePolicy(): StrictMode.VmPolicy {
+        var vmPolicy = StrictMode.VmPolicy.Builder()
+                .detectActivityLeaks()
+                .detectLeakedClosableObjects()
+                .detectLeakedRegistrationObjects()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+            vmPolicy = vmPolicy.detectFileUriExposure()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            vmPolicy = vmPolicy.detectContentUriWithoutPermission()
+
+        return vmPolicy
+                .penaltyLog()
+                .penaltyDeath()
+                .build()
     }
 
     @SuppressLint("NewApi")

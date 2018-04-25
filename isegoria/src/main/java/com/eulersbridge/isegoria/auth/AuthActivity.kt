@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.auth
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -14,6 +15,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.login.LoginFragment
 import com.eulersbridge.isegoria.auth.signup.ConsentAgreementFragment
@@ -34,9 +36,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 
     private lateinit var viewModel: AuthViewModel
 
-    private class ViewModelProviderFactory(
-            private val repository: Repository
-    ) : ViewModelProvider.Factory {
+    private class ViewModelProviderFactory(private val repository: Repository) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -103,6 +103,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         ifTrue(viewModel.userLoggedIn) {
             finish()
+            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 

@@ -14,6 +14,8 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
+import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_master_layout.*
@@ -21,25 +23,16 @@ import javax.inject.Inject
 
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    // TODO: Convert to observing view model for fragment
-    private val overviewFragment: ElectionOverviewFragment by lazy { ElectionOverviewFragment() }
-    private val candidateFragment: CandidateFragment by lazy { CandidateFragment() }
-
-    private lateinit var tabLayout: TabLayout
-
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ElectionViewModel
 
+    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
+    private lateinit var tabLayout: TabLayout
+
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
-            val subFragment = when (tab.position) {
-                0 -> overviewFragment
-                1 -> candidateFragment
-                else -> return
-            }
-
-            showTabFragment(subFragment)
+            showTabFragment(tabFragments[tab.position])
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -50,6 +43,23 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
+        createViewModelObserver()
+    }
+
+    private fun createViewModelObserver() {
+        observeBoolean(viewModel.surveyPromptVisible) {
+            if (it) {
+                surveyPrompt.isVisible = true
+            }
+        }
+
+        ifTrue(viewModel.surveyVisible) {
+            activity!!.supportFragmentManager
+                    .beginTransaction()
+                    .add(R.id.container, SelfEfficacyQuestionsFragment())
+                    .commit()
+        }
+
     }
 
     override fun onCreateView(
@@ -61,9 +71,13 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
         activity?.invalidateOptionsMenu()
 
-        showFirstTab()
+        showTabFragment(tabFragments[0])
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        overlaySurveyButton.setOnClickListener { viewModel.onSurveyPromptNext() }
     }
 
     override fun getTitle(context: Context?): String?
@@ -94,25 +108,10 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
     }
 
-    private fun showFirstTab()
-        = showTabFragment(overviewFragment)
-
     private fun showTabFragment(fragment: Fragment) {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.election_frame, fragment)
             ?.commitAllowingStateLoss()
-
-        if (!viewModel.userCompletedEfficacyQuestions()) {
-            overlayView.isVisible = true
-
-            overlaySurveyButton.setOnClickListener {
-                activity?.supportFragmentManager
-                        ?.beginTransaction()
-                        ?.addToBackStack(null)
-                        ?.add(R.id.container, SelfEfficacyQuestionsFragment())
-                        ?.commit()
-            }
-        }
     }
 }

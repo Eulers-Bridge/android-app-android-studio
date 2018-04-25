@@ -5,23 +5,26 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Event
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.zipWithTimer
 import javax.inject.Inject
 
 class EventsViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
+    internal var isRefreshing = MutableLiveData<Boolean>()
     internal val events = MutableLiveData<List<Event>>()
 
     init {
-        fetchEvents()
+        isRefreshing.value = false
+        refresh()
     }
 
-    internal fun onRefresh() {
-        fetchEvents()
-    }
+    internal fun refresh() {
+        isRefreshing.postValue(true)
 
-    private fun fetchEvents() {
-        repository.getEvents().subscribeSuccess {
-            events.postValue(it)
-        }.addToDisposable()
+        zipWithTimer(repository.getEvents())
+                .subscribeSuccess {
+                    isRefreshing.postValue(false)
+                    events.postValue(it)
+                }.addToDisposable()
     }
 }

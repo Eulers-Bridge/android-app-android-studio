@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentManager
 import android.view.Menu
 import android.view.MenuItem
 import androidx.core.content.systemService
-import com.eulersbridge.isegoria.auth.AuthActivity
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
@@ -69,7 +68,17 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
 
         setContentView(R.layout.activity_main)
         setupNavigation()
-        createApplicationObservers()
+        compositeDisposable.size()
+    }
+
+    override fun onPause() {
+        compositeDisposable.clear()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        createObservers()
     }
 
     override fun onDestroy() {
@@ -90,7 +99,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         supportFragmentManager.addOnBackStackChangedListener(this)
     }
 
-    private fun createApplicationObservers() {
+    private fun createObservers() {
         repository.getLoginState().subscribe {
             when (it) {
                 is LoginState.LoggedIn -> {
@@ -101,7 +110,8 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                     }
                 }
                 is LoginState.LoggedOut -> {
-                    startActivity(Intent(this, AuthActivity::class.java))
+                    startActivity(Intent(this, SplashActivity::class.java))
+                    finish()
                 }
             }
         }.addTo(compositeDisposable)

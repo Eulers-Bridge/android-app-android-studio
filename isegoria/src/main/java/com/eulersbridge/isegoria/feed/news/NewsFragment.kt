@@ -9,10 +9,9 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.postDelayed
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.network.api.model.NewsArticle
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.news_fragment.*
@@ -24,11 +23,7 @@ class NewsFragment : Fragment(), TitledFragment {
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: NewsViewModel
 
-    private val newsAdapter: NewsAdapter by lazy {
-        val adapter = NewsAdapter()
-        adapter.isLoading = true
-        adapter
-    }
+    private val newsAdapter = NewsAdapter()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -42,40 +37,28 @@ class NewsFragment : Fragment(), TitledFragment {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         refreshLayout.apply {
             setColorSchemeResources(R.color.lightBlue)
-            setOnRefreshListener {
-                isRefreshing = true
-                refresh()
-                postDelayed(6000) { isRefreshing = false }
-            }
+            setOnRefreshListener { viewModel.refresh() }
         }
 
         val layoutManager = gridView.layoutManager as GridLayoutManager
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (position == 0) 2 else 1
-            }
+            override fun getSpanSize(position: Int) = if (position == 0) 2 else 1
         }
 
         gridView.adapter = newsAdapter
 
         createViewModelObserver()
-        refresh()
     }
 
     override fun getTitle(context: Context?) = "News"
 
     private fun createViewModelObserver() {
-        observe(viewModel.newsArticles) {
-            setNewsArticles(it!!)
+        observeBoolean(viewModel.isRefreshing) {
+            refreshLayout.post { refreshLayout?.isRefreshing = it }
         }
-    }
 
-    private fun refresh() {
-        viewModel.onRefresh()
-    }
-
-    private fun setNewsArticles(articles: List<NewsArticle>) {
-        refreshLayout?.post({ refreshLayout.isRefreshing = false })
-        newsAdapter.replaceItems(articles)
+        observe(viewModel.newsArticles) {
+            newsAdapter.replaceItems(it!!)
+        }
     }
 }

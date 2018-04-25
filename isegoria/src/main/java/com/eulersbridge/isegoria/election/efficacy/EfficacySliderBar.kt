@@ -27,7 +27,7 @@ class EfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(c
             val paint = Paint(Paint.ANTI_ALIAS_FLAG)
             paint.color = lineColours[i]
             paint.strokeWidth = 4f
-            paints + paint
+            paints.add(paint)
         }
 
         notchPaint.color = ContextCompat.getColor(context, R.color.barBackground)

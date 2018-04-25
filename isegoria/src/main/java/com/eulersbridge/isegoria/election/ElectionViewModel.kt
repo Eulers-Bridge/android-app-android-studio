@@ -9,14 +9,22 @@ import javax.inject.Inject
 
 class ElectionViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
+    internal val surveyPromptVisible = MutableLiveData<Boolean>()
+    internal val surveyVisible = MutableLiveData<Boolean>()
     internal val election = MutableLiveData<Election?>()
 
     init {
+        // If the user has not completed the questions, show a prompt for them
+        //surveyPromptVisible.value = !repository.getUser().hasPPSEQuestions
+        surveyPromptVisible.value = true
+        surveyVisible.value = false
+
         repository.getLatestElection().subscribeSuccess {
             election.postValue(it.value)
         }.addToDisposable()
     }
 
-    internal fun userCompletedEfficacyQuestions()
-        = repository.getUser().hasPPSEQuestions
+    internal fun onSurveyPromptNext() {
+        surveyVisible.value = true
+    }
 }
