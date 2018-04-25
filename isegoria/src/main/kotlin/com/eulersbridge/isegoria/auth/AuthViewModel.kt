@@ -25,8 +25,6 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
     val signUpConsentGiven = MutableLiveData<Boolean>()
     val verificationComplete = MutableLiveData<Boolean>()
 
-    val userLoggedIn = MutableLiveData<Boolean>()
-
     init {
         authFinished.value = false
 

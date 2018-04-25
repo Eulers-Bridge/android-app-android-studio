@@ -64,6 +64,7 @@ class AuthActivity : DaggerAppCompatActivity() {
         presentRootContent(LoginFragment())
 
         ifTrue(viewModel.authFinished) {
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
 
@@ -99,11 +100,6 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         ifTrue(viewModel.verificationComplete) {
             presentRootContent(LoginFragment())
-        }
-
-        ifTrue(viewModel.userLoggedIn) {
-            finish()
-            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 
