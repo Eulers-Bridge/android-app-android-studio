@@ -5,10 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:ignore="Overdraw">
 
     <ImageView
-        android:id="@+id/album_thumbnail_image_view"
+        android:id="@+id/thumbnailImageView"
         android:layout_width="@dimen/photo_album_list_item_thumbnail_size"
         android:layout_height="@dimen/photo_album_list_item_thumbnail_size"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
@@ -18,10 +19,10 @@
         app:layout_constraintStart_toStartOf="parent"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription"
-        tools:background="@color/grey" />
+        tools:background="@tools:sample/backgrounds/scenic" />
 
     <TextView
-        android:id="@+id/album_title_text_view"
+        android:id="@+id/titleTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -34,12 +35,12 @@
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/album_thumbnail_image_view"
-        app:layout_constraintTop_toTopOf="@id/album_thumbnail_image_view"
+        app:layout_constraintStart_toEndOf="@id/thumbnailImageView"
+        app:layout_constraintTop_toTopOf="@id/thumbnailImageView"
         tools:text="Album Title" />
 
     <TextView
-        android:id="@+id/album_description_text_view"
+        android:id="@+id/descriptionTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -53,21 +54,22 @@
         android:textColor="@color/blue_grey"
         android:textSize="@dimen/photo_album_list_item_description_size"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/album_thumbnail_image_view"
-        app:layout_constraintTop_toBottomOf="@id/album_title_text_view"
-        app:layout_constraintBottom_toBottomOf="@id/album_thumbnail_image_view"
-        tools:text="Album Description" />
+        app:layout_constraintStart_toEndOf="@id/thumbnailImageView"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        app:layout_constraintBottom_toBottomOf="@id/thumbnailImageView"
+        tools:text="@tools:sample/lorem/random" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/album_photos_grid_view"
+        android:id="@+id/gridView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/album_thumbnail_image_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         android:layoutAnimation="@anim/layout_animation_fade_in"
         app:layoutManager="android.support.v7.widget.GridLayoutManager"
-        app:spanCount="4" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/thumbnailImageView"
+        app:spanCount="4"
+        tools:listitem="@layout/photo_grid_item" />
 
 </android.support.constraint.ConstraintLayout>

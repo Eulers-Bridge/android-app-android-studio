@@ -9,6 +9,7 @@
         android:title="@string/feed_menu_item_friends"
         android:icon="@drawable/friends"
         app:showAsAction="always"
-        tools:iconTint="@color/white"/>
+        tools:iconTint="@color/white"
+        android:tooltipText="@string/shortcut_add_friend_label_long"/>
 
 </menu>

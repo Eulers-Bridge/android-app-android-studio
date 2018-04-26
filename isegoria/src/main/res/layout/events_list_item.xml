@@ -18,11 +18,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/round_rect_placeholder"/>
+        android:background="@drawable/round_rect_placeholder"
+        tools:background="@tools:sample/backgrounds/scenic"/>
 
     <TextView
         android:id="@+id/event_list_title_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -42,7 +43,7 @@
 
     <TextView
         android:id="@+id/event_list_details_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
@@ -52,9 +53,10 @@
         android:gravity="center"
         android:textColor="@color/white"
         android:textSize="12sp"
+        android:maxLines="1"
         app:layout_constraintEnd_toEndOf="@+id/event_list_image_view"
         app:layout_constraintStart_toStartOf="@+id/event_list_image_view"
         app:layout_constraintTop_toBottomOf="@+id/event_list_title_text_view"
-        tools:text="Details" />
+        tools:text="@tools:sample/lorem/random"/>
 
 </android.support.constraint.ConstraintLayout>

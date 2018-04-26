@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/login_container"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@drawable/tumblr_static_aphc"
@@ -15,33 +15,33 @@
         android:fitsSystemWindows="false">
 
         <android.support.constraint.Guideline
-            android:id="@+id/login_guideline_start"
+            android:id="@+id/guidelineStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_begin="16dp" />
 
         <android.support.constraint.Guideline
-            android:id="@+id/login_guideline_end"
+            android:id="@+id/guidelineEnd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
 
         <ImageView
-            android:id="@+id/login_image_logo"
+            android:id="@+id/logoImage"
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@string/isegoria_logo_content_description"
             android:src="@drawable/isegoria"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp" />
 
         <TextView
-            android:id="@+id/isegoria_label"
+            android:id="@+id/isegoriaLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -49,84 +49,86 @@
             android:gravity="center"
             android:text="@string/app_name"
             android:textAppearance="@style/LoginHeadingTextAppearance"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/login_image_logo" />
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/logoImage" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/login_email_layout"
+            android:id="@+id/emailLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:hint="@string/user_login_email_hint"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/isegoria_label">
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/isegoriaLabel">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/login_email"
+                android:id="@+id/emailField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/white"
-                android:autofillHints="emailAddress"/>
+                android:autofillHints="emailAddress"
+                tools:targetApi="o" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/login_password_layout"
+            android:id="@+id/passwordLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="@string/user_login_password_hint"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/login_email_layout"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/emailLayout"
             app:passwordToggleEnabled="true"
             app:passwordToggleTint="@color/white">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/login_password"
+                android:id="@+id/passwordField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textWebPassword"
                 android:textColor="@color/white"
-                android:autofillHints="password"/>
+                android:autofillHints="password"
+                tools:targetApi="o" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/loginButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/user_login_button"
             android:theme="@style/GreenButton"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/login_password_layout" />
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/passwordLayout" />
 
         <Button
-            android:id="@+id/login_signup_button"
+            android:id="@+id/signUpButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/user_sign_up_button"
             android:theme="@style/BlueButton"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start"
-            app:layout_constraintTop_toBottomOf="@id/login_button" />
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart"
+            app:layout_constraintTop_toBottomOf="@id/loginButton" />
 
         <TextView
             style="@style/LoginSignUpSmallPrintText"
-            android:id="@+id/login_forgot_password"
+            android:id="@+id/forgotPassword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/login_forgot_password_hint"
-            app:layout_constraintTop_toBottomOf="@id/login_signup_button"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start" />
+            app:layout_constraintTop_toBottomOf="@id/signUpButton"
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart" />
 
         <TextView
             style="@style/LoginSignUpSmallPrintText"
@@ -136,10 +138,10 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/login_small_print"
-            app:layout_constraintTop_toBottomOf="@id/login_forgot_password"
+            app:layout_constraintTop_toBottomOf="@id/forgotPassword"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/login_guideline_end"
-            app:layout_constraintStart_toStartOf="@id/login_guideline_start" />
+            app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
+            app:layout_constraintStart_toStartOf="@id/guidelineStart" />
 
     </android.support.constraint.ConstraintLayout>
 

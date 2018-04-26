@@ -9,7 +9,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/settings_image_background"
+        android:id="@+id/backgroundImageView"
         android:layout_width="0dp"
         android:layout_height="260dp"
         android:background="@color/profileImageBackground"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/settings_button_back"
+        android:id="@+id/backButton"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="16dp"
@@ -32,29 +32,30 @@
         app:srcCompat="@drawable/ic_arrow_back_white_24dp" />
 
     <ImageView
-        android:id="@+id/settings_image_small"
+        android:id="@+id/smallImageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginBottom="32dp"
         android:contentDescription="@string/settings_profile_picture_content_description"
-        app:layout_constraintBottom_toTopOf="@+id/settings_button_change_photo"
+        app:layout_constraintBottom_toTopOf="@+id/changePhotoButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@tools:sample/avatars"/>
 
     <Button
-        android:id="@+id/settings_button_change_photo"
+        android:id="@+id/changePhotoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:alpha="0.9"
         android:text="@string/settings_change_photo"
-        app:layout_constraintBottom_toBottomOf="@+id/settings_image_background"
+        app:layout_constraintBottom_toBottomOf="@+id/backgroundImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/settings_privacy_label"
+        android:id="@+id/privacyLabelTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -66,11 +67,11 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_image_background"
+        app:layout_constraintTop_toBottomOf="@id/backgroundImageView"
         tools:ignore="RtlSymmetry" />
 
     <Switch
-        android:id="@+id/settings_switch_opt_out_data_collection"
+        android:id="@+id/optOutDataCollectionSwitch"
         android:layout_width="0dp"
         android:layout_height="23dp"
         android:layout_marginEnd="16dp"
@@ -82,19 +83,20 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_privacy_label" />
+        app:layout_constraintTop_toBottomOf="@id/privacyLabelTextView"
+        tools:checked="true"/>
 
     <!-- Divider -->
     <View
-        android:id="@+id/settings_divider_1"
+        android:id="@+id/divider1"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:background="@color/offGrey"
-        app:layout_constraintTop_toBottomOf="@id/settings_switch_opt_out_data_collection" />
+        app:layout_constraintTop_toBottomOf="@id/optOutDataCollectionSwitch" />
 
     <Switch
-        android:id="@+id/settings_switch_do_not_track"
+        android:id="@+id/doNotTrackSwitch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -106,19 +108,20 @@
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_divider_1" />
+        app:layout_constraintTop_toBottomOf="@+id/divider1"
+        tools:checked="true"/>
 
     <!-- Divider -->
     <View
-        android:id="@+id/settings_divider_2"
+        android:id="@+id/divider2"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
         android:layout_marginTop="8dp"
         android:background="@color/offGrey"
-        app:layout_constraintTop_toBottomOf="@id/settings_switch_do_not_track" />
+        app:layout_constraintTop_toBottomOf="@id/doNotTrackSwitch" />
 
     <TextView
-        android:id="@+id/settings_credits_label"
+        android:id="@+id/creditsLabel"
         android:layout_width="0dp"
         android:layout_height="26dp"
         android:layout_marginEnd="16dp"
@@ -130,11 +133,11 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_divider_2"
+        app:layout_constraintTop_toBottomOf="@+id/divider2"
         tools:ignore="RtlSymmetry" />
 
     <TextView
-        android:id="@+id/settings_button_about"
+        android:id="@+id/aboutButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -147,6 +150,6 @@
         android:text="@string/settings_about_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/settings_credits_label" />
+        app:layout_constraintTop_toBottomOf="@+id/creditsLabel" />
 
 </android.support.constraint.ConstraintLayout>

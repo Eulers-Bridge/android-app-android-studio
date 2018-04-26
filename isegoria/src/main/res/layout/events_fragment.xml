@@ -2,29 +2,32 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/events_refresh_layout"
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/events_list_view"
+            android:id="@+id/listView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
-            android:paddingStart="4dp"
-            android:paddingRight="4dp"
-            android:paddingEnd="4dp"
-            android:paddingHorizontal="4dp"
             android:clipToPadding="false"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            android:paddingHorizontal="4dp"
+            android:paddingStart="4dp"
+            android:paddingLeft="4dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="4dp"
+            android:paddingRight="4dp"
+            android:paddingBottom="2dp"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            android:layoutAnimation="@anim/layout_animation_fade_in"/>
+            tools:listitem="@layout/events_list_item"
+            tools:targetApi="o" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 </FrameLayout>

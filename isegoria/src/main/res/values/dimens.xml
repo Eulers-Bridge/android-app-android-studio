@@ -11,8 +11,6 @@
     <dimen name="newsPointsSize">15sp</dimen>
     <dimen name="eventLocationSize">16sp</dimen>
 
-    <dimen name="profile_circle_size">80dp</dimen>
-
     <dimen name="feed_corner_radius">0dp</dimen>
 
     <dimen name="photo_album_list_item_thumbnail_size">40dp</dimen>

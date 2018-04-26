@@ -12,6 +12,7 @@
 -keepattributes SourceFile,LineNumberTable
 
 -keep class com.eulersbridge.** { *; }
+-dontwarn com.eulersbridge.**
 
 -keep class android.support.v7.widget.SearchView { *; }
 
@@ -63,3 +64,6 @@
 
 ## Android Support RenderScript ##
 -keep class android.support.v8.renderscript.** { *; }
+
+## Dagger ##
+-dontwarn com.google.errorprone.annotations.**

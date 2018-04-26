@@ -27,13 +27,13 @@
     </android.support.design.widget.CoordinatorLayout>
 
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
-        android:id="@id/navigation"
+        android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         app:itemIconTint="@color/nav_state_list"
         app:itemTextColor="@color/nav_state_list"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation"/>
 
 </RelativeLayout>

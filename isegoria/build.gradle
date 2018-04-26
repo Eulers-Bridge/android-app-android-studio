@@ -1,6 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
+    androidExtensions {
+        // Generated Kotlin fields for XML layout views
+        experimental = true
+    }
     signingConfigs {
         release {
             keyAlias 'IsegoriaAndroidKey'
@@ -8,16 +15,18 @@ android {
             storePassword 'EulersBridge88902'
         }
     }
-    compileSdkVersion 27
+    compileSdkVersion Versions.compile_sdk
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "au.com.isegoria.app"
-        minSdkVersion 16
+        multiDexEnabled true
+        minSdkVersion Versions.min_sdk
         renderscriptSupportModeEnabled true
-        targetSdkVersion 27
+        targetSdkVersion Versions.target_sdk
         vectorDrawables.useSupportLibrary = true
-        versionCode 22
-        versionName "1.0.21"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionCode Versions.version_code
+        versionName Versions.version_name
     }
     lintOptions {
         abortOnError false
@@ -33,6 +42,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
     }
 }
 
@@ -55,51 +70,67 @@ if (project.hasProperty('devBuild')) {
 }
 
 dependencies {
-    // Annotation to parcel/un-parcel a given class
-    implementation 'org.parceler:parceler-api:1.1.9'
-    annotationProcessor 'org.parceler:parceler:1.1.9'
+    implementation Deps.kotlin_stdlib
 
-    // Image loading / caching
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.6.1'
+    implementation Deps.multidex
 
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.9.0'
+    implementation Deps.support_core_ui
+    implementation Deps.support_fragment
+    implementation Deps.appcompat_v7
+    implementation Deps.design
+    implementation Deps.recyclerview_v7
+    implementation Deps.support_vector_drawable
 
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
+    implementation Deps.constraint_layout
+    implementation Deps.ktx
 
-    implementation 'com.android.support:support-fragment:27.1.0'
-    // core-ui in order to access `ViewPager` (does not affect APK size)
-    implementation 'com.android.support:support-core-ui:27.1.0'
-    implementation 'com.android.support:appcompat-v7:27.1.0'
-    implementation 'com.android.support:design:27.1.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta5'
-    implementation 'com.android.support:recyclerview-v7:27.1.0'
-    implementation 'com.android.support:support-vector-drawable:27.1.0'
+    implementation Deps.rxjava2
+    implementation Deps.rxkotlin
+    implementation Deps.rxjava_reactive_streams
 
     // ViewModel and LiveData
-    implementation 'android.arch.lifecycle:extensions:1.1.0'
-    annotationProcessor 'android.arch.lifecycle:common-java8:1.1.0'
+    implementation Deps.lifecycle_extensions
+    implementation Deps.lifecycle_java8
+    // ReactiveStreams support for LiveData
+    implementation Deps.lifecycle_reactive_streams
 
-    implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation Deps.dagger
+    kapt Deps.dagger_processor
+    implementation Deps.dagger_android
+    implementation Deps.dagger_android_support
+    kapt Deps.dagger_android_processor
 
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation Deps.okhttp
+    implementation Deps.okhttp_interceptor
+    implementation Deps.retrofit
+    implementation Deps.retrofit_rxjava
+    implementation Deps.retrofit_moshi
 
-    // Used in Candidate fragment for bottom tabs
-    implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
-
-    implementation 'com.amazonaws:aws-android-sdk-s3:2.6.16'
-    implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.16'
-    implementation 'com.amazonaws:aws-android-sdk-sns:2.6.16'
-
+    implementation Deps.aws_s3
+    implementation Deps.aws_cognito
+    implementation Deps.aws_sns
     // Required for push notifications
-    implementation 'com.google.firebase:firebase-messaging:11.8.0'
-
+    implementation Deps.firebase_messaging
     // Secures/obfuscates user email/password storage for auto-login
-    implementation 'com.github.scottyab:secure-preferences:v0.1.6'
+    implementation Deps.secure_prefs
+
+    implementation Deps.glide
+    kapt Deps.glide_processor
+    implementation Deps.image_view
+    implementation Deps.image_cropper
+
+    implementation Deps.bottom_navigation
+    // Used in Candidate fragment for bottom tabs
+    implementation Deps.view_pager_indicator
+
+    // Dependencies for local unit tests
+    testImplementation TestDeps.junit
+    testImplementation TestDeps.mockito
+    testImplementation TestDeps.mockito_kotlin
+    testImplementation TestDeps.livedata_test
+
+    androidTestImplementation TestDeps.espresso
+    androidTestImplementation TestDeps.espresso_intents
 }
 
 apply plugin: 'com.google.gms.google-services'
