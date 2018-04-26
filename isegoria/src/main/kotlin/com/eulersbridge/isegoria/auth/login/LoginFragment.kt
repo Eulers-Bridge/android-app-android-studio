@@ -29,7 +29,6 @@ class LoginFragment : Fragment() {
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: LoginViewModel
 
     private val authViewModel: AuthViewModel by lazy {

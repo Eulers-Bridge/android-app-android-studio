@@ -35,13 +35,13 @@ internal class FriendRequestAdapter(
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = items[oldItemPosition]
-                val newItem = items[newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = items[oldItemPosition]
-                val newItem = items[newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return oldItem == newItem
             }
         })

@@ -11,11 +11,7 @@ import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import javax.inject.Inject
 
-class LoginViewModel
-@Inject constructor(
-        private val repository: Repository,
-        private val api: API
-) : BaseViewModel() {
+class LoginViewModel @Inject constructor(private val repository: Repository, private val api: API) : BaseViewModel() {
 
     private val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
@@ -37,8 +33,8 @@ class LoginViewModel
         networkError.value = false
         canShowPasswordResetDialog.value = true
 
+        // Pre-fill saved user email
         email.value = repository.getSavedEmail()
-        email.value = repository.getSavedPassword()
 
         repository.getLoginState().subscribe {
             when (it) {
@@ -62,14 +58,13 @@ class LoginViewModel
     }
 
     internal fun login() {
-        formEnabled.value = false
-
         if (emailError.value == false && passwordError.value == false) {
             // Email/password not null as validation checks for null
+
+            formEnabled.value = false
+
             repository.login(email.value!!, password.value!!)
         }
-
-        formEnabled.value = true
     }
 
     internal fun setNetworkErrorShown() {

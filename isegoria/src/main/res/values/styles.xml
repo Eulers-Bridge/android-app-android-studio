@@ -18,6 +18,8 @@
         <item name="colorAccent">@color/lightBlue</item>
 
         <item name="textColorError">@color/lightRed</item>
+
+        <item name="actionModeBackground">@color/lightBlue</item>
     </style>
 
     <style name="AuthTheme" parent="AppTheme">

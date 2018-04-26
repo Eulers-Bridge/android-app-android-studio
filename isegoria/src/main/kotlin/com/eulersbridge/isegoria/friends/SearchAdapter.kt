@@ -34,13 +34,13 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = items[oldItemPosition]
-                val newItem = items[newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return oldItem.email == newItem.email
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = items[oldItemPosition]
-                val newItem = items[newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return oldItem == newItem
             }
         })

@@ -99,10 +99,6 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         super.onDestroy()
     }
 
-    private fun getReceivedFriendRequests() {
-        viewModel.refreshReceivedFriendRequests()
-    }
-
     override fun getContactInstitution(
         institutionId: Long,
         weakViewHolder: WeakReference<UserViewHolder>
@@ -183,7 +179,9 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
     override fun onSearchedUserActionClick(user: User?) {
         if (user != null)
-            observe(viewModel.addFriend(user.email)) { showAddedMessage() }
+            observeBoolean(viewModel.addFriend(user.email)) {
+                if (it) showAddedMessage()
+            }
     }
 
     override fun onContactClick(contact: Contact) {

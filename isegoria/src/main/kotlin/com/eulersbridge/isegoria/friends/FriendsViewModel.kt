@@ -14,10 +14,15 @@ import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.subjects.BehaviorSubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, private val repository: Repository) : BaseViewModel() {
 
+    private val searchQuery = BehaviorSubject.create<String>()
     internal var searchResults = MutableLiveData<List<User>>()
     internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var receivedFriendRequests = MutableLiveData<List<FriendRequest>>()
@@ -37,6 +42,27 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         getFriends()
         getReceivedFriendRequests()
         getSentFriendRequests()
+        createSearchObserver()
+    }
+
+    private fun createSearchObserver() {
+        searchQuery
+                .debounce(250, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .switchMapSingle {
+                    if (it.isBlank() || it.length < 3) {
+                        Single.just(emptyList())
+                    } else {
+                        repository.searchForUsers(it)
+                    }
+                }
+                .onErrorReturnItem(emptyList())
+                .subscribeBy(
+                        onNext = { searchResults.postValue(it) },
+                        onComplete = {},
+                        onError = {}
+                )
+                .addToDisposable()
     }
 
     internal fun onDestroy() {
@@ -51,6 +77,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     internal fun hideSearch() {
+        searchQuery.onNext("")
         searchSectionVisible.value = false
 
         val haveSentRequests = sentFriendRequests.value?.isNotEmpty() ?: false
@@ -64,15 +91,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     internal fun onSearchQueryChanged(query: String) {
         showSearch()
-
-        if (!query.isBlank() && query.length > 2) {
-            repository.searchForUsers(query).subscribeSuccess {
-                searchResults.postValue(it)
-            }
-
-        } else {
-            searchResults.value = emptyList()
-        }
+        searchQuery.onNext(query)
     }
 
     private fun getFriends() {
@@ -88,10 +107,6 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         }.addToDisposable()
     }
 
-    internal fun refreshReceivedFriendRequests() {
-        this.getReceivedFriendRequests()
-    }
-
     private fun getReceivedFriendRequests() {
         repository.getReceivedFriendRequests().subscribeSuccess {
             receivedFriendRequests.postValue(it)
@@ -100,10 +115,11 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
-        if (!newFriendEmail.isBlank())
+        return if (newFriendEmail.isBlank()) {
+            SingleLiveData(false)
+        } else {
             repository.addFriend(newFriendEmail).toLiveData()
-
-        return SingleLiveData(false)
+        }
     }
 
     internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {

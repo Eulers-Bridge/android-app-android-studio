@@ -7,6 +7,7 @@ import com.amazonaws.auth.CognitoCachingCredentialsProvider
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3Client
+import com.eulersbridge.isegoria.SERVER_URL_KEY
 import com.eulersbridge.isegoria.SNS_PLATFORM_APPLICATION_ARN
 import com.eulersbridge.isegoria.USER_EMAIL_KEY
 import com.eulersbridge.isegoria.USER_PASSWORD_KEY
@@ -46,23 +47,31 @@ class DataRepository @Inject constructor(
 ) : Repository {
 
     // Updates the base URL of the API by fetching the API root for the user's institution
-    private fun updateAPIBaseURL(user: User) {
-        user.institutionId?.let { institutionId ->
+    private fun fetchAPIBaseURL(user: User): Single<Optional<String>> {
+        val savedUrl = getSavedApiBaseUrl()
+
+        if (!savedUrl.isNullOrBlank())
+            return Single.just(Optional(savedUrl))
+
+        return user.institutionId?.let { institutionId ->
 
             getInstitutionName(institutionId)
                     .map { it.value }
                     .flatMap { name ->
                         api.getInstitutionURLs().map { Pair(name, it) }
                     }
-                    .subscribeSuccess { (name, urls) ->
+                    .map { (name, urls) ->
                         // Find the matching institution (by name), use its URL
-                        urls.singleOrNull {
+                        val url = urls.singleOrNull {
                             it.name == name && !it.apiRoot.isNullOrBlank()
                         }?.let {
-                            networkConfig.baseUrl = it.apiRoot + "api/"
+                            it.apiRoot + "api/"
                         }
+
+                        Optional(url)
                     }
-        }
+
+        } ?: Single.error(Exception("Missing user institution ID"))
     }
 
     @get:JvmName("_loginState")
@@ -74,8 +83,27 @@ class DataRepository @Inject constructor(
 
     private var cachedLoginArticles: List<NewsArticle>? = null
 
+    private fun saveUserCredentials(email: String, password: String) {
+        securePreferences.edit {
+            putString(USER_EMAIL_KEY, email)
+            putString(USER_PASSWORD_KEY, password)
+        }
+    }
+
     override fun getSavedEmail(): String? = securePreferences.getString(USER_EMAIL_KEY, null)
     override fun getSavedPassword(): String? = securePreferences.getString(USER_PASSWORD_KEY, null)
+
+    private fun getSavedApiBaseUrl(): String? = securePreferences.getString(SERVER_URL_KEY, null)
+
+    private fun setApiBaseUrl(url: String) {
+        networkConfig.baseUrl = url
+        securePreferences.edit { putString(SERVER_URL_KEY, url) }
+    }
+
+    private fun resetApiBaseUrl() {
+        networkConfig.resetBaseUrl()
+        securePreferences.edit { remove(SERVER_URL_KEY) }
+    }
 
     @Throws(NullPointerException::class)
     private fun requireUser(): User {
@@ -107,13 +135,11 @@ class DataRepository @Inject constructor(
         loginState.onNext(LoginState.LoggingIn())
 
         getDeviceToken()
-                .doOnSuccess {
-                    AuthenticationInterceptor.setCredentials(email, password)
-                }
+                .doOnSuccess { AuthenticationInterceptor.setCredentials(email, password) }
                 .flatMap { api.login(SNS_PLATFORM_APPLICATION_ARN, it) }
                 .doOnSuccess {
-                    it.user.takeIf { it.accountVerified }?.let {
-                        updateAPIBaseURL(it)
+                    fetchAPIBaseURL(it.user).subscribeSuccess {
+                        it.value?.let { url -> setApiBaseUrl(url) }
                     }
                 }
                 .subscribeBy(
@@ -140,10 +166,7 @@ class DataRepository @Inject constructor(
                                             }
                                     )
 
-                            securePreferences.edit {
-                                putString(USER_EMAIL_KEY, email)
-                                putString(USER_PASSWORD_KEY, password)
-                            }
+                            saveUserCredentials(email, password)
                         },
                         onError = {
                             loginState.onNext(LoginState.LoginFailure())
@@ -158,10 +181,10 @@ class DataRepository @Inject constructor(
             remove(USER_PASSWORD_KEY)
         }
 
-        loginState.onNext(LoginState.LoggedOut())
-
         AuthenticationInterceptor.setCredentials(null, null)
-        networkConfig.resetBaseUrl()
+        resetApiBaseUrl()
+
+        loginState.onNext(LoginState.LoggedOut())
 
         return api.logOut()
     }
@@ -203,7 +226,9 @@ class DataRepository @Inject constructor(
                 .build()
 
         // Create new HTTP client rather than using application's, as no auth is required
-        return httpClient.newCall(request).execute().toCompletable()
+        return httpClient.newCall(request).execute()
+                .toCompletable()
+                .andThen { login(user.email, user.email) }
     }
 
     private fun updateUser(updatedUser: User): Completable {
@@ -558,7 +583,7 @@ class DataRepository @Inject constructor(
 
     override fun addFriend(newFriendEmail: String): Single<Boolean> {
         val user = requireUser()
-        return api.addFriend(user.email, newFriendEmail).toBooleanSingle()
+        return api.addFriend(user.id!!, newFriendEmail).toBooleanSingle()
     }
 
     override fun acceptFriendRequest(requestId: Long): Completable {

@@ -68,8 +68,8 @@ interface API {
     @GET("contact/{userEmail}/")
     fun getContact(@Path("userEmail") userEmail: String): Single<Contact>
 
-    @POST("user/{userEmail}/contactRequest/{targetUserEmail}")
-    fun addFriend(@Path("userEmail") userEmail: String, @Path("targetUserEmail") targetUserEmail: String): Completable
+    @POST("user/{userId}/contactRequest/{targetEmail}/")
+    fun addFriend(@Path("userId") userId: Long, @Path("targetEmail") targetUserEmail: String): Completable
 
     @PUT("user/contactRequest/{contactRequestId}/accept")
     fun acceptFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
