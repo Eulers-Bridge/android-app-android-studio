@@ -18,11 +18,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_centerHorizontal="true"
         android:contentDescription="@null"
-        tools:background="@color/grey"/>
+        tools:background="@tools:sample/backgrounds/scenic"/>
 
     <ImageView
         android:id="@+id/poll_vote_option_list_item_check_box"
-        android:src="@drawable/tickempty"
+        android:src="@drawable/tick_empty"
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:layout_marginLeft="16dp"
@@ -59,6 +59,6 @@
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/poll_vote_option_list_item_check_box"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Poll Option Name" />
+        tools:text="Poll Option Name"/>
 
 </android.support.constraint.ConstraintLayout>

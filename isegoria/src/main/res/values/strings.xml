@@ -67,7 +67,6 @@
     <!-- Personality Questions -->
     <string name="personality_screen_1_message">Isegoria is an academic project and we would love to collect a little bit of data based around our users. For science!\n\nAll you need to do is answer a few questions about yourself and your personality - nothing longer than 3 minutes. Plus, you\'ll even unlock a limited edition badge for completing it! as always, your information is kept completely anonymous.</string>
     <string name="personality_screen_1_begin_questions">Take Personality Questions</string>
-    <string name="personality_screen_skip_button">Skip</string>
     <string name="personality_questions_done_button">Complete and Finish</string>
     <string name="personality_screen_2_description">Simply select a number next to each statement to indicate the extent to which you agree or disagree. You should rate the extend to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.</string>
 
@@ -127,7 +126,6 @@
     <!-- Polls -->
     <string name="poll_title">Poll %d</string>
     <string name="poll_asked_by">Asked by %s</string>
-    <string name="poll_vote_answers_content_description">%d answers</string>
 
     <!-- Feed/News -->
     <string name="news_article_star_content_description">Star news article</string>
@@ -139,7 +137,7 @@
     <string name="friend_request_sent_message">Friend request sent</string>
     <string name="friend_request_accepted_message">Friend request from %s accepted!</string>
     <string name="friend_request_rejected_message">Friend request rejected</string>
-    <string name="friend_request_action_dialog_title">Friend request from</string>
+    <string name="friend_request_action_dialog_title">Friend request from %s</string>
     <string name="friend_request_action_dialog_positive">Accept</string>
     <string name="friend_request_action_dialog_negative">Reject</string>
     <string name="friend_request_action_dialog_neutral">Ignore</string>
@@ -222,5 +220,34 @@
 
     <string name="log_out_confirmation_title">Are you sure?</string>
     <string name="login_forgot_password_hint">Forgot password?</string>
+    <string name="candidate_ticket_detail_supporters">Supporters</string>
+    <string name="candidate_ticket_detail_button_support">Support</string>
+    <string name="candidate_ticket_detail_button_unsupport">Unsupport</string>
+    <string name="candidate_ticket_detail_election_ticket">Election Ticket</string>
+
+    <string name="personality_slider_description_1">Extroverted, enthusiastic</string>
+    <string name="personality_slider_description_2">Critical, quarrelsome</string>
+    <string name="personality_slider_description_3">Dependable, self-disciplined</string>
+    <string name="personality_slider_description_4">Anxious, easily upset</string>
+    <string name="personality_slider_description_5">Open to new experiences</string>
+    <string name="personality_slider_description_6">Reserved, quiet</string>
+    <string name="personality_slider_description_7">Sympathetic, warm</string>
+    <string name="personality_slider_description_8">Disorganized, careless</string>
+    <string name="personality_slider_description_9">Calm, emotionally stable</string>
+    <string name="personality_slider_description_10">Conventional, uncreative</string>
+
+    <string name="about_behavioral_name_1">James Kotsias</string>
+    <string name="about_behavioral_name_2">Drew Smith</string>
+    <string name="about_behavioral_name_3">Greg Newitt</string>
+    <string name="about_behavioral_name_4">Miguel Wood</string>
+    <string name="about_behavioral_name_5">Charlie Eastaugh</string>
+    <string name="about_design_team_heading">Design Team</string>
+    <string name="about_designer_name_1">Drew Smith</string>
+    <string name="about_coding_team_heading">Coding Team</string>
+    <string name="about_coding_team_name_1">Alan Gao</string>
+    <string name="about_coding_team_name_2">David Rivera</string>
+    <string name="about_coding_team_name_3">Greg Newitt</string>
+    <string name="about_coding_team_name_4">Anthony Quattrone</string>
+    <string name="about_coding_team_name_5">Yikai Gong</string>
 
 </resources>

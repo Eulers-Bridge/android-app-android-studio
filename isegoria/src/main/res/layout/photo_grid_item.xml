@@ -12,6 +12,6 @@
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        tools:background="@color/lightGrey" />
+        tools:background="@tools:sample/backgrounds/scenic" />
 
 </com.eulersbridge.isegoria.util.ui.SquareFrameLayout>

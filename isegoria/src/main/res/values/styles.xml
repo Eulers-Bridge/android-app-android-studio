@@ -18,6 +18,8 @@
         <item name="colorAccent">@color/lightBlue</item>
 
         <item name="textColorError">@color/lightRed</item>
+
+        <item name="actionModeBackground">@color/lightBlue</item>
     </style>
 
     <style name="AuthTheme" parent="AppTheme">
@@ -94,10 +96,6 @@
 
     <style name="LoginHeadingTextAppearance" parent="LoginSignUpHeadingTextAppearance">
         <item name="android:textSize">33sp</item>
-    </style>
-
-    <style name="SignUpHeadingTextAppearance" parent="LoginSignUpHeadingTextAppearance">
-        <item name="android:textSize">25sp</item>
     </style>
 
     <style name="LoginSignUpSmallPrintText">

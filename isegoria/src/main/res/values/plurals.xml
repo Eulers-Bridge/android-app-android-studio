@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Polls -->
+    <plurals name="poll_vote_answers_content_description">
+        <item quantity="zero">No answers</item>
+        <item quantity="one">%d answer</item>
+        <item quantity="other">%d answers</item>
+    </plurals>
+</resources>

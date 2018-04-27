@@ -17,7 +17,7 @@
     <item
         android:id="@+id/navigation_election"
         android:title="@string/navigation_election"
-        android:icon="@drawable/electionblue"
+        android:icon="@drawable/election_blue"
         tools:showAsAction="always"
         tools:iconTint="@color/white"/>
 

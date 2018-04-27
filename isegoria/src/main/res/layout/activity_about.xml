@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -14,7 +15,7 @@
         android:paddingBottom="32dp">
 
         <ImageView
-            android:id="@+id/back_button"
+            android:id="@+id/backButton"
             android:contentDescription="@string/settings_back_button_content_description"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -69,7 +70,8 @@
                 android:textSize="18sp"
                 android:textColor="#ff4c74cc"
                 android:paddingRight="8dp"
-                android:paddingEnd="8dp"/>
+                android:paddingEnd="8dp"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -95,7 +97,8 @@
                 android:textSize="18sp"
                 android:textColor="#ff4c74cc"
                 android:paddingRight="8dp"
-                android:paddingEnd="8dp"/>
+                android:paddingEnd="8dp"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,82 +130,90 @@
                     android:textColor="#ff4c74cc"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="16dp" />
+                    android:layout_marginTop="16dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="James Kotsias"
+                    android:text="@string/about_behavioral_name_1"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Drew Smith"
+                    android:text="@string/about_behavioral_name_2"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Greg Newitt"
+                    android:text="@string/about_behavioral_name_3"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="20dp"
                     android:paddingStart="20dp"
                     android:layout_marginRight="@dimen/activity_horizontal_margin"
                     android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Miguel Wood"
+                    android:text="@string/about_behavioral_name_4"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Charlie Eastaugh"
+                    android:text="@string/about_behavioral_name_5"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Design Team"
+                    android:text="@string/about_design_team_heading"
                     android:textSize="18sp"
                     android:textColor="#ff4c74cc"
                     android:layout_marginTop="16dp"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Drew Smith"
+                    android:text="@string/about_designer_name_1"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingStart="@dimen/activity_horizontal_margin"
                     android:layout_marginRight="18dp"
                     android:layout_marginEnd="18dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
 
             <LinearLayout
@@ -214,69 +225,75 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Coding Team"
+                    android:text="@string/about_coding_team_heading"
                     android:textSize="18sp"
                     android:textColor="#ff4c74cc"
                     android:layout_gravity="end"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:layout_marginTop="16dp" />
+                    android:layout_marginTop="16dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Alan Gao"
+                    android:text="@string/about_coding_team_name_1"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:layout_gravity="end"
                     android:layout_marginTop="8dp"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="David Rivera"
+                    android:text="@string/about_coding_team_name_2"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:layout_gravity="end"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Greg Newitt"
+                    android:text="@string/about_coding_team_name_3"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:layout_gravity="end"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Anthony Quattrone"
+                    android:text="@string/about_coding_team_name_4"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:layout_gravity="end"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Yikai Gong"
+                    android:text="@string/about_coding_team_name_5"
                     android:textSize="16sp"
                     android:textColor="#fffff0ef"
                     android:layout_gravity="end"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    tools:ignore="RtlSymmetry" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -297,7 +314,8 @@
                     android:textSize="15sp"
                     android:textColor="#fffff0ef"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"/>
+                    android:paddingEnd="@dimen/activity_horizontal_margin"
+                    tools:ignore="RtlSymmetry" />
             </LinearLayout>
 
         </LinearLayout>

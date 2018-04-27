@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:paddingBottom="16dp">
 
     <android.support.constraint.ConstraintLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/poll_vote_creator_image_view"
+            android:id="@+id/creatorImageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginStart="16dp"
@@ -25,7 +25,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/poll_vote_question_text_view"
+            android:id="@+id/questionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -34,12 +34,12 @@
             android:maxLines="1"
             android:textColor="@color/black"
             android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/poll_vote_creator_image_view"
+            app:layout_constraintStart_toEndOf="@id/creatorImageView"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Lorem ipsum question here?" />
+            tools:text="Lorem ipsum?" />
 
         <TextView
-            android:id="@+id/poll_vote_creator_name_text_view"
+            android:id="@+id/creatorNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -47,51 +47,52 @@
             android:layout_marginTop="16dp"
             android:maxLines="1"
             android:visibility="gone"
-            app:layout_constraintStart_toEndOf="@id/poll_vote_creator_image_view"
-            app:layout_constraintTop_toBottomOf="@id/poll_vote_question_text_view"
+            app:layout_constraintStart_toEndOf="@id/creatorImageView"
+            app:layout_constraintTop_toBottomOf="@id/questionTextView"
             tools:text="Jane Doe" />
 
         <ImageView
-            android:id="@+id/poll_vote_answers_count_image_view"
+            android:id="@+id/answersCountImageView"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@null"
-            android:src="@drawable/votecount"
+            android:src="@drawable/vote_count"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/poll_vote_answers_count_text_view"
+            android:id="@+id/answersCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
-            android:layout_toLeftOf="@+id/poll_vote_answers_count_image_view"
-            android:layout_toStartOf="@+id/poll_vote_answers_count_image_view"
+            android:layout_toLeftOf="@+id/answersCountImageView"
+            android:layout_toStartOf="@+id/answersCountImageView"
             android:maxLines="1"
             android:text="0"
-            app:layout_constraintBottom_toBottomOf="@+id/poll_vote_answers_count_image_view"
-            app:layout_constraintEnd_toStartOf="@+id/poll_vote_answers_count_image_view"
-            app:layout_constraintTop_toTopOf="@+id/poll_vote_answers_count_image_view"
+            app:layout_constraintBottom_toBottomOf="@+id/answersCountImageView"
+            app:layout_constraintEnd_toStartOf="@+id/answersCountImageView"
+            app:layout_constraintTop_toTopOf="@+id/answersCountImageView"
             tools:ignore="HardcodedText"
             tools:text="1" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/poll_fragment_list_view"
+            android:id="@+id/listView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layoutAnimation="@anim/layout_animation_fade_in"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/poll_vote_creator_name_text_view"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-            android:layoutAnimation="@anim/layout_animation_fade_in"/>
+            app:layout_constraintTop_toBottomOf="@id/creatorNameTextView"
+            tools:listitem="@layout/poll_vote_option_list_item" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
