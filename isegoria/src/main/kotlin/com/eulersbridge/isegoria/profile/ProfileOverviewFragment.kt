@@ -140,7 +140,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         }
 
         observe(viewModel!!.tasks) {
-            taskAdapter.setItems(it!!)
+            taskAdapter.submitList(it!!)
         }
 
         observe(viewModel!!.personalityTestHintVisible) {

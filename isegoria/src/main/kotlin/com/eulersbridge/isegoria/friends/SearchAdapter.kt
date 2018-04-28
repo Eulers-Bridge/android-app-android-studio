@@ -1,7 +1,7 @@
 package com.eulersbridge.isegoria.friends
 
+import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
@@ -9,12 +9,19 @@ import com.eulersbridge.isegoria.network.api.model.GenericUser
 import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.network.api.model.User
 import java.lang.ref.WeakReference
-import java.util.*
+
+private class UserDiffCallback : DiffUtil.ItemCallback<User>() {
+    override fun areItemsTheSame(oldItem: User?, newItem: User?): Boolean {
+        return oldItem?.id == newItem?.id
+    }
+
+    override fun areContentsTheSame(oldItem: User?, newItem: User?): Boolean {
+        return oldItem == newItem
+    }
+}
 
 internal class SearchAdapter(private val delegate: UserDelegate?) :
-    RecyclerView.Adapter<UserViewHolder>(), UserViewHolder.OnClickListener {
-
-    private val items = ArrayList<User>()
+    ListAdapter<User, UserViewHolder>(UserDiffCallback()), UserViewHolder.OnClickListener {
 
     internal interface UserDelegate {
         fun getSearchedUserInstitution(
@@ -26,31 +33,6 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         fun onSearchedUserActionClick(user: User?)
     }
 
-    fun setItems(newItems: List<User>) {
-        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize() = items.size
-
-            override fun getNewListSize() = newItems.size
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = items[oldItemPosition]
-                val newItem = newItems[newItemPosition]
-                return oldItem.email == newItem.email
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = items[oldItemPosition]
-                val newItem = newItems[newItemPosition]
-                return oldItem == newItem
-            }
-        })
-
-        items.clear()
-        items.addAll(newItems)
-
-        result.dispatchUpdatesTo(this)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.friend_partial_list_item, parent, false)
@@ -59,7 +41,7 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
     }
 
     override fun onBindViewHolder(viewHolder: UserViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         viewHolder.setItem(item)
 
         if (delegate != null && item.institutionId != null) {
@@ -77,8 +59,6 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
             weakViewHolder.get()?.setInstitution(it)
         }
     }
-
-    override fun getItemCount() = items.size
 
     override fun onViewClick(user: GenericUser?) {
         (user as? User)?.let {

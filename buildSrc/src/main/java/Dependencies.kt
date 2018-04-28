@@ -31,7 +31,7 @@ object Versions {
     const val firebase = "15.0.0"
     const val secure_prefs = "v0.1.6"
 
-    const val glide = "4.6.1"
+    const val glide = "4.7.1"
     const val image_view = "3.10.0"
     const val image_cropper = "2.7.0"
 
