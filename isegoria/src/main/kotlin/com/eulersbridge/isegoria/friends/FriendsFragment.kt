@@ -78,9 +78,9 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         observeBoolean(viewModel.receivedRequestsVisible) { receivedRequestsContainer.isVisible = it }
         observeBoolean(viewModel.sentRequestsVisible) { sentRequestsContainer.isVisible = it }
         observe(viewModel.friends) { friendsAdapter.setItems(it!!) }
-        observe(viewModel.receivedFriendRequests) { receivedAdapter.setItems(it!!) }
-        observe(viewModel.sentFriendRequests) { sentAdapter.setItems(it!!) }
-        observe(viewModel.searchResults) { searchAdapter.setItems(it!!) }
+        observe(viewModel.receivedFriendRequests) { receivedAdapter.submitList(it!!) }
+        observe(viewModel.sentFriendRequests) { sentAdapter.submitList(it!!) }
+        observe(viewModel.searchResults) { searchAdapter.submitList(it!!) }
 
         mainActivity = activity as? MainActivity
 

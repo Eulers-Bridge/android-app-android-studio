@@ -80,7 +80,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
 
         observe(viewModel.getCompletedTasks()) { completedTasks ->
             if (completedTasks != null)
-                completedAdapter.setItems(completedTasks)
+                completedAdapter.submitList(completedTasks)
         }
     }
 
@@ -124,7 +124,7 @@ class ProfileTaskProgressFragment : Fragment(), TitledFragment {
     }
 
     private fun setRemainingTasks(remainingTasks: List<Task>) {
-        remainingAdapter.setItems(remainingTasks)
+        remainingAdapter.submitList(remainingTasks)
 
         // Calculate rough new list view size to 'autosize' it
         runOnUiThread {
