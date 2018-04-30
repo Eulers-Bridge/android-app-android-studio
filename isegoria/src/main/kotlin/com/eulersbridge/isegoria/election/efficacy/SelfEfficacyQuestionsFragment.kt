@@ -63,7 +63,7 @@ class SelfEfficacyQuestionsFragment : Fragment(), TitledFragment, MainActivity.T
             doneButton.isEnabled = it
         }
 
-        observeBoolean(viewModel.efficacyComplete) {
+        observe(viewModel.efficacyComplete) {
             activity?.supportFragmentManager?.popBackStack()
         }
     }

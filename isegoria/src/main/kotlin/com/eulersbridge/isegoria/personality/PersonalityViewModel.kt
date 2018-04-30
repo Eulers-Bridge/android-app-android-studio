@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.UserPersonality
 import com.eulersbridge.isegoria.util.BaseViewModel
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
@@ -11,7 +12,7 @@ class PersonalityViewModel @Inject constructor(private val repository: Repositor
 
     internal val doneButtonEnabled = MutableLiveData<Boolean>()
     internal val questionsContinued = MutableLiveData<Boolean>()
-    internal val questionsComplete = MutableLiveData<Boolean>()
+    internal val questionsComplete = SingleLiveEvent<Any>()
 
     init {
         doneButtonEnabled.value = true
@@ -21,12 +22,8 @@ class PersonalityViewModel @Inject constructor(private val repository: Repositor
         doneButtonEnabled.value = false
 
         repository.addUserPersonality(userPersonality).subscribeBy(
-                onComplete = {
-                    questionsComplete.postValue(true)
-                },
-                onError = {
-
-                }
+                onComplete = { questionsComplete.call() },
+                onError = { }
         ).addToDisposable()
     }
 }
