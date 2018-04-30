@@ -63,7 +63,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         presentRootContent(LoginFragment())
 
-        ifTrue(viewModel.authFinished) {
+        observe(viewModel.authFinished) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }

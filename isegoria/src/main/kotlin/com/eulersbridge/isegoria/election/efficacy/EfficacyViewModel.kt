@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.UserSelfEfficacy
 import com.eulersbridge.isegoria.util.BaseViewModel
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
@@ -11,7 +12,7 @@ import javax.inject.Inject
 class EfficacyViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     internal val doneButtonEnabled = MutableLiveData<Boolean>()
-    internal val efficacyComplete = MutableLiveData<Boolean>()
+    internal val efficacyComplete = SingleLiveEvent<Any>()
 
     internal val score1 = MutableLiveData<Int>()
     internal val score2 = MutableLiveData<Int>()
@@ -20,19 +21,18 @@ class EfficacyViewModel @Inject constructor(private val repository: Repository) 
 
     init {
         doneButtonEnabled.value = true
-        efficacyComplete.value = false
     }
 
     internal fun onDone() {
         doneButtonEnabled.value = false
         addUserEfficacy().subscribeBy(
                 onComplete = {
-                    efficacyComplete.postValue(true)
+                    efficacyComplete.call()
                 },
                 onError = {
                     doneButtonEnabled.postValue(true)
                 }
-        )
+        ).addToDisposable()
     }
 
     private fun addUserEfficacy(): Completable {
@@ -45,7 +45,6 @@ class EfficacyViewModel @Inject constructor(private val repository: Repository) 
 
         } else {
             val answers = UserSelfEfficacy(scores[0], scores[1], scores[2], scores[3])
-
             repository.addUserSelfEfficacyAnswers(answers)
         }
     }

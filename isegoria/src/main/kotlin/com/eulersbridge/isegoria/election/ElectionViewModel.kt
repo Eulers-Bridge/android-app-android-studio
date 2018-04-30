@@ -7,7 +7,7 @@ import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import javax.inject.Inject
 
-class ElectionViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
+class ElectionViewModel @Inject constructor(repository: Repository) : BaseViewModel() {
 
     internal val surveyPromptVisible = MutableLiveData<Boolean>()
     internal val surveyVisible = MutableLiveData<Boolean>()

@@ -1,7 +1,7 @@
 @file:Suppress("unused")
 
 object Versions {
-    const val kotlin = "1.2.40"
+    const val kotlin = "1.2.41"
     const val android_gradle_plugin = "3.2.0-alpha12"
     const val google_gradle_plugin = "3.1.1"
 

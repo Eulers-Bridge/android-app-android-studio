@@ -27,8 +27,8 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ElectionViewModel
 
-    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
     private lateinit var tabLayout: TabLayout
+    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
@@ -43,14 +43,12 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
-        createViewModelObserver()
+        createViewModelObservers()
     }
 
-    private fun createViewModelObserver() {
+    private fun createViewModelObservers() {
         observeBoolean(viewModel.surveyPromptVisible) {
-            if (it) {
-                surveyPrompt.isVisible = true
-            }
+            if (it) surveyPrompt.isVisible = true
         }
 
         ifTrue(viewModel.surveyVisible) {
@@ -59,7 +57,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
                     .add(R.id.container, SelfEfficacyQuestionsFragment())
                     .commit()
         }
-
     }
 
     override fun onCreateView(
@@ -78,6 +75,11 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         overlaySurveyButton.setOnClickListener { viewModel.onSurveyPromptNext() }
+
+        activity!!.supportFragmentManager
+                .beginTransaction()
+                .add(R.id.container, SelfEfficacyQuestionsFragment())
+                .commit()
     }
 
     override fun getTitle(context: Context?): String?
