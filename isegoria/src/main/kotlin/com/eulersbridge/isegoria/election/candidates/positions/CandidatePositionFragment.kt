@@ -45,8 +45,8 @@ class CandidatePositionFragment : Fragment() {
     }
 
     override fun onPause() {
-        super.onPause()
         compositeDisposable.dispose()
+        super.onPause()
     }
 
     override fun onCreateView(
@@ -158,14 +158,16 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        repository.getTicket(candidate.ticketId).subscribeSuccess {
-            it.value?.let { ticket ->
-                runOnUiThread {
-                    textViewParty.text = ticket.code
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        repository.getTicket(candidate.ticketId)
+                .subscribeSuccess {
+                    it.value?.let { ticket ->
+                        runOnUiThread {
+                            textViewParty.text = ticket.code
+                            textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
 
         val imageSize2 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -198,11 +200,13 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        repository.getPosition(candidate.positionId).subscribeSuccess {
-            runOnUiThread {
-                textViewPosition.text = it.value?.name
-            }
-        }.addTo(compositeDisposable)
+        repository.getPosition(candidate.positionId)
+                .subscribeSuccess {
+                    runOnUiThread {
+                        textViewPosition.text = it.value?.name
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)

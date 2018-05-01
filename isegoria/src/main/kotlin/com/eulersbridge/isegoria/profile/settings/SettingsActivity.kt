@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SettingsActivity : DaggerAppCompatActivity() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

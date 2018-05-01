@@ -95,20 +95,24 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun fetchUserInstitutionName(user: GenericUser) {
-        user.institutionId?.let {
-            repository.getInstitutionName(it).subscribeSuccess {
-                institutionName.postValue(it.value)
-            }.addToDisposable()
+        user.institutionId?.let { id ->
+            repository.getInstitutionName(id)
+                    .subscribeSuccess { result ->
+                        institutionName.postValue(result.value)
+                    }
+                    .addToDisposable()
         }
     }
 
     private fun fetchUserStats(user: GenericUser) {
-        repository.getContact(user.email).subscribeSuccess { result ->
-            result.value?.let {
-                contactsCount.postValue(it.contactsCount)
-                totalTasksCount.postValue(it.totalTasksCount)
-            }
-        }.addToDisposable()
+        repository.getContact(user.email)
+                .subscribeSuccess { result ->
+                    result.value?.let {
+                        contactsCount.postValue(it.contactsCount)
+                        totalTasksCount.postValue(it.totalTasksCount)
+                    }
+                }
+                .addToDisposable()
     }
 
     private fun getUser(): User? {
@@ -121,12 +125,13 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun fetchBadgeCounts(user: User) {
-        user.id?.let {
-            repository.getUserRemainingBadges(it).subscribeSuccess {
-                remainingBadges.postValue(it.filter { it.level == targetBadgeLevel })
-
-                badgeCount.postValue(BadgeCount(it.size, user.completedBadgesCount.toInt()))
-            }
+        user.id?.let { id ->
+            repository.getUserRemainingBadges(id)
+                    .subscribeSuccess { badges ->
+                        remainingBadges.postValue(badges.filter { it.level == targetBadgeLevel })
+                        badgeCount.postValue(BadgeCount(badges.size, user.completedBadgesCount.toInt()))
+                    }
+                    .addToDisposable()
         }
     }
 
@@ -143,9 +148,9 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun getTasks() {
-        repository.getTasks().subscribeSuccess {
-            tasks.postValue(it)
-        }.addToDisposable()
+        repository.getTasks()
+                .subscribeSuccess { tasks.postValue(it) }
+                .addToDisposable()
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
@@ -161,8 +166,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun fetchUserPhoto() {
-        repository.getUserPhoto().subscribeSuccess {
-            userPhoto.postValue(it.value)
-        }.addToDisposable()
+        repository.getUserPhoto()
+                .subscribeSuccess { userPhoto.postValue(it.value) }
+                .addToDisposable()
     }
 }

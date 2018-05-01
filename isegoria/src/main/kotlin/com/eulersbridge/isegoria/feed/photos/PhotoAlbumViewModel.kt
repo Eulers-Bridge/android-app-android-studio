@@ -22,9 +22,9 @@ class PhotoAlbumViewModel(private val repository: Repository) : BaseViewModel() 
     }
 
     private fun getAlbumPhotos() {
-        repository.getAlbumPhotos(_photoAlbum.id).subscribeSuccess {
-            photos.postValue(it)
-        }.addToDisposable()
+        repository.getAlbumPhotos(_photoAlbum.id)
+                .subscribeSuccess { photos.postValue(it) }
+                .addToDisposable()
     }
 
 }

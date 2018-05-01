@@ -31,7 +31,7 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private var tabLayout: TabLayout? = null
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FeedViewModel
 
     override fun onAttach(context: Context?) {
@@ -139,12 +139,12 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     }
 
     override fun onPause() {
-        super.onPause()
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onDestroy()
     }
 }

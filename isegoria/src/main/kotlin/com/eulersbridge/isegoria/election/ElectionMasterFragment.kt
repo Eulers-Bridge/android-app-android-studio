@@ -24,7 +24,7 @@ import javax.inject.Inject
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ElectionViewModel
 
     private lateinit var tabLayout: TabLayout
@@ -101,9 +101,8 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 
     private fun showTabFragment(fragment: Fragment) {

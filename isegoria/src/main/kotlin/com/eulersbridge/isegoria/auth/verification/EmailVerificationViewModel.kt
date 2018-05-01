@@ -34,12 +34,11 @@ class EmailVerificationViewModel
 
         repository.resendVerificationEmail()
                 .subscribeBy(
-                        onComplete = {
-
-                        },
+                        onComplete = { },
                         onError = {
                             resendVerificationButtonEnabled.postValue(true)
                         }
                 )
+                .addToDisposable()
     }
 }

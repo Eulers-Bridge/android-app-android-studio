@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ElectionOverviewFragment : Fragment() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ElectionViewModel
 
     override fun onAttach(context: Context?) {

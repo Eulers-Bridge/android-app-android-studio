@@ -35,8 +35,8 @@ class EventDetailActivity : DaggerAppCompatActivity() {
     }
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
-    lateinit var viewModel: EventDetailViewModel
+    internal lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var viewModel: EventDetailViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

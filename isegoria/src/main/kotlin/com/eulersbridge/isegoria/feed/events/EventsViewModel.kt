@@ -25,6 +25,7 @@ class EventsViewModel @Inject constructor(private val repository: Repository) : 
                 .subscribeSuccess {
                     isRefreshing.postValue(false)
                     events.postValue(it)
-                }.addToDisposable()
+                }
+                .addToDisposable()
     }
 }

@@ -71,8 +71,8 @@ class CandidateAllFragment : Fragment() {
     }
 
     override fun onPause() {
-        super.onPause()
         compositeDisposable.dispose()
+        super.onPause()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,9 +89,9 @@ class CandidateAllFragment : Fragment() {
                     = handleSearchQueryTextChange(query)
         })
 
-        repository.getLatestElectionCandidates().subscribeSuccess { candidates ->
-            addCandidates(candidates)
-        }
+        repository.getLatestElectionCandidates()
+                .subscribeSuccess { addCandidates(it) }
+                .addTo(compositeDisposable)
     }
 
     private fun handleSearchQueryTextChange(query: String): Boolean {
@@ -165,23 +165,27 @@ class CandidateAllFragment : Fragment() {
             scaleType = ScaleType.CENTER_CROP
         }
 
-        repository.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos.firstOrNull()?.let {
-                GlideApp.with(this@CandidateAllFragment)
-                        .load(it.getPhotoUrl())
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
-            }
-        }.addTo(compositeDisposable)
+        repository.getPhotos(candidate.userId)
+                .subscribeSuccess {
+                    it.photos.firstOrNull()?.let {
+                        GlideApp.with(this@CandidateAllFragment)
+                                .load(it.getPhotoUrl())
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(candidateProfileView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
-        repository.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos.firstOrNull()?.let {
-                GlideApp.with(this@CandidateAllFragment)
-                    .load(it.getPhotoUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(candidateProfileView)
-            }
-        }
+        repository.getPhotos(candidate.userId)
+                .subscribeSuccess {
+                    it.photos.firstOrNull()?.let {
+                        GlideApp.with(this@CandidateAllFragment)
+                            .load(it.getPhotoUrl())
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(candidateProfileView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
@@ -225,14 +229,16 @@ class CandidateAllFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        repository.getTicket(candidate.ticketId).subscribeSuccess {
-            it.value?.let { ticket ->
-                runOnUiThread {
-                    textViewParty.text = ticket.code
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        repository.getTicket(candidate.ticketId)
+                .subscribeSuccess {
+                    it.value?.let { ticket ->
+                        runOnUiThread {
+                            textViewParty.text = ticket.code
+                            textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
 
         val rect = RectShape()
         val rectShapeDrawable = ShapeDrawable(rect)
@@ -278,11 +284,13 @@ class CandidateAllFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        repository.getPosition(candidate.positionId).subscribeSuccess {
-            runOnUiThread {
-                textViewPosition.text = it.value?.name
-            }
-        }.addTo(compositeDisposable)
+        repository.getPosition(candidate.positionId)
+                .subscribeSuccess {
+                    runOnUiThread {
+                        textViewPosition.text = it.value?.name
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.apply {

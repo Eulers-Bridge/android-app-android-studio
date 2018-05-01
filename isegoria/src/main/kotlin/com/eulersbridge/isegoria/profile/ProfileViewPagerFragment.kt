@@ -26,13 +26,13 @@ import javax.inject.Inject
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     @Inject
-    lateinit var appRouter: AppRouter
+    internal  lateinit var appRouter: AppRouter
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ProfileViewModel
 
     private lateinit var tabLayout: TabLayout
@@ -149,8 +149,7 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 }

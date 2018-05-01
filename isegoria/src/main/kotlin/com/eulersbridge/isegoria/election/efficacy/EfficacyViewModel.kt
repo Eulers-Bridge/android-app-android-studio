@@ -26,14 +26,16 @@ class EfficacyViewModel @Inject constructor(private val repository: Repository) 
     internal fun onDone() {
         doneButtonEnabled.value = false
 
-        addUserEfficacy().subscribeBy(
-                onComplete = {
-                    efficacyComplete.call()
-                },
-                onError = {
-                    doneButtonEnabled.postValue(true)
-                }
-        ).addToDisposable()
+        addUserEfficacy()
+                .subscribeBy(
+                        onComplete = {
+                            efficacyComplete.call()
+                        },
+                        onError = {
+                            doneButtonEnabled.postValue(true)
+                        }
+                )
+                .addToDisposable()
     }
 
     private fun addUserEfficacy(): Completable {

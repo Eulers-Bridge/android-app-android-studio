@@ -20,7 +20,7 @@ import javax.inject.Inject
 class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PollVoteViewModel
 
     private var pollOptionsAdapter: PollOptionAdapter = PollOptionAdapter(this)

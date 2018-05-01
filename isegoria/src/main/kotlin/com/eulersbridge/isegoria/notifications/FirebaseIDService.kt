@@ -19,7 +19,7 @@ import javax.inject.Inject
 class FirebaseIDService : FirebaseInstanceIdService() {
 
     @Inject
-    lateinit var securePreferences: SecurePreferences
+    internal lateinit var securePreferences: SecurePreferences
 
     override fun onCreate() {
         AndroidInjection.inject(this)

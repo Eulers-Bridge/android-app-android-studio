@@ -19,8 +19,8 @@ import javax.inject.Inject
 class EventsFragment : Fragment(), TitledFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
-    lateinit var viewModel: EventsViewModel
+    internal lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var viewModel: EventsViewModel
 
     private val adapter = EventAdapter()
 
