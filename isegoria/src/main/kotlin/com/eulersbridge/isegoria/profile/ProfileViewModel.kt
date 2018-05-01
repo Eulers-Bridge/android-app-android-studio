@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.profile
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
@@ -11,11 +12,13 @@ import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
-class ProfileViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
+class ProfileViewModel @Inject constructor(
+        private val repository: Repository,
+        private val appRouter: AppRouter?
+) : BaseViewModel() {
 
     data class BadgeCount(val remaining: Int, val completed: Int)
 
-    internal val friendsScreenVisible = MutableLiveData<Boolean>()
     internal val currentSectionIndex = MutableLiveData<Int>()
 
     internal val user = MutableLiveData<GenericUser>()
@@ -35,17 +38,14 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     internal val totalTasksCount = MutableLiveData<Long>()
 
     init {
-        friendsScreenVisible.value = false
         currentSectionIndex.value = 0
     }
 
     internal fun viewFriends() {
-        val isAnotherUser = user.value is Contact
+        val isLoggedInUser = user.value is User
 
-        if (!isAnotherUser) {
-            friendsScreenVisible.value = true
-            friendsScreenVisible.value = false
-        }
+        if (isLoggedInUser)
+            appRouter!!.setFriendsScreenVisible(true)
     }
 
     fun setTargetBadgeLevel(targetBadgeLevel: Int?) {

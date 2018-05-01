@@ -66,9 +66,11 @@ class CandidatePositionFragment : Fragment() {
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         position?.id?.let {
-            repository.getPositionCandidates(it).subscribeSuccess {
-                addCandidates(it)
-            }.addTo(compositeDisposable)
+            repository.getPositionCandidates(it)
+                    .subscribeSuccess {
+                        addCandidates(it)
+                    }
+                    .addTo(compositeDisposable)
         }
 
         return rootView
@@ -108,14 +110,16 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        repository.getPhoto(candidate.userId).subscribeSuccess {
-            it.value?.let {
-                GlideApp.with(this@CandidatePositionFragment)
-                        .load(it.getPhotoUrl())
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
-            }
-        }.addTo(compositeDisposable)
+        repository.getPhoto(candidate.userId)
+                .subscribeSuccess {
+                    it.value?.let {
+                        GlideApp.with(this@CandidatePositionFragment)
+                                .load(it.getPhotoUrl())
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(candidateProfileView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {

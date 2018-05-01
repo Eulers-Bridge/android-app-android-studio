@@ -72,10 +72,10 @@ class AuthActivity : DaggerAppCompatActivity() {
             presentContent(SignUpFragment())
         }
 
-        observe(viewModel.signUpUser) {
+        observe(viewModel.signUpUser) { user ->
             val consentValue = viewModel.signUpConsentGiven.value
             val consentRequired = consentValue == null || !consentValue
-            if (it != null && consentRequired)
+            if (user != null && consentRequired)
                 presentContent(ConsentAgreementFragment())
         }
 

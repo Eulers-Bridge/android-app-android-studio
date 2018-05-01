@@ -30,9 +30,11 @@ class SignUpViewModel
     }
 
     private fun fetchCountries() {
-        repository.getSignUpCountries().subscribeSuccess {
-            countries.postValue(it)
-        }
+        repository.getSignUpCountries()
+                .subscribeSuccess {
+                    countries.postValue(it)
+                }
+                .addToDisposable()
     }
 
     fun setGivenName(value: String) {

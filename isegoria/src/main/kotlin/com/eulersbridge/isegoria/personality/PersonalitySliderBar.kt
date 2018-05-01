@@ -9,10 +9,7 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.ui.BaseSliderBar
 import com.eulersbridge.isegoria.util.ui.SliderBarPoint
 
-class PersonalitySliderBar @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null
-) : BaseSliderBar(context, attrs) {
+class PersonalitySliderBar constructor(context: Context, attrs: AttributeSet) : BaseSliderBar(context, attrs) {
 
     private val disagreePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val centrePaint = Paint(Paint.ANTI_ALIAS_FLAG)

@@ -3,11 +3,16 @@ package com.eulersbridge.isegoria.util.extension
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.Observer
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 
 fun <T : Any?> LifecycleOwner.observe(data: LiveData<T>?, onChanged: (value: T?) -> Unit) {
     data?.observe(this, android.arch.lifecycle.Observer {
         onChanged(it)
     })
+}
+
+fun LifecycleOwner.observe(event: SingleLiveEvent<Any>, onChanged: () -> Unit) {
+    event.observe(this, Observer { onChanged() })
 }
 
 /**

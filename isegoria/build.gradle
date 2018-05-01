@@ -129,6 +129,7 @@ dependencies {
     testImplementation TestDeps.mockito_kotlin
     testImplementation TestDeps.livedata_test
 
+    androidTestImplementation TestDeps.test_runner
     androidTestImplementation TestDeps.espresso
     androidTestImplementation TestDeps.espresso_intents
 }

@@ -10,6 +10,7 @@ import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.ui.LoadingAdapter
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import java.lang.ref.WeakReference
 
 internal class PositionAdapter(
@@ -43,13 +44,15 @@ internal class PositionAdapter(
 
             val weakViewHolder = WeakReference(viewHolder)
 
-            repository.getPhotos(itemId).subscribeSuccess {
-                it.photos.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
-                    weakViewHolder.get()?.apply {
-                        setImageUrl(glide, photoThumbnailUrl, itemId)
+            repository.getPhotos(itemId)
+                    .subscribeSuccess {
+                        it.photos.firstOrNull()?.getPhotoUrl()?.let { photoThumbnailUrl ->
+                            weakViewHolder.get()?.apply {
+                                setImageUrl(glide, photoThumbnailUrl, itemId)
+                            }
+                        }
                     }
-                }
-            }
+                    .addTo(compositeDisposable)
         }
     }
 

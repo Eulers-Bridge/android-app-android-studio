@@ -27,9 +27,9 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
     val verificationComplete = MutableLiveData<Boolean>()
 
     init {
-        repository.getSignUpCountries().subscribeSuccess {
-            countries = it
-        }.addToDisposable()
+        repository.getSignUpCountries()
+                .subscribeSuccess { countries = it }
+                .addToDisposable()
 
         repository.getLoginState()
                 .filter { it is LoginState.LoggedIn }

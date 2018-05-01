@@ -25,6 +25,7 @@ class EfficacyViewModel @Inject constructor(private val repository: Repository) 
 
     internal fun onDone() {
         doneButtonEnabled.value = false
+
         addUserEfficacy().subscribeBy(
                 onComplete = {
                     efficacyComplete.call()
@@ -36,12 +37,11 @@ class EfficacyViewModel @Inject constructor(private val repository: Repository) 
     }
 
     private fun addUserEfficacy(): Completable {
-
         val scores = listOfNotNull(score1.value, score2.value, score3.value, score4.value)
             .map { it.toFloat() }
 
         return if (scores.isEmpty()) {
-            Completable.error(Exception(""))
+            Completable.error(Exception("No scores"))
 
         } else {
             val answers = UserSelfEfficacy(scores[0], scores[1], scores[2], scores[3])

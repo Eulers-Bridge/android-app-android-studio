@@ -14,7 +14,7 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
-import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -48,13 +48,14 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
     private fun createViewModelObservers() {
         observeBoolean(viewModel.surveyPromptVisible) {
-            if (it) surveyPrompt.isVisible = true
+            surveyPrompt.isVisible = it == true
         }
 
-        ifTrue(viewModel.surveyVisible) {
+        observe(viewModel.surveyVisible) {
             activity!!.supportFragmentManager
                     .beginTransaction()
                     .add(R.id.container, SelfEfficacyQuestionsFragment())
+                    .addToBackStack(null)
                     .commit()
         }
     }
@@ -75,11 +76,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         overlaySurveyButton.setOnClickListener { viewModel.onSurveyPromptNext() }
-
-        activity!!.supportFragmentManager
-                .beginTransaction()
-                .add(R.id.container, SelfEfficacyQuestionsFragment())
-                .commit()
     }
 
     override fun getTitle(context: Context?): String?
