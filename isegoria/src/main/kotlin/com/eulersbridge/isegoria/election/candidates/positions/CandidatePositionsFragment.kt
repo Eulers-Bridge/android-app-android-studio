@@ -18,6 +18,8 @@ import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.election_positions_fragment.*
 import javax.inject.Inject
 
@@ -25,6 +27,8 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
 
     @Inject
     internal lateinit var repository: Repository
+
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -50,9 +54,16 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         positionsGridView.adapter = adapter
 
-        repository.getLatestElectionPositions().subscribeSuccess {
-            runOnUiThread { setPositions(it) }
-        }
+        repository.getLatestElectionPositions()
+                .subscribeSuccess {
+                    runOnUiThread { setPositions(it) }
+                }
+                .addTo(compositeDisposable)
+    }
+
+    override fun onPause() {
+        compositeDisposable.dispose()
+        super.onPause()
     }
 
     private fun setPositions(positions: List<Position>) {

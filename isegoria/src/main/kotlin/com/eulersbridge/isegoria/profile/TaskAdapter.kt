@@ -50,18 +50,20 @@ internal class TaskAdapter(
         val itemId = item.id
 
         val weakViewHolder = WeakReference(viewHolder)
-        repository.getPhotos(itemId).subscribeSuccess {
-            if (it.totalPhotos > imageIndex + 1) {
-                val innerViewHolder = weakViewHolder.get()
+        repository.getPhotos(itemId)
+                .subscribeSuccess {
+                    if (it.totalPhotos > imageIndex + 1) {
+                        val innerViewHolder = weakViewHolder.get()
 
-                if (innerViewHolder != null) {
-                    val imageUrl = it.photos[imageIndex].getPhotoUrl()
+                        if (innerViewHolder != null) {
+                            val imageUrl = it.photos[imageIndex].getPhotoUrl()
 
-                    if (!imageUrl.isNullOrBlank())
-                        innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)
+                            if (!imageUrl.isNullOrBlank())
+                                innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
     }
 
     override fun onViewRecycled(holder: TaskViewHolder) {

@@ -83,22 +83,29 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
 
         createNotificationChannels()
 
-        repository.getLoginState().subscribe {
-            when (it) {
-                is LoginState.LoggedIn -> {
-                    createAppShortcuts()
-                }
+        repository.getLoginState()
+                .subscribe {
+                    when (it) {
+                        is LoginState.LoggedIn -> {
+                            createAppShortcuts()
+                        }
 
-                is LoginState.LoggedOut -> {
-                    // Remove any notifications that are still visible
-                    NotificationManagerCompat.from(this).cancelAll()
+                        is LoginState.LoggedOut -> {
+                            // Remove any notifications that are still visible
+                            NotificationManagerCompat.from(this).cancelAll()
 
-                    // Remove all app long-press shortcuts
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)
-                        systemService<ShortcutManager>().removeAllDynamicShortcuts()
+                            // Remove all app long-press shortcuts
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N_MR1)
+                                systemService<ShortcutManager>().removeAllDynamicShortcuts()
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
+    }
+
+    override fun onTerminate() {
+        compositeDisposable.dispose()
+        super.onTerminate()
     }
 
     private fun setDebugStrictModePolicies() {

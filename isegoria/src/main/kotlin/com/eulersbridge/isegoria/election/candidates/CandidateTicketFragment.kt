@@ -25,13 +25,17 @@ import com.eulersbridge.isegoria.network.api.model.CandidateTicket
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.election_candidates_tickets_fragment.*
 import javax.inject.Inject
 
 class CandidateTicketFragment : Fragment() {
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
+
+    private val compositeDisposable = CompositeDisposable()
 
     private var dpWidth: Float = 0.toFloat()
 
@@ -50,6 +54,11 @@ class CandidateTicketFragment : Fragment() {
         super.onAttach(context)
     }
 
+    override fun onPause() {
+        compositeDisposable.dispose()
+        super.onPause()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,9 +71,9 @@ class CandidateTicketFragment : Fragment() {
         val displayMetrics = activity!!.resources.displayMetrics
         dpWidth = displayMetrics.widthPixels / displayMetrics.density
 
-        repository.getLatestElectionTickets().subscribeSuccess { tickets ->
-            addTickets(tickets)
-        }
+        repository.getLatestElectionTickets()
+                .subscribeSuccess { addTickets(it) }
+                .addTo(compositeDisposable)
 
         return rootView
     }

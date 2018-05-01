@@ -45,11 +45,11 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     private var friendsAdapter: FriendAdapter = FriendAdapter(this)
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     private var mainActivity: MainActivity? = null
 

@@ -14,7 +14,7 @@ import javax.inject.Inject
 class PersonalityActivity : DaggerAppCompatActivity() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PersonalityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

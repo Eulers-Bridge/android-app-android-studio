@@ -20,7 +20,7 @@ import javax.inject.Inject
 class NewsFragment : Fragment(), TitledFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: NewsViewModel
 
     private val newsAdapter = NewsAdapter()

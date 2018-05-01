@@ -21,7 +21,7 @@ import javax.inject.Inject
 class PhotoAlbumFragment : Fragment() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PhotoAlbumViewModel
     private val adapter: PhotoAdapter = PhotoAdapter()
 

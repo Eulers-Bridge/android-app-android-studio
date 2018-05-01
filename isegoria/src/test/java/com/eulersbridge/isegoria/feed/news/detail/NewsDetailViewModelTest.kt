@@ -7,10 +7,7 @@ import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.Like
 import com.eulersbridge.isegoria.network.api.model.NewsArticle
 import com.eulersbridge.isegoria.network.api.model.User
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -116,7 +113,9 @@ class NewsDetailViewModelTest {
 
         verify(repository, times(1)).getNewsArticleLikes(newsArticle.id)
         verify(likeCountObserver, times(1)).onChanged(newsArticleLikes.size)
+        verifyNoMoreInteractions(likeCountObserver)
         verify(likedByUserObserver, times(1)).onChanged(false)
+        verifyNoMoreInteractions(likedByUserObserver)
     }
 
 }

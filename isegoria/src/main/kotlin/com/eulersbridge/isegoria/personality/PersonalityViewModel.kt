@@ -21,9 +21,11 @@ class PersonalityViewModel @Inject constructor(private val repository: Repositor
     internal fun setUserCompletedQuestions(userPersonality: UserPersonality) {
         doneButtonEnabled.value = false
 
-        repository.addUserPersonality(userPersonality).subscribeBy(
-                onComplete = { questionsComplete.call() },
-                onError = { }
-        ).addToDisposable()
+        repository.addUserPersonality(userPersonality)
+                .subscribeBy(
+                        onComplete = { questionsComplete.call() },
+                        onError = { }
+                )
+                .addToDisposable()
     }
 }

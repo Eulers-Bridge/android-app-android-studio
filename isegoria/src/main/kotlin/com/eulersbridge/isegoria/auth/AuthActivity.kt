@@ -32,7 +32,7 @@ import javax.inject.Inject
 class AuthActivity : DaggerAppCompatActivity() {
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     private lateinit var viewModel: AuthViewModel
 

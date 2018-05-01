@@ -51,10 +51,10 @@ class CandidateTicketDetailFragment : Fragment() {
     private var partyLogo: String? = ""
 
     @Inject
-    lateinit var app: IsegoriaApp
+    internal lateinit var app: IsegoriaApp
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -103,9 +103,7 @@ class CandidateTicketDetailFragment : Fragment() {
             })
 
         repository.getTicketCandidates(ticketId)
-                .subscribeSuccess {
-                    addCandidates(it)
-                }
+                .subscribeSuccess { addCandidates(it) }
                 .addTo(compositeDisposable)
 
         repository.getPhotos(ticketId)
@@ -163,8 +161,8 @@ class CandidateTicketDetailFragment : Fragment() {
     }
 
     override fun onPause() {
-        super.onPause()
         compositeDisposable.dispose()
+        super.onPause()
     }
 
     private fun addCandidates(candidates: List<Candidate>) {
@@ -288,9 +286,11 @@ class CandidateTicketDetailFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        repository.getPosition(candidate.positionId).subscribeSuccess {
-            textViewPosition.text = it.value?.name
-        }.addTo(compositeDisposable)
+        repository.getPosition(candidate.positionId)
+                .subscribeSuccess {
+                    textViewPosition.text = it.value?.name
+                }
+                .addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.apply {

@@ -19,9 +19,7 @@ class ElectionViewModel @Inject constructor(repository: Repository) : BaseViewMo
         surveyPromptVisible.value = !repository.getUser().hasPPSEQuestions
 
         repository.getLatestElection()
-                .subscribeSuccess {
-                    election.postValue(it.value)
-                }
+                .subscribeSuccess { election.postValue(it.value) }
                 .addToDisposable()
     }
 
