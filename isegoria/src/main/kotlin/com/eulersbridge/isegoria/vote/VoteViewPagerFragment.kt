@@ -22,7 +22,7 @@ import javax.inject.Inject
 class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: VoteViewModel
 
     private lateinit var tabLayout: TabLayout
@@ -103,8 +103,7 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 }

@@ -19,7 +19,7 @@ import javax.inject.Inject
 class FirebaseIDService : FirebaseInstanceIdService() {
 
     @Inject
-    lateinit var securePreferences: SecurePreferences
+    internal lateinit var securePreferences: SecurePreferences
 
     override fun onCreate() {
         AndroidInjection.inject(this)
@@ -39,9 +39,9 @@ class FirebaseIDService : FirebaseInstanceIdService() {
             platformApplicationArn = SNS_PLATFORM_APPLICATION_ARN
         }
 
-        snsClient.createPlatformEndpoint(request)?.let {
+        snsClient.createPlatformEndpoint(request)?.let { result ->
             securePreferences.edit {
-                putString(ENDPOINT_ARN_KEY, it.endpointArn)
+                putString(ENDPOINT_ARN_KEY, result.endpointArn)
             }
         }
     }

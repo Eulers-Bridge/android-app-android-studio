@@ -1,6 +1,8 @@
 package com.eulersbridge.isegoria.profile
 
 import android.content.res.Resources
+import android.support.v7.recyclerview.extensions.ListAdapter
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -13,23 +15,23 @@ import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import java.lang.ref.WeakReference
-import java.util.*
+
+private class TaskDiffCallback : DiffUtil.ItemCallback<Task>() {
+    override fun areItemsTheSame(oldItem: Task?, newItem: Task?): Boolean {
+        return oldItem?.id == newItem?.id
+    }
+
+    override fun areContentsTheSame(oldItem: Task?, newItem: Task?): Boolean {
+        return oldItem == newItem
+    }
+}
 
 internal class TaskAdapter(
     private val glide: RequestManager,
     private val repository: Repository
-) : RecyclerView.Adapter<TaskViewHolder>() {
+) : ListAdapter<Task, TaskViewHolder>(TaskDiffCallback()) {
 
     private val compositeDisposable = CompositeDisposable()
-    private val items = ArrayList<Task>()
-
-    fun setItems(newItems: List<Task>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyItemRangeChanged(0, newItems.size)
-    }
-
-    override fun getItemCount() = items.size
 
     private fun getImageIndex(): Int {
         return when (Resources.getSystem().displayMetrics.densityDpi) {
@@ -40,7 +42,7 @@ internal class TaskAdapter(
     }
 
     override fun onBindViewHolder(viewHolder: TaskViewHolder, index: Int) {
-        val item = items[index]
+        val item = getItem(index)
 
         viewHolder.setItem(item)
 
@@ -48,18 +50,20 @@ internal class TaskAdapter(
         val itemId = item.id
 
         val weakViewHolder = WeakReference(viewHolder)
-        repository.getPhotos(itemId).subscribeSuccess {
-            if (it.totalPhotos > imageIndex + 1) {
-                val innerViewHolder = weakViewHolder.get()
+        repository.getPhotos(itemId)
+                .subscribeSuccess {
+                    if (it.totalPhotos > imageIndex + 1) {
+                        val innerViewHolder = weakViewHolder.get()
 
-                if (innerViewHolder != null) {
-                    val imageUrl = it.photos[imageIndex].getPhotoUrl()
+                        if (innerViewHolder != null) {
+                            val imageUrl = it.photos[imageIndex].getPhotoUrl()
 
-                    if (!imageUrl.isNullOrBlank())
-                        innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)
+                            if (!imageUrl.isNullOrBlank())
+                                innerViewHolder.setImageUrl(glide, item.id, imageUrl!!)
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
     }
 
     override fun onViewRecycled(holder: TaskViewHolder) {

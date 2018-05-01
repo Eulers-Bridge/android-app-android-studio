@@ -28,7 +28,7 @@ import javax.inject.Inject
 class SignUpFragment : Fragment() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SignUpViewModel
 
     private val authViewModel: AuthViewModel by lazy {

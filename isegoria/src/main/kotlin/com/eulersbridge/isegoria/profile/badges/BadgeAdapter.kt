@@ -80,18 +80,20 @@ internal class BadgeAdapter(
 
         val weakViewHolder = WeakReference(viewHolder)
 
-        repository.getPhotos(itemId).subscribeSuccess {
-            if (it.totalPhotos > imageIndex + 1) {
-                val innerViewHolder = weakViewHolder.get()
+        repository.getPhotos(itemId)
+                .subscribeSuccess {
+                    if (it.totalPhotos > imageIndex + 1) {
+                        val innerViewHolder = weakViewHolder.get()
 
-                if (innerViewHolder != null)
-                    it.photos[imageIndex].getPhotoUrl()
-                        ?.takeUnless { it.isBlank() }
-                        ?.also {
-                            innerViewHolder.setImageUrl(glide, item.id, it)
-                        }
-            }
-        }.addTo(compositeDisposable)
+                        if (innerViewHolder != null)
+                            it.photos[imageIndex].getPhotoUrl()
+                                ?.takeUnless { it.isBlank() }
+                                ?.also {
+                                    innerViewHolder.setImageUrl(glide, item.id, it)
+                                }
+                    }
+                }
+                .addTo(compositeDisposable)
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BadgeViewHolder {

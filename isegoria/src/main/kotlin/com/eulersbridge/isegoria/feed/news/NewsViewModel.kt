@@ -28,6 +28,7 @@ class NewsViewModel @Inject constructor(private val repository: Repository) : Ba
                 .subscribeSuccess {
                     isRefreshing.postValue(false)
                     newsArticles.postValue(it)
-                }.addToDisposable()
+                }
+                .addToDisposable()
     }
 }

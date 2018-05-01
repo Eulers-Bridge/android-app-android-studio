@@ -8,6 +8,7 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
@@ -18,7 +19,7 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
 
     private var countries: List<Country>? = null
 
-    val authFinished = MutableLiveData<Boolean>()
+    val authFinished = SingleLiveEvent<Any>()
 
     val signUpVisible = MutableLiveData<Boolean>()
     val signUpUser = MutableLiveData<SignUpUser>()
@@ -26,17 +27,13 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
     val verificationComplete = MutableLiveData<Boolean>()
 
     init {
-        authFinished.value = false
-
-        repository.getSignUpCountries().subscribeSuccess {
-            countries = it
-        }.addToDisposable()
+        repository.getSignUpCountries()
+                .subscribeSuccess { countries = it }
+                .addToDisposable()
 
         repository.getLoginState()
                 .filter { it is LoginState.LoggedIn }
-                .subscribe {
-                    authFinished.postValue(true)
-                }
+                .subscribe { authFinished.call() }
                 .addToDisposable()
     }
 

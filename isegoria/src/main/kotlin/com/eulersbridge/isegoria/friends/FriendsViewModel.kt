@@ -95,23 +95,27 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     private fun getFriends() {
-        repository.getFriends().subscribeSuccess {
-            friends.postValue(it)
-        }.addToDisposable()
+        repository.getFriends()
+                .subscribeSuccess { friends.postValue(it) }
+                .addToDisposable()
     }
 
     private fun getSentFriendRequests() {
-        repository.getSentFriendRequests().subscribeSuccess {
-            sentFriendRequests.postValue(it)
-            sentRequestsVisible.postValue(it.isNotEmpty())
-        }.addToDisposable()
+        repository.getSentFriendRequests()
+                .subscribeSuccess {
+                    sentFriendRequests.postValue(it)
+                    sentRequestsVisible.postValue(it.isNotEmpty())
+                }
+                .addToDisposable()
     }
 
     private fun getReceivedFriendRequests() {
-        repository.getReceivedFriendRequests().subscribeSuccess {
-            receivedFriendRequests.postValue(it)
-            receivedRequestsVisible.postValue(it.isNotEmpty())
-        }.addToDisposable()
+        repository.getReceivedFriendRequests()
+                .subscribeSuccess {
+                    receivedFriendRequests.postValue(it)
+                    receivedRequestsVisible.postValue(it.isNotEmpty())
+                }
+                .addToDisposable()
     }
 
     internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {

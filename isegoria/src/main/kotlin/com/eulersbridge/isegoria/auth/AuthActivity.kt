@@ -32,7 +32,7 @@ import javax.inject.Inject
 class AuthActivity : DaggerAppCompatActivity() {
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     private lateinit var viewModel: AuthViewModel
 
@@ -63,7 +63,7 @@ class AuthActivity : DaggerAppCompatActivity() {
 
         presentRootContent(LoginFragment())
 
-        ifTrue(viewModel.authFinished) {
+        observe(viewModel.authFinished) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
@@ -72,10 +72,10 @@ class AuthActivity : DaggerAppCompatActivity() {
             presentContent(SignUpFragment())
         }
 
-        observe(viewModel.signUpUser) {
+        observe(viewModel.signUpUser) { user ->
             val consentValue = viewModel.signUpConsentGiven.value
             val consentRequired = consentValue == null || !consentValue
-            if (it != null && consentRequired)
+            if (user != null && consentRequired)
                 presentContent(ConsentAgreementFragment())
         }
 

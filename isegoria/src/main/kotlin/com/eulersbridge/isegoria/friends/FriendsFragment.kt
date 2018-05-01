@@ -27,6 +27,7 @@ import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
+import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
@@ -44,11 +45,11 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     private var friendsAdapter: FriendAdapter = FriendAdapter(this)
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FriendsViewModel
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     private var mainActivity: MainActivity? = null
 
@@ -78,9 +79,9 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         observeBoolean(viewModel.receivedRequestsVisible) { receivedRequestsContainer.isVisible = it }
         observeBoolean(viewModel.sentRequestsVisible) { sentRequestsContainer.isVisible = it }
         observe(viewModel.friends) { friendsAdapter.setItems(it!!) }
-        observe(viewModel.receivedFriendRequests) { receivedAdapter.setItems(it!!) }
-        observe(viewModel.sentFriendRequests) { sentAdapter.setItems(it!!) }
-        observe(viewModel.searchResults) { searchAdapter.setItems(it!!) }
+        observe(viewModel.receivedFriendRequests) { receivedAdapter.submitList(it!!) }
+        observe(viewModel.sentFriendRequests) { sentAdapter.submitList(it!!) }
+        observe(viewModel.searchResults) { searchAdapter.submitList(it!!) }
 
         mainActivity = activity as? MainActivity
 
@@ -149,7 +150,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
         } else if (type == SENT && mainActivity != null) {
             val user = request.requestReceiver
 
-            val profileFragment = ProfileOverviewFragment.create(repository, null)
+            val profileFragment = ProfileOverviewFragment.create(repository)
             profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
             mainActivity?.presentContent(profileFragment)
@@ -171,7 +172,7 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
     }
 
     override fun onSearchedUserClick(user: User?) {
-        val profileFragment = ProfileOverviewFragment.create(repository, null)
+        val profileFragment = ProfileOverviewFragment.create(repository)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to user)
 
         mainActivity?.presentContent(profileFragment)
@@ -179,13 +180,13 @@ class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
 
     override fun onSearchedUserActionClick(user: User?) {
         if (user != null)
-            observeBoolean(viewModel.addFriend(user.email)) {
-                if (it) showAddedMessage()
+            ifTrue(viewModel.addFriend(user.email)) {
+                showAddedMessage()
             }
     }
 
     override fun onContactClick(contact: Contact) {
-        val profileFragment = ProfileOverviewFragment.create(repository, null)
+        val profileFragment = ProfileOverviewFragment.create(repository)
         profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CONTACT to contact)
 
         mainActivity!!.presentContent(profileFragment)

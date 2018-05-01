@@ -14,7 +14,7 @@ import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
-import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
@@ -24,11 +24,11 @@ import javax.inject.Inject
 class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ElectionViewModel
 
-    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
     private lateinit var tabLayout: TabLayout
+    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
@@ -43,23 +43,21 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[ElectionViewModel::class.java]
-        createViewModelObserver()
+        createViewModelObservers()
     }
 
-    private fun createViewModelObserver() {
+    private fun createViewModelObservers() {
         observeBoolean(viewModel.surveyPromptVisible) {
-            if (it) {
-                surveyPrompt.isVisible = true
-            }
+            surveyPrompt.isVisible = it == true
         }
 
-        ifTrue(viewModel.surveyVisible) {
+        observe(viewModel.surveyVisible) {
             activity!!.supportFragmentManager
                     .beginTransaction()
                     .add(R.id.container, SelfEfficacyQuestionsFragment())
+                    .addToBackStack(null)
                     .commit()
         }
-
     }
 
     override fun onCreateView(
@@ -103,9 +101,8 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 
     private fun showTabFragment(fragment: Fragment) {

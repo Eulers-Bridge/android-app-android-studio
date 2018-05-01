@@ -28,7 +28,7 @@ import javax.inject.Inject
 class LoginFragment : Fragment() {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: LoginViewModel
 
     private val authViewModel: AuthViewModel by lazy {
@@ -38,7 +38,6 @@ class LoginFragment : Fragment() {
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-
         viewModel = ViewModelProviders.of(this, modelFactory)[LoginViewModel::class.java]
     }
 

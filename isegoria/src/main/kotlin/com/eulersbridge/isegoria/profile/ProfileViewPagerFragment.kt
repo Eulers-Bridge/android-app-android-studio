@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
 import android.view.*
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
@@ -25,10 +26,13 @@ import javax.inject.Inject
 class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var repository: Repository
+    internal lateinit var repository: Repository
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal  lateinit var appRouter: AppRouter
+
+    @Inject
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: ProfileViewModel
 
     private lateinit var tabLayout: TabLayout
@@ -68,7 +72,7 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
         val fragments = mutableListOf<Fragment>()
 
-        val overviewFragment = ProfileOverviewFragment.create(repository, viewModel)
+        val overviewFragment = ProfileOverviewFragment.create(repository, viewModel, appRouter)
         fragments.add(overviewFragment)
 
         val taskProgressFragment = ProfileTaskProgressFragment()
@@ -145,8 +149,7 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 }

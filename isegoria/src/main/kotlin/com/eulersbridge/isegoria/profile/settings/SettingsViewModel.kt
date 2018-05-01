@@ -41,14 +41,16 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
     internal fun onOptOutDataCollectionChange(isChecked: Boolean) {
         optOutDataCollectionSwitchEnabled.value = false
 
-        repository.setUserOptedOutOfDataCollection(isChecked).subscribeBy(
-                onComplete = {
-                    optOutDataCollectionSwitchChecked.postValue(isChecked)
-                },
-                onError = {
-                    optOutDataCollectionSwitchChecked.postValue(!isChecked)
-                }
-        ).addToDisposable()
+        repository.setUserOptedOutOfDataCollection(isChecked)
+                .subscribeBy(
+                        onComplete = {
+                            optOutDataCollectionSwitchChecked.postValue(isChecked)
+                        },
+                        onError = {
+                            optOutDataCollectionSwitchChecked.postValue(!isChecked)
+                        }
+                )
+                .addToDisposable()
     }
 
     internal fun onTrackingChange(isChecked: Boolean) {
@@ -66,9 +68,9 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
     }
 
     private fun fetchUserPhoto() {
-        repository.getUserPhoto().subscribeSuccess {
-            userPhoto.postValue(it.value)
-        }.addToDisposable()
+        repository.getUserPhoto()
+                .subscribeSuccess { userPhoto.postValue(it.value) }
+                .addToDisposable()
     }
 
     internal fun updateUserPhoto(imageUri: Uri): LiveData<Boolean> {

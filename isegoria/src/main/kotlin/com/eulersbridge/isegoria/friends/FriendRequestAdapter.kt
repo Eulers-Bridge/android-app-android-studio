@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.friends
 
+import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -8,14 +9,21 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.Institution
 import java.lang.ref.WeakReference
-import java.util.*
+
+private class FriendRequestDiffCallback : DiffUtil.ItemCallback<FriendRequest>() {
+    override fun areItemsTheSame(oldItem: FriendRequest?, newItem: FriendRequest?): Boolean {
+        return oldItem?.id == newItem?.id
+    }
+
+    override fun areContentsTheSame(oldItem: FriendRequest?, newItem: FriendRequest?): Boolean {
+        return oldItem == newItem
+    }
+}
 
 internal class FriendRequestAdapter(
     @param:FriendsFragment.FriendRequestType @field:FriendsFragment.FriendRequestType private val itemType: Int,
     private val delegate: Delegate
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ViewHolderDataSource {
-
-    private val items = ArrayList<FriendRequest>()
+) : ListAdapter<FriendRequest, RecyclerView.ViewHolder>(FriendRequestDiffCallback()), ViewHolderDataSource {
 
     internal interface Delegate {
         fun getFriendRequestInstitution(
@@ -25,31 +33,6 @@ internal class FriendRequestAdapter(
         )
 
         fun performFriendRequestAction(@FriendsFragment.FriendRequestType type: Int, request: FriendRequest)
-    }
-
-    fun setItems(newItems: List<FriendRequest>) {
-        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize() = items.size
-
-            override fun getNewListSize() = newItems.size
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = items[oldItemPosition]
-                val newItem = newItems[newItemPosition]
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val oldItem = items[oldItemPosition]
-                val newItem = newItems[newItemPosition]
-                return oldItem == newItem
-            }
-        })
-
-        items.clear()
-        items.addAll(newItems)
-
-        result.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -65,7 +48,7 @@ internal class FriendRequestAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
 
         if (this.itemType == FriendsFragment.RECEIVED) {
             (holder as ReceivedFriendRequestViewHolder).setItem(item)
@@ -115,6 +98,4 @@ internal class FriendRequestAdapter(
                     ?: (viewHolder as? SentFriendRequestViewHolder)?.setInstitution(institution)
         }
     }
-
-    override fun getItemCount() = items.size
 }

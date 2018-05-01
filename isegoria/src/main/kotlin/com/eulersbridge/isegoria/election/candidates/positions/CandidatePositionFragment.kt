@@ -45,8 +45,8 @@ class CandidatePositionFragment : Fragment() {
     }
 
     override fun onPause() {
-        super.onPause()
         compositeDisposable.dispose()
+        super.onPause()
     }
 
     override fun onCreateView(
@@ -66,9 +66,11 @@ class CandidatePositionFragment : Fragment() {
         //addTableRow(R.drawable.head1, "GRN", "#4FBE3E", "Lillian Adams", "President");
 
         position?.id?.let {
-            repository.getPositionCandidates(it).subscribeSuccess {
-                addCandidates(it)
-            }.addTo(compositeDisposable)
+            repository.getPositionCandidates(it)
+                    .subscribeSuccess {
+                        addCandidates(it)
+                    }
+                    .addTo(compositeDisposable)
         }
 
         return rootView
@@ -108,14 +110,16 @@ class CandidatePositionFragment : Fragment() {
         //candidateProfileView.setImageBitmap(decodeSampledBitmapFromResource(getResources(), profileDrawable, imageSize, imageSize));
         candidateProfileView.setPadding(paddingMargin, 0, paddingMargin, 0)
 
-        repository.getPhoto(candidate.userId).subscribeSuccess {
-            it.value?.let {
-                GlideApp.with(this@CandidatePositionFragment)
-                        .load(it.getPhotoUrl())
-                        .transition(DrawableTransitionOptions.withCrossFade())
-                        .into(candidateProfileView)
-            }
-        }.addTo(compositeDisposable)
+        repository.getPhoto(candidate.userId)
+                .subscribeSuccess {
+                    it.value?.let {
+                        GlideApp.with(this@CandidatePositionFragment)
+                                .load(it.getPhotoUrl())
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(candidateProfileView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
@@ -154,14 +158,16 @@ class CandidatePositionFragment : Fragment() {
             setTypeface(null, Typeface.BOLD)
         }
 
-        repository.getTicket(candidate.ticketId).subscribeSuccess {
-            it.value?.let { ticket ->
-                runOnUiThread {
-                    textViewParty.text = ticket.code
-                    textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        repository.getTicket(candidate.ticketId)
+                .subscribeSuccess {
+                    it.value?.let { ticket ->
+                        runOnUiThread {
+                            textViewParty.text = ticket.code
+                            textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                        }
+                    }
                 }
-            }
-        }.addTo(compositeDisposable)
+                .addTo(compositeDisposable)
 
         val imageSize2 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -194,11 +200,13 @@ class CandidatePositionFragment : Fragment() {
             gravity = Gravity.START
         }
 
-        repository.getPosition(candidate.positionId).subscribeSuccess {
-            runOnUiThread {
-                textViewPosition.text = it.value?.name
-            }
-        }.addTo(compositeDisposable)
+        repository.getPosition(candidate.positionId)
+                .subscribeSuccess {
+                    runOnUiThread {
+                        textViewPosition.text = it.value?.name
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val dividerView = View(activity)
         dividerView.layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 1)

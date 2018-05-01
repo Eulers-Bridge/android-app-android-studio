@@ -27,7 +27,7 @@ import javax.inject.Inject
 class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
     @Inject
-    lateinit var modelFactory: ViewModelProvider.Factory
+    internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PollsViewModel
 
     private var tabLayout: TabLayout? = null
@@ -105,9 +105,8 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     }
 
     override fun onPause() {
-        super.onPause()
-
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
+        super.onPause()
     }
 
     private fun addPolls(polls: List<Poll>) {

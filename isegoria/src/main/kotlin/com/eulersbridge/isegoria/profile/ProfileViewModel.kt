@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.profile
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
@@ -11,11 +12,13 @@ import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
 
-class ProfileViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
+class ProfileViewModel @Inject constructor(
+        private val repository: Repository,
+        private val appRouter: AppRouter?
+) : BaseViewModel() {
 
     data class BadgeCount(val remaining: Int, val completed: Int)
 
-    internal val friendsScreenVisible = MutableLiveData<Boolean>()
     internal val currentSectionIndex = MutableLiveData<Int>()
 
     internal val user = MutableLiveData<GenericUser>()
@@ -35,17 +38,14 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     internal val totalTasksCount = MutableLiveData<Long>()
 
     init {
-        friendsScreenVisible.value = false
         currentSectionIndex.value = 0
     }
 
     internal fun viewFriends() {
-        val isAnotherUser = user.value is Contact
+        val isLoggedInUser = user.value is User
 
-        if (!isAnotherUser) {
-            friendsScreenVisible.value = true
-            friendsScreenVisible.value = false
-        }
+        if (isLoggedInUser)
+            appRouter!!.setFriendsScreenVisible(true)
     }
 
     fun setTargetBadgeLevel(targetBadgeLevel: Int?) {
@@ -95,20 +95,24 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     }
 
     private fun fetchUserInstitutionName(user: GenericUser) {
-        user.institutionId?.let {
-            repository.getInstitutionName(it).subscribeSuccess {
-                institutionName.postValue(it.value)
-            }.addToDisposable()
+        user.institutionId?.let { id ->
+            repository.getInstitutionName(id)
+                    .subscribeSuccess { result ->
+                        institutionName.postValue(result.value)
+                    }
+                    .addToDisposable()
         }
     }
 
     private fun fetchUserStats(user: GenericUser) {
-        repository.getContact(user.email).subscribeSuccess { result ->
-            result.value?.let {
-                contactsCount.postValue(it.contactsCount)
-                totalTasksCount.postValue(it.totalTasksCount)
-            }
-        }.addToDisposable()
+        repository.getContact(user.email)
+                .subscribeSuccess { result ->
+                    result.value?.let {
+                        contactsCount.postValue(it.contactsCount)
+                        totalTasksCount.postValue(it.totalTasksCount)
+                    }
+                }
+                .addToDisposable()
     }
 
     private fun getUser(): User? {
@@ -121,12 +125,13 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     }
 
     private fun fetchBadgeCounts(user: User) {
-        user.id?.let {
-            repository.getUserRemainingBadges(it).subscribeSuccess {
-                remainingBadges.postValue(it.filter { it.level == targetBadgeLevel })
-
-                badgeCount.postValue(BadgeCount(it.size, user.completedBadgesCount.toInt()))
-            }
+        user.id?.let { id ->
+            repository.getUserRemainingBadges(id)
+                    .subscribeSuccess { badges ->
+                        remainingBadges.postValue(badges.filter { it.level == targetBadgeLevel })
+                        badgeCount.postValue(BadgeCount(badges.size, user.completedBadgesCount.toInt()))
+                    }
+                    .addToDisposable()
         }
     }
 
@@ -143,9 +148,9 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     }
 
     private fun getTasks() {
-        repository.getTasks().subscribeSuccess {
-            tasks.postValue(it)
-        }.addToDisposable()
+        repository.getTasks()
+                .subscribeSuccess { tasks.postValue(it) }
+                .addToDisposable()
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
@@ -161,8 +166,8 @@ class ProfileViewModel @Inject constructor(private val repository: Repository) :
     }
 
     private fun fetchUserPhoto() {
-        repository.getUserPhoto().subscribeSuccess {
-            userPhoto.postValue(it.value)
-        }.addToDisposable()
+        repository.getUserPhoto()
+                .subscribeSuccess { userPhoto.postValue(it.value) }
+                .addToDisposable()
     }
 }

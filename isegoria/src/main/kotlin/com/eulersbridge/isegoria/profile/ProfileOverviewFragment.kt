@@ -16,14 +16,13 @@ import androidx.core.view.isGone
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.friends.FriendsFragment
 import com.eulersbridge.isegoria.network.api.model.GenericUser
 import com.eulersbridge.isegoria.personality.PersonalityActivity
-import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
@@ -32,25 +31,29 @@ import kotlinx.android.synthetic.main.profile_overview_fragment.*
 
 class ProfileOverviewFragment : Fragment(), TitledFragment {
 
+    private class ViewModelProviderFactory(
+            private val repository: Repository,
+            private val appRouter: AppRouter?
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return ProfileViewModel(repository, appRouter) as T
+        }
+    }
+
     companion object {
-        fun create(repository: Repository, viewModel: ProfileViewModel?): ProfileOverviewFragment {
+        fun create(repository: Repository, viewModel: ProfileViewModel? = null, appRouter: AppRouter? = null): ProfileOverviewFragment {
             val fragment = ProfileOverviewFragment()
-            fragment.provideDependencies(repository, viewModel)
+            fragment.provideDependencies(repository, viewModel, appRouter)
             return fragment
         }
     }
 
-    private var wasOpenedByFriendsScreen = false
     private lateinit var repository: Repository
+    private var appRouter: AppRouter? = null
+    private lateinit var viewModel: ProfileViewModel
+    private var wasOpenedByFriendsScreen = false
     private lateinit var taskAdapter: TaskAdapter
-    private var viewModel: ProfileViewModel? = null
-
-    private class ViewModelProviderFactory(private val repository: Repository) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ProfileViewModel(repository) as T
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,9 +64,8 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if (viewModel == null) {
-            viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository))[ProfileViewModel::class.java]
-        }
+        if (!::viewModel.isInitialized)
+            viewModel = ViewModelProviders.of(this, ViewModelProviderFactory(repository, appRouter))[ProfileViewModel::class.java]
 
         requireNotNull(viewModel)
 
@@ -71,7 +73,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             startActivity(Intent(activity, PersonalityActivity::class.java))
         }
 
-        viewProgressTextView.setOnClickListener { viewModel!!.viewTasksProgress() }
+        viewProgressTextView.setOnClickListener { viewModel.viewTasksProgress() }
 
         setupTaskListView()
         createViewModelObservers()
@@ -90,19 +92,20 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             // ...
         }*/
 
-        viewModel!!.setUser(user)
+        viewModel.setUser(user)
     }
 
-    private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?) {
+    private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?, appRouter: AppRouter?) {
         this.repository = repository
-        this.viewModel = viewModel
+        if (viewModel != null) this.viewModel = viewModel
+        this.appRouter = appRouter
     }
 
     private fun setupTaskListView() {
         taskAdapter = TaskAdapter(Glide.with(this), repository)
 
-        friendsCountTextView.setOnClickListener({  viewModel!!.viewFriends() })
-        friendsLabel.setOnClickListener({  viewModel!!.viewFriends() })
+        friendsCountTextView.setOnClickListener({  viewModel.viewFriends() })
+        friendsLabel.setOnClickListener({  viewModel.viewFriends() })
 
         tasksListView.apply {
             adapter = taskAdapter
@@ -119,7 +122,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
     private fun createViewModelObservers() {
         requireNotNull(viewModel)
 
-        observe(viewModel!!.userPhoto) {
+        observe(viewModel.userPhoto) {
             if (it != null)
                 GlideApp.with(this)
                         .load(it.getPhotoUrl())
@@ -130,28 +133,28 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
                         .into(backgroundImageView)
         }
 
-        observe(viewModel!!.institutionName) {
+        observe(viewModel.institutionName) {
             institutionTextView.text = it
         }
 
-        observe(viewModel!!.badgeCount) {
+        observe(viewModel.badgeCount) {
             if (it != null)
                 updateBadgeCount(it.remaining, it.completed)
         }
 
-        observe(viewModel!!.tasks) {
-            taskAdapter.setItems(it!!)
+        observe(viewModel.tasks) {
+            taskAdapter.submitList(it!!)
         }
 
-        observe(viewModel!!.personalityTestHintVisible) {
+        observe(viewModel.personalityTestHintVisible) {
             personalityTestButton.isGone = (it == false)
         }
 
-        observe(viewModel!!.viewProgressHintVisible) {
+        observe(viewModel.viewProgressHintVisible) {
             viewProgressTextView.isGone = (it == false)
         }
 
-        observe(viewModel!!.user) {
+        observe(viewModel.user) {
             it?.let { user ->
                 GlideApp.with(this)
                         .load(user.profilePhotoURL)
@@ -166,20 +169,12 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             }
         }
 
-        observe(viewModel!!.contactsCount) {
+        observe(viewModel.contactsCount) {
             if (it != null) updateContactsCount(it)
         }
 
-        observe(viewModel!!.totalTasksCount) {
+        observe(viewModel.totalTasksCount) {
             if (it != null) updateTotalTasksCount(it)
-        }
-
-        ifTrue(viewModel!!.friendsScreenVisible) {
-            childFragmentManager
-                    .beginTransaction()
-                    .add(FriendsFragment(), null)
-                    .addToBackStack(null)
-                    .commit()
         }
     }
 
