@@ -2,8 +2,8 @@
 
 object Versions {
     const val kotlin = "1.2.41"
-    const val android_gradle_plugin = "3.2.0-alpha12"
-    const val google_gradle_plugin = "3.1.1"
+    const val android_gradle_plugin = "3.2.0-alpha13"
+    const val google_gradle_plugin = "3.1.2"
 
     const val min_sdk = 16
     const val target_sdk = 27
@@ -17,7 +17,7 @@ object Versions {
     const val support_lib = "27.1.1"
     const val constraint_layout = "1.1.0"
 
-    const val rxjava = "2.1.12"
+    const val rxjava = "2.1.13"
     const val rxkotlin = "2.2.0"
     const val rxjava_reactive_streams = "1.2.1"
 
@@ -41,7 +41,8 @@ object Versions {
     const val junit = "4.12"
     const val mockito = "2.18.3"
     const val mockito_kotlin = "2.0.0-alpha03"
-    const val espresso = "3.0.1"
+    const val test_runner = "1.0.2"
+    const val espresso = "3.0.2"
 }
 
 object TestDeps {
@@ -50,6 +51,7 @@ object TestDeps {
     const val mockito_kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockito_kotlin}"
     const val livedata_test = "android.arch.core:core-testing:${Versions.arch_components}"
 
+    const val test_runner = "com.android.support.test:runner:${Versions.test_runner}"
     const val espresso = "com.android.support.test.espresso:espresso-core:${Versions.espresso}"
     const val espresso_intents = "com.android.support.test.espresso:espresso-intents:${Versions.espresso}"
 }

@@ -75,7 +75,7 @@ class DataRepository @Inject constructor(
     }
 
     @get:JvmName("_loginState")
-    private val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
+    private val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())
 
     override fun getLoginState(): Observable<LoginState> {
         return loginState.distinctUntilChanged()
@@ -271,9 +271,11 @@ class DataRepository @Inject constructor(
 
     override fun addUserPersonality(personality: UserPersonality): Completable {
         val user = requireUser()
-        return api.addUserPersonality(user.email, personality).doOnSuccess {
-            setUserPersonalityCompleted()
-        }.toCompletable()
+        return api.addUserPersonality(user.email, personality)
+                .doOnSuccess {
+                    setUserPersonalityCompleted()
+                }
+                .ignoreElement()
     }
 
     override fun getUserProfilePhotoUrl(): String? = requireUser().profilePhotoURL

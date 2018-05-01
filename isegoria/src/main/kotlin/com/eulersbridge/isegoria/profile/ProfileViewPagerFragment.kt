@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
 import android.view.*
+import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
@@ -26,6 +27,9 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
     @Inject
     lateinit var repository: Repository
+
+    @Inject
+    lateinit var appRouter: AppRouter
 
     @Inject
     lateinit var modelFactory: ViewModelProvider.Factory
@@ -68,7 +72,7 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
 
         val fragments = mutableListOf<Fragment>()
 
-        val overviewFragment = ProfileOverviewFragment.create(repository, viewModel)
+        val overviewFragment = ProfileOverviewFragment.create(repository, viewModel, appRouter)
         fragments.add(overviewFragment)
 
         val taskProgressFragment = ProfileTaskProgressFragment()

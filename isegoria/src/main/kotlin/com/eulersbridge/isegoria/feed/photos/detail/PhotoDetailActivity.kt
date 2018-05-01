@@ -74,15 +74,15 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
             }
         }
 
-        observe(viewModel.getPhotoLikeCount()) {
-            runOnUiThread { likesTextView.text = it.toString() }
+        observe(viewModel.getPhotoLikeCount()) { likeCount ->
+            runOnUiThread { likesTextView.text = likeCount.toString() }
         }
 
-        observeBoolean(viewModel.getPhotoLikedByUser()) {
+        observeBoolean(viewModel.getPhotoLikedByUser()) { wasLikedByUser ->
             runOnUiThread {
-                userLikedCurrentPhoto = it
+                userLikedCurrentPhoto = wasLikedByUser
 
-                val starImage = if (it) R.drawable.star else R.drawable.star_default
+                val starImage = if (wasLikedByUser) R.drawable.star else R.drawable.star_default
                 starImageView.setImageResource(starImage)
             }
         }

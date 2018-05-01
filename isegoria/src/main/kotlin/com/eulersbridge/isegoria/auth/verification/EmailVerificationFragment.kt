@@ -24,7 +24,6 @@ class EmailVerificationFragment : Fragment() {
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-
         viewModel = ViewModelProviders.of(this, modelFactory)[EmailVerificationViewModel::class.java]
     }
 

@@ -7,6 +7,7 @@ import android.content.pm.ShortcutManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.IdRes
+import android.support.annotation.UiThread
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -116,15 +117,19 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
             }
         }.addTo(compositeDisposable)
 
-        app.userVerificationScreenVisible.subscribe {
-            if (it)
-                presentRootContent(EmailVerificationFragment())
-        }.addTo(compositeDisposable)
+        app.getUserVerificationScreenVisible()
+                .filter { it }
+                .subscribe {
+                    runOnUiThread { presentRootContent(EmailVerificationFragment()) }
+                }
+                .addTo(compositeDisposable)
 
-        app.friendsScreenVisible.subscribe {
-            if (it)
-                showFriends()
-        }.addTo(compositeDisposable)
+        app.getFriendsScreenVisible()
+                .filter { it }
+                .subscribe {
+                    runOnUiThread { showFriends() }
+                }
+                .addTo(compositeDisposable)
     }
 
     private fun onLoginSuccess() {
@@ -224,6 +229,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
             navigationView.selectedItemId = id
     }
 
+    @UiThread
     private fun showFriends() = presentContent(FriendsFragment())
 
     override fun onCreateOptionsMenu(menu: Menu) = false
@@ -244,11 +250,12 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         fragment
             .takeIf { currentFragment == null || it::class != currentFragment!!::class }
             ?.let {
-                if (app.friendsScreenVisible.value == true) {
+                if (currentFragment is FriendsFragment) {
                     supportFragmentManager.popBackStackImmediate(
                         null,
                         FragmentManager.POP_BACK_STACK_INCLUSIVE
                     )
+
                     tabFragmentsStack.clear()
                     app.setFriendsScreenVisible(false)
                 }
@@ -259,6 +266,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         return true
     }
 
+    @UiThread
     fun presentContent(fragment: Fragment) {
         tabFragmentsStack.push(fragment)
 
@@ -272,6 +280,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         }
     }
 
+    @UiThread
     private fun presentRootContent(fragment: Fragment) {
         tabFragmentsStack.clear()
         tabFragmentsStack.push(fragment)

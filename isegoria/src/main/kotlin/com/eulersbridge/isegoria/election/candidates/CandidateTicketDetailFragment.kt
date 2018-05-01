@@ -102,24 +102,30 @@ class CandidateTicketDetailFragment : Fragment() {
 
             })
 
-        repository.getTicketCandidates(ticketId).subscribeSuccess {
-            addCandidates(it)
-        }.addTo(compositeDisposable)
+        repository.getTicketCandidates(ticketId)
+                .subscribeSuccess {
+                    addCandidates(it)
+                }
+                .addTo(compositeDisposable)
 
-        repository.getPhotos(ticketId).subscribeSuccess {
-            it.photos.firstOrNull()?.let {
-                GlideApp.with(this@CandidateTicketDetailFragment)
-                    .load(it.getPhotoUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(partyDetailLogoImageView)
-            }
-        }.addTo(compositeDisposable)
+        repository.getPhotos(ticketId)
+                .subscribeSuccess {
+                    it.photos.firstOrNull()?.let {
+                        GlideApp.with(this@CandidateTicketDetailFragment)
+                            .load(it.getPhotoUrl())
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(partyDetailLogoImageView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
-        repository.getUserSupportedTicket(ticketId).subscribeSuccess {
-            runOnUiThread {
-                ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
-            }
-        }
+        repository.getUserSupportedTicket(ticketId)
+                .subscribeSuccess {
+                    runOnUiThread {
+                        ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
+                    }
+                }
+                .addTo(compositeDisposable)
 
         ticketSupportButton.setOnClickListener {
 
@@ -197,14 +203,16 @@ class CandidateTicketDetailFragment : Fragment() {
             setPadding(paddingMargin3, 0, paddingMargin3, 0)
         }
 
-        repository.getPhotos(candidate.userId).subscribeSuccess {
-            it.photos.firstOrNull()?.let {
-                GlideApp.with(this@CandidateTicketDetailFragment)
-                    .load(it.getPhotoUrl())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(candidateProfileView)
-            }
-        }.addTo(compositeDisposable)
+        repository.getPhotos(candidate.userId)
+                .subscribeSuccess {
+                    it.photos.firstOrNull()?.let {
+                        GlideApp.with(this@CandidateTicketDetailFragment)
+                            .load(it.getPhotoUrl())
+                            .transition(DrawableTransitionOptions.withCrossFade())
+                            .into(candidateProfileView)
+                    }
+                }
+                .addTo(compositeDisposable)
 
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {

@@ -23,7 +23,7 @@ class LoginViewModelTest {
     @Before
     fun setUp() {
         repository = mock {
-            on { getLoginState() } doReturn BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())!!
+            on { getLoginState() } doReturn BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())
         }
         api = mock()
 

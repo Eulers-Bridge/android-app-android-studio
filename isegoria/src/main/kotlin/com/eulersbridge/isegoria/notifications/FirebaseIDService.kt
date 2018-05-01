@@ -39,9 +39,9 @@ class FirebaseIDService : FirebaseInstanceIdService() {
             platformApplicationArn = SNS_PLATFORM_APPLICATION_ARN
         }
 
-        snsClient.createPlatformEndpoint(request)?.let {
+        snsClient.createPlatformEndpoint(request)?.let { result ->
             securePreferences.edit {
-                putString(ENDPOINT_ARN_KEY, it.endpointArn)
+                putString(ENDPOINT_ARN_KEY, result.endpointArn)
             }
         }
     }

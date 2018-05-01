@@ -25,6 +25,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import dagger.android.HasServiceInjector
 import dagger.android.support.HasSupportFragmentInjector
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
@@ -49,8 +50,8 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
 
     private val compositeDisposable = CompositeDisposable()
 
-    val userVerificationScreenVisible = BehaviorSubject.createDefault(false)!!
-    val friendsScreenVisible = BehaviorSubject.createDefault(false)!!
+    private val userVerificationScreenVisible = BehaviorSubject.createDefault(false)
+    private val friendsScreenVisible = BehaviorSubject.createDefault(false)
 
     override fun setUserVerificationScreenVisible(visible: Boolean) {
         userVerificationScreenVisible.onNext(visible)
@@ -58,6 +59,14 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
 
     override fun setFriendsScreenVisible(visible: Boolean) {
         friendsScreenVisible.onNext(visible)
+    }
+
+    override fun getUserVerificationScreenVisible(): Observable<Boolean> {
+        return userVerificationScreenVisible.distinctUntilChanged()
+    }
+
+    override fun getFriendsScreenVisible(): Observable<Boolean> {
+        return friendsScreenVisible.distinctUntilChanged()
     }
 
     override fun onCreate() {

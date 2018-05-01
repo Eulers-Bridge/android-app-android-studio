@@ -15,7 +15,7 @@ import android.view.ViewOutlineProvider
 import com.eulersbridge.isegoria.R
 import java.util.*
 
-open class BaseSliderBar(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+open class BaseSliderBar(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     protected var parentWidth: Int = 0
         private set

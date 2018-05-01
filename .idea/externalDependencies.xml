@@ -3,5 +3,6 @@
   <component name="ExternalDependencies">
     <plugin id="org.jetbrains.android" />
     <plugin id="org.jetbrains.kotlin" />
+    <plugin id="org.jetbrains.plugins.gradle" />
   </component>
 </project>
