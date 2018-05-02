@@ -19,7 +19,6 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "au.com.isegoria.app"
-        multiDexEnabled true
         minSdkVersion Versions.min_sdk
         renderscriptSupportModeEnabled true
         targetSdkVersion Versions.target_sdk
@@ -32,8 +31,12 @@ android {
         abortOnError false
     }
     buildTypes {
+        debug {
+            multiDexEnabled true
+        }
         release {
             minifyEnabled true
+            multiDexEnabled false
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
