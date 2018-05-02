@@ -20,7 +20,7 @@ class EventsFragment : Fragment(), TitledFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
-    internal lateinit var viewModel: EventsViewModel
+    private lateinit var viewModel: EventsViewModel
 
     private val adapter = EventAdapter()
 

@@ -6,10 +6,13 @@ import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
+import com.eulersbridge.isegoria.util.data.Optional
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.Single
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(
@@ -28,8 +31,8 @@ class ProfileViewModel @Inject constructor(
     internal val badgeCount = MutableLiveData<BadgeCount?>()
     internal val tasks = MutableLiveData<List<Task>>()
 
-    internal val personalityTestHintVisible = MutableLiveData<Boolean>()
-    internal val viewProgressHintVisible = MutableLiveData<Boolean>()
+    internal val personalityTestHintVisible = SingleLiveEvent<Boolean>()
+    internal val viewProgressHintVisible = SingleLiveEvent<Boolean>()
 
     private var targetBadgeLevel = 0
 
@@ -48,8 +51,8 @@ class ProfileViewModel @Inject constructor(
             appRouter!!.setFriendsScreenVisible(true)
     }
 
-    fun setTargetBadgeLevel(targetBadgeLevel: Int?) {
-        this.targetBadgeLevel = targetBadgeLevel ?: 0
+    fun setTargetBadgeLevel(targetBadgeLevel: Int) {
+        this.targetBadgeLevel = targetBadgeLevel
     }
 
     internal fun onSectionIndexChanged(newIndex: Int) {
@@ -82,6 +85,7 @@ class ProfileViewModel @Inject constructor(
 
             if (isLoggedInUser) {
                 fetchBadgeCounts(user)
+                fetchUserPhoto()
                 viewProgressHintVisible.value = true
             }
 
@@ -91,7 +95,6 @@ class ProfileViewModel @Inject constructor(
         }
 
         getTasks()
-        fetchUserPhoto()
     }
 
     private fun fetchUserInstitutionName(user: GenericUser) {
@@ -105,14 +108,21 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun fetchUserStats(user: GenericUser) {
-        repository.getContact(user.email)
-                .subscribeSuccess { result ->
-                    result.value?.let {
-                        contactsCount.postValue(it.contactsCount)
-                        totalTasksCount.postValue(it.totalTasksCount)
-                    }
-                }
-                .addToDisposable()
+
+        val stream = if (user is Contact) {
+            Single.just(Optional(user))
+
+        } else {
+            repository.getContact(user.email)
+        }
+
+        stream.subscribeSuccess { result ->
+            result.value?.let {
+                contactsCount.postValue(it.contactsCount)
+                totalTasksCount.postValue(it.totalTasksCount)
+            }
+        }
+        .addToDisposable()
     }
 
     private fun getUser(): User? {
@@ -151,6 +161,10 @@ class ProfileViewModel @Inject constructor(
         repository.getTasks()
                 .subscribeSuccess { tasks.postValue(it) }
                 .addToDisposable()
+
+        repository.getTasks()
+                .subscribeSuccess { tasks.postValue(it) }
+                .addToDisposable()
     }
 
     internal fun getRemainingTasks(): LiveData<List<Task>?>? {
@@ -162,7 +176,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     internal fun getCompletedTasks(): LiveData<List<Task>> {
-        return repository.getCompletedTasks().toLiveData()
+        return repository.getCompletedTasks()
+                .toLiveData()
     }
 
     private fun fetchUserPhoto() {

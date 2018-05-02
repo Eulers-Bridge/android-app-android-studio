@@ -19,19 +19,19 @@ class NewsDetailViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    private lateinit var newsArticleLikes: List<Like>
-    private lateinit var user: User
-    private lateinit var contact: Contact
-    private lateinit var newsArticle: NewsArticle
+    private lateinit var dummyNewsArticleLikes: List<Like>
+    private lateinit var dummyUser: User
+    private lateinit var dummyContact: Contact
+    private lateinit var dummyNewsArticle: NewsArticle
 
     private lateinit var repository: Repository
     private lateinit var newsDetailViewModel: NewsDetailViewModel
 
     @Before
     fun setUp() {
-        newsArticleLikes = listOf(Like("John", "Smith", "john@smith.com"))
+        dummyNewsArticleLikes = listOf(Like("John", "Smith", "john@smith.com"))
 
-        user = User(
+        dummyUser = User(
                 "Female",
                 null,
                 "phoebe_bell@example.com",
@@ -53,7 +53,7 @@ class NewsDetailViewModelTest {
                 null
         )
 
-        contact = Contact(
+        dummyContact = Contact(
                 "Female",
                 null,
                 "executive@cis-gres.org",
@@ -70,7 +70,7 @@ class NewsDetailViewModelTest {
                 null
         )
 
-        newsArticle = NewsArticle(
+        dummyNewsArticle = NewsArticle(
                 37225,
                 26,
                 "CIS Students in the University's 3-Minute Thesis Competition",
@@ -79,13 +79,13 @@ class NewsDetailViewModelTest {
                 1507507200000,
                 0,
                 "executive@cis-gres.org",
-                contact,
+                dummyContact,
                 false
         )
 
         repository = mock {
-            on { getNewsArticleLikes(anyLong()) } doReturn Single.just(newsArticleLikes)
-            on { getUser() } doReturn user
+            on { getNewsArticleLikes(anyLong()) } doReturn Single.just(dummyNewsArticleLikes)
+            on { getUser() } doReturn dummyUser
         }
 
         newsDetailViewModel = NewsDetailViewModel(repository)
@@ -96,9 +96,9 @@ class NewsDetailViewModelTest {
         val observer = mock<Observer<NewsArticle>>()
         newsDetailViewModel.newsArticle.observeForever(observer)
 
-        newsDetailViewModel.setNewsArticle(newsArticle)
+        newsDetailViewModel.setNewsArticle(dummyNewsArticle)
 
-        verify(observer, times(1)).onChanged(newsArticle)
+        verify(observer, times(1)).onChanged(dummyNewsArticle)
     }
 
     @Test
@@ -109,10 +109,10 @@ class NewsDetailViewModelTest {
         val likedByUserObserver = mock<Observer<Boolean>>()
         newsDetailViewModel.likedByUser.observeForever(likedByUserObserver)
 
-        newsDetailViewModel.setNewsArticle(newsArticle)
+        newsDetailViewModel.setNewsArticle(dummyNewsArticle)
 
-        verify(repository, times(1)).getNewsArticleLikes(newsArticle.id)
-        verify(likeCountObserver, times(1)).onChanged(newsArticleLikes.size)
+        verify(repository, times(1)).getNewsArticleLikes(dummyNewsArticle.id)
+        verify(likeCountObserver, times(1)).onChanged(dummyNewsArticleLikes.size)
         verifyNoMoreInteractions(likeCountObserver)
         verify(likedByUserObserver, times(1)).onChanged(false)
         verifyNoMoreInteractions(likedByUserObserver)

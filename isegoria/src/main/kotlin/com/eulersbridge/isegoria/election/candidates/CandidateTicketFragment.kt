@@ -78,14 +78,11 @@ class CandidateTicketFragment : Fragment() {
         return rootView
     }
 
-    private fun addTickets(tickets: List<CandidateTicket>?) {
-        if (tickets == null)
-            return
-
+    private fun addTickets(tickets: List<CandidateTicket>) {
         runOnUiThread {
-
             for (ticket in tickets) {
                 addedCounter += 1
+
                 if (added) {
                     this.addTableRow(
                         lastTicketId,
