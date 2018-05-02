@@ -12,6 +12,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.StrictMode
+import android.support.multidex.MultiDex
 import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
@@ -67,6 +68,15 @@ class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSu
 
     override fun getFriendsScreenVisible(): Observable<Boolean> {
         return friendsScreenVisible.distinctUntilChanged()
+    }
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+
+        // Multidex only in debug.
+        // For release/production, Proguard reduces method count significantly below 64k limit.
+        if (BuildConfig.DEBUG)
+            MultiDex.install(this)
     }
 
     override fun onCreate() {
