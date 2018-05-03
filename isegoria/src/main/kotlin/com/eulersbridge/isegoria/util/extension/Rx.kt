@@ -16,9 +16,6 @@ fun <T> Observable<T>.toLiveData(strategy: BackpressureStrategy)
 fun <T> Single<T>.toLiveData()
         = toFlowable().toLiveData()
 
-fun <T> Completable.toLiveData()
-        = toFlowable<T>().toLiveData()
-
 fun Completable.toBooleanSingle(): Single<Boolean>
         = toSingleDefault(true).onErrorReturnItem(false)
 

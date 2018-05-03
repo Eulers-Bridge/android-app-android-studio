@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
     <!-- Exclude shared preferences (with user email & password) as per Google suggestion:
-    "Consider asking the user to reauthenticate the first time they launch a restored app rather
+    "Consider asking the user to re-authenticate the first time they launch a restored app rather
     than allowing for storage of such information in the backup" -->
     <exclude domain="sharedpref" path="."/>
 

@@ -620,7 +620,6 @@ class DataRepository @Inject constructor(
 
     override fun answerPoll(pollId: Long, answerId: Long): Completable {
         return api.answerPoll(pollId, answerId)
-                .onErrorComplete()
     }
 
     override fun getPollResults(pollId: Long): Single<List<PollResult>> {

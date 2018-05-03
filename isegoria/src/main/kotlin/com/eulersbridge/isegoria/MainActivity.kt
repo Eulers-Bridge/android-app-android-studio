@@ -7,8 +7,10 @@ import android.content.pm.ShortcutManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.IdRes
+import android.support.annotation.StringRes
 import android.support.annotation.UiThread
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -41,7 +43,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
     FragmentManager.OnBackStackChangedListener {
 
     @Inject
-    lateinit var app: IsegoriaApp
+    lateinit var appRouter: AppRouter
 
     @Inject
     lateinit var repository: Repository
@@ -117,14 +119,14 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
             }
         }.addTo(compositeDisposable)
 
-        app.getUserVerificationScreenVisible()
+        appRouter.getUserVerificationScreenVisible()
                 .filter { it }
                 .subscribe {
                     runOnUiThread { presentRootContent(EmailVerificationFragment()) }
                 }
                 .addTo(compositeDisposable)
 
-        app.getFriendsScreenVisible()
+        appRouter.getFriendsScreenVisible()
                 .filter { it }
                 .subscribe {
                     runOnUiThread { showFriends() }
@@ -161,7 +163,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                     }
 
                     SHORTCUT_ACTION_FRIENDS -> {
-                        app.setFriendsScreenVisible(true)
+                        appRouter.setFriendsScreenVisible(true)
                         handledShortcut = true
                     }
                 }
@@ -257,7 +259,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                     )
 
                     tabFragmentsStack.clear()
-                    app.setFriendsScreenVisible(false)
+                    appRouter.setFriendsScreenVisible(false)
                 }
 
                 presentRootContent(fragment)
@@ -313,5 +315,9 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                 }
             }
         }
+    }
+
+    internal fun showSnackbar(@StringRes stringRes: Int, length: Int = Snackbar.LENGTH_LONG ) {
+        Snackbar.make(coordinator_layout, stringRes, length).show()
     }
 }

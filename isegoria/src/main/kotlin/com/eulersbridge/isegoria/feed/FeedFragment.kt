@@ -28,11 +28,11 @@ import javax.inject.Inject
 
 class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
-    private var tabLayout: TabLayout? = null
-
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: FeedViewModel
+
+    private var tabLayout: TabLayout? = null
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)

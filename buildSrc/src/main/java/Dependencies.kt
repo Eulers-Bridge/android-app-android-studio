@@ -3,13 +3,13 @@
 object Versions {
     const val kotlin = "1.2.41"
     const val android_gradle_plugin = "3.2.0-alpha13"
-    const val google_gradle_plugin = "3.1.2"
+    const val google_gradle_plugin = "3.2.1"
 
     const val min_sdk = 16
     const val target_sdk = 27
     const val compile_sdk = 27
-    const val version_code = 24
-    const val version_name = "1.0.23"
+    const val version_code = 25
+    const val version_name = "1.0.24"
 
     const val ktx = "0.3"
     const val multidex = "1.0.3"

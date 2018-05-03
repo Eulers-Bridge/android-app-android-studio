@@ -12,7 +12,7 @@ internal class PollOptionAdapter internal constructor(private val optionVoteList
     : LoadingAdapter<PollOption, PollOptionViewHolder>(2),
         PollOptionViewHolder.ClickListener {
 
-    internal var pollVotingEnabled = true
+    internal var pollVotingEnabled = false
 
     interface PollOptionVoteListener {
         /**
@@ -22,12 +22,9 @@ internal class PollOptionAdapter internal constructor(private val optionVoteList
     }
 
     override fun onClick(item: PollOption, position: Int) {
-        if (pollVotingEnabled && !item.hasVoted) {
+        // TODO: Move logic into view model (?)
+        if (pollVotingEnabled && !item.hasVoted)
             optionVoteListener.onPollOptionClick(position)
-
-            items[position].hasVoted = true
-            notifyItemChanged(position)
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PollOptionViewHolder {
