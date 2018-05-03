@@ -29,7 +29,6 @@ internal class PollOptionViewHolder(itemView: View, private val clickListener: C
     }
 
     init {
-
         itemView.setOnClickListener {
             item?.let {
                 clickListener?.onClick(it, adapterPosition)

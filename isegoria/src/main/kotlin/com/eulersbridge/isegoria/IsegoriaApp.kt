@@ -1,10 +1,7 @@
 package com.eulersbridge.isegoria
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -13,7 +10,6 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.StrictMode
 import android.support.multidex.MultiDex
-import android.support.multidex.MultiDexApplication
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationManagerCompat
 import androidx.core.content.systemService
@@ -33,7 +29,7 @@ import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 import javax.inject.Inject
 
-class IsegoriaApp : MultiDexApplication(), AppRouter, HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
+class IsegoriaApp : Application(), AppRouter, HasActivityInjector, HasSupportFragmentInjector, HasServiceInjector {
 
     @Inject
     lateinit var activityInjector: DispatchingAndroidInjector<Activity>
