@@ -32,7 +32,7 @@ class PollVoteViewModel @Inject constructor (private val repository: Repository)
             pollOptions.value = it.options
 
             // Enable voting if the poll is not closed and the user has not voted for any option
-            votingEnabled.value = !it.closed  &&it.options.none { it.hasVoted }
+            votingEnabled.value = !it.closed && it.options.none { it.hasVoted }
 
             fetchPollCreator()
         }

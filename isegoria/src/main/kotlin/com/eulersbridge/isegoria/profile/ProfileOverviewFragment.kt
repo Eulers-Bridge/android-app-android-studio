@@ -180,39 +180,39 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
     private fun updateBadgeCount(remainingCount: Int, completedCount: Int) {
         badgesProgressCircle.post {
-            badgesProgressCircle.topText = completedCount.toString()
-            badgesProgressCircle.bottomText = "/" + remainingCount.toString()
-            badgesProgressCircle.maximumValue = remainingCount
-            badgesProgressCircle.setValue(completedCount, true)
+            badgesProgressCircle?.topText = completedCount.toString()
+            badgesProgressCircle?.bottomText = "/" + remainingCount.toString()
+            badgesProgressCircle?.maximumValue = remainingCount
+            badgesProgressCircle?.setValue(completedCount, true)
         }
     }
 
     private fun updateCompletedTasksCount(count: Long) {
         tasksProgressCircle.post {
-            tasksProgressCircle.topText  = count.toString()
-            tasksProgressCircle.setValue(count.toInt(), true)
+            tasksProgressCircle?.topText = count.toString()
+            tasksProgressCircle?.setValue(count.toInt(), true)
         }
     }
 
     private fun updateExperience(level: Long, experience: Long) {
         experienceProgressCircle.post {
-            experienceProgressCircle.topText = level.toString()
+            experienceProgressCircle?.topText = level.toString()
 
             val progress = experience % 1000
             val max: Long = 1000
 
-            experienceProgressCircle.bottomText = "NEED $progress"
-            experienceProgressCircle.maximumValue = max.toInt()
-            experienceProgressCircle.setValue(progress.toInt(), true)
+            experienceProgressCircle?.bottomText = "NEED $progress"
+            experienceProgressCircle?.maximumValue = max.toInt()
+            experienceProgressCircle?.setValue(progress.toInt(), true)
         }
     }
 
     private fun updateContactsCount(contactsCount: Long) {
-        friendsCountTextView.text = contactsCount.toString()
+        friendsCountTextView?.text = contactsCount.toString()
     }
 
     private fun updateTotalTasksCount(totalTasksCount: Long) {
-        tasksProgressCircle?.post { tasksProgressCircle.maximumValue  = totalTasksCount.toInt() }
+        tasksProgressCircle?.post { tasksProgressCircle?.maximumValue  = totalTasksCount.toInt() }
     }
 
     override fun onDetach() {
