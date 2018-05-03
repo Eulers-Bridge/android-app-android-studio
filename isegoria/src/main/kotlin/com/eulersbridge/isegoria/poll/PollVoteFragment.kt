@@ -10,8 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.extension.setCompatTooltipText
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.poll_fragment.*
@@ -39,7 +42,7 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
 
         val rootView = inflater.inflate(R.layout.poll_fragment, container, false)
 
-        viewModel.poll.value = arguments?.getParcelable(FRAGMENT_EXTRA_POLL)
+        viewModel.setPoll(arguments?.getParcelable(FRAGMENT_EXTRA_POLL))
 
         return rootView
     }
@@ -51,20 +54,17 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.poll) {
-            if (it != null) {
-                questionTextView.text = it.question
-                populatePollOptions()
-            }
-        }
+        observe(viewModel.pollQuestion) { questionTextView.text = it!! }
+        observe(viewModel.pollOptions) { pollOptionsAdapter.replaceItems(it!!) }
+        observeBoolean(viewModel.votingEnabled) { pollOptionsAdapter.pollVotingEnabled = it }
 
         observe(viewModel.pollCreator) {
             if (it != null) {
                 GlideApp.with(this)
-                    .load(it.profilePhotoURL)
-                    .placeholder(R.color.lightGrey)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(creatorImageView)
+                        .load(it.profilePhotoURL)
+                        .placeholder(R.color.lightGrey)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .into(creatorImageView)
 
                 creatorNameTextView.apply {
                     text = getString(R.string.poll_asked_by, it.fullName)
@@ -83,18 +83,11 @@ class PollVoteFragment : Fragment(), PollOptionAdapter.PollOptionVoteListener {
                     resources.getQuantityString(R.plurals.poll_vote_answers_content_description, answerCount)
                 answersCountTextView.contentDescription = answersQuantity
                 answersCountTextView.setCompatTooltipText(answersQuantity)
-
-                populatePollOptions()
             }
         }
-    }
 
-    private fun populatePollOptions() {
-        val poll = viewModel.poll.value
-
-        poll?.options?.let {
-            pollOptionsAdapter.replaceItems(it)
-            pollOptionsAdapter.pollVotingEnabled = !poll.closed
+        ifTrue(viewModel.votingError) {
+            (activity as? MainActivity)?.showSnackbar(R.string.poll_vote_failed)
         }
     }
 

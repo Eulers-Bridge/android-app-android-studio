@@ -47,6 +47,7 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, modelFactory)[PollsViewModel::class.java]
+        createViewModelObservers()
     }
 
     override fun onCreateView(
@@ -58,11 +59,6 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         // Ensure options menu from another fragment is not carried over
         activity?.invalidateOptionsMenu()
-
-        observe(viewModel.getPolls()) { polls ->
-            if (polls != null)
-                addPolls(polls)
-        }
 
         return rootView
     }
@@ -100,13 +96,16 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     @UiThread
     private fun updateTabs() {
         pagerAdapter.notifyDataSetChanged()
-
         tabLayout?.isVisible = fragments.size >= 2
     }
 
     override fun onPause() {
         tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
         super.onPause()
+    }
+
+    private fun createViewModelObservers() {
+        observe(viewModel.polls) { addPolls(it!!) }
     }
 
     private fun addPolls(polls: List<Poll>) {
@@ -118,8 +117,6 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
 
         fragments.addAll(newFragments)
 
-        runOnUiThread {
-            updateTabs()
-        }
+        runOnUiThread { updateTabs() }
     }
 }

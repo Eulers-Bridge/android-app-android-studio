@@ -7,7 +7,6 @@ import com.eulersbridge.isegoria.network.api.model.Institution
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +26,7 @@ class SignUpViewModelTest {
         val mockCountry = Country(6228, "Australia", listOf(mockInstitution))
 
         repository = mock {
-            on { getSignUpCountries() } doReturn Single.just(listOf(mockCountry)).subscribeOn(Schedulers.trampoline())
+            on { getSignUpCountries() } doReturn Single.just(listOf(mockCountry))
         }
 
         signUpViewModel = SignUpViewModel(repository)

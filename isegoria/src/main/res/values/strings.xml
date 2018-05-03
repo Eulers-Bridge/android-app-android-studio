@@ -126,6 +126,7 @@
     <!-- Polls -->
     <string name="poll_title">Poll %d</string>
     <string name="poll_asked_by">Asked by %s</string>
+    <string name="poll_vote_failed">Something went wrong, please try again in a minute</string>
 
     <!-- Feed/News -->
     <string name="news_article_star_content_description">Star news article</string>

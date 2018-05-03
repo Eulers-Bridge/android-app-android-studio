@@ -1,49 +1,96 @@
 package com.eulersbridge.isegoria.poll
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.Transformations
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.Poll
+import com.eulersbridge.isegoria.network.api.model.PollOption
 import com.eulersbridge.isegoria.network.api.model.PollResult
 import com.eulersbridge.isegoria.util.BaseViewModel
-import com.eulersbridge.isegoria.util.data.SingleLiveData
-import com.eulersbridge.isegoria.util.extension.map
+import com.eulersbridge.isegoria.util.data.Optional
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
-import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class PollVoteViewModel @Inject constructor (private val repository: Repository) : BaseViewModel() {
 
-    internal val poll = MutableLiveData<Poll>()
+    private var poll: Poll? = null
+    internal val pollQuestion = MutableLiveData<String>()
+    internal val pollCreator = MutableLiveData<Contact?>()
+    internal val pollOptions = MutableLiveData<List<PollOption>>()
+
+    internal val votingEnabled = MutableLiveData<Boolean>()
+    internal val votingError = MutableLiveData<Boolean>()
+
     internal val pollResults = MutableLiveData<List<PollResult>>()
 
-    internal val pollCreator: LiveData<Contact?> = Transformations.switchMap(poll) {
-        return@switchMap if (it.creator == null && !it.creatorEmail.isNullOrBlank()) {
-            repository.getContact(it.creatorEmail!!).toLiveData().map { it.value }
+    internal fun setPoll(poll: Poll?) {
+        this.poll = poll
 
-        } else {
-            SingleLiveData(it?.creator)
+        poll?.let {
+            pollQuestion.value = it.question
+            pollOptions.value = it.options
+
+            // Enable voting if the poll is not closed and the user has not voted for any option
+            votingEnabled.value = !it.closed  &&it.options.none { it.hasVoted }
+
+            fetchPollCreator()
+        }
+    }
+
+    private fun fetchPollCreator() {
+        this.poll?.let { poll ->
+            if (poll.creator == null && !poll.creatorEmail.isNullOrBlank()) {
+                repository.getContact(poll.creatorEmail!!)
+                        .onErrorReturnItem(Optional(poll.creator))
+                        .subscribeSuccess {
+                            pollCreator.postValue(it.value)
+                        }
+                        .addToDisposable()
+            } else {
+                pollCreator.value = poll.creator
+            }
         }
     }
 
     internal fun voteForPollOption(optionIndex: Int) {
-        val currentPoll = poll.value ?: return
+        votingEnabled.value = false
+        votingError.value = false
+
+        val currentPoll = poll ?: return
 
         val (id) = currentPoll.options[optionIndex]
 
         repository.answerPoll(currentPoll.id, id)
                 .andThen(repository.getPollResults(currentPoll.id))
-                .subscribeSuccess { results ->
-                    val updatedPollOptions = currentPoll.options
-                            .mapIndexed { index, pollOption ->
-                                pollOption.copy(result = results[index])
-                            }
+                .map {
+                    if (it.size == currentPoll.options.size) {
+                        it
+                    } else {
+                        throw Exception("Missing results for all poll options")
+                    }
+                }
+                .subscribeBy(
+                        onSuccess = { results ->
+                            votingEnabled.postValue(true)
 
-                    val updatedPoll = currentPoll.copy(options = updatedPollOptions)
-                    poll.postValue(updatedPoll)
-                    pollResults.postValue(results)
-                }.addToDisposable()
+                            val updatedPollOptions = currentPoll.options
+                                    .mapIndexed { index, pollOption ->
+                                        if (index < results.size - 1) {
+                                            pollOption.copy(result = results[index])
+                                        } else {
+                                            pollOption
+                                        }
+                                    }
+
+                            pollOptions.postValue(updatedPollOptions)
+                            pollResults.postValue(results)
+                        },
+                        onError = {
+                            votingEnabled.postValue(true)
+                            votingError.postValue(true)
+                        }
+                )
+                .addToDisposable()
     }
 }

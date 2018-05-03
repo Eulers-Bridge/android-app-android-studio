@@ -6,7 +6,7 @@ data class NetworkConfig(
         val s3PicturesPath: String = "https://s3.amazonaws.com/isegoriauserpics/"
 ) {
     companion object {
-        private const val DEFAULT_BASE_URL = "http://54.79.70.241:8080/dbInterface/api/"
+        internal const val DEFAULT_BASE_URL = "http://54.79.70.241:8080/dbInterface/api/"
     }
 
     fun resetBaseUrl() {

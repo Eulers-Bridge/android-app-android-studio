@@ -7,7 +7,10 @@ import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.Like
 import com.eulersbridge.isegoria.network.api.model.NewsArticle
 import com.eulersbridge.isegoria.network.api.model.User
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.given
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.then
+import com.nhaarman.mockitokotlin2.times
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -83,26 +86,30 @@ class NewsDetailViewModelTest {
                 false
         )
 
-        repository = mock {
-            on { getNewsArticleLikes(anyLong()) } doReturn Single.just(dummyNewsArticleLikes)
-            on { getUser() } doReturn dummyUser
-        }
+        repository = mock()
 
         newsDetailViewModel = NewsDetailViewModel(repository)
     }
 
     @Test
     fun `view model stores given article`() {
+        given(repository.getNewsArticleLikes(anyLong())).willReturn(Single.just(dummyNewsArticleLikes))
+        given(repository.getUser()).willReturn(dummyUser)
+
         val observer = mock<Observer<NewsArticle>>()
         newsDetailViewModel.newsArticle.observeForever(observer)
 
         newsDetailViewModel.setNewsArticle(dummyNewsArticle)
 
-        verify(observer, times(1)).onChanged(dummyNewsArticle)
+        then(observer).should(times(1)).onChanged(dummyNewsArticle)
+        then(observer).shouldHaveNoMoreInteractions()
     }
 
     @Test
     fun `view model fetches likes for a given article`() {
+        given(repository.getNewsArticleLikes(anyLong())).willReturn(Single.just(dummyNewsArticleLikes))
+        given(repository.getUser()).willReturn(dummyUser)
+
         val likeCountObserver = mock<Observer<Int>>()
         newsDetailViewModel.likeCount.observeForever(likeCountObserver)
 
@@ -111,11 +118,11 @@ class NewsDetailViewModelTest {
 
         newsDetailViewModel.setNewsArticle(dummyNewsArticle)
 
-        verify(repository, times(1)).getNewsArticleLikes(dummyNewsArticle.id)
-        verify(likeCountObserver, times(1)).onChanged(dummyNewsArticleLikes.size)
-        verifyNoMoreInteractions(likeCountObserver)
-        verify(likedByUserObserver, times(1)).onChanged(false)
-        verifyNoMoreInteractions(likedByUserObserver)
+        then(repository).should(times(1)).getNewsArticleLikes(dummyNewsArticle.id)
+        then(likeCountObserver).should(times(1)).onChanged(dummyNewsArticleLikes.size)
+        then(likeCountObserver).shouldHaveNoMoreInteractions()
+        then(likedByUserObserver).should(times(1)).onChanged(false)
+        then(likedByUserObserver).shouldHaveNoMoreInteractions()
     }
 
 }

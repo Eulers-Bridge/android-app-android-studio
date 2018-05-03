@@ -37,8 +37,8 @@ class LoginViewModelTest {
 
         loginViewModel.setPassword("thi\$,i5af4ntasticp4S5w0rd!")
 
-        verify(observer, times(1)).onChanged(false)
-        verify(observer, never()).onChanged(true)
+        then(observer).should(times(1)).onChanged(false)
+        then(observer).should(never()).onChanged(true)
     }
 
     @Test
@@ -48,19 +48,21 @@ class LoginViewModelTest {
 
         loginViewModel.setPassword("")
 
-        verify(observer, times(1)).onChanged(true)
+        then(observer).should(times(1)).onChanged(true)
     }
 
     @Test
     fun `initial view model state prevents login via Repository`() {
         loginViewModel.login()
-        verify(repository, never()).login(any(), any())
+
+        then(repository).should(never()).login(any(), any())
     }
 
     @Test
     fun `view model does not login via Repository, given an email but no password`() {
         loginViewModel.setEmail("jane@doe.com")
         loginViewModel.login()
-        verify(repository, never()).login(any(), any())
+
+        then(repository).should(never()).login(any(), any())
     }
 }
