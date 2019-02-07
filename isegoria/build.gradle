@@ -16,7 +16,7 @@ android {
         }
     }
     compileSdkVersion Versions.compile_sdk
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "au.com.isegoria.app"
         minSdkVersion Versions.min_sdk
