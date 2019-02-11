@@ -32,6 +32,7 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import retrofit2.HttpException
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -169,7 +170,11 @@ class DataRepository @Inject constructor(
                             saveUserCredentials(email, password)
                         },
                         onError = {
-                            loginState.onNext(LoginState.LoginFailure())
+                            if (it is HttpException && (it as HttpException)!!.code() == 401) {
+                                loginState.onNext(LoginState.LoginUnauthorised())
+                            } else {
+                                loginState.onNext(LoginState.LoginFailure())
+                            }
                         }
                 )
     }

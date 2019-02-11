@@ -6,5 +6,6 @@ sealed class LoginState {
     class LoggingIn : LoginState()
     class LoggedIn(val user: User): LoginState()
     class LoginFailure : LoginState()
+    class LoginUnauthorised : LoginState()
     class LoggedOut : LoginState()
 }

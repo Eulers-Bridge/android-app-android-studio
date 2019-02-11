@@ -13,6 +13,10 @@ import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(private val repository: Repository, private val api: API) : BaseViewModel() {
 
+    enum class LoginError {
+        NotAuthorised, UnkownFailure
+    }
+
     private val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
 
@@ -21,7 +25,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
     internal val formEnabled = MutableLiveData<Boolean>()
-    internal val networkError = MutableLiveData<Boolean>()
+    internal val loginError = MutableLiveData<LoginError?>()
 
     internal val canShowPasswordResetDialog = MutableLiveData<Boolean>()
 
@@ -30,7 +34,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
     init {
         formEnabled.value = true
-        networkError.value = false
+        loginError.value = null
         canShowPasswordResetDialog.value = true
 
         // Pre-fill saved user email
@@ -38,11 +42,12 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
         repository.getLoginState().subscribe {
             when (it) {
-                is LoginState.LoggingIn -> {
-                    networkError.postValue(false)
-                }
                 is LoginState.LoginFailure -> {
-                    networkError.postValue(true)
+                    loginError.postValue(LoginError.UnkownFailure)
+                    formEnabled.postValue(true)
+                }
+                is LoginState.LoginUnauthorised -> {
+                    loginError.postValue(LoginError.NotAuthorised)
                     formEnabled.postValue(true)
                 }
             }
@@ -67,8 +72,8 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
         }
     }
 
-    internal fun setNetworkErrorShown() {
-        networkError.value = false
+    internal fun clearLoginError() {
+        loginError.value = null
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
