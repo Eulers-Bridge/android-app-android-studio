@@ -21,7 +21,7 @@ internal class SentFriendRequestViewHolder(
 
     private val imageView: ImageView = itemView.findViewById(R.id.friends_list_image_view)
     private val nameTextView: TextView = itemView.findViewById(R.id.friends_list_name_text_view)
-    private val institutionTextView: TextView = itemView.findViewById(R.id.friends_list_institution_text_view)
+    private val institutionTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
 
     init {
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
