@@ -288,7 +288,9 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         tabFragmentsStack.push(fragment)
 
         supportFragmentManager.apply {
-            popBackStack()
+            for (i in 0 .. backStackEntryCount) {
+                popBackStackImmediate()
+            }
 
             beginTransaction()
                 .replace(R.id.container, fragment)
