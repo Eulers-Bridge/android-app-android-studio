@@ -125,10 +125,6 @@ class LoginFragment : Fragment() {
                                 .show()
                     }
                 }
-
-                if (loginError.value != null) {
-                    clearLoginError()
-                }
             }
 
             observeBoolean(formEnabled) { enabled ->

@@ -8,6 +8,7 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
     internal val formEnabled = MutableLiveData<Boolean>()
-    internal val loginError = MutableLiveData<LoginError?>()
+    internal val loginError =  SingleLiveEvent<LoginError>()
 
     internal val canShowPasswordResetDialog = MutableLiveData<Boolean>()
 
@@ -34,7 +35,6 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
     init {
         formEnabled.value = true
-        loginError.value = null
         canShowPasswordResetDialog.value = true
 
         // Pre-fill saved user email
@@ -70,10 +70,6 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
             repository.login(email.value!!, password.value!!)
         }
-    }
-
-    internal fun clearLoginError() {
-        loginError.value = null
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {
