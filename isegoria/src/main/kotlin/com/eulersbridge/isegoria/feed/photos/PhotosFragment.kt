@@ -64,6 +64,8 @@ class PhotosFragment : Fragment(), TitledFragment, PhotoAlbumAdapter.PhotoAlbumC
         val albumFragment = PhotoAlbumFragment()
         albumFragment.arguments = bundleOf(FRAGMENT_EXTRA_PHOTO_ALBUM to item)
 
+        val man = childFragmentManager
+
         (activity as? MainActivity)?.presentContent(albumFragment)
     }
 }

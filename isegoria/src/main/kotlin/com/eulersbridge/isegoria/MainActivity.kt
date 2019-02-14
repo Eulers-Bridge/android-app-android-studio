@@ -26,6 +26,7 @@ import com.eulersbridge.isegoria.friends.FriendsFragment
 import com.eulersbridge.isegoria.personality.PersonalityActivity
 import com.eulersbridge.isegoria.poll.PollsFragment
 import com.eulersbridge.isegoria.profile.ProfileViewPagerFragment
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import com.eulersbridge.isegoria.vote.VoteViewPagerFragment
 import com.google.firebase.FirebaseApp
@@ -58,10 +59,6 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
 
     private var loginActionsComplete = false
     private val compositeDisposable = CompositeDisposable()
-
-    interface TabbedFragment {
-        fun setupTabLayout(tabLayout: TabLayout)
-    }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -288,7 +285,7 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         tabFragmentsStack.push(fragment)
 
         supportFragmentManager.apply {
-            for (i in 0 .. backStackEntryCount) {
+            for (i in 0 until backStackEntryCount - 1) {
                 popBackStackImmediate()
             }
 
@@ -300,9 +297,23 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
         updateAppBarState()
     }
 
+    @UiThread
+    internal fun clearTabFragmentStack() {
+
+        supportFragmentManager.apply {
+            for (i in 0 until backStackEntryCount - 1) {
+                popBackStackImmediate()
+                tabFragmentsStack.pop()
+            }
+        }
+    }
+
+
     private fun updateAppBarState() {
         currentFragment?.let {
             runOnUiThread {
+                val fragment = it
+
                 if (it is TitledFragment) {
                     val fragmentTitle =
                         (it as TitledFragment).getTitle(this@MainActivity)
@@ -311,8 +322,9 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
                         setToolbarTitle(fragmentTitle!!)
                 }
 
+                tabLayout.clearOnTabSelectedListeners()
+
                 if (it is TabbedFragment) {
-                    tabLayout.clearOnTabSelectedListeners()
                     (it as TabbedFragment).setupTabLayout(tabLayout)
                 }
             }
