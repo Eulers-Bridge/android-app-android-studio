@@ -23,6 +23,10 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.election_positions_fragment.*
 import javax.inject.Inject
 
+
+/**
+ * This fragment shows all the positions in the current election
+ */
 class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickListener {
 
     @Inject

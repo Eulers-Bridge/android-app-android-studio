@@ -30,6 +30,9 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.election_candidates_tickets_fragment.*
 import javax.inject.Inject
 
+/**
+ * This fragment shows a grid of all the tickets (parties) in the current election.
+ */
 class CandidateTicketFragment : Fragment() {
 
     @Inject

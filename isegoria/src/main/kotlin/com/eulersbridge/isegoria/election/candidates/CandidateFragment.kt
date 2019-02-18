@@ -10,6 +10,10 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.election.candidates.positions.CandidatePositionsFragment
 import kotlinx.android.synthetic.main.candidate_fragment.*
 
+/**
+ * This is the master fragment for candidates. Holds the view pager and tab indicator for the
+ * positions, tickets and all candidates fragments.
+ */
 class CandidateFragment : Fragment() {
 
     override fun onCreateView(

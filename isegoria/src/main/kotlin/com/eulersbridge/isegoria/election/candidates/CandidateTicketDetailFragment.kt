@@ -40,7 +40,11 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.*
 import javax.inject.Inject
 
-class CandidateTicketDetailFragment : Fragment() {
+/**
+ * This fragment shows the profile for a ticket (party).
+ */
+
+class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment {
 
     private var dpWidth: Float = 0.toFloat()
 

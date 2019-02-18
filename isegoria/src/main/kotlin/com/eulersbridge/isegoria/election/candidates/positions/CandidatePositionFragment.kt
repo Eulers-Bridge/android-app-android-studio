@@ -31,7 +31,11 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
 import javax.inject.Inject
 
-class CandidatePositionFragment : Fragment() {
+/**
+ * This fragment shows a list of candidate running for a particular position.
+ */
+
+class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
     private var dpWidth: Float = 0.toFloat()
 
     @Inject
