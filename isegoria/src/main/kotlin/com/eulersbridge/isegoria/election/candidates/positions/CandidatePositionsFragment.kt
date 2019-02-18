@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.bumptech.glide.request.RequestOptions
 import com.eulersbridge.isegoria.GlideApp
+import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
@@ -78,10 +79,7 @@ class CandidatePositionsFragment : Fragment(), PositionAdapter.PositionClickList
         val detailFragment = CandidatePositionFragment()
         detailFragment.arguments = bundleOf(FRAGMENT_EXTRA_CANDIDATE_POSITION to item)
 
-        childFragmentManager
-            .beginTransaction()
-            .addToBackStack(null)
-            .add(R.id.electionCandidateFrame, detailFragment)
-            .commit()
+
+        (activity as MainActivity).presentContent(detailFragment)
     }
 }
