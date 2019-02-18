@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
@@ -29,12 +28,6 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPagerAdapter: SimpleFragmentPagerAdapter
-
-    private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab) { print("Hello") }
-        override fun onTabUnselected(tab: TabLayout.Tab) {}
-        override fun onTabReselected(tab: TabLayout.Tab) {}
-    }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
