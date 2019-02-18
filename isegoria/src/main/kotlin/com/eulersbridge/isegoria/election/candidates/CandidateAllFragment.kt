@@ -34,6 +34,10 @@ import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_all_fragment.*
 import javax.inject.Inject
 
+
+/**
+ * This fragment shows a list of all candidates filtered by a search query.
+ */
 class CandidateAllFragment : Fragment() {
     private lateinit var rootView: View
 

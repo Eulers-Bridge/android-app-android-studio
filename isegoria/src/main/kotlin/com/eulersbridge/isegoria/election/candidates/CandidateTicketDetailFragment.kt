@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.util.TypedValue
 import android.view.Gravity
@@ -18,6 +19,7 @@ import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -34,10 +36,13 @@ import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
+import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.*
+import kotlinx.android.synthetic.main.candidate_ticket_detail_fragment.view.*
 import javax.inject.Inject
 
 /**
@@ -67,15 +72,10 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
         super.onAttach(context)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.candidate_ticket_detail_fragment, container, false)
 
-        //int backgroundDrawableResource = R.drawable.me;
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         var ticketName: String? = null
         var noOfSupporters: Int? = null
 
@@ -159,9 +159,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
         }
 
         partyDetailSupporters.text = noOfSupporters?.toString()
-        partyNameTextView.text = ticketName
-
-        return rootView
+        backgroundLayout.partyNameTextView.text = ticketName
     }
 
     override fun onPause() {
@@ -292,7 +290,9 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
         repository.getPosition(candidate.positionId)
                 .subscribeSuccess {
-                    textViewPosition.text = it.value?.name
+                    runOnUiThread {
+                        textViewPosition.text = it.value?.name
+                    }
                 }
                 .addTo(compositeDisposable)
 
@@ -341,5 +341,13 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
         tableLayout.addView(tr)
         tableLayout.addView(dividerView)
+    }
+
+    override fun getTitle(context: Context?): String? = "Ticket Profile"
+
+    override fun setupTabLayout(tabLayout: TabLayout) {
+        tabLayout.apply {
+            isGone = true
+        }
     }
 }

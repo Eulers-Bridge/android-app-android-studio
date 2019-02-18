@@ -19,6 +19,7 @@ import android.widget.TableRow
 import android.widget.TableRow.LayoutParams
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.CandidateTicket
@@ -316,11 +317,7 @@ class CandidateTicketFragment : Fragment() {
                 val detailFragment = CandidateTicketDetailFragment()
                 detailFragment.arguments = args
 
-                activity?.supportFragmentManager?.beginTransaction()?.apply {
-                    addToBackStack(null)
-                    add(R.id.candidateFrame, detailFragment)
-                    commit()
-                }
+                (activity as MainActivity).presentContent(detailFragment)
             }
 
             relativeLayout.addView(view)
@@ -472,11 +469,7 @@ class CandidateTicketFragment : Fragment() {
             val detailFragment = CandidateTicketDetailFragment()
             detailFragment.arguments = args
 
-            activity?.supportFragmentManager?.beginTransaction()?.apply {
-                addToBackStack(null)
-                add(R.id.candidateFrame, detailFragment)
-                commit()
-            }
+            (activity as MainActivity).presentContent(detailFragment)
         }
 
         val linLayout = LinearLayout(activity)
