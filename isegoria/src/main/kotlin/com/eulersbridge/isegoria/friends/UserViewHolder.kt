@@ -21,7 +21,7 @@ class UserViewHolder(
 
     private val imageView: ImageView = itemView.findViewById(R.id.friends_list_image_view)
     private val nameTextView: TextView = itemView.findViewById(R.id.friends_list_name_text_view)
-    private val institutionTextView: TextView= itemView.findViewById(R.id.friends_list_institution_text_view)
+    private val subtextTextView: TextView= itemView.findViewById(R.id.friends_list_subtext_text_view)
 
     interface OnClickListener {
         fun onViewClick(user: GenericUser?)
@@ -51,10 +51,11 @@ class UserViewHolder(
     private fun bindItem(item: GenericUser?) {
         if (item == null) {
             nameTextView.text = null
-            institutionTextView.text = null
+            subtextTextView.text = null
 
         } else {
             nameTextView.text = item.fullName
+            subtextTextView.text = item.email
 
             GlideApp.with(imageView.context)
                 .load(item.profilePhotoURL)
@@ -64,8 +65,5 @@ class UserViewHolder(
         }
     }
 
-    fun setInstitution(institution: Institution) {
-        if (item?.institutionId == institution.id)
-            institutionTextView.text = institution.getName()
-    }
+    fun setInstitution(_institution: Institution) { }
 }

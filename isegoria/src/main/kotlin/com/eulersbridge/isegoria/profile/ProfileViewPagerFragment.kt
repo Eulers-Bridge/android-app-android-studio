@@ -18,12 +18,13 @@ import com.eulersbridge.isegoria.profile.badges.ProfileBadgesFragment
 import com.eulersbridge.isegoria.profile.settings.SettingsActivity
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.profile_viewpager_fragment.*
 import javax.inject.Inject
 
-class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+class ProfileViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
 
     @Inject
     internal lateinit var repository: Repository
@@ -146,10 +147,5 @@ class ProfileViewPagerFragment : Fragment(), TitledFragment, MainActivity.Tabbed
             setupWithViewPager(viewPager)
             addOnTabSelectedListener(onTabSelectedListener)
         }
-    }
-
-    override fun onPause() {
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onPause()
     }
 }

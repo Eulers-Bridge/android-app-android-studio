@@ -19,7 +19,7 @@ import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
-import com.eulersbridge.isegoria.util.extension.ifTrue
+import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
@@ -111,13 +111,20 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            ifTrue(networkError) {
-                Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
-                    .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
-                    .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
-                    .show()
 
-                setNetworkErrorShown()
+            observe(loginError) {
+                when (loginError.value) {
+                    LoginViewModel.LoginError.NotAuthorised -> {
+                        Snackbar.make(coordinatorLayout, getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
+                                .show()
+                    }
+                    LoginViewModel.LoginError.UnkownFailure -> {
+                        Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
+                                .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
+                                .show()
+                    }
+                }
             }
 
             observeBoolean(formEnabled) { enabled ->

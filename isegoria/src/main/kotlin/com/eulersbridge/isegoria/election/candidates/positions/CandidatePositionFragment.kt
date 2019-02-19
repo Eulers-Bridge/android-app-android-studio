@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.util.TypedValue
 import android.view.Gravity
@@ -14,6 +15,7 @@ import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
 import com.eulersbridge.isegoria.GlideApp
@@ -25,13 +27,20 @@ import com.eulersbridge.isegoria.network.api.model.Position
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
+import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
+import kotlinx.android.synthetic.main.candidate_position_fragment.view.*
 import javax.inject.Inject
 
-class CandidatePositionFragment : Fragment() {
+/**
+ * This fragment shows a list of candidate running for a particular position.
+ */
+
+class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
     private var dpWidth: Float = 0.toFloat()
 
     @Inject
@@ -53,9 +62,9 @@ class CandidatePositionFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.candidate_position_fragment, container, false)
+    ): View? = inflater.inflate(R.layout.candidate_position_fragment, container, false)
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val position =
             arguments?.getParcelable<Position>(FRAGMENT_EXTRA_CANDIDATE_POSITION)
 
@@ -72,8 +81,6 @@ class CandidatePositionFragment : Fragment() {
                     }
                     .addTo(compositeDisposable)
         }
-
-        return rootView
     }
 
     private fun addCandidates(candidates: List<Candidate>?) {
@@ -250,5 +257,13 @@ class CandidatePositionFragment : Fragment() {
 
         candidatePositionTable.addView(tr)
         candidatePositionTable.addView(dividerView)
+    }
+
+    override fun getTitle(context: Context?): String? = "Position Candidates"
+
+    override fun setupTabLayout(tabLayout: TabLayout) {
+        tabLayout.apply {
+            isGone = true
+        }
     }
 }

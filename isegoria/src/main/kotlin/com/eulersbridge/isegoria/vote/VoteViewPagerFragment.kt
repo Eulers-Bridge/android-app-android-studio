@@ -9,17 +9,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.eulersbridge.isegoria.MainActivity
+import androidx.core.view.isGone
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.vote_view_pager_fragment.*
 import java.util.*
 import javax.inject.Inject
 
-class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
@@ -27,12 +28,6 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
 
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPagerAdapter: SimpleFragmentPagerAdapter
-
-    private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab) {}
-        override fun onTabUnselected(tab: TabLayout.Tab) {}
-        override fun onTabReselected(tab: TabLayout.Tab) {}
-    }
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
@@ -94,16 +89,7 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, MainActivity.TabbedFra
         this.tabLayout = tabLayout
 
         tabLayout.apply {
-            removeAllTabs()
-            visibility = View.VISIBLE
-            setupWithViewPager(viewPager)
-            addOnTabSelectedListener(onTabSelectedListener)
-            isEnabled = false
+            isGone = true
         }
-    }
-
-    override fun onPause() {
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onPause()
     }
 }

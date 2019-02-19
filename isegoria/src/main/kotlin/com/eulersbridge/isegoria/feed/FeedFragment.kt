@@ -17,16 +17,16 @@ import android.support.v4.content.ContextCompat
 import android.view.*
 import androidx.core.graphics.toColorFilter
 import androidx.core.view.isVisible
-import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.feed_fragment.*
 import javax.inject.Inject
 
 
-class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+class FeedFragment : Fragment(), TitledFragment, TabbedFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
@@ -43,6 +43,8 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {
             viewPager?.currentItem = tab.position
+//            runOnUiThread { (activity as MainActivity).clearTabFragmentStack() }
+
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -136,15 +138,5 @@ class FeedFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
             if (viewPager != null)
                 setupWithViewPager(viewPager)
         }
-    }
-
-    override fun onPause() {
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onDestroy()
     }
 }

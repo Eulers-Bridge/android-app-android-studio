@@ -36,6 +36,7 @@ class SplashActivity : DaggerAppCompatActivity() {
             when (it) {
                 is LoginState.LoggedIn -> showMainActivity()
                 is LoginState.LoginFailure -> showLoginActivity()
+                is LoginState.LoginUnauthorised -> showLoginActivity()
             }
         }.addTo(compositeDisposable)
     }

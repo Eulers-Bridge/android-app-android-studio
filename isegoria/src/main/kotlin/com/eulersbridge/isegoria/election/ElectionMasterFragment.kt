@@ -16,12 +16,13 @@ import com.eulersbridge.isegoria.election.candidates.CandidateFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.election_master_layout.*
 import javax.inject.Inject
 
-class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+class ElectionMasterFragment : Fragment(), TitledFragment, TabbedFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
@@ -98,11 +99,6 @@ class ElectionMasterFragment : Fragment(), TitledFragment, MainActivity.TabbedFr
 
             addOnTabSelectedListener(onTabSelectedListener)
         }
-    }
-
-    override fun onPause() {
-        tabLayout.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onPause()
     }
 
     private fun showTabFragment(fragment: Fragment) {

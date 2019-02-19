@@ -7,8 +7,8 @@ A [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-
 Bugs should be reported via Slack or Trello.
 
 ## Pre-Requisites
-* [Android Studio](https://developer.android.com/studio/index.html)
-* Gradle ([download standalone](http://www.gradle.org/downloads) or allow Android Studio to maintain)
+* [Android Studio 3.2.1](https://developer.android.com/studio/index.html)
+* Gradle () ([download standalone](http://www.gradle.org/downloads) or allow Android Studio to maintain)
 * Android SDK (maintained by Android Studio)
 
 ## Android SDK

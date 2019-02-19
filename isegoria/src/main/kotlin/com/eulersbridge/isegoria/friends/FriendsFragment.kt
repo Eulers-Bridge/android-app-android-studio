@@ -30,13 +30,14 @@ import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.friends_fragment.*
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
-class FriendsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment,
+class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
     FriendAdapter.Delegate, SearchAdapter.UserDelegate, FriendRequestAdapter.Delegate {
 
     private val searchAdapter = SearchAdapter(this)

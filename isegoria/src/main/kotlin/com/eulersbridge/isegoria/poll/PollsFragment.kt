@@ -18,13 +18,14 @@ import com.eulersbridge.isegoria.network.api.model.Poll
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.poll_vote_fragment.*
 import java.util.*
 import javax.inject.Inject
 
-class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
+class PollsFragment : Fragment(), TitledFragment, TabbedFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
@@ -97,11 +98,6 @@ class PollsFragment : Fragment(), TitledFragment, MainActivity.TabbedFragment {
     private fun updateTabs() {
         pagerAdapter.notifyDataSetChanged()
         tabLayout?.isVisible = fragments.size >= 2
-    }
-
-    override fun onPause() {
-        tabLayout?.removeOnTabSelectedListener(onTabSelectedListener)
-        super.onPause()
     }
 
     private fun createViewModelObservers() {

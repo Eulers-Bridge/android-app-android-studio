@@ -8,10 +8,15 @@ import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(private val repository: Repository, private val api: API) : BaseViewModel() {
+
+    enum class LoginError {
+        NotAuthorised, UnkownFailure
+    }
 
     private val email = MutableLiveData<String>()
     internal val emailError = Transformations.switchMap(email) { SingleLiveData(!it.isValidEmail) }
@@ -21,7 +26,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
     internal val formEnabled = MutableLiveData<Boolean>()
-    internal val networkError = MutableLiveData<Boolean>()
+    internal val loginError =  SingleLiveEvent<LoginError>()
 
     internal val canShowPasswordResetDialog = MutableLiveData<Boolean>()
 
@@ -30,7 +35,6 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
     init {
         formEnabled.value = true
-        networkError.value = false
         canShowPasswordResetDialog.value = true
 
         // Pre-fill saved user email
@@ -38,11 +42,12 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
         repository.getLoginState().subscribe {
             when (it) {
-                is LoginState.LoggingIn -> {
-                    networkError.postValue(false)
-                }
                 is LoginState.LoginFailure -> {
-                    networkError.postValue(true)
+                    loginError.postValue(LoginError.UnkownFailure)
+                    formEnabled.postValue(true)
+                }
+                is LoginState.LoginUnauthorised -> {
+                    loginError.postValue(LoginError.NotAuthorised)
                     formEnabled.postValue(true)
                 }
             }
@@ -65,10 +70,6 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
             repository.login(email.value!!, password.value!!)
         }
-    }
-
-    internal fun setNetworkErrorShown() {
-        networkError.value = false
     }
 
     internal fun requestPasswordRecoveryEmail(email: String?): Boolean {

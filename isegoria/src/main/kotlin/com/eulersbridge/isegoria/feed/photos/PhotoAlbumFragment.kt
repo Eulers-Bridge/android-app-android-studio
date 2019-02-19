@@ -4,21 +4,25 @@ import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.Photo
 import com.eulersbridge.isegoria.network.api.model.PhotoAlbum
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.ui.TabbedFragment
+import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.photo_album_fragment.*
 import javax.inject.Inject
 
-class PhotoAlbumFragment : Fragment() {
+class PhotoAlbumFragment : Fragment(), TabbedFragment, TitledFragment {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
@@ -61,6 +65,14 @@ class PhotoAlbumFragment : Fragment() {
         adapter.apply {
             isLoading = false
             replaceItems(photos)
+        }
+    }
+
+    override fun getTitle(context: Context?): String? = "Photos"
+
+    override fun setupTabLayout(tabLayout: TabLayout) {
+        tabLayout.apply {
+            isGone = true
         }
     }
 }
