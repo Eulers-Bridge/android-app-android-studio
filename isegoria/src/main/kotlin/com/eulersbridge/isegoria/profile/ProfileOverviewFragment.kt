@@ -16,10 +16,7 @@ import androidx.core.view.isGone
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.AppRouter
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.GenericUser
 import com.eulersbridge.isegoria.personality.PersonalityActivity
@@ -80,17 +77,12 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
         fetchAndSetViewModelUser()
     }
 
+    private val fragmentExtraContactArgument get() = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
+    private val fragmentExtraUserArgument get() = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_USER) as? GenericUser
+
     private fun fetchAndSetViewModelUser() {
-        val userArgument = arguments?.getParcelable<Parcelable>(FRAGMENT_EXTRA_CONTACT) as? GenericUser
-        wasOpenedByFriendsScreen = userArgument != null
-
-        val user = userArgument ?: repository.getUser()
-
-        /*if (user == null) {
-            val userId = arguments?.getLong(FRAGMENT_EXTRA_PROFILE_ID)
-
-            // ...
-        }*/
+        //checks if the parcelable is the current user or a contact
+        val user = (fragmentExtraContactArgument ?: fragmentExtraUserArgument) ?: repository.getUser()
 
         viewModel.setUser(user)
     }
