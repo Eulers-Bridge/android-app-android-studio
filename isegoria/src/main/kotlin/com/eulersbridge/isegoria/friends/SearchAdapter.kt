@@ -24,10 +24,6 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
     ListAdapter<User, UserViewHolder>(UserDiffCallback()), UserViewHolder.OnClickListener {
 
     internal interface UserDelegate {
-        fun getSearchedUserInstitution(
-            institutionId: Long,
-            weakViewHolder: WeakReference<UserViewHolder>
-        )
 
         fun onSearchedUserClick(user: User?)
         fun onSearchedUserActionClick(user: User?)
@@ -46,18 +42,11 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
 
         if (delegate != null && item.institutionId != null) {
             val weakViewHolder = WeakReference(viewHolder)
-            delegate.getSearchedUserInstitution(item.institutionId!!, weakViewHolder)
         }
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
         onBindViewHolder(holder, position)
-    }
-
-    fun setInstitution(institution: Institution?, weakViewHolder: WeakReference<UserViewHolder>) {
-        institution?.let {
-            weakViewHolder.get()?.setInstitution(it)
-        }
     }
 
     override fun onViewClick(user: GenericUser?) {

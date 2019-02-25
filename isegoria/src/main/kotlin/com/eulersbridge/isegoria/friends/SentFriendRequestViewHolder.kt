@@ -1,11 +1,9 @@
 package com.eulersbridge.isegoria.friends
 
-import android.support.annotation.DrawableRes
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isGone
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
@@ -18,11 +16,11 @@ internal class SentFriendRequestViewHolder(
         private val dataSource: ViewHolderDataSource
 ) : RecyclerView.ViewHolder(itemView) {
 
-    private var item: FriendRequest? = null
+    private var userRequest: FriendRequest? = null
 
     private val imageView: ImageView = itemView.findViewById(R.id.friends_list_image_view)
     private val nameTextView: TextView = itemView.findViewById(R.id.friends_list_name_text_view)
-    private val institutionTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
+    private val subTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
 
     init {
         //Grabs the action image (adding friend button/pending)
@@ -30,28 +28,25 @@ internal class SentFriendRequestViewHolder(
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
         actionImageView.setImageResource(R.drawable.added_inactive)
 
-        itemView.setOnClickListener { dataSource.onClick(item) }
+        itemView.setOnClickListener { dataSource.onClick(userRequest) }
     }
 
     fun setItem(item: FriendRequest?) {
-        this.item = item
+        this.userRequest = item
 
         bindItem(item)
     }
 
-    fun bindItem(item: FriendRequest?) {
-        if (item == null) {
+    fun bindItem(userParam: FriendRequest?) {
+        if (userParam == null) {
             nameTextView.text = null
-            institutionTextView.text = null
+            subTextView.text = null
 
         } else {
-            val user = item.requestReceiver
+            val user = userParam.requestReceiver
 
             nameTextView.text = user!!.fullName
-            dataSource.getFriendRequestInstitution(
-                    user.institutionId,
-                    WeakReference(this)
-            )
+            subTextView.text = user?.email
 
             GlideApp.with(imageView.context)
                     .load(user.profilePhotoURL)
@@ -59,10 +54,5 @@ internal class SentFriendRequestViewHolder(
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)
         }
-    }
-
-    fun setInstitution(institution: Institution) {
-        if (item?.requester?.institutionId == institution.id)
-            institutionTextView.text = institution.getName()
     }
 }

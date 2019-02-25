@@ -101,36 +101,6 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
         super.onDestroy()
     }
 
-    override fun getContactInstitution(
-        institutionId: Long,
-        weakViewHolder: WeakReference<UserViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            friendsAdapter.setInstitution(it, weakViewHolder)
-        }
-    }
-
-    override fun getSearchedUserInstitution(
-        institutionId: Long,
-        weakViewHolder: WeakReference<UserViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            searchAdapter.setInstitution(it, weakViewHolder)
-        }
-    }
-
-    override fun getFriendRequestInstitution(
-        institutionId: Long, @FriendRequestType type: Int,
-        weakViewHolder: WeakReference<RecyclerView.ViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            if (type == RECEIVED)
-                receivedAdapter.setInstitution(it, weakViewHolder)
-            else
-                sentAdapter.setInstitution(it, weakViewHolder)
-        }
-    }
-
     override fun performFriendRequestAction(type: Int, request: FriendRequest) {
         if (type == RECEIVED) {
 

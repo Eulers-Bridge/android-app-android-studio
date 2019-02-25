@@ -16,11 +16,6 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
     private val items = mutableListOf<Contact>()
 
     internal interface Delegate {
-        fun getContactInstitution(
-            institutionId: Long,
-            weakViewHolder: WeakReference<UserViewHolder>
-        )
-
         fun onContactClick(contact: Contact)
     }
 
@@ -42,24 +37,10 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val item = items[position]
         holder.setItem(item)
-
-        item.institutionId?.let {
-            val weakViewHolder = WeakReference(holder)
-            delegate?.getContactInstitution(it, weakViewHolder)
-        }
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
         onBindViewHolder(holder, position)
-    }
-
-    internal fun setInstitution(
-        institution: Institution?,
-        weakViewHolder: WeakReference<UserViewHolder>
-    ) {
-        institution?.let {
-            weakViewHolder.get()?.setInstitution(it)
-        }
     }
 
     internal fun setItems(newItems: List<Contact>) {

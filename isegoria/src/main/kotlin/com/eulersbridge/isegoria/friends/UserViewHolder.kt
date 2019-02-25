@@ -67,6 +67,4 @@ class UserViewHolder(
             // if theyre not show the add friend button
         }
     }
-
-    fun setInstitution(_institution: Institution) { }
 }
