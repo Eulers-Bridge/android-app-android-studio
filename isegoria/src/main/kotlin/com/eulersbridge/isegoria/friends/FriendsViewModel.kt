@@ -22,7 +22,12 @@ import javax.inject.Inject
 
 class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, private val repository: Repository) : BaseViewModel() {
 
-    private val searchQuery = BehaviorSubject.create<String>()
+    private val searchQuerySubject = BehaviorSubject.create<String>()
+    private val searchResultsSubject = BehaviorSubject.create<List<User>>()
+    private val sentFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
+    private val receivedFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
+    private val friendsSubject = BehaviorSubject.create<List<Contact>>()
+
     internal var searchResults = MutableLiveData<List<User>>()
     internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var receivedFriendRequests = MutableLiveData<List<FriendRequest>>()
@@ -42,11 +47,13 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         getFriends()
         getReceivedFriendRequests()
         getSentFriendRequests()
+
+
         createSearchObserver()
     }
 
     private fun createSearchObserver() {
-        searchQuery
+        searchQuerySubject
                 .debounce(250, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
                 .switchMapSingle {
@@ -58,10 +65,16 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                 }
                 .onErrorReturnItem(emptyList())
                 .subscribeBy(
-                        onNext = { searchResults.postValue(it) },
+                        onNext = { searchResultsSubject.onNext(it) },
                         onComplete = {},
                         onError = {}
                 )
+                .addToDisposable()
+
+        searchResultsSubject
+                .subscribe {
+                    searchResults.postValue(it)
+                }
                 .addToDisposable()
     }
 
@@ -77,7 +90,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     internal fun hideSearch() {
-        searchQuery.onNext("")
+        searchQuerySubject.onNext("")
         searchSectionVisible.value = false
 
         val haveSentRequests = sentFriendRequests.value?.isNotEmpty() ?: false
@@ -91,22 +104,37 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     internal fun onSearchQueryChanged(query: String) {
         showSearch()
-        searchQuery.onNext(query)
+        searchQuerySubject.onNext(query)
     }
 
     private fun getFriends() {
+
         repository.getFriends()
-                .subscribeSuccess { friends.postValue(it) }
+                .subscribeSuccess {friendsSubject.onNext(it) }
+                .addToDisposable()
+
+        friendsSubject
+                .subscribe {
+                    friends.postValue(it)
+                }
                 .addToDisposable()
     }
 
     private fun getSentFriendRequests() {
+
+
         repository.getSentFriendRequests()
                 .map { friendRequests ->
                     // if a friend request has been accepted or rejected the accepted property will be set
                     friendRequests.filter { it.accepted == null }
                 }
                 .subscribeSuccess {
+                    sentFriendRequestsSubject.onNext(it)
+                }
+                .addToDisposable()
+
+        sentFriendRequestsSubject
+                .subscribe {
                     sentFriendRequests.postValue(it)
                     sentRequestsVisible.postValue(it.isNotEmpty())
                 }
@@ -120,6 +148,12 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                     friendRequests.filter { it.accepted == null }
                 }
                 .subscribeSuccess {
+                    receivedFriendRequestsSubject.onNext(it)
+                }
+                .addToDisposable()
+
+        receivedFriendRequestsSubject
+                .subscribe {
                     receivedFriendRequests.postValue(it)
                     receivedRequestsVisible.postValue(it.isNotEmpty())
                 }
@@ -147,8 +181,4 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
             getFriends()
         }.toBooleanSingle().toLiveData()
     }
-
-    internal fun getInstitution(institutionId: Long): LiveData<Institution?>
-            = repository.getInstitution(institutionId).toLiveData().map { it.value }
-
 }
