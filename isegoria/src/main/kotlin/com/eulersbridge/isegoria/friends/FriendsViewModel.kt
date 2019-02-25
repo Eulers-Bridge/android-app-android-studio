@@ -44,38 +44,19 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         receivedRequestsVisible.value = false
         friendsVisible.value = true
 
-        getFriends()
-        getReceivedFriendRequests()
-        getSentFriendRequests()
+        // setup observers
+        createSearchResultsObserver()
+        createReceivedFriendRequestsObserver()
+        createSentFriendRequestsObserver()
+        createFriendsObserver()
 
+        // initialise subjects
+        refreshFriends()
+        refreshReceivedFriendRequests()
+        refreshSentFriendRequests()
 
-        createSearchObserver()
-    }
-
-    private fun createSearchObserver() {
-        searchQuerySubject
-                .debounce(250, TimeUnit.MILLISECONDS)
-                .distinctUntilChanged()
-                .switchMapSingle {
-                    if (it.isBlank() || it.length < 3) {
-                        Single.just(emptyList())
-                    } else {
-                        repository.searchForUsers(it)
-                    }
-                }
-                .onErrorReturnItem(emptyList())
-                .subscribeBy(
-                        onNext = { searchResultsSubject.onNext(it) },
-                        onComplete = {},
-                        onError = {}
-                )
-                .addToDisposable()
-
-        searchResultsSubject
-                .subscribe {
-                    searchResults.postValue(it)
-                }
-                .addToDisposable()
+        // setup search results subject from other subjects
+        createSearchResultsSubject()
     }
 
     internal fun onDestroy() {
@@ -107,12 +88,39 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         searchQuerySubject.onNext(query)
     }
 
-    private fun getFriends() {
+    internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
+        return if (newFriendEmail.isBlank()) {
+            SingleLiveData(false)
+        } else {
+            repository.addFriend(newFriendEmail).toLiveData()
+        }
+    }
 
-        repository.getFriends()
-                .subscribeSuccess {friendsSubject.onNext(it) }
+    internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
+        return repository.acceptFriendRequest(requestId).doOnComplete {
+            refreshReceivedFriendRequests()
+            refreshFriends()
+        }.toBooleanSingle().toLiveData()
+    }
+
+    internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
+        return repository.rejectFriendRequest(requestId).doOnComplete {
+            refreshReceivedFriendRequests()
+            refreshFriends()
+        }.toBooleanSingle().toLiveData()
+    }
+
+    // Setup Subject Observers
+
+    private fun createSearchResultsObserver() {
+        searchResultsSubject
+                .subscribe {
+                    searchResults.postValue(it)
+                }
                 .addToDisposable()
+    }
 
+    private fun createFriendsObserver() {
         friendsSubject
                 .subscribe {
                     friends.postValue(it)
@@ -120,7 +128,55 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                 .addToDisposable()
     }
 
-    private fun getSentFriendRequests() {
+    private fun createSentFriendRequestsObserver() {
+        sentFriendRequestsSubject
+                .subscribe {
+                    sentFriendRequests.postValue(it)
+                    sentRequestsVisible.postValue(it.isNotEmpty())
+                }
+                .addToDisposable()
+    }
+
+    private fun createReceivedFriendRequestsObserver() {
+        receivedFriendRequestsSubject
+                .subscribe {
+                    receivedFriendRequests.postValue(it)
+                    receivedRequestsVisible.postValue(it.isNotEmpty())
+                }
+                .addToDisposable()
+    }
+
+    private fun createSearchResultsSubject() {
+        searchQuerySubject
+                .debounce(250, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .switchMapSingle {
+                    if (it.isBlank() || it.length < 3) {
+                        Single.just(emptyList())
+                    } else {
+                        repository.searchForUsers(it)
+                    }
+                }
+                .onErrorReturnItem(emptyList())
+                .subscribeBy(
+                        onNext = { searchResultsSubject.onNext(it) },
+                        onComplete = {},
+                        onError = {}
+                )
+                .addToDisposable()
+    }
+
+
+    // Refresh Subjects
+
+    private fun refreshFriends() {
+
+        repository.getFriends()
+                .subscribeSuccess {friendsSubject.onNext(it) }
+                .addToDisposable()
+    }
+
+    private fun refreshSentFriendRequests() {
 
 
         repository.getSentFriendRequests()
@@ -132,16 +188,9 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                     sentFriendRequestsSubject.onNext(it)
                 }
                 .addToDisposable()
-
-        sentFriendRequestsSubject
-                .subscribe {
-                    sentFriendRequests.postValue(it)
-                    sentRequestsVisible.postValue(it.isNotEmpty())
-                }
-                .addToDisposable()
     }
 
-    private fun getReceivedFriendRequests() {
+    private fun refreshReceivedFriendRequests() {
         repository.getReceivedFriendRequests()
                 .map { friendRequests ->
                     // if a friend request has been accepted or rejected the accepted property will be set
@@ -151,34 +200,5 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                     receivedFriendRequestsSubject.onNext(it)
                 }
                 .addToDisposable()
-
-        receivedFriendRequestsSubject
-                .subscribe {
-                    receivedFriendRequests.postValue(it)
-                    receivedRequestsVisible.postValue(it.isNotEmpty())
-                }
-                .addToDisposable()
-    }
-
-    internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
-        return if (newFriendEmail.isBlank()) {
-            SingleLiveData(false)
-        } else {
-            repository.addFriend(newFriendEmail).toLiveData()
-        }
-    }
-
-    internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
-        return repository.acceptFriendRequest(requestId).doOnComplete {
-            getReceivedFriendRequests()
-            getFriends()
-        }.toBooleanSingle().toLiveData()
-    }
-
-    internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
-        return repository.rejectFriendRequest(requestId).doOnComplete {
-            getReceivedFriendRequests()
-            getFriends()
-        }.toBooleanSingle().toLiveData()
     }
 }
