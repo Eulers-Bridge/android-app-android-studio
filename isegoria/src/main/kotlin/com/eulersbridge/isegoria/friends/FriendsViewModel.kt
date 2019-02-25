@@ -102,6 +102,10 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     private fun getSentFriendRequests() {
         repository.getSentFriendRequests()
+                .map { friendRequests ->
+                    // if a friend request has been accepted or rejected the accepted property will be set
+                    friendRequests.filter { it.accepted == null }
+                }
                 .subscribeSuccess {
                     sentFriendRequests.postValue(it)
                     sentRequestsVisible.postValue(it.isNotEmpty())
@@ -111,6 +115,10 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     private fun getReceivedFriendRequests() {
         repository.getReceivedFriendRequests()
+                .map { friendRequests ->
+                    // if a friend request has been accepted or rejected the accepted property will be set
+                    friendRequests.filter { it.accepted == null }
+                }
                 .subscribeSuccess {
                     receivedFriendRequests.postValue(it)
                     receivedRequestsVisible.postValue(it.isNotEmpty())
