@@ -13,8 +13,8 @@ import com.eulersbridge.isegoria.network.api.model.GenericUser
 import com.eulersbridge.isegoria.network.api.model.Institution
 
 class UserViewHolder(
-    itemView: View, @DrawableRes actionImageDrawableRes: Int,
-    private val clickListener: OnClickListener?
+        itemView: View, @DrawableRes actionImageDrawableRes: Int,
+        private val clickListener: OnClickListener?
 ) : RecyclerView.ViewHolder(itemView) {
 
     private var item: GenericUser? = null
@@ -35,7 +35,6 @@ class UserViewHolder(
 
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
         actionImageView.apply {
-            setImageResource(actionImageDrawableRes)
             setOnClickListener {
                 clickListener?.onActionClick(item)
             }
@@ -48,20 +47,24 @@ class UserViewHolder(
         bindItem(item)
     }
 
-    private fun bindItem(item: GenericUser?) {
-        if (item == null) {
+    private fun bindItem(user: GenericUser?) {
+        if (user == null) {
             nameTextView.text = null
             subtextTextView.text = null
 
         } else {
-            nameTextView.text = item.fullName
-            subtextTextView.text = item.email
+            nameTextView.text = user.fullName
+            subtextTextView.text = user.email
 
             GlideApp.with(imageView.context)
-                .load(item.profilePhotoURL)
-                .placeholder(R.color.white)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+                    .load(user.profilePhotoURL)
+                    .placeholder(R.drawable.account_circle_24dp)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView)
+
+            // check to see if the person is already a friend
+            // if they are then show already a friend icon
+            // if theyre not show the add friend button
         }
     }
 

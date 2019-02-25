@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.friends
 
+import android.support.annotation.DrawableRes
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
@@ -13,8 +14,8 @@ import com.eulersbridge.isegoria.network.api.model.Institution
 import java.lang.ref.WeakReference
 
 internal class SentFriendRequestViewHolder(
-    itemView: View,
-    private val dataSource: ViewHolderDataSource
+        itemView: View,
+        private val dataSource: ViewHolderDataSource
 ) : RecyclerView.ViewHolder(itemView) {
 
     private var item: FriendRequest? = null
@@ -24,8 +25,10 @@ internal class SentFriendRequestViewHolder(
     private val institutionTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
 
     init {
+        //Grabs the action image (adding friend button/pending)
+        //Sets the images drawable to the pending one
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
-        actionImageView.isGone = true
+        actionImageView.setImageResource(R.drawable.added_inactive)
 
         itemView.setOnClickListener { dataSource.onClick(item) }
     }
@@ -46,15 +49,15 @@ internal class SentFriendRequestViewHolder(
 
             nameTextView.text = user!!.fullName
             dataSource.getFriendRequestInstitution(
-                user.institutionId,
-                WeakReference(this)
+                    user.institutionId,
+                    WeakReference(this)
             )
 
             GlideApp.with(imageView.context)
-                .load(user.profilePhotoURL)
-                .placeholder(R.color.white)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView)
+                    .load(user.profilePhotoURL)
+                    .placeholder(R.drawable.account_circle_24dp)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(imageView)
         }
     }
 
