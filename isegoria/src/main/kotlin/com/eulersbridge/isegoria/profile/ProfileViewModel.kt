@@ -70,14 +70,13 @@ class ProfileViewModel @Inject constructor(
                 .addToDisposable()
     }
 
-    internal fun setUser(user: GenericUser) {
+    internal fun setUser(user: GenericUser, isLoggedInUser: Boolean) {
         this.user.value = user
 
         fetchUserInstitutionName(user)
         fetchUserStats(user)
 
         if (user is User) {
-            val isLoggedInUser = user !is Contact
             val isLoggedInUserWithPersonality = user.hasPersonality
 
             if (!isLoggedInUser || isLoggedInUserWithPersonality)

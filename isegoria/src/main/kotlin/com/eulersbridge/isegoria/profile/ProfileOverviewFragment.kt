@@ -82,9 +82,11 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
     private fun fetchAndSetViewModelUser() {
         //checks if the parcelable is the current user or a contact
-        val user = (fragmentExtraContactArgument ?: fragmentExtraUserArgument) ?: repository.getUser()
+        val userArgument = fragmentExtraContactArgument ?: fragmentExtraUserArgument
 
-        viewModel.setUser(user)
+        wasOpenedByFriendsScreen = userArgument != null
+
+        viewModel.setUser(userArgument ?: repository.getUser(), !wasOpenedByFriendsScreen)
     }
 
     private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?, appRouter: AppRouter?) {
