@@ -312,8 +312,6 @@ class MainActivity : DaggerAppCompatActivity(), BottomNavigationView.OnNavigatio
     private fun updateAppBarState() {
         currentFragment?.let {
             runOnUiThread {
-                val fragment = it
-
                 if (it is TitledFragment) {
                     val fragmentTitle =
                         (it as TitledFragment).getTitle(this@MainActivity)

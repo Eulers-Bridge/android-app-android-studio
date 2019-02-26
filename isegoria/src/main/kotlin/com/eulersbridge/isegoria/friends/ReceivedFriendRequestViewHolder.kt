@@ -8,8 +8,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
-import com.eulersbridge.isegoria.network.api.model.Institution
-import java.lang.ref.WeakReference
 
 internal class ReceivedFriendRequestViewHolder(
     itemView: View,
@@ -20,7 +18,7 @@ internal class ReceivedFriendRequestViewHolder(
 
     private val imageView: ImageView = itemView.findViewById(R.id.friends_list_image_view)
     private val nameTextView: TextView = itemView.findViewById(R.id.friends_list_name_text_view)
-    private val institutionTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
+    private val subTextView: TextView = itemView.findViewById(R.id.friends_list_subtext_text_view)
 
     init {
         val actionImageView = itemView.findViewById<ImageView>(R.id.friends_list_action_image_view)
@@ -39,27 +37,19 @@ internal class ReceivedFriendRequestViewHolder(
     private fun bindItem(item: FriendRequest?) {
         if (item == null) {
             nameTextView.text = null
-            institutionTextView.text = null
+            subTextView.text = null
 
         } else {
             val user = item.requester
 
             nameTextView.text = user?.fullName
-            dataSource.getFriendRequestInstitution(
-                user?.institutionId,
-                WeakReference(this)
-            )
+            subTextView.text = user?.email
 
             GlideApp.with(imageView.context)
                 .load(user?.profilePhotoURL)
-                .placeholder(R.color.white)
+                .placeholder(R.drawable.account_circle_24dp)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(imageView)
         }
-    }
-
-    fun setInstitution(institution: Institution) {
-        if (item?.requester?.institutionId == institution.id)
-            institutionTextView.text = institution.getName()
     }
 }

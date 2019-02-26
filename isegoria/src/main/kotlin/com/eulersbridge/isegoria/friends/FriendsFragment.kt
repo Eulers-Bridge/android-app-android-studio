@@ -82,7 +82,11 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
         observe(viewModel.friends) { friendsAdapter.setItems(it!!) }
         observe(viewModel.receivedFriendRequests) { receivedAdapter.submitList(it!!) }
         observe(viewModel.sentFriendRequests) { sentAdapter.submitList(it!!) }
-        observe(viewModel.searchResults) { searchAdapter.submitList(it!!) }
+        observe(viewModel.searchResults) { friendSearchResults ->
+            searchAdapter.submitList(friendSearchResults!!
+        )}
+
+        observe(viewModel.toastMessage) { showMessage(it ?: "") }
 
         mainActivity = activity as? MainActivity
 
@@ -99,36 +103,6 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
     override fun onDestroy() {
         viewModel.onDestroy()
         super.onDestroy()
-    }
-
-    override fun getContactInstitution(
-        institutionId: Long,
-        weakViewHolder: WeakReference<UserViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            friendsAdapter.setInstitution(it, weakViewHolder)
-        }
-    }
-
-    override fun getSearchedUserInstitution(
-        institutionId: Long,
-        weakViewHolder: WeakReference<UserViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            searchAdapter.setInstitution(it, weakViewHolder)
-        }
-    }
-
-    override fun getFriendRequestInstitution(
-        institutionId: Long, @FriendRequestType type: Int,
-        weakViewHolder: WeakReference<RecyclerView.ViewHolder>
-    ) {
-        observe(viewModel.getInstitution(institutionId)) {
-            if (type == RECEIVED)
-                receivedAdapter.setInstitution(it, weakViewHolder)
-            else
-                sentAdapter.setInstitution(it, weakViewHolder)
-        }
     }
 
     override fun performFriendRequestAction(type: Int, request: FriendRequest) {
@@ -181,9 +155,7 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
 
     override fun onSearchedUserActionClick(user: User?) {
         if (user != null)
-            ifTrue(viewModel.addFriend(user.email)) {
-                showAddedMessage()
-            }
+            viewModel.addFriend(user.email)
     }
 
     override fun onContactClick(contact: Contact) {
