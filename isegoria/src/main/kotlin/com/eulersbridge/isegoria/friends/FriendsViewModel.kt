@@ -4,16 +4,14 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.model.Contact
-import com.eulersbridge.isegoria.network.api.model.FriendRequest
-import com.eulersbridge.isegoria.network.api.model.Institution
-import com.eulersbridge.isegoria.network.api.model.User
+import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -22,13 +20,21 @@ import javax.inject.Inject
 
 class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, private val repository: Repository) : BaseViewModel() {
 
+    enum class FriendStatus {
+        FRIEND,
+        PENDING,
+        NOT_FRIEND
+    }
+
+    internal data class FriendSearchResult(val user: User, val friendStatus: FriendStatus)
+
     private val searchQuerySubject = BehaviorSubject.create<String>()
-    private val searchResultsSubject = BehaviorSubject.create<List<User>>()
+    private val searchResultsSubject = BehaviorSubject.create<List<FriendSearchResult>>()
     private val sentFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
     private val receivedFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
     private val friendsSubject = BehaviorSubject.create<List<Contact>>()
 
-    internal var searchResults = MutableLiveData<List<User>>()
+    internal var searchResults = MutableLiveData<List<FriendSearchResult>>()
     internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var receivedFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var friends = MutableLiveData<List<Contact>>()
@@ -147,7 +153,9 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     private fun createSearchResultsSubject() {
-        searchQuerySubject
+         val userSearchResultsSubject = BehaviorSubject.create<List<User>>()
+
+         searchQuerySubject
                 .debounce(250, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
                 .switchMapSingle {
@@ -158,11 +166,52 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
                     }
                 }
                 .onErrorReturnItem(emptyList())
-                .subscribeBy(
-                        onNext = { searchResultsSubject.onNext(it) },
-                        onComplete = {},
-                        onError = {}
+                .subscribe { userSearchResultsSubject.onNext(it) }
+                .addToDisposable()
+
+
+
+        Observable.combineLatest(arrayOf(
+                userSearchResultsSubject,
+                sentFriendRequestsSubject,
+                receivedFriendRequestsSubject,
+                friendsSubject
+        )) {
+            val latestSearchResults = it[0] as List<User>
+            val latestSentFriendRequests = it[1] as List<FriendRequest>
+            val latestReceivedFriendRequests = it[2] as List<FriendRequest>
+            val latestFriends = it[3] as List<Contact>
+
+            // Search through the list of results
+            // return the status of the friendship
+            // the status then changes the associated icon
+            latestSearchResults.map { searchResult ->
+                FriendSearchResult(
+                    searchResult,
+                    when {
+                        latestFriends.filter {
+                            it.email == searchResult.email
+                        }.isNotEmpty() -> FriendStatus.FRIEND
+                        latestSentFriendRequests.filter {
+                            if (it.requestReceiver != null) {
+                                it.requestReceiver!!.email == searchResult.email
+                            } else {
+                                false
+                            }
+                        }.isNotEmpty() -> FriendStatus.PENDING
+                        latestReceivedFriendRequests.filter {
+                            if (it.requester != null) {
+                                it.requester!!.email == searchResult.email
+                            } else {
+                                false
+                            }
+                        }.isNotEmpty() -> FriendStatus.PENDING
+                        else -> FriendStatus.NOT_FRIEND
+                    }
                 )
+            }
+        }
+                .subscribeBy { searchResultsSubject.onNext(it) }
                 .addToDisposable()
     }
 
