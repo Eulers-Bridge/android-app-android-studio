@@ -7,7 +7,7 @@
     <item
         android:id="@+id/feed_menu_item_friends"
         android:title="@string/feed_menu_item_friends"
-        android:icon="@drawable/friends"
+        android:icon="@drawable/add_friend_blue"
         app:showAsAction="always"
         tools:iconTint="@color/white"
         android:tooltipText="@string/shortcut_add_friend_label_long"/>

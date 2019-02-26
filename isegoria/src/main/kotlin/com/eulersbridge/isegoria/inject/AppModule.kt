@@ -85,16 +85,10 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideCacheInterceptor(appContext: Context): CacheInterceptor
-            = CacheInterceptor(appContext)
-
-    @Provides
-    @Singleton
     fun provideHttpClient(
             loggingInterceptor: HttpLoggingInterceptor,
             baseUrlInterceptor: BaseUrlInterceptor,
             authenticationInterceptor: AuthenticationInterceptor,
-            cacheInterceptor: CacheInterceptor,
             cache: Cache
     ): OkHttpClient {
         return OkHttpClient.Builder()
@@ -104,10 +98,8 @@ class AppModule {
                             .addAppHeaders()
                     chain.proceed(request.build())
                 }
-                .addInterceptor(cacheInterceptor)
                 .addInterceptor(baseUrlInterceptor)
                 .addInterceptor(authenticationInterceptor)
-                .addNetworkInterceptor(cacheInterceptor)
                 .cache(cache)
                 .build()
     }
