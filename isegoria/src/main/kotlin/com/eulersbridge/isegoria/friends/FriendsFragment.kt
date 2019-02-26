@@ -86,6 +86,8 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
             searchAdapter.submitList(friendSearchResults!!
         )}
 
+        observe(viewModel.toastMessage) { showMessage(it ?: "") }
+
         mainActivity = activity as? MainActivity
 
         return rootView
@@ -153,9 +155,7 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
 
     override fun onSearchedUserActionClick(user: User?) {
         if (user != null)
-            ifTrue(viewModel.addFriend(user.email)) {
-                showAddedMessage()
-            }
+            viewModel.addFriend(user.email)
     }
 
     override fun onContactClick(contact: Contact) {

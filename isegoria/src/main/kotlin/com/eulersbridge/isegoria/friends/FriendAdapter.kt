@@ -31,7 +31,7 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.friend_partial_list_item, parent, false)
 
-        return UserViewHolder(itemView, R.drawable.profile_active, this)
+        return UserViewHolder(itemView, this)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {

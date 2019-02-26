@@ -12,7 +12,7 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.GenericUser
 
 class UserViewHolder(
-        itemView: View, @DrawableRes actionImageDrawableRes: Int,
+        itemView: View,
         private val clickListener: OnClickListener?
 ) : RecyclerView.ViewHolder(itemView) {
 
