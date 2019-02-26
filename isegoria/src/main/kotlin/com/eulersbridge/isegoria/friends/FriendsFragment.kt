@@ -83,10 +83,7 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
         observe(viewModel.receivedFriendRequests) { receivedAdapter.submitList(it!!) }
         observe(viewModel.sentFriendRequests) { sentAdapter.submitList(it!!) }
         observe(viewModel.searchResults) { friendSearchResults ->
-            searchAdapter.submitList(friendSearchResults!!.map
-                {friendSearchResult ->
-                    friendSearchResult.user
-            }
+            searchAdapter.submitList(friendSearchResults!!
         )}
 
         mainActivity = activity as? MainActivity

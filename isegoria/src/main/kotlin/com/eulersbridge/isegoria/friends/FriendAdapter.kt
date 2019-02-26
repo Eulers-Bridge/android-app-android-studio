@@ -36,7 +36,7 @@ class FriendAdapter internal constructor(private val delegate: Delegate?) :
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val item = items[position]
-        holder.setItem(item)
+        holder.setItem(item, UserViewHolder.ActionIcon.FRIEND)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
