@@ -10,16 +10,15 @@
         android:id="@+id/friends_list_image_view"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/lightGrey"
-        tools:src="@tools:sample/avatars"
-        android:contentDescription="@null"/>
+        app:srcCompat ="@drawable/account_circle_24dp" />
 
     <TextView
         android:id="@+id/friends_list_name_text_view"
@@ -57,17 +56,15 @@
 
     <ImageView
         android:id="@+id/friends_list_action_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="63dp"
+        android:layout_height="39dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/added_active"
+        android:contentDescription="@null"
         app:layout_constraintBottom_toBottomOf="@+id/friends_list_image_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/friends_list_image_view"
-        android:contentDescription="@null"
-        tools:src="@drawable/profile_active" />
+        app:layout_constraintTop_toTopOf="@+id/friends_list_image_view" />
 
 </android.support.constraint.ConstraintLayout>

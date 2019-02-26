@@ -170,7 +170,7 @@ class DataRepository @Inject constructor(
                             saveUserCredentials(email, password)
                         },
                         onError = {
-                            if (it is HttpException && (it as HttpException)!!.code() == 401) {
+                            if (it is HttpException && it.code() == 401) {
                                 loginState.onNext(LoginState.LoginUnauthorised())
                             } else {
                                 loginState.onNext(LoginState.LoginFailure())

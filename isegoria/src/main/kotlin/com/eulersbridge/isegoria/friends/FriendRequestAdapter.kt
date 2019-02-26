@@ -26,18 +26,12 @@ internal class FriendRequestAdapter(
 ) : ListAdapter<FriendRequest, RecyclerView.ViewHolder>(FriendRequestDiffCallback()), ViewHolderDataSource {
 
     internal interface Delegate {
-        fun getFriendRequestInstitution(
-            institutionId: Long,
-            @FriendsFragment.FriendRequestType type: Int,
-            weakViewHolder: WeakReference<RecyclerView.ViewHolder>
-        )
-
         fun performFriendRequestAction(@FriendsFragment.FriendRequestType type: Int, request: FriendRequest)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.friend_partial_list_item, parent, false)
+                .inflate(R.layout.friend_partial_list_item, parent, false)
 
         return if (this.itemType == FriendsFragment.RECEIVED) {
             ReceivedFriendRequestViewHolder(itemView, this)
@@ -59,20 +53,11 @@ internal class FriendRequestAdapter(
     }
 
     override fun onBindViewHolder(
-        holder: RecyclerView.ViewHolder,
-        position: Int,
-        payloads: MutableList<Any>
+            holder: RecyclerView.ViewHolder,
+            position: Int,
+            payloads: MutableList<Any>
     ) {
         onBindViewHolder(holder, position)
-    }
-
-    override fun getFriendRequestInstitution(
-        institutionId: Long?,
-        weakViewHolder: WeakReference<RecyclerView.ViewHolder>
-    ) {
-        institutionId?.let {
-            delegate.getFriendRequestInstitution(it, itemType, weakViewHolder)
-        }
     }
 
     override fun onClick(friendRequest: FriendRequest?) {
@@ -84,18 +69,6 @@ internal class FriendRequestAdapter(
     override fun onActionClick(friendRequest: FriendRequest?) {
         friendRequest?.let {
             delegate.performFriendRequestAction(itemType, it)
-        }
-    }
-
-    fun setInstitution(
-        institution: Institution?,
-        weakViewHolder: WeakReference<RecyclerView.ViewHolder>
-    ) {
-        val viewHolder = weakViewHolder.get()
-
-        if (viewHolder != null && institution != null) {
-            (viewHolder as? ReceivedFriendRequestViewHolder)?.setInstitution(institution)
-                    ?: (viewHolder as? SentFriendRequestViewHolder)?.setInstitution(institution)
         }
     }
 }

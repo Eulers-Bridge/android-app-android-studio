@@ -155,7 +155,7 @@
     <string name="friends_search_title">Search</string>
     <string name="friends_subheading_search_results">Search Results</string>
     <string name="friends_subheading_friend_requests_received">Friend Requests</string>
-    <string name="friends_subheading_friend_requests_sent">Pending</string>
+    <string name="friends_subheading_friend_requests_sent">Pending Friend Requests</string>
     <string name="friends_subheading_all_friends">Friends</string>
 
     <!-- User profile page -->

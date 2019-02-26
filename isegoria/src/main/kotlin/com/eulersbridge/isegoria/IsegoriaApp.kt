@@ -200,7 +200,7 @@ class IsegoriaApp : Application(), AppRouter, HasActivityInjector, HasSupportFra
             val friends = ShortcutInfo.Builder(this, SHORTCUT_ACTION_FRIENDS)
                 .setShortLabel(getString(R.string.shortcut_add_friend_label_short))
                 .setLongLabel(getString(R.string.shortcut_add_friend_label_long))
-                .setIcon(Icon.createWithResource(this, R.drawable.friends))
+                .setIcon(Icon.createWithResource(this, R.drawable.add_friend_blue))
                 .setRank(2)
                 .setIntent(
                     Intent(this, MainActivity::class.java)

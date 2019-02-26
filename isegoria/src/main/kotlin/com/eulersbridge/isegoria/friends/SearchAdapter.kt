@@ -6,28 +6,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.GenericUser
-import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.network.api.model.User
-import java.lang.ref.WeakReference
 
-private class UserDiffCallback : DiffUtil.ItemCallback<User>() {
-    override fun areItemsTheSame(oldItem: User?, newItem: User?): Boolean {
-        return oldItem?.id == newItem?.id
+private class UserDiffCallback : DiffUtil.ItemCallback<FriendsViewModel.FriendSearchResult>() {
+    override fun areItemsTheSame(oldItem: FriendsViewModel.FriendSearchResult?, newItem: FriendsViewModel.FriendSearchResult?): Boolean {
+        return oldItem?.user?.id == newItem?.user?.id
     }
 
-    override fun areContentsTheSame(oldItem: User?, newItem: User?): Boolean {
-        return oldItem == newItem
+    override fun areContentsTheSame(oldItem: FriendsViewModel.FriendSearchResult?, newItem: FriendsViewModel.FriendSearchResult?): Boolean {
+        return areItemsTheSame(oldItem, newItem) && oldItem?.friendStatus == newItem?.friendStatus
     }
 }
 
 internal class SearchAdapter(private val delegate: UserDelegate?) :
-    ListAdapter<User, UserViewHolder>(UserDiffCallback()), UserViewHolder.OnClickListener {
+    ListAdapter<FriendsViewModel.FriendSearchResult, UserViewHolder>(UserDiffCallback()), UserViewHolder.OnClickListener {
 
     internal interface UserDelegate {
-        fun getSearchedUserInstitution(
-            institutionId: Long,
-            weakViewHolder: WeakReference<UserViewHolder>
-        )
 
         fun onSearchedUserClick(user: User?)
         fun onSearchedUserActionClick(user: User?)
@@ -37,27 +31,23 @@ internal class SearchAdapter(private val delegate: UserDelegate?) :
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.friend_partial_list_item, parent, false)
 
-        return UserViewHolder(itemView, R.drawable.friends, this)
+        return UserViewHolder(itemView, this)
     }
 
     override fun onBindViewHolder(viewHolder: UserViewHolder, position: Int) {
         val item = getItem(position)
-        viewHolder.setItem(item)
-
-        if (delegate != null && item.institutionId != null) {
-            val weakViewHolder = WeakReference(viewHolder)
-            delegate.getSearchedUserInstitution(item.institutionId!!, weakViewHolder)
-        }
+        viewHolder.setItem(
+                item.user,
+                when (item.friendStatus) {
+                     FriendsViewModel.FriendStatus.FRIEND -> UserViewHolder.ActionIcon.FRIEND
+                     FriendsViewModel.FriendStatus.PENDING -> UserViewHolder.ActionIcon.FRIEND_PENDING
+                     FriendsViewModel.FriendStatus.NOT_FRIEND -> UserViewHolder.ActionIcon.ADD_FRIEND
+                }
+            )
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int, payloads: MutableList<Any>) {
         onBindViewHolder(holder, position)
-    }
-
-    fun setInstitution(institution: Institution?, weakViewHolder: WeakReference<UserViewHolder>) {
-        institution?.let {
-            weakViewHolder.get()?.setInstitution(it)
-        }
     }
 
     override fun onViewClick(user: GenericUser?) {

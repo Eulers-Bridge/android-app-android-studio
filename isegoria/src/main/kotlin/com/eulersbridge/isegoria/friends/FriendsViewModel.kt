@@ -3,17 +3,17 @@ package com.eulersbridge.isegoria.friends
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.AppRouter
+import com.eulersbridge.isegoria.auth.login.LoginViewModel
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.api.model.Contact
-import com.eulersbridge.isegoria.network.api.model.FriendRequest
-import com.eulersbridge.isegoria.network.api.model.Institution
-import com.eulersbridge.isegoria.network.api.model.User
+import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
+import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
@@ -22,8 +22,21 @@ import javax.inject.Inject
 
 class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, private val repository: Repository) : BaseViewModel() {
 
-    private val searchQuery = BehaviorSubject.create<String>()
-    internal var searchResults = MutableLiveData<List<User>>()
+    enum class FriendStatus {
+        FRIEND,
+        PENDING,
+        NOT_FRIEND
+    }
+
+    internal data class FriendSearchResult(val user: User, val friendStatus: FriendStatus)
+
+    private val searchQuerySubject = BehaviorSubject.create<String>()
+    private val searchResultsSubject = BehaviorSubject.create<List<FriendSearchResult>>()
+    private val sentFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
+    private val receivedFriendRequestsSubject = BehaviorSubject.create<List<FriendRequest>>()
+    private val friendsSubject = BehaviorSubject.create<List<Contact>>()
+
+    internal var searchResults = MutableLiveData<List<FriendSearchResult>>()
     internal var sentFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var receivedFriendRequests = MutableLiveData<List<FriendRequest>>()
     internal var friends = MutableLiveData<List<Contact>>()
@@ -32,6 +45,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     internal val sentRequestsVisible = MutableLiveData<Boolean>()
     internal val receivedRequestsVisible = MutableLiveData<Boolean>()
     internal val friendsVisible = MutableLiveData<Boolean>()
+    internal val toastMessage =  SingleLiveEvent<String>()
 
     init {
         searchSectionVisible.value = false
@@ -39,30 +53,19 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
         receivedRequestsVisible.value = false
         friendsVisible.value = true
 
-        getFriends()
-        getReceivedFriendRequests()
-        getSentFriendRequests()
-        createSearchObserver()
-    }
+        // setup observers
+        createSearchResultsObserver()
+        createReceivedFriendRequestsObserver()
+        createSentFriendRequestsObserver()
+        createFriendsObserver()
 
-    private fun createSearchObserver() {
-        searchQuery
-                .debounce(250, TimeUnit.MILLISECONDS)
-                .distinctUntilChanged()
-                .switchMapSingle {
-                    if (it.isBlank() || it.length < 3) {
-                        Single.just(emptyList())
-                    } else {
-                        repository.searchForUsers(it)
-                    }
-                }
-                .onErrorReturnItem(emptyList())
-                .subscribeBy(
-                        onNext = { searchResults.postValue(it) },
-                        onComplete = {},
-                        onError = {}
-                )
-                .addToDisposable()
+        // initialise subjects
+        refreshFriends()
+        refreshReceivedFriendRequests()
+        refreshSentFriendRequests()
+
+        // setup search results subject from other subjects
+        createSearchResultsSubject()
     }
 
     internal fun onDestroy() {
@@ -77,7 +80,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     }
 
     internal fun hideSearch() {
-        searchQuery.onNext("")
+        searchQuerySubject.onNext("")
         searchSectionVisible.value = false
 
         val haveSentRequests = sentFriendRequests.value?.isNotEmpty() ?: false
@@ -91,56 +94,171 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     internal fun onSearchQueryChanged(query: String) {
         showSearch()
-        searchQuery.onNext(query)
+        searchQuerySubject.onNext(query)
     }
 
-    private fun getFriends() {
-        repository.getFriends()
-                .subscribeSuccess { friends.postValue(it) }
+    internal fun addFriend(newFriendEmail: String) {
+        if (newFriendEmail.isBlank()) {
+            toastMessage.postValue("Unable to add friend")
+        } else {
+            repository.addFriend(newFriendEmail)
+                .doOnError { toastMessage.postValue("Unable to add friend") }
+                .subscribe { success ->
+                    if (success) {
+                        refreshSentFriendRequests()
+                        refreshFriends()
+                        toastMessage.postValue("Friend added")
+                    } else {
+                        toastMessage.postValue("Unable to add friend")
+                    }
+                 }
+                .addToDisposable()
+        }
+    }
+
+    internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
+        return repository.acceptFriendRequest(requestId).doOnComplete {
+            refreshReceivedFriendRequests()
+            refreshFriends()
+        }.toBooleanSingle().toLiveData()
+    }
+
+    internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
+        return repository.rejectFriendRequest(requestId).doOnComplete {
+            refreshReceivedFriendRequests()
+            refreshFriends()
+        }.toBooleanSingle().toLiveData()
+    }
+
+    // Setup Subject Observers
+
+    private fun createSearchResultsObserver() {
+        searchResultsSubject
+                .subscribe {
+                    searchResults.postValue(it)
+                }
                 .addToDisposable()
     }
 
-    private fun getSentFriendRequests() {
-        repository.getSentFriendRequests()
-                .subscribeSuccess {
+    private fun createFriendsObserver() {
+        friendsSubject
+                .subscribe {
+                    friends.postValue(it)
+                }
+                .addToDisposable()
+    }
+
+    private fun createSentFriendRequestsObserver() {
+        sentFriendRequestsSubject
+                .subscribe {
                     sentFriendRequests.postValue(it)
                     sentRequestsVisible.postValue(it.isNotEmpty())
                 }
                 .addToDisposable()
     }
 
-    private fun getReceivedFriendRequests() {
-        repository.getReceivedFriendRequests()
-                .subscribeSuccess {
+    private fun createReceivedFriendRequestsObserver() {
+        receivedFriendRequestsSubject
+                .subscribe {
                     receivedFriendRequests.postValue(it)
                     receivedRequestsVisible.postValue(it.isNotEmpty())
                 }
                 .addToDisposable()
     }
 
-    internal fun addFriend(newFriendEmail: String): LiveData<Boolean> {
-        return if (newFriendEmail.isBlank()) {
-            SingleLiveData(false)
-        } else {
-            repository.addFriend(newFriendEmail).toLiveData()
+    private fun createSearchResultsSubject() {
+         val userSearchResultsSubject = BehaviorSubject.create<List<User>>()
+
+         searchQuerySubject
+                .debounce(250, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .switchMapSingle {
+                    if (it.isBlank() || it.length < 3) {
+                        Single.just(emptyList())
+                    } else {
+                        repository.searchForUsers(it)
+                    }
+                }
+                .onErrorReturnItem(emptyList())
+                .subscribe { userSearchResultsSubject.onNext(it) }
+                .addToDisposable()
+
+
+
+        Observable.combineLatest(arrayOf(
+                userSearchResultsSubject,
+                sentFriendRequestsSubject,
+                receivedFriendRequestsSubject,
+                friendsSubject
+        )) {
+            val latestSearchResults = it[0] as List<User>
+            val latestSentFriendRequests = it[1] as List<FriendRequest>
+            val latestReceivedFriendRequests = it[2] as List<FriendRequest>
+            val latestFriends = it[3] as List<Contact>
+
+            // Search through the list of results
+            // return the status of the friendship
+            // the status then changes the associated icon
+            latestSearchResults.map { searchResult ->
+                FriendSearchResult(
+                    searchResult,
+                    when {
+                        latestFriends.filter {
+                            it.email == searchResult.email
+                        }.isNotEmpty() -> FriendStatus.FRIEND
+                        latestSentFriendRequests.filter {
+                            if (it.requestReceiver != null) {
+                                it.requestReceiver!!.email == searchResult.email
+                            } else {
+                                false
+                            }
+                        }.isNotEmpty() -> FriendStatus.PENDING
+                        latestReceivedFriendRequests.filter {
+                            if (it.requester != null) {
+                                it.requester!!.email == searchResult.email
+                            } else {
+                                false
+                            }
+                        }.isNotEmpty() -> FriendStatus.PENDING
+                        else -> FriendStatus.NOT_FRIEND
+                    }
+                )
+            }
         }
+                .subscribeBy { searchResultsSubject.onNext(it) }
+                .addToDisposable()
     }
 
-    internal fun acceptFriendRequest(requestId: Long): LiveData<Boolean> {
-        return repository.acceptFriendRequest(requestId).doOnComplete {
-            getReceivedFriendRequests()
-            getFriends()
-        }.toBooleanSingle().toLiveData()
+
+    // Refresh Subjects
+
+    private fun refreshFriends() {
+        repository.getFriends()
+                .subscribeSuccess {friendsSubject.onNext(it) }
+                .addToDisposable()
     }
 
-    internal fun rejectFriendRequest(requestId: Long): LiveData<Boolean> {
-        return repository.rejectFriendRequest(requestId).doOnComplete {
-            getReceivedFriendRequests()
-            getFriends()
-        }.toBooleanSingle().toLiveData()
+    private fun refreshSentFriendRequests() {
+        repository.getSentFriendRequests()
+                .map { friendRequests ->
+                    // if a friend request has been accepted or rejected the accepted property will be set
+                    friendRequests.filter { it.accepted == null }
+                }
+                .subscribeSuccess {
+                    sentFriendRequestsSubject.onNext(it)
+                }
+                .addToDisposable()
     }
 
-    internal fun getInstitution(institutionId: Long): LiveData<Institution?>
-            = repository.getInstitution(institutionId).toLiveData().map { it.value }
-
+    private fun refreshReceivedFriendRequests() {
+        repository.getReceivedFriendRequests()
+                .map { friendRequests ->
+                    // if a friend request has been accepted or rejected the accepted property will be set
+                    friendRequests.filter { it.accepted == null }
+                }
+                .subscribeSuccess {
+                    receivedFriendRequestsSubject.onNext(it)
+                }
+                .addToDisposable()
+    }
 }
