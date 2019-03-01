@@ -13,6 +13,7 @@ import com.eulersbridge.isegoria.util.data.Optional
 import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.BackpressureStrategy
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import java.util.*
@@ -20,11 +21,17 @@ import javax.inject.Inject
 
 class VoteViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
-    private var voteLocations: LiveData<List<VoteLocation>>? = null
-    internal var electionData: LiveData<Election?>? = null
-    private val selectedVoteLocationIndex = BehaviorSubject.createDefault(0)
-    private val selectedVoteLocation = selectedVoteLocationIndex.map { Optional(voteLocations?.value?.get(it)) }
+    // rx subjects
     private val dateTime = BehaviorSubject.createDefault(Optional<Calendar>())
+    private val selectedVoteLocationIndex = BehaviorSubject.createDefault(0)
+    private val selectedVoteLocation = selectedVoteLocationIndex.map {
+        Optional(  voteLocationsSubject.value?.getOrNull(it))
+    }
+    private val voteLocationsSubject = BehaviorSubject.createDefault<List<VoteLocation>>(listOf())
+
+    // live data
+    internal val voteLocations = voteLocationsSubject.toLiveData(BackpressureStrategy.LATEST)
+    internal var electionData: LiveData<Election?>? = null
 
     private val pledgeComplete = MutableLiveData<Boolean>()
 
@@ -41,6 +48,11 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
             if (it && pledgeComplete.value == false)
                 viewPagerIndex.postValue(1)
         }.addToDisposable()
+
+        // refresh values
+        refreshVoteLocations()
+
+
     }
 
     fun getAddReminderToCalendarIntent(): Intent? {
@@ -91,11 +103,16 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
         return electionData!!
     }
 
-    internal fun getVoteLocations(): LiveData<List<VoteLocation>> {
-        return repository.getVoteLocations().toLiveData()
+    private fun refreshVoteLocations() {
+        repository.getVoteLocations().doOnSuccess {
+            voteLocationsSubject.onNext(it)
+        }
+                .subscribe()
+                .addToDisposable()
     }
 
     internal fun setPledgeComplete() {
+        //Checks if a pledge has already been filled out before
         if (pledgeComplete.value != null && pledgeComplete.value == true)
             return
 

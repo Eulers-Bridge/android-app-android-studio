@@ -15,6 +15,9 @@ import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import com.eulersbridge.isegoria.vote.pages.VoteDoneFragment
+import com.eulersbridge.isegoria.vote.pages.VoteFragment
+import com.eulersbridge.isegoria.vote.pages.VotePledgeFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.vote_view_pager_fragment.*
 import java.util.*

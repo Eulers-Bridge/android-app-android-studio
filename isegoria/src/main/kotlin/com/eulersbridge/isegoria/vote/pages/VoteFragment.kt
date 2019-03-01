@@ -71,7 +71,7 @@ class VoteFragment : Fragment(), TitledFragment {
         timeTextView.isEnabled = false
 
         timeTextView.setOnClickListener {
-            if (!it.isEnabled) {
+            if (it.isEnabled) {
                 viewModel.getDateTime()?.let { calendar ->
                     openDialog = TimePickerDialog(
                         context,
@@ -97,7 +97,7 @@ class VoteFragment : Fragment(), TitledFragment {
         dateTextView.isEnabled = false
 
         dateTextView.setOnClickListener {
-            if (!it.isEnabled) {
+            if (it.isEnabled) {
                 viewModel.getDateTime()?.let { calendar ->
                     val datePickerDialog = DatePickerDialog(
                         context!!,
