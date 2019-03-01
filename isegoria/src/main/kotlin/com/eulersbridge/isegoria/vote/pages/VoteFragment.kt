@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.vote
+package com.eulersbridge.isegoria.vote.pages
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -18,6 +18,7 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.VoteLocation
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import com.eulersbridge.isegoria.vote.VoteViewModel
 import kotlinx.android.synthetic.main.vote_fragment.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -133,7 +134,7 @@ class VoteFragment : Fragment(), TitledFragment {
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.getVoteLocations()) { locations ->
+        observe(viewModel.voteLocations) { locations ->
             if (locations != null)
                 voteLocationArrayAdapter.addAll(locations)
         }

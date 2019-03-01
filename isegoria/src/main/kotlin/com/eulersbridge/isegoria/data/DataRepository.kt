@@ -509,6 +509,13 @@ class DataRepository @Inject constructor(
                 .onErrorReturnItem(false)
     }
 
+    override fun getLatestUserVoteReminder(): Single<VoteReminder> {
+        val user = requireUser()
+        return api.getVoteReminders(user.email).map { voteReminders ->
+            voteReminders.maxBy { it.date }
+        }
+    }
+
     override fun getUserSupportedTicket(ticketId: Long): Single<Boolean> {
         val user = requireUser()
         return api.getUserSupportedTickets(user.email).map {

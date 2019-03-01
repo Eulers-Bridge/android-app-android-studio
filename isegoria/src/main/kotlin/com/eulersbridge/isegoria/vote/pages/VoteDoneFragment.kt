@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.vote
+package com.eulersbridge.isegoria.vote.pages
 
 import android.content.Context
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import com.eulersbridge.isegoria.vote.VoteViewModel
 import kotlinx.android.synthetic.main.vote_fragment_done.*
 
 class VoteDoneFragment : Fragment(), TitledFragment {
@@ -29,8 +30,7 @@ class VoteDoneFragment : Fragment(), TitledFragment {
         }
 
         observeBoolean(viewModel.getLatestVoteReminder()) { success ->
-            if (!success)
-                addToCalendarButton.isEnabled = true
+            addToCalendarButton.isEnabled = success
         }
     }
 
