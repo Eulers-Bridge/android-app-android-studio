@@ -82,7 +82,7 @@ class VoteFragment : Fragment(), TitledFragment {
                                 it.set(Calendar.HOUR_OF_DAY, hourOfDay)
                                 it.set(Calendar.MINUTE, minute)
 
-                                viewModel.setDateTime(it)
+                                viewModel.onDateTimeChanged(it)
                                 updateTimeLabel(timeTextView, it)
                             }
                         },
@@ -109,7 +109,7 @@ class VoteFragment : Fragment(), TitledFragment {
                                 it.set(Calendar.MONTH, monthOfYear)
                                 it.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                                viewModel.setDateTime(it)
+                                viewModel.onDateTimeChanged(it)
                                 updateDateLabel(dateTextView, it)
                             }
                         },
@@ -118,7 +118,7 @@ class VoteFragment : Fragment(), TitledFragment {
                         calendar[Calendar.DAY_OF_MONTH]
                     )
 
-                    val election = viewModel.electionData?.value?.takeIf { it.startVoting < it.endVoting }
+                    val election = viewModel.election?.value?.takeIf { it.startVoting < it.endVoting }
                     if (election != null) {
                         datePickerDialog.datePicker.minDate = election.startVoting
                         datePickerDialog.datePicker.maxDate = election.endVoting
@@ -130,7 +130,7 @@ class VoteFragment : Fragment(), TitledFragment {
             }
         }
 
-        completeButton.setOnClickListener { viewModel.onVoteComplete() }
+        completeButton.setOnClickListener { viewModel.onInitialPageComplete() }
     }
 
     private fun createViewModelObservers() {
@@ -139,7 +139,7 @@ class VoteFragment : Fragment(), TitledFragment {
                 voteLocationArrayAdapter.addAll(locations)
         }
 
-        observe(viewModel.getElection()) {
+        observe(viewModel.election) {
             dateTextView.isEnabled = true
             timeTextView.isEnabled = true
         }

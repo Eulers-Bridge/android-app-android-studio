@@ -9,12 +9,9 @@ import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.network.api.model.VoteLocation
 import com.eulersbridge.isegoria.network.api.model.VoteReminder
 import com.eulersbridge.isegoria.util.BaseViewModel
-import com.eulersbridge.isegoria.util.data.Optional
-import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.BackpressureStrategy
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 import javax.inject.Inject
@@ -22,21 +19,19 @@ import javax.inject.Inject
 class VoteViewModel @Inject constructor(private val repository: Repository) : BaseViewModel() {
 
     enum class PageIndex(val value: Int) {
-        INTIAL(0),
+        INITIAL(0),
         PLEDGE(1),
         DONE(2)
     }
 
     // rx subjects
-    private val selectedDateTimeSubject = BehaviorSubject.createDefault(Optional<Calendar>())
+    private val selectedDateTimeSubject = BehaviorSubject.create<Calendar>()
     private val selectedVoteLocationIndexSubject = BehaviorSubject.createDefault(0)
-    private val selectedVoteLocationSubject = selectedVoteLocationIndexSubject.map {
-        Optional(  voteLocationsSubject.value?.getOrNull(it))
-    }
+
     private val voteLocationsSubject = BehaviorSubject.createDefault<List<VoteLocation>>(listOf())
     private val voteReminderSubject = BehaviorSubject.create<VoteReminder?>()
     private val pledgeCompleteSubject = BehaviorSubject.create<Boolean>()
-    private val viewPageIndexSubject = BehaviorSubject.createDefault(PageIndex.INTIAL)
+    private val pageIndexSubject = BehaviorSubject.createDefault(PageIndex.INITIAL)
     private val electionSubject = BehaviorSubject.create<Election?>()
 
     // live data
@@ -45,9 +40,9 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
 
     private val pledgeComplete = pledgeCompleteSubject.toLiveData(BackpressureStrategy.LATEST)
 
-    private val latestVoteReminder = voteReminderSubject.toLiveData(BackpressureStrategy.LATEST)
+    internal val voteReminder = voteReminderSubject.toLiveData(BackpressureStrategy.LATEST)
 
-    internal val viewPagerIndex = MutableLiveData<PageIndex>()
+    internal val pageIndex = pageIndexSubject.toLiveData(BackpressureStrategy.LATEST)
 
     init {
 //        Observables.combineLatest(selectedVoteLocationSubject, dateTimeSubject) { location, dateTime ->
@@ -59,6 +54,7 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
 
         //create observers
         observeVoteReminderSubject()
+        observeElectionSubject()
 
         // refresh values
         refreshElection()
@@ -67,7 +63,7 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
     }
 
     fun getAddReminderToCalendarIntent(): Intent? {
-        val (_, _, location, date) = latestVoteReminder.value ?: return null
+        val (_, _, location, date) = voteReminderSubject.value ?: return null
 
         return Intent(Intent.ACTION_INSERT)
                 .setData(CalendarContract.Events.CONTENT_URI)
@@ -80,103 +76,114 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
                 .putExtra(CalendarContract.Events.EVENT_LOCATION, location)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
+    internal fun getDateTime(): Calendar? {
+        return selectedDateTimeSubject.value
+    }
 
     internal fun onVoteLocationChanged(newIndex: Int) {
         selectedVoteLocationIndexSubject.onNext(newIndex)
     }
 
-    internal fun onDateAndTimeChanged(calendar: Calendar) {
-        selectedDateTimeSubject.onNext(Optional(calendar))
+    internal fun onDateTimeChanged(calendar: Calendar) {
+        selectedDateTimeSubject.onNext(calendar)
     }
 
     internal fun onInitialPageComplete() {
-        Observables.combineLatest(selectedVoteLocationSubject, selectedDateTimeSubject) { location, dateTime ->
-                location.value != null && dateTime.value != null
-        }.subscribe {pageComplete ->
-                if (pageComplete)
-                        viewPageIndexSubject.onNext(PageIndex.PLEDGE)
-        }.addToDisposable()
+        if (selectedVoteLocationIndexSubject.hasValue() && selectedDateTimeSubject.hasValue()) {
+            pageIndexSubject.onNext(PageIndex.PLEDGE)
+        } else {
+            //TODO: show notification with toast
+        }
     }
 
     internal fun onVotePledgeComplete() {
         //Checks if a pledge has already been filled out before
-        if (pledgeComplete.value != null && pledgeComplete.value == true)
+        if (pledgeCompleteSubject.value != null && pledgeCompleteSubject.value == true)
             return
 
-        val election = this.electionData?.value
-        val voteLocation = selectedVoteLocation.blockingFirst().value
-        val dateTimeCalendar = dateTime.value?.value
+        // Checks inputs have been selected
+        if (!(selectedVoteLocationIndexSubject.hasValue() && voteLocationsSubject.hasValue() && selectedDateTimeSubject.hasValue()))
+            //TODO: toast message
+            return
+
+        val election = electionSubject.value
+        val voteLocation =   voteLocationsSubject.value!!.getOrNull(selectedVoteLocationIndexSubject.value!!)
+        val dateTimeCalendar = selectedDateTimeSubject.value!!
 
         if (election != null && voteLocation != null && dateTimeCalendar != null) {
             repository.createUserVoteReminder(election.id, voteLocation.name!!, dateTimeCalendar.timeInMillis)
                     .toBooleanSingle()
+                    .doOnSuccess {
+                        pageIndexSubject.onNext(PageIndex.DONE)
+                    }
+                    .doOnError {
+                        //TODO: toast message
+                        print("Oh no")
+                    }
                     .subscribe()
                     .addToDisposable()
-
-            viewPagerIndex.value = 2
         }
 
-        refreshVoteReminder()
+//        refreshVoteReminder()
     }
-
-
-
-
-
-//        if (electionData != null)
-//            return electionData!!
-//
-//
-//
-//
-//
-//        electionData = repository.getLatestElection().map {
-//            if (it.value != null) {
-//                val calendar = Calendar.getInstance()
-//
-//                calendar.timeInMillis = it.value.startVoting
-//
-//                dateTime.onNext(Optional(calendar))
-//            }
-//
-//            it
-//        }.toLiveData().map { it.value }
-//
-//        return electionData!!
 
     // observers
 
     private fun observeVoteReminderSubject() {
-        voteReminderSubscribe.subscribe { viewPagerIndex.value = PageIndex.DONE }
+        voteReminderSubject.subscribe { pageIndexSubject.onNext(PageIndex.DONE) }.addToDisposable()
     }
 
+    private fun observeElectionSubject() {
+        electionSubject
+                .subscribe { election ->
+                    if (election != null) {
+                        val defaultVotingTime = Calendar.getInstance()
+                        defaultVotingTime.timeInMillis = election!!.startVoting
+                        selectedDateTimeSubject.onNext(defaultVotingTime)
+                    }
+                }
+                .addToDisposable()
+    }
 
     // subject refreshers
 
-
-
     private fun refreshElection() {
-        repository.getLatestElection().doOnSuccess {
-            if (it.value != null)
-                electionSubject.onNext(it.value)
-        }
+        repository.getLatestElection()
+                .doOnSuccess {
+                         if (it.value != null)
+                                electionSubject.onNext(it.value)
+                 }
+                .doOnError {
+                    //TODO: toast message
+                    print("Oh no")
+                }
                 .subscribe()
                 .addToDisposable()
     }
 
     private fun refreshVoteLocations() {
-        repository.getVoteLocations().doOnSuccess {
-            voteLocationsSubject.onNext(it)
-        }
+        repository.getVoteLocations()
+                .doOnSuccess {
+                    voteLocationsSubject.onNext(it)
+                }
+                .doOnError {
+                    //TODO: toast message
+                    print("Oh no")
+                }
                 .subscribe()
                 .addToDisposable()
     }
 
-    internal fun refreshVoteReminder() {
+    private fun refreshVoteReminder() {
         repository.getLatestUserVoteReminder()
                 .doOnSuccess {
-                    voteReminder.onNext(it)
+                    voteReminderSubject.onNext(it)
+                }
+                .doOnError {
+                    //TODO: toast message
+                    print("Oh no")
                 }
                 .subscribe()
+                .addToDisposable()
     }
 }

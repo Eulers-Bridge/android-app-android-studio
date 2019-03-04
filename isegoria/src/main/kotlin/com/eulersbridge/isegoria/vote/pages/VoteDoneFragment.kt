@@ -29,7 +29,7 @@ class VoteDoneFragment : Fragment(), TitledFragment {
             setOnClickListener { addToCalendar() }
         }
 
-        observeBoolean(viewModel.getLatestVoteReminder()) { success ->
+        observeBoolean(viewModel.voteReminder) { success ->
             addToCalendarButton.isEnabled = success
         }
     }

@@ -19,7 +19,7 @@ class VotePledgeFragment : Fragment(), TitledFragment {
             = inflater.inflate(R.layout.vote_fragment_pledge, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        votePledgeNextButton.setOnClickListener { viewModel.setPledgeComplete() }
+        votePledgeNextButton.setOnClickListener { viewModel.onVotePledgeComplete() }
     }
 
     fun setViewModel(viewModel: VoteViewModel) {

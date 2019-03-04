@@ -44,8 +44,8 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
         // Ensure options menu from another fragment is not carried over
         activity?.invalidateOptionsMenu()
 
-        observe(viewModel.viewPagerIndex) {
-            viewPager.currentItem = it!!
+        observe(viewModel.pageIndex) {
+            viewPager.currentItem = it?.value ?: 0
         }
 
         return rootView
