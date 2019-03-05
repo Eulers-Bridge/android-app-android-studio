@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.vote
+package com.eulersbridge.isegoria.vote.pages
 
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -18,6 +18,7 @@ import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.network.api.model.VoteLocation
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import com.eulersbridge.isegoria.vote.VoteViewModel
 import kotlinx.android.synthetic.main.vote_fragment.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -71,7 +72,7 @@ class VoteFragment : Fragment(), TitledFragment {
         timeTextView.isEnabled = false
 
         timeTextView.setOnClickListener {
-            if (!it.isEnabled) {
+            if (it.isEnabled) {
                 viewModel.getDateTime()?.let { calendar ->
                     openDialog = TimePickerDialog(
                         context,
@@ -81,7 +82,7 @@ class VoteFragment : Fragment(), TitledFragment {
                                 it.set(Calendar.HOUR_OF_DAY, hourOfDay)
                                 it.set(Calendar.MINUTE, minute)
 
-                                viewModel.setDateTime(it)
+                                viewModel.onDateTimeChanged(it)
                                 updateTimeLabel(timeTextView, it)
                             }
                         },
@@ -97,7 +98,7 @@ class VoteFragment : Fragment(), TitledFragment {
         dateTextView.isEnabled = false
 
         dateTextView.setOnClickListener {
-            if (!it.isEnabled) {
+            if (it.isEnabled) {
                 viewModel.getDateTime()?.let { calendar ->
                     val datePickerDialog = DatePickerDialog(
                         context!!,
@@ -108,7 +109,7 @@ class VoteFragment : Fragment(), TitledFragment {
                                 it.set(Calendar.MONTH, monthOfYear)
                                 it.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
-                                viewModel.setDateTime(it)
+                                viewModel.onDateTimeChanged(it)
                                 updateDateLabel(dateTextView, it)
                             }
                         },
@@ -117,7 +118,7 @@ class VoteFragment : Fragment(), TitledFragment {
                         calendar[Calendar.DAY_OF_MONTH]
                     )
 
-                    val election = viewModel.electionData?.value?.takeIf { it.startVoting < it.endVoting }
+                    val election = viewModel.election?.value?.takeIf { it.startVoting < it.endVoting }
                     if (election != null) {
                         datePickerDialog.datePicker.minDate = election.startVoting
                         datePickerDialog.datePicker.maxDate = election.endVoting
@@ -129,16 +130,16 @@ class VoteFragment : Fragment(), TitledFragment {
             }
         }
 
-        completeButton.setOnClickListener { viewModel.onVoteComplete() }
+        completeButton.setOnClickListener { viewModel.onInitialPageComplete() }
     }
 
     private fun createViewModelObservers() {
-        observe(viewModel.getVoteLocations()) { locations ->
+        observe(viewModel.voteLocations) { locations ->
             if (locations != null)
                 voteLocationArrayAdapter.addAll(locations)
         }
 
-        observe(viewModel.getElection()) {
+        observe(viewModel.election) {
             dateTextView.isEnabled = true
             timeTextView.isEnabled = true
         }

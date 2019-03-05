@@ -26,13 +26,12 @@ internal class UnwrapConverterFactory : Converter.Factory() {
             val delegate = retrofit.nextResponseBodyConverter<GenericPaginatedResponse<*>>(this, envelopeType, annotations)
 
             Converter<ResponseBody, Any> { value ->
-                val (foundObjects, totalElements) = delegate.convert(value)
+                val (foundObjects) = delegate.convert(value)
 
-                if (totalElements > 0) {
-                    foundObjects
-                } else {
-                    null
-                }
+                foundObjects
+                // NOTE: there was previously a check to return null if found objects is an empty
+                //       list, this was removed because it was causing unnecessary errors and had no
+                //        obvious purpose
             }
 
         } else {

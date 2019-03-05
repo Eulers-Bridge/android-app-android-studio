@@ -59,6 +59,7 @@ interface Repository {
 
     fun getVoteLocations(): Single<List<VoteLocation>>
     fun createUserVoteReminder(electionId: Long, voteLocation: String, date: Long): Completable
+    fun getLatestUserVoteReminder(): Single<Optional<VoteReminder>>
     fun getUserVoteReminderExists(): Single<Boolean>
     fun getUserSupportedTicket(ticketId: Long): Single<Boolean>
 

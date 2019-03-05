@@ -9,12 +9,16 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isGone
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.ui.SimpleFragmentPagerAdapter
 import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
+import com.eulersbridge.isegoria.vote.pages.VoteDoneFragment
+import com.eulersbridge.isegoria.vote.pages.VoteFragment
+import com.eulersbridge.isegoria.vote.pages.VotePledgeFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.vote_view_pager_fragment.*
 import java.util.*
@@ -41,8 +45,8 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
         // Ensure options menu from another fragment is not carried over
         activity?.invalidateOptionsMenu()
 
-        observe(viewModel.viewPagerIndex) {
-            viewPager.currentItem = it!!
+        observe(viewModel.pageIndex) {
+            viewPager.currentItem = it?.value ?: 0
         }
 
         return rootView
@@ -50,6 +54,12 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViewPager()
+
+        observe(viewModel.toastMessage) {message ->
+            if (message != null) {
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_vote)
