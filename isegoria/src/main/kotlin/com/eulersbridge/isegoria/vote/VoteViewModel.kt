@@ -122,9 +122,6 @@ class VoteViewModel @Inject constructor(private val repository: Repository) : Ba
                         } else {
                             toastMessage.postValue("Unexpected error")
                         }
-
-                        //TODO: remove once vote reminders backend has been fixed
-                        voteReminderSubject.onNext(VoteReminder("james@margenberg.com.au", currentElection.id, selectedVoteLocation.name, dateTimeCalendar.timeInMillis))
                     }
                     .doOnError {
                         toastMessage.postValue("Unexpected error")
