@@ -113,8 +113,15 @@ class DataRepository @Inject constructor(
     }
 
     @Throws(NullPointerException::class)
-    override fun getUser(): User {
+    override fun getUserFromLoginState(): User {
         return requireUser()
+    }
+
+    @Throws(NullPointerException::class)
+    override fun getUser(): Single<User> {
+        val user = requireUser()
+
+        return api.getUser(user.email)
     }
 
     override fun resendVerificationEmail(): Completable {

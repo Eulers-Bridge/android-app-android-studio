@@ -94,7 +94,7 @@ class NewsDetailViewModelTest {
     @Test
     fun `view model stores given article`() {
         given(repository.getNewsArticleLikes(anyLong())).willReturn(Single.just(dummyNewsArticleLikes))
-        given(repository.getUser()).willReturn(dummyUser)
+        given(repository.getUserFromLoginState()).willReturn(dummyUser)
 
         val observer = mock<Observer<NewsArticle>>()
         newsDetailViewModel.newsArticle.observeForever(observer)
@@ -108,7 +108,7 @@ class NewsDetailViewModelTest {
     @Test
     fun `view model fetches likes for a given article`() {
         given(repository.getNewsArticleLikes(anyLong())).willReturn(Single.just(dummyNewsArticleLikes))
-        given(repository.getUser()).willReturn(dummyUser)
+        given(repository.getUserFromLoginState()).willReturn(dummyUser)
 
         val likeCountObserver = mock<Observer<Int>>()
         newsDetailViewModel.likeCount.observeForever(likeCountObserver)

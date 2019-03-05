@@ -6,17 +6,28 @@ import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.BackpressureStrategy
+import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
 class ElectionViewModel @Inject constructor(repository: Repository) : BaseViewModel() {
 
-    internal val surveyPromptVisible = MutableLiveData<Boolean>()
+    private val surveyPromptVisibleSubject = BehaviorSubject.createDefault<Boolean>(false)
+
+    internal val surveyPromptVisible = surveyPromptVisibleSubject.toLiveData(BackpressureStrategy.LATEST)
     internal val surveyVisible = SingleLiveEvent<Any>()
     internal val election = MutableLiveData<Election?>()
 
     init {
-        // If the user has not completed the questions, show a prompt for them
-        surveyPromptVisible.value = !repository.getUser().hasPPSEQuestions
+        repository.getUser()
+                .doOnSuccess { user ->
+                    // If the user has not completed the questions, show a prompt for them
+                    surveyPromptVisibleSubject.onNext(!user.hasPPSEQuestions)
+                }
+                .subscribe()
+                .addToDisposable()
+
 
         repository.getLatestElection()
                 .subscribeSuccess { election.postValue(it.value) }
@@ -25,6 +36,6 @@ class ElectionViewModel @Inject constructor(repository: Repository) : BaseViewMo
 
     internal fun onSurveyPromptNext() {
         surveyVisible.call()
-        surveyPromptVisible.value = false
+        surveyPromptVisibleSubject.onNext(false)
     }
 }

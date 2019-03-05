@@ -15,7 +15,8 @@ interface Repository {
     fun getSavedEmail(): String?
     fun getSavedPassword(): String?
 
-    fun getUser(): User
+    fun getUserFromLoginState(): User
+    fun getUser(): Single<User>
 
     fun resendVerificationEmail(): Completable
     fun login(email: String, password: String)

@@ -86,7 +86,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
 
         wasOpenedByFriendsScreen = userArgument != null
 
-        viewModel.setUser(userArgument ?: repository.getUser(), !wasOpenedByFriendsScreen)
+        viewModel.setUser(userArgument ?: repository.getUserFromLoginState(), !wasOpenedByFriendsScreen)
     }
 
     private fun provideDependencies(repository: Repository, viewModel: ProfileViewModel?, appRouter: AppRouter?) {
