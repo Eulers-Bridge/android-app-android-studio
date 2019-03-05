@@ -8,6 +8,9 @@ import retrofit2.http.*
 
 interface API {
 
+    @GET("user/{userEmail}")
+    fun getUser(@Path("userEmail") userEmail: String): Single<User>
+
     @GET("general-info")
     fun getGeneralInfo(): Single<GeneralInfoResponse>
 

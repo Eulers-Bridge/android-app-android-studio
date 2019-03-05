@@ -63,7 +63,7 @@ class PhotoDetailViewModel @Inject constructor(private val repository: Repositor
 
     internal fun getPhotoLikedByUser(): LiveData<Boolean> {
         return photoLikes
-                .map { it.singleOrNull { it.email == repository.getUser().email } != null }
+                .map { it.singleOrNull { it.email == repository.getUserFromLoginState().email } != null }
                 .toLiveData(BackpressureStrategy.LATEST)
     }
 

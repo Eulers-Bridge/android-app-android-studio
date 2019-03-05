@@ -27,7 +27,7 @@ class SettingsViewModel @Inject constructor(private val repository: Repository) 
         optOutDataCollectionSwitchEnabled.value = false
         doNotTrackSwitchEnabled.value = false
 
-        val user = repository.getUser()
+        val user = repository.getUserFromLoginState()
 
         optOutDataCollectionSwitchChecked.value = user.isOptedOutOfDataCollection
         optOutDataCollectionSwitchEnabled.value = true

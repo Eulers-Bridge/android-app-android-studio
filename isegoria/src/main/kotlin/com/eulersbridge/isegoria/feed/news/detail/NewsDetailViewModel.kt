@@ -29,7 +29,7 @@ class NewsDetailViewModel @Inject constructor(private val repository: Repository
                 .subscribeSuccess {
                     likeCount.postValue(it.size)
 
-                    val likesContainUser = it.any { it.email == repository.getUser().email }
+                    val likesContainUser = it.any { it.email == repository.getUserFromLoginState().email }
                     likedByUser.postValue(likesContainUser)
                 }.addToDisposable()
     }
