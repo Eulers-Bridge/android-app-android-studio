@@ -145,8 +145,6 @@ class IsegoriaApp : Application(), AppRouter, HasActivityInjector, HasSupportFra
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             vmPolicy = vmPolicy.detectFileUriExposure()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            vmPolicy = vmPolicy.detectContentUriWithoutPermission()
 
         return vmPolicy
                 .penaltyLog()

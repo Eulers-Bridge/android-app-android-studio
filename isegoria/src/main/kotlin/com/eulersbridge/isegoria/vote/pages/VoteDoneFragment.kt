@@ -7,10 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import com.eulersbridge.isegoria.vote.VoteViewModel
 import kotlinx.android.synthetic.main.vote_fragment_done.*
+
 
 class VoteDoneFragment : Fragment(), TitledFragment {
 
@@ -24,28 +24,21 @@ class VoteDoneFragment : Fragment(), TitledFragment {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        addToCalendarButton.apply {
-            isEnabled = false
-            setOnClickListener { addToCalendar() }
-        }
-
-        observeBoolean(viewModel.voteReminder) { success ->
-            addToCalendarButton.isEnabled = success
-        }
+        addToCalendarButton.setOnClickListener { addToCalendar() }
     }
 
     private fun addToCalendar() {
-        addToCalendarButton.isEnabled = false
-
         activity?.let { activity ->
             viewModel.getAddReminderToCalendarIntent()
-                ?.takeIf { it.resolveActivity(activity.packageManager) != null }
                 ?.apply {
-                    activity.startActivity(this)
+                    if (this.resolveActivity(activity.packageManager) != null) {
+                        activity.startActivity(this)
+                    } else {
+                        //TODO: toast message
+                        print("Oh no")
+                    }
                 }
         }
-
-        addToCalendarButton.isEnabled = true
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.vote_tab_3)

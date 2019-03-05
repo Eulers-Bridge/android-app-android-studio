@@ -8,7 +8,6 @@ import android.support.annotation.IntDef
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.text.InputType
 import android.view.*
@@ -17,7 +16,6 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.core.widget.toast
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CONTACT
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
 import com.eulersbridge.isegoria.MainActivity
@@ -27,14 +25,12 @@ import com.eulersbridge.isegoria.network.api.model.Contact
 import com.eulersbridge.isegoria.network.api.model.FriendRequest
 import com.eulersbridge.isegoria.network.api.model.User
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
-import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TabbedFragment
 import com.eulersbridge.isegoria.util.ui.TitledFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.friends_fragment.*
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
@@ -222,10 +218,7 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
     }
 
     private fun showMessage(message: String)
-            = context?.toast(message, Toast.LENGTH_LONG)?.show()
-
-    private fun showAddedMessage()
-            = showMessage(getString(R.string.friend_request_sent_message))
+            = Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
 
     private fun showAcceptedMessage(friendName: String)
             = showMessage(getString(R.string.friend_request_accepted_message, friendName))

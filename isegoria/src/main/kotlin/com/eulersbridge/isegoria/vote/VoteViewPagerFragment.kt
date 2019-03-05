@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isGone
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.util.extension.observe
@@ -53,6 +54,12 @@ class VoteViewPagerFragment : Fragment(), TitledFragment, TabbedFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupViewPager()
+
+        observe(viewModel.toastMessage) {message ->
+            if (message != null) {
+                Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun getTitle(context: Context?) = context?.getString(R.string.section_title_vote)
