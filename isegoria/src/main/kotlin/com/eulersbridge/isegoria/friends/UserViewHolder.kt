@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
@@ -65,6 +66,7 @@ class UserViewHolder(
 
             GlideApp.with(imageView.context)
                     .load(user.profilePhotoURL)
+                    .transform(CircleCrop())
                     .placeholder(R.drawable.account_circle_24dp)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(imageView)

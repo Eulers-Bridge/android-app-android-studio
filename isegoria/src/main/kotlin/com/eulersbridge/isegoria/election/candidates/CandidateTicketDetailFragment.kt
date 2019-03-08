@@ -22,6 +22,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -112,6 +113,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
                     it.photos.firstOrNull()?.let {
                         GlideApp.with(this@CandidateTicketDetailFragment)
                             .load(it.getPhotoUrl())
+                            .transform(CircleCrop())
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(partyDetailLogoImageView)
                     }
@@ -205,6 +207,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
                     it.photos.firstOrNull()?.let {
                         GlideApp.with(this@CandidateTicketDetailFragment)
                             .load(it.getPhotoUrl())
+                            .transform(CircleCrop())
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(candidateProfileView)
                     }
