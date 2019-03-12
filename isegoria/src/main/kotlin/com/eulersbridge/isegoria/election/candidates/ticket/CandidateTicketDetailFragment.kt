@@ -1,12 +1,8 @@
-package com.eulersbridge.isegoria.election.candidates
+package com.eulersbridge.isegoria.election.candidates.ticket
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RectShape
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
@@ -27,6 +23,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.data.Repository
+import com.eulersbridge.isegoria.election.candidates.profile.CandidateProfileFragment
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
@@ -51,8 +48,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
     private var dpWidth: Float = 0.toFloat()
 
     private var ticketId: Long = 0
-    private val code = ""
-    private val colour = "#000000"
+    private var partyCode: String? = ""
     private var partyColour: String? = ""
     private var partyLogo: String? = ""
 
@@ -82,6 +78,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
             noOfSupporters = it.getInt("NoOfSupporters")
             partyColour = it.getString("Colour")
             partyLogo = it.getString("Logo")
+            partyCode = it.getString("Code")
         }
 
         activity?.resources?.displayMetrics?.let {
@@ -107,56 +104,63 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
                 .subscribeSuccess { addCandidates(it) }
                 .addTo(compositeDisposable)
 
-        repository.getPhotos(ticketId)
-                .subscribeSuccess {
-                    it.photos.firstOrNull()?.let {
-                        GlideApp.with(this@CandidateTicketDetailFragment)
-                            .load(it.getPhotoUrl())
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(partyDetailLogoImageView)
-                    }
-                }
-                .addTo(compositeDisposable)
+
+        GlideApp.with(this@CandidateTicketDetailFragment)
+                .load(partyLogo)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(partyDetailLogoImageView)
 
         repository.getUserSupportedTicket(ticketId)
-                .subscribeSuccess {
+                .subscribeSuccess {userSupportsTicket ->
                     runOnUiThread {
-                        ticketSupportButton.text = getString(R.string.candidate_ticket_detail_button_unsupport)
+                        ticketSupportButton.text =
+                            if (userSupportsTicket)
+                                getString(R.string.candidate_ticket_detail_button_supporting)
+                            else
+                                getString(R.string.candidate_ticket_detail_button_not_supporting)
+
                     }
                 }
                 .addTo(compositeDisposable)
 
         ticketSupportButton.setOnClickListener {
 
-            val supportStr = getString(R.string.candidate_ticket_detail_button_support)
-            val unsupportStr = getString(R.string.candidate_ticket_detail_button_unsupport)
+            val supportStr = getString(R.string.candidate_ticket_detail_button_supporting)
+            val unsupportStr =  getString(R.string.candidate_ticket_detail_button_not_supporting)
 
-            if (ticketSupportButton.text == supportStr) {
+            if (ticketSupportButton.text == unsupportStr) {
 
                 repository.supportTicket(ticketId)
                         .toBooleanSingle()
                         .subscribe()
                         .addTo(compositeDisposable)
 
+                ticketSupportButton.setBackgroundResource(R.color.election_ticket_supporting)
+
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) + 1).toString()
-                ticketSupportButton.text = unsupportStr
+                ticketSupportButton.text = supportStr
 
-            } else if (ticketSupportButton.text == unsupportStr) {
+            } else if (ticketSupportButton.text == supportStr ) {
 
                 repository.unsupportTicket(ticketId)
                         .toBooleanSingle()
                         .subscribe()
                         .addTo(compositeDisposable)
 
+                ticketSupportButton.setBackgroundResource(R.color.election_ticket_not_supporting)
+
+
                 val value = partyDetailSupporters.text.toString()
                 partyDetailSupporters.text = (Integer.parseInt(value) - 1).toString()
-                ticketSupportButton.text = supportStr
+                ticketSupportButton.text = unsupportStr
             }
         }
 
         partyDetailSupporters.text = noOfSupporters?.toString()
         backgroundLayout.partyNameTextView.text = ticketName
+
+
     }
 
     override fun onPause() {
@@ -186,41 +190,17 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
         val rowParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         tr.layoutParams = rowParams
-        tr.setPadding(0, paddingMargin3, 0, paddingMargin3)
-        val imageHeight = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            53.33333333.toFloat(), resources.displayMetrics
-        ).toInt()
 
-        val candidateProfileView = ImageView(activity)
-        candidateProfileView.apply {
-            layoutParams = LayoutParams(imageHeight, imageHeight)
-            scaleType = ScaleType.CENTER_CROP
-            //setImageBitmap(decodeSampledBitmapFromResource(resources, candidate.userId, imageHeight, imageHeight));
-            setPadding(paddingMargin3, 0, paddingMargin3, 0)
-        }
-
-        repository.getPhotos(candidate.userId)
-                .subscribeSuccess {
-                    it.photos.firstOrNull()?.let {
-                        GlideApp.with(this@CandidateTicketDetailFragment)
-                            .load(it.getPhotoUrl())
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(candidateProfileView)
-                    }
-                }
-                .addTo(compositeDisposable)
-
+        // Sets the candidate image
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.END.toFloat()
+                    150,
+                    150
             )
 
-            scaleType = ScaleType.CENTER_CROP
-            setImageResource(R.drawable.profile_light)
-            setPadding(paddingMargin3, 0, paddingMargin3, 0)
+            scaleType = ScaleType.FIT_CENTER
+            setImageResource(R.drawable.account_circle_24dp)
 
             setOnClickListener {
 
@@ -232,37 +212,39 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
             }
         }
 
-        val textViewParty = TextView(activity)
-        textViewParty.apply {
-            setTextColor(Color.parseColor("#FFFFFF"))
-            setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f)
-            text = partyLogo
+        val candidatePartyImage = TextView(activity)
+        candidatePartyImage.apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                    200 ,
+                    150
             )
-            gravity = Gravity.CENTER
-            setTypeface(null, Typeface.BOLD)
+            text = partyCode
+
+            setOnClickListener {
+
+                val profileFragment = ProfileOverviewFragment()
+                profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to candidate.userId)
+
+
+                (activity as MainActivity).presentContent(profileFragment)
+            }
         }
 
-        val rect = RectShape()
-        val rectShapeDrawable = ShapeDrawable(rect)
-        val paint = rectShapeDrawable.paint
-        paint.apply {
-            color = Color.parseColor(partyColour)
-            style = Paint.Style.FILL_AND_STROKE
-            strokeWidth = 5f
-        }
-
-        val partyLayout = LinearLayout(activity)
-        partyLayout.apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_VERTICAL
+        val candidateProfileLink = ImageView(activity)
+        candidateProfileLink.apply {
             layoutParams = LinearLayout.LayoutParams(
-                imageHeight, 40
+                    200,
+                    150
             )
-            background = rectShapeDrawable
-            addView(textViewParty)
+
+            setBackgroundResource(R.drawable.profile_active)
+
+            setOnClickListener {
+                val profileFragment = CandidateProfileFragment()
+                profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CANDIDATE_ID to candidate.id)
+
+                (activity as MainActivity).presentContent(profileFragment)
+            }
         }
 
         val textViewCandidate = TextView(activity)
@@ -317,14 +299,14 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
         val linLayout2 = LinearLayout(activity)
         linLayout2.apply {
+            addView(candidateProfileLink)
             orientation = LinearLayout.VERTICAL
-            addView(candidateProfileImage)
             gravity = Gravity.END
             layoutParams = relativeParamsRight
         }
 
-        layout.addView(candidateProfileView)
-        layout.addView(partyLayout)
+        layout.addView(candidateProfileImage)
+        layout.addView(candidatePartyImage)
         layout.addView(linLayout)
         layout.layoutParams = relativeParamsLeft
 

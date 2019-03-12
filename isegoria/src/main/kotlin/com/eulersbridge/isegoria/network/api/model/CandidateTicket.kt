@@ -16,6 +16,7 @@ data class CandidateTicket (
 
     var information: String?,
     var logo: String? = null,
+    var code: String?,
 
     private val colour: String?
 

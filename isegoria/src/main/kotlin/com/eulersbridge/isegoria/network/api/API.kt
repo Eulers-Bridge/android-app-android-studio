@@ -11,6 +11,18 @@ interface API {
     @GET("user/{userEmail}")
     fun getUser(@Path("userEmail") userEmail: String): Single<User>
 
+    @GET("candidate/{candidateId}")
+    fun getCandidate(@Path("candidateId") candidateId: Long): Single<Candidate>
+
+    @GET("candidate/{candidateId}/likes")
+    fun getCandidateLikes(@Path("candidateId") candidateId: Long): Single<List<Like>>
+
+    @PUT("candidate/{candidateId}/likedBy/{email}/")
+    fun likeCandidate(@Path("candidateId") candidateId: Long, @Path("email") email: String): Completable
+
+    @DELETE("candidate/{candidateId}/likedBy/{email}/")
+    fun unlikeCandidate(@Path("candidateId") candidateId: Long, @Path("email") email: String): Completable
+
     @GET("general-info")
     fun getGeneralInfo(): Single<GeneralInfoResponse>
 
@@ -74,12 +86,17 @@ interface API {
     @POST("user/{userId}/contactRequest/{targetEmail}/")
     fun addFriend(@Path("userId") userId: Long, @Path("targetEmail") targetUserEmail: String): Completable
 
+    @DELETE("contact/{targetEmail}")
+    fun removeFriend(@Path("targetEmail") targetEmail: String): Completable
+
     @PUT("user/contactRequest/{contactRequestId}/accept")
     fun acceptFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
 
     @PUT("user/contactRequest/{contactRequestId}/reject")
     fun rejectFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
 
+    @DELETE("user/contactRequest/{contactRequestId}")
+    fun revokeFriendRequest(@Path("contactRequestId") contactRequestId: Long): Completable
 
     @GET("searchUserProfile/{query}/")
     fun searchForUsers(@Path("query") query: String): Single<List<User>>

@@ -16,6 +16,7 @@ import com.eulersbridge.isegoria.network.AuthenticationInterceptor
 import com.eulersbridge.isegoria.network.NetworkConfig
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.*
+import com.eulersbridge.isegoria.network.api.response.LikeResponse
 import com.eulersbridge.isegoria.network.api.response.PhotosResponse
 import com.eulersbridge.isegoria.network.toCompletable
 import com.eulersbridge.isegoria.util.data.Optional
@@ -25,6 +26,7 @@ import com.securepreferences.SecurePreferences
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import okhttp3.MediaType
@@ -457,6 +459,28 @@ class DataRepository @Inject constructor(
         }.onErrorReturnItem(emptyList())
     }
 
+    override fun getCandidate(candidateId: Long): Single<Candidate> {
+        return api.getCandidate(candidateId)
+    }
+
+
+    override fun getCandidateLikes(candidateId: Long): Single<List<Like>> {
+        return api.getCandidateLikes(candidateId)
+    }
+
+
+    override fun likeCandidate(candidateId: Long): Completable {
+        val user = requireUser()
+
+        return api.likeCandidate(candidateId, user.email)
+    }
+
+    override fun unlikeCandidate(candidateId: Long): Completable {
+        val user = requireUser()
+
+        return api.unlikeCandidate(candidateId, user.email)
+    }
+
     override fun getLatestElectionTickets(): Single<List<CandidateTicket>> {
         return getLatestElection().flatMap {
             it.value?.let {
@@ -607,12 +631,49 @@ class DataRepository @Inject constructor(
         return api.addFriend(user.id!!, newFriendEmail).toBooleanSingle()
     }
 
+    override fun removeFriend(friendEmail: String): Completable {
+        return api.removeFriend(friendEmail)
+    }
+
     override fun acceptFriendRequest(requestId: Long): Completable {
         return api.acceptFriendRequest(requestId)
     }
 
     override fun rejectFriendRequest(requestId: Long): Completable {
         return api.rejectFriendRequest(requestId)
+    }
+
+    override fun revokeFriendRequest(requestId: Long): Completable {
+        return api.revokeFriendRequest(requestId)
+    }
+
+    /**
+     * Checks if a user is either a friend or has received a pending friend request
+     */
+    override fun getUserAddedAsFriend(targetUserEmail: String): Single<Boolean> {
+        return Single.zip(getFriends(), getSentFriendRequests(), BiFunction<List<Contact>, List<FriendRequest>, Boolean> {
+            friends, sentRequests -> friends.any { friend -> friend.email == targetUserEmail }
+                || sentRequests.any { sentRequest ->
+            sentRequest.requestReceiver?.email == targetUserEmail
+                    && sentRequest.accepted == null }
+        })
+    }
+
+    override fun getFriendStatusAndPendingFriendRequest(targetUserEmail: String): Single<Pair<Boolean, FriendRequest?>> {
+        return Single.zip(getFriends(), getSentFriendRequests(), BiFunction<List<Contact>, List<FriendRequest>, Pair<Boolean, FriendRequest?>> {
+            friends, sentRequests ->
+                 val pendingRequest = sentRequests.firstOrNull() { sentRequest ->
+                     sentRequest.requestReceiver?.email == targetUserEmail
+                             && sentRequest.accepted == null }
+
+                 when {
+                    (friends.any { friend -> friend.email == targetUserEmail }) ->
+                        Pair(true, pendingRequest)
+                     else ->
+                         Pair(false, pendingRequest)
+                }
+            }
+        )
     }
 
     override fun searchForUsers(query: String): Single<List<User>> {

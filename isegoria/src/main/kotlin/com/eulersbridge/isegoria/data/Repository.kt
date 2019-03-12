@@ -3,6 +3,7 @@ package com.eulersbridge.isegoria.data
 import android.net.Uri
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.api.model.*
+import com.eulersbridge.isegoria.network.api.response.LikeResponse
 import com.eulersbridge.isegoria.network.api.response.PhotosResponse
 import com.eulersbridge.isegoria.util.data.Optional
 import io.reactivex.Completable
@@ -58,6 +59,11 @@ interface Repository {
     fun getTicket(id: Long): Single<Optional<Ticket>>
     fun getTicketCandidates(ticketId: Long): Single<List<Candidate>>
 
+    fun getCandidate(candidateId: Long): Single<Candidate>
+    fun getCandidateLikes(candidateId: Long): Single<List<Like>>
+    fun likeCandidate(candidateId: Long): Completable
+    fun unlikeCandidate(candidateId: Long): Completable
+
     fun getVoteLocations(): Single<List<VoteLocation>>
     fun createUserVoteReminder(electionId: Long, voteLocation: String, date: Long): Completable
     fun getLatestUserVoteReminder(): Single<Optional<VoteReminder>>
@@ -80,9 +86,13 @@ interface Repository {
     fun getFriends(): Single<List<Contact>>
     fun getSentFriendRequests(): Single<List<FriendRequest>>
     fun getReceivedFriendRequests(): Single<List<FriendRequest>>
+    fun getUserAddedAsFriend(userEmail: String): Single<Boolean>
     fun addFriend(newFriendEmail: String): Single<Boolean>
+    fun removeFriend(friendEmail: String): Completable
     fun acceptFriendRequest(requestId: Long): Completable
     fun rejectFriendRequest(requestId: Long): Completable
+    fun revokeFriendRequest(requestId: Long): Completable
+    fun getFriendStatusAndPendingFriendRequest(targetUserEmail: String): Single<Pair<Boolean, FriendRequest?>>
     fun searchForUsers(query: String): Single<List<User>>
 
     fun getInstitution(institutionId: Long): Single<Optional<Institution>>
