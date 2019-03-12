@@ -157,6 +157,8 @@
     <string name="friends_subheading_friend_requests_received">Friend Requests</string>
     <string name="friends_subheading_friend_requests_sent">Pending Friend Requests</string>
     <string name="friends_subheading_all_friends">Friends</string>
+    <string name="friend_add_successful">Friend Added</string>
+    <string name="friend_add_unsuccessful">Unable to add friend</string>
 
     <!-- User profile page -->
     <string name="profile_badges_section_title">Badges</string>
@@ -208,6 +210,8 @@
     <string name="about_thanks_people">The Euler\'s Bridge Advisory Network Members</string>
 
     <!-- Misc -->
+    <string name="unknown_error_occurred">Unknown error occurred</string>
+
     <string name="shortcut_view_latest_election_label_short">Latest Election</string>
     <string name="shortcut_view_latest_election_label_long">View the latest election</string>
 
