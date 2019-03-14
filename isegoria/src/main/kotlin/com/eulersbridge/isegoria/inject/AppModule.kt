@@ -4,9 +4,13 @@ import android.content.Context
 import com.eulersbridge.isegoria.AppRouter
 import com.eulersbridge.isegoria.BuildConfig
 import com.eulersbridge.isegoria.IsegoriaApp
+import com.eulersbridge.isegoria.PLACEHOLDER_BASE_URL
 import com.eulersbridge.isegoria.data.DataRepository
 import com.eulersbridge.isegoria.data.Repository
-import com.eulersbridge.isegoria.network.*
+import com.eulersbridge.isegoria.network.AuthenticationInterceptor
+import com.eulersbridge.isegoria.network.BaseUrlInterceptor
+import com.eulersbridge.isegoria.network.NetworkConfig
+import com.eulersbridge.isegoria.network.UnwrapConverterFactory
 import com.eulersbridge.isegoria.network.adapters.LenientLongAdapter
 import com.eulersbridge.isegoria.network.adapters.NullPrimitiveAdapter
 import com.eulersbridge.isegoria.network.adapters.TimestampAdapter
@@ -109,7 +113,7 @@ class AppModule {
     fun provideRetrofit(httpClient: OkHttpClient, networkConfig: NetworkConfig, moshi: MoshiConverterFactory): Retrofit
             = Retrofit.Builder()
             .client(httpClient)
-            .baseUrl(networkConfig.baseUrl)
+            .baseUrl(PLACEHOLDER_BASE_URL)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
             .addConverterFactory(UnwrapConverterFactory())
             .addConverterFactory(moshi)

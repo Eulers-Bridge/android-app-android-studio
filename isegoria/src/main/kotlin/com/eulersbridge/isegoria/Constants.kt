@@ -24,3 +24,6 @@ const val FRAGMENT_EXTRA_CANDIDATE_ID = "candidateId"
 
 const val NOTIFICATION_CHANNEL_FRIENDS = "Friends"
 const val NOTIFICATION_CHANNEL_VOTE_REMINDERS = "Vote Reminder"
+
+// Used for network configuration
+const val PLACEHOLDER_BASE_URL = "http://base-url.placeholder/"

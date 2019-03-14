@@ -3,7 +3,6 @@ package com.eulersbridge.isegoria.data
 import android.net.Uri
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.network.api.model.*
-import com.eulersbridge.isegoria.network.api.response.LikeResponse
 import com.eulersbridge.isegoria.network.api.response.PhotosResponse
 import com.eulersbridge.isegoria.util.data.Optional
 import io.reactivex.Completable
@@ -15,12 +14,15 @@ interface Repository {
 
     fun getSavedEmail(): String?
     fun getSavedPassword(): String?
+    fun getSavedApiBaseUrl(): String?
+
+    fun setApiBaseUrl(url: String)
 
     fun getUserFromLoginState(): User
     fun getUser(): Single<User>
 
     fun resendVerificationEmail(): Completable
-    fun login(email: String, password: String)
+    fun login(email: String, password: String, apiBaseUrl: String)
     fun logOut(): Completable
     fun signUp(user: SignUpUser): Completable
 
@@ -97,6 +99,7 @@ interface Repository {
 
     fun getInstitution(institutionId: Long): Single<Optional<Institution>>
     fun getInstitutionName(institutionId: Long): Single<Optional<String>>
+    fun getInstitutionServers(): Single<List<InstitutionServer>>
 
     fun getPolls(): Single<List<Poll>>
     fun answerPoll(pollId: Long, answerId: Long): Completable

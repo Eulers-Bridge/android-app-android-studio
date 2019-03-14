@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat
 import android.view.*
 import android.widget.Toast
 import com.bumptech.glide.Priority
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_CANDIDATE_ID
 import com.eulersbridge.isegoria.GlideApp
@@ -18,7 +19,6 @@ import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import com.eulersbridge.isegoria.util.transformation.TintTransformation
 import com.eulersbridge.isegoria.util.ui.TitledFragment
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.candidate_profile_fragment.*
 import javax.inject.Inject

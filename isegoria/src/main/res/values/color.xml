@@ -20,6 +20,9 @@
 
     <color name="slider_text">#738192</color>
 
+    <!-- Login Page -->
+    <color name="institution_spinner_dropdown_background">#d5686868</color>
+
     <color name="self_efficacy_slider_2">#647EC7</color>
     <color name="self_efficacy_slider_3">#B4629A</color>
 
@@ -30,6 +33,7 @@
     <color name="about_background">#262e3b</color>
 
     <color name="divider">#1f000000</color>
+
 
     <color name="profile_circle_ring_base">#64d3d3d3</color>
 

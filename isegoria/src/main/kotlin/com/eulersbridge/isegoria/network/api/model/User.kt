@@ -34,7 +34,7 @@ data class User (
     val accountVerified: Boolean = false,
 
     var hasPPSEQuestions: Boolean = false,
-    val hasPersonality: Boolean = false,
+    var hasPersonality: Boolean = false,
 
     var trackingOff: Boolean = false,
     @field:Json(name = "optOutDataCollection")
