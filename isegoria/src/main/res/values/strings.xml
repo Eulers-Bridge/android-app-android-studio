@@ -17,6 +17,7 @@
     <string name="section_title_vote">Vote</string>
     <string name="section_title_friends">Friends</string>
     <string name="section_title_profile">Profile</string>
+    <string name="section_title_candidate_profile">Candidate Profile</string>
 
     <!-- Login / Sign Up -->
     <string name="user_login_email_hint">Email</string>
@@ -87,6 +88,11 @@
 
     <string name="election_efficacy_survey_message">Welcome to your election centre.\nLearn about your political efficacy by completing this survey.</string>
     <string name="election_efficacy_survey_start_button">Start Survey</string>
+
+    <string name="election_candidate_profile_description_label">DESCRIPTION</string>
+
+    <string name="election_candidate_profile_add_friend">Add candidate as friend</string>
+    <string name="election_candidate_profile_remove_friend">Remove candidate as friend</string>
 
     <!-- Voting -->
     <string name="vote_location_hint">I will be voting in the next community election at</string>
@@ -222,8 +228,8 @@
     <string name="log_out_confirmation_title">Are you sure?</string>
     <string name="login_forgot_password_hint">Forgot password?</string>
     <string name="candidate_ticket_detail_supporters">Supporters</string>
-    <string name="candidate_ticket_detail_button_support">Support</string>
-    <string name="candidate_ticket_detail_button_unsupport">Unsupport</string>
+    <string name="candidate_ticket_detail_button_supporting">Supporting</string>
+    <string name="candidate_ticket_detail_button_not_supporting">Not Supporting</string>
     <string name="candidate_ticket_detail_election_ticket">Election Ticket</string>
 
     <string name="personality_slider_description_1">Extroverted, enthusiastic</string>

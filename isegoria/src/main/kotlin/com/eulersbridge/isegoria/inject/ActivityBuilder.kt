@@ -7,6 +7,8 @@ import com.eulersbridge.isegoria.auth.login.LoginFragmentProvider
 import com.eulersbridge.isegoria.auth.signup.SignUpFragmentProvider
 import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragmentProvider
 import com.eulersbridge.isegoria.election.ElectionFragmentProvider
+import com.eulersbridge.isegoria.election.candidates.profile.CandidateProfileFragment
+import com.eulersbridge.isegoria.election.candidates.profile.CandidateProfileFragmentModule
 import com.eulersbridge.isegoria.feed.FeedFragmentProvider
 import com.eulersbridge.isegoria.feed.events.detail.EventDetailActivity
 import com.eulersbridge.isegoria.feed.events.detail.EventDetailModule
@@ -58,4 +60,6 @@ abstract class ActivityBuilder {
     @ContributesAndroidInjector(modules = [(SettingsActivityModule::class)])
     internal abstract fun bindSettingsActivity(): SettingsActivity
 
+    @ContributesAndroidInjector(modules = [(CandidateProfileFragmentModule::class)])
+    internal abstract fun bindCandidateProfileFragment(): CandidateProfileFragment
 }

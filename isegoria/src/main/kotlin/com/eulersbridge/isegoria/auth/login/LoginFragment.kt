@@ -15,21 +15,27 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
+import com.eulersbridge.isegoria.network.api.model.InstitutionServer
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.onItemSelected
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
+
 
 class LoginFragment : Fragment() {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: LoginViewModel
+
+    private lateinit var institutionServerAdapter: ArrayAdapter<InstitutionServer>
 
     private val authViewModel: AuthViewModel by lazy {
         ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
@@ -54,9 +60,19 @@ class LoginFragment : Fragment() {
         emailField.onTextChanged { viewModel.setEmail(it) }
         passwordField.onTextChanged { viewModel.setPassword(it) }
 
+        institutionServerSpinner.onItemSelected { viewModel.setInstitutionServer(it) }
+
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
         signUpButton.setOnClickListener { authViewModel.signUpVisible.value = true }
+
+        institutionServerAdapter = ArrayAdapter(activity,R.layout.institution_spinner_item)
+        institutionServerAdapter.setDropDownViewResource(R.layout.institution_spinner_dropdown_item)
+
+        institutionServerSpinner.apply {
+            adapter = institutionServerAdapter
+            isEnabled = false
+        }
 
         createViewModelObservers()
     }
@@ -111,14 +127,13 @@ class LoginFragment : Fragment() {
                 }
             }
 
-
             observe(loginError) {
                 when (loginError.value) {
                     LoginViewModel.LoginError.NotAuthorised -> {
                         Snackbar.make(coordinatorLayout, getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
                                 .show()
                     }
-                    LoginViewModel.LoginError.UnkownFailure -> {
+                    LoginViewModel.LoginError.UnknownFailure -> {
                         Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
                                 .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
                                 .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
@@ -130,6 +145,18 @@ class LoginFragment : Fragment() {
             observeBoolean(formEnabled) { enabled ->
                 arrayOf(emailLayout, passwordLayout, loginButton, signUpButton).forEach {
                     it.isEnabled = enabled
+                }
+            }
+
+            observe(institutionServersLiveData) { clientInstitutions ->
+
+                institutionServerAdapter.apply {
+                    clear()
+                    addAll(clientInstitutions)
+                }
+
+                institutionServerSpinner.apply {
+                    isEnabled = true
                 }
             }
         }

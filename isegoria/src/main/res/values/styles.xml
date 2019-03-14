@@ -89,6 +89,16 @@
         <item name="android:textColorHint">@color/white</item>
     </style>
 
+    <style name="institution_spinner_style" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+        <item name="android:padding">5dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:dropDownHeight">wrap_content</item>
+        <item name="android:scrollbarAlwaysDrawVerticalTrack">true</item>
+    </style>
+
     <style name="LoginSignUpHeadingTextAppearance">
         <item name="android:textColor">@color/white</item>
         <item name="android:fontFamily">@font/museo_sans_rounded_500</item>

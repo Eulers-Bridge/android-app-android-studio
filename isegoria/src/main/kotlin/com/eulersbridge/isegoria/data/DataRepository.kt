@@ -19,12 +19,16 @@ import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.network.api.response.PhotosResponse
 import com.eulersbridge.isegoria.network.toCompletable
 import com.eulersbridge.isegoria.util.data.Optional
-import com.eulersbridge.isegoria.util.extension.*
+import com.eulersbridge.isegoria.util.extension.addAppHeaders
+import com.eulersbridge.isegoria.util.extension.edit
+import com.eulersbridge.isegoria.util.extension.toBooleanSingle
+import com.eulersbridge.isegoria.util.extension.toCompletable
 import com.google.firebase.iid.FirebaseInstanceId
 import com.securepreferences.SecurePreferences
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.BehaviorSubject
 import okhttp3.MediaType
@@ -47,34 +51,6 @@ class DataRepository @Inject constructor(
         private val securePreferences: SecurePreferences
 ) : Repository {
 
-    // Updates the base URL of the API by fetching the API root for the user's institution
-    private fun fetchAPIBaseURL(user: User): Single<Optional<String>> {
-        val savedUrl = getSavedApiBaseUrl()
-
-        if (!savedUrl.isNullOrBlank())
-            return Single.just(Optional(savedUrl))
-
-        return user.institutionId?.let { institutionId ->
-
-            getInstitutionName(institutionId)
-                    .map { it.value }
-                    .flatMap { name ->
-                        api.getInstitutionURLs().map { Pair(name, it) }
-                    }
-                    .map { (name, urls) ->
-                        // Find the matching institution (by name), use its URL
-                        val url = urls.singleOrNull {
-                            it.name == name && !it.apiRoot.isNullOrBlank()
-                        }?.let {
-                            it.apiRoot + "api/"
-                        }
-
-                        Optional(url)
-                    }
-
-        } ?: Single.error(Exception("Missing user institution ID"))
-    }
-
     @get:JvmName("_loginState")
     private val loginState = BehaviorSubject.createDefault<LoginState>(LoginState.LoggedOut())
 
@@ -84,19 +60,19 @@ class DataRepository @Inject constructor(
 
     private var cachedLoginArticles: List<NewsArticle>? = null
 
-    private fun saveUserCredentials(email: String, password: String) {
+    private fun saveUserCredentials(email: String, password: String, apiBaseUrl: String) {
         securePreferences.edit {
             putString(USER_EMAIL_KEY, email)
             putString(USER_PASSWORD_KEY, password)
+            putString(SERVER_URL_KEY, apiBaseUrl)
         }
     }
 
     override fun getSavedEmail(): String? = securePreferences.getString(USER_EMAIL_KEY, null)
     override fun getSavedPassword(): String? = securePreferences.getString(USER_PASSWORD_KEY, null)
+    override fun getSavedApiBaseUrl(): String? = securePreferences.getString(SERVER_URL_KEY, null)
 
-    private fun getSavedApiBaseUrl(): String? = securePreferences.getString(SERVER_URL_KEY, null)
-
-    private fun setApiBaseUrl(url: String) {
+    override fun setApiBaseUrl(url: String) {
         networkConfig.baseUrl = url
         securePreferences.edit { putString(SERVER_URL_KEY, url) }
     }
@@ -139,17 +115,14 @@ class DataRepository @Inject constructor(
         }
     }
 
-    override fun login(email: String, password: String) {
+    override fun login(email: String, password: String, apiBaseUrl: String) {
         loginState.onNext(LoginState.LoggingIn())
+
+        setApiBaseUrl(apiBaseUrl)
 
         getDeviceToken()
                 .doOnSuccess { AuthenticationInterceptor.setCredentials(email, password) }
                 .flatMap { api.login(SNS_PLATFORM_APPLICATION_ARN, it) }
-                .doOnSuccess {
-                    fetchAPIBaseURL(it.user).subscribeSuccess {
-                        it.value?.let { url -> setApiBaseUrl(url) }
-                    }
-                }
                 .subscribeBy(
                         onSuccess = {
                             // Store news articles for user's institution
@@ -174,7 +147,7 @@ class DataRepository @Inject constructor(
                                             }
                                     )
 
-                            saveUserCredentials(email, password)
+                            saveUserCredentials(email, password, apiBaseUrl)
                         },
                         onError = {
                             if (it is HttpException && it.code() == 401) {
@@ -191,6 +164,7 @@ class DataRepository @Inject constructor(
 
         securePreferences.edit {
             remove(USER_PASSWORD_KEY)
+            remove(SERVER_URL_KEY)
         }
 
         AuthenticationInterceptor.setCredentials(null, null)
@@ -240,7 +214,7 @@ class DataRepository @Inject constructor(
         // Create new HTTP client rather than using application's, as no auth is required
         return httpClient.newCall(request).execute()
                 .toCompletable()
-                .andThen { login(user.email, user.email) }
+                .andThen { login(user.email, user.email, getSavedApiBaseUrl()!!) }
     }
 
     private fun updateUser(updatedUser: User): Completable {
@@ -457,6 +431,28 @@ class DataRepository @Inject constructor(
         }.onErrorReturnItem(emptyList())
     }
 
+    override fun getCandidate(candidateId: Long): Single<Candidate> {
+        return api.getCandidate(candidateId)
+    }
+
+
+    override fun getCandidateLikes(candidateId: Long): Single<List<Like>> {
+        return api.getCandidateLikes(candidateId)
+    }
+
+
+    override fun likeCandidate(candidateId: Long): Completable {
+        val user = requireUser()
+
+        return api.likeCandidate(candidateId, user.email)
+    }
+
+    override fun unlikeCandidate(candidateId: Long): Completable {
+        val user = requireUser()
+
+        return api.unlikeCandidate(candidateId, user.email)
+    }
+
     override fun getLatestElectionTickets(): Single<List<CandidateTicket>> {
         return getLatestElection().flatMap {
             it.value?.let {
@@ -607,12 +603,49 @@ class DataRepository @Inject constructor(
         return api.addFriend(user.id!!, newFriendEmail).toBooleanSingle()
     }
 
+    override fun removeFriend(friendEmail: String): Completable {
+        return api.removeFriend(friendEmail)
+    }
+
     override fun acceptFriendRequest(requestId: Long): Completable {
         return api.acceptFriendRequest(requestId)
     }
 
     override fun rejectFriendRequest(requestId: Long): Completable {
         return api.rejectFriendRequest(requestId)
+    }
+
+    override fun revokeFriendRequest(requestId: Long): Completable {
+        return api.revokeFriendRequest(requestId)
+    }
+
+    /**
+     * Checks if a user is either a friend or has received a pending friend request
+     */
+    override fun getUserAddedAsFriend(targetUserEmail: String): Single<Boolean> {
+        return Single.zip(getFriends(), getSentFriendRequests(), BiFunction<List<Contact>, List<FriendRequest>, Boolean> {
+            friends, sentRequests -> friends.any { friend -> friend.email == targetUserEmail }
+                || sentRequests.any { sentRequest ->
+            sentRequest.requestReceiver?.email == targetUserEmail
+                    && sentRequest.accepted == null }
+        })
+    }
+
+    override fun getFriendStatusAndPendingFriendRequest(targetUserEmail: String): Single<Pair<Boolean, FriendRequest?>> {
+        return Single.zip(getFriends(), getSentFriendRequests(), BiFunction<List<Contact>, List<FriendRequest>, Pair<Boolean, FriendRequest?>> {
+            friends, sentRequests ->
+                 val pendingRequest = sentRequests.firstOrNull() { sentRequest ->
+                     sentRequest.requestReceiver?.email == targetUserEmail
+                             && sentRequest.accepted == null }
+
+                 when {
+                    (friends.any { friend -> friend.email == targetUserEmail }) ->
+                        Pair(true, pendingRequest)
+                     else ->
+                         Pair(false, pendingRequest)
+                }
+            }
+        )
     }
 
     override fun searchForUsers(query: String): Single<List<User>> {
@@ -628,6 +661,10 @@ class DataRepository @Inject constructor(
     override fun getInstitutionName(institutionId: Long): Single<Optional<String>> {
         return getInstitution(institutionId)
                 .map { Optional(it.value?.getName()) }
+    }
+
+    override fun getInstitutionServers(): Single<List<InstitutionServer>> {
+        return api.getInstitutionURLs()
     }
 
     override fun getPolls(): Single<List<Poll>> {

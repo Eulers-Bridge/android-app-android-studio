@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.election.candidates
+package com.eulersbridge.isegoria.election.candidates.ticket
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -99,7 +99,8 @@ class CandidateTicketFragment : Fragment() {
                         lastNoOfSupporters,
                         ticket.supportersCount,
                         lastLogo,
-                        ticket.logo
+                        ticket.logo,
+                        ticket.code
                     )
                 }
 
@@ -118,7 +119,8 @@ class CandidateTicketFragment : Fragment() {
                         ticket.getColour(),
                         ticket.fullName,
                         ticket.supportersCount,
-                        ticket.logo
+                        ticket.logo,
+                        ticket.code
                     )
                 }
             }
@@ -130,7 +132,7 @@ class CandidateTicketFragment : Fragment() {
         lastTicketId: Long, ticketId: Long, colour1: String?,
         colour2: String, doubleCell: Boolean, lastCell: Boolean,
         title1: String?, title2: String, supporters1: String?,
-        supporters2: String?, logo1: String?, logo2: String?
+        supporters2: String?, logo1: String?, logo2: String?, partyCode: String?
     ) {
         val tr: TableRow
 
@@ -217,7 +219,8 @@ class CandidateTicketFragment : Fragment() {
                     "TicketName" to title1,
                     "Colour" to colour1,
                     "NoOfSupporters" to Integer.parseInt(supporters1),
-                    "Logo" to logo1
+                    "Logo" to logo1,
+                    "Code" to partyCode
                 )
 
                 val detailFragment = CandidateTicketDetailFragment()
@@ -311,7 +314,8 @@ class CandidateTicketFragment : Fragment() {
                     "TicketName" to title2,
                     "Colour" to colour2,
                     "NoOfSupporters" to Integer.parseInt(supporters2),
-                    "Logo" to logo2
+                    "Logo" to logo2,
+                    "Code" to partyCode
                 )
 
                 val detailFragment = CandidateTicketDetailFragment()
@@ -386,7 +390,7 @@ class CandidateTicketFragment : Fragment() {
     @SuppressLint("CommitTransaction")
     private fun addTableRowOneSquare(
         ticketId: Long, colour1: String, title1: String,
-        supporters1: String?, logo1: String?
+        supporters1: String?, logo1: String?, partyCode: String?
     ) {
         val tr = TableRow(activity)
 
@@ -463,7 +467,8 @@ class CandidateTicketFragment : Fragment() {
                 "TicketName" to title1,
                 "Colour" to colour1,
                 "NoOfSupporters" to Integer.parseInt(supporters1),
-                "Logo" to logo1
+                "Logo" to logo1,
+                "Code" to partyCode
             )
 
             val detailFragment = CandidateTicketDetailFragment()

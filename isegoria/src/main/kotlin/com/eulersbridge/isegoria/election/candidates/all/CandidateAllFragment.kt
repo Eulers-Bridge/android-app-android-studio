@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.election.candidates
+package com.eulersbridge.isegoria.election.candidates.all
 
 import android.annotation.SuppressLint
 import android.content.Context

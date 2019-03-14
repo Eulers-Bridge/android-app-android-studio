@@ -7,7 +7,7 @@ data class Ticket (
     @field:Json(name = "ticketId")
     val id: Long = 0,
 
-    val electionId: Long = 0,
+    val electionId: Long? = 0,
 
     val name: String?,
     val information: String?,

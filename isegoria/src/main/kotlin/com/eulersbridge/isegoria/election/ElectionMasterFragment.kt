@@ -10,10 +10,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import com.eulersbridge.isegoria.MainActivity
 import com.eulersbridge.isegoria.R
-import com.eulersbridge.isegoria.election.candidates.CandidateFragment
+import com.eulersbridge.isegoria.election.candidates.CandidateViewPagerFragment
 import com.eulersbridge.isegoria.election.efficacy.SelfEfficacyQuestionsFragment
+import com.eulersbridge.isegoria.election.overview.ElectionOverviewFragment
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.ui.TabbedFragment
@@ -29,7 +29,7 @@ class ElectionMasterFragment : Fragment(), TitledFragment, TabbedFragment {
     private lateinit var viewModel: ElectionViewModel
 
     private lateinit var tabLayout: TabLayout
-    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateFragment())
+    private val tabFragments = listOf(ElectionOverviewFragment(), CandidateViewPagerFragment())
 
     private val onTabSelectedListener = object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab) {

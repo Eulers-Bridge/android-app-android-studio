@@ -19,6 +19,7 @@ import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.onItemSelected
 import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.sign_up_fragment.*
@@ -63,7 +64,7 @@ class SignUpFragment : Fragment() {
 
         institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        institutionSpinner.adapter = institutionAdapter
+        loginInstitutionSpinner.adapter = institutionAdapter
 
         val spinnerYearOfBirthArrayAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item)
 
@@ -120,7 +121,7 @@ class SignUpFragment : Fragment() {
 
         countrySpinner.onItemSelected { position -> updateInstitutionSpinner(position) }
 
-        institutionSpinner.onItemSelected { position -> viewModel.onInstitutionSelected(position) }
+        loginInstitutionSpinner.onItemSelected { position -> viewModel.onInstitutionSelected(position) }
 
         birthYearSpinner.onItemSelected {
             val birthYear = birthYearSpinner.selectedItem as String
@@ -129,14 +130,14 @@ class SignUpFragment : Fragment() {
     }
 
     private fun updateInstitutionSpinner(position: Int) {
-        institutionSpinner.isEnabled = false
+        loginInstitutionSpinner.isEnabled = false
 
         viewModel.onCountrySelected(position)?.let { institutions ->
             institutionAdapter.clear()
             institutionAdapter.addAll(institutions)
         }
 
-        institutionSpinner.isEnabled = true
+        loginInstitutionSpinner.isEnabled = true
     }
 
     private fun setCountries(newCountries: List<Country>) {
@@ -148,15 +149,5 @@ class SignUpFragment : Fragment() {
         updateInstitutionSpinner(0)
 
         countrySpinner.isEnabled = true
-    }
-
-    private inline fun Spinner.onItemSelected(crossinline onItemSelected: (position: Int) -> Unit) {
-        this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                onItemSelected(position)
-            }
-        }
     }
 }
