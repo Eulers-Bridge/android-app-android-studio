@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.text.Editable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +26,7 @@ import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
 import android.widget.ArrayAdapter
 import com.eulersbridge.isegoria.network.api.model.ClientInstitution
-import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.util.extension.onItemSelected
 
 
 class LoginFragment : Fragment() {
@@ -36,7 +35,7 @@ class LoginFragment : Fragment() {
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: LoginViewModel
 
-    private lateinit var institutionAdapter: ArrayAdapter<ClientInstitution?>
+    private lateinit var clientInstitutionAdapter: ArrayAdapter<ClientInstitution>
 
 
     private val authViewModel: AuthViewModel by lazy {
@@ -59,23 +58,23 @@ class LoginFragment : Fragment() {
             params.topMargin += Math.round(22.0f * resources.displayMetrics.density)
         }
 
-//        // Spinner click listener
-//        institutionSpinner.setOnItemSelectedListener
-//
-
-        viewModel.getAllInstitutionUrlsAndNames()
-        Log.w("Institution data", viewModel.institutionLiveData.value.toString())
-        // Spinner Drop down elements
-        institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, viewModel.institutionLiveData.value)
-        institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        loginInstitutionSpinner.adapter = institutionAdapter
 
         emailField.onTextChanged { viewModel.setEmail(it) }
         passwordField.onTextChanged { viewModel.setPassword(it) }
 
+        clientInstitutionSpinner.onItemSelected { viewModel.setClientInstitutionIndex(it) }
+
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
         signUpButton.setOnClickListener { authViewModel.signUpVisible.value = true }
+
+        clientInstitutionAdapter = ArrayAdapter(activity,R.layout.institution_spinner_item)
+        clientInstitutionAdapter.setDropDownViewResource(R.layout.institution_spinner_dropdown_item)
+
+        clientInstitutionSpinner.apply {
+            adapter = clientInstitutionAdapter
+            isEnabled = false
+        }
 
         createViewModelObservers()
     }
@@ -137,7 +136,7 @@ class LoginFragment : Fragment() {
                         Snackbar.make(coordinatorLayout, getString(R.string.user_login_error_message), Snackbar.LENGTH_LONG)
                                 .show()
                     }
-                    LoginViewModel.LoginError.UnkownFailure -> {
+                    LoginViewModel.LoginError.UnknownFailure -> {
                         Snackbar.make(coordinatorLayout, getString(R.string.connection_error_message), Snackbar.LENGTH_LONG)
                                 .setAction(getString(R.string.connection_error_action)) { onLoginClicked() }
                                 .setActionTextColor(ContextCompat.getColor(context!!, R.color.white))
@@ -149,6 +148,18 @@ class LoginFragment : Fragment() {
             observeBoolean(formEnabled) { enabled ->
                 arrayOf(emailLayout, passwordLayout, loginButton, signUpButton).forEach {
                     it.isEnabled = enabled
+                }
+            }
+
+            observe(institutionLiveData) {clientInstitutions ->
+
+                clientInstitutionAdapter.apply {
+                    clear()
+                    addAll(clientInstitutions)
+                }
+
+                clientInstitutionSpinner.apply {
+                    isEnabled = true
                 }
             }
         }

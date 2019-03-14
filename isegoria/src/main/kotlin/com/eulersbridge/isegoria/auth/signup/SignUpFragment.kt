@@ -19,6 +19,7 @@ import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.util.extension.observe
+import com.eulersbridge.isegoria.util.extension.onItemSelected
 import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.sign_up_fragment.*
@@ -148,15 +149,5 @@ class SignUpFragment : Fragment() {
         updateInstitutionSpinner(0)
 
         countrySpinner.isEnabled = true
-    }
-
-    private inline fun Spinner.onItemSelected(crossinline onItemSelected: (position: Int) -> Unit) {
-        this.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-
-            override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                onItemSelected(position)
-            }
-        }
     }
 }

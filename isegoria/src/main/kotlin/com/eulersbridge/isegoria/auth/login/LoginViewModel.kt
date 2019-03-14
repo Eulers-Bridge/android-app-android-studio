@@ -2,26 +2,24 @@ package com.eulersbridge.isegoria.auth.login
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
-import android.util.Log
 import android.util.Patterns
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.API
 import com.eulersbridge.isegoria.network.api.model.ClientInstitution
-import com.eulersbridge.isegoria.network.api.model.Election
-import com.eulersbridge.isegoria.network.api.model.Institution
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
-import io.reactivex.Single
+import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.BackpressureStrategy
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(private val repository: Repository, private val api: API) : BaseViewModel() {
 
     enum class LoginError {
-        NotAuthorised, UnkownFailure
+        NotAuthorised, UnknownFailure
     }
 
     private val email = MutableLiveData<String>()
@@ -29,8 +27,10 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
     private val password = MutableLiveData<String>()
 
-    private val institutionSubject = BehaviorSubject.createDefault<List<ClientInstitution>>(listOf())
-    internal val institutionLiveData = MutableLiveData<List<ClientInstitution?>>()
+    private val clientInstitution = MutableLiveData<ClientInstitution>()
+
+    private val clientInstitutionsSubject = BehaviorSubject.create<List<ClientInstitution>>()
+    internal val institutionLiveData = clientInstitutionsSubject.toLiveData(BackpressureStrategy.LATEST)
 
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 
@@ -52,7 +52,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
         repository.getLoginState().subscribe {
             when (it) {
                 is LoginState.LoginFailure -> {
-                    loginError.postValue(LoginError.UnkownFailure)
+                    loginError.postValue(LoginError.UnknownFailure)
                     formEnabled.postValue(true)
                 }
                 is LoginState.LoginUnauthorised -> {
@@ -61,6 +61,8 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
                 }
             }
         }.addToDisposable()
+
+        refreshClientInstitutions()
     }
 
     fun setEmail(value: String?) {
@@ -69,6 +71,10 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
 
     fun setPassword(value: String?) {
         this.password.value = value
+    }
+
+    fun setClientInstitutionIndex(index: Int) {
+        this.clientInstitution.value = this.clientInstitutionsSubject.value!![index]
     }
 
     internal fun login() {
@@ -81,10 +87,11 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
         }
     }
 
-    internal fun getAllInstitutionUrlsAndNames() {
+    private fun refreshClientInstitutions() {
         repository.getInstitutionURLs()
-                .doOnSuccess { institution ->
-                    institutionLiveData.postValue(institution!!)
+                .doOnSuccess { clientInstitutions ->
+                    clientInstitutionsSubject.onNext(clientInstitutions)
+                    clientInstitution.postValue(clientInstitutions.first())
                 }
                 .subscribe()
                 .addToDisposable()
