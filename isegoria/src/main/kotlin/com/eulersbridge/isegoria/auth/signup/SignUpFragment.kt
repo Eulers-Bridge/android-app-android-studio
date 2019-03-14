@@ -63,7 +63,7 @@ class SignUpFragment : Fragment() {
 
         institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        institutionSpinner.adapter = institutionAdapter
+        loginInstitutionSpinner.adapter = institutionAdapter
 
         val spinnerYearOfBirthArrayAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item)
 
@@ -120,7 +120,7 @@ class SignUpFragment : Fragment() {
 
         countrySpinner.onItemSelected { position -> updateInstitutionSpinner(position) }
 
-        institutionSpinner.onItemSelected { position -> viewModel.onInstitutionSelected(position) }
+        loginInstitutionSpinner.onItemSelected { position -> viewModel.onInstitutionSelected(position) }
 
         birthYearSpinner.onItemSelected {
             val birthYear = birthYearSpinner.selectedItem as String
@@ -129,14 +129,14 @@ class SignUpFragment : Fragment() {
     }
 
     private fun updateInstitutionSpinner(position: Int) {
-        institutionSpinner.isEnabled = false
+        loginInstitutionSpinner.isEnabled = false
 
         viewModel.onCountrySelected(position)?.let { institutions ->
             institutionAdapter.clear()
             institutionAdapter.addAll(institutions)
         }
 
-        institutionSpinner.isEnabled = true
+        loginInstitutionSpinner.isEnabled = true
     }
 
     private fun setCountries(newCountries: List<Country>) {

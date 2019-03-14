@@ -691,6 +691,10 @@ class DataRepository @Inject constructor(
                 .map { Optional(it.value?.getName()) }
     }
 
+    override fun getInstitutionURLs(): Single<List<ClientInstitution>> {
+        return api.getInstitutionURLs()
+    }
+
     override fun getPolls(): Single<List<Poll>> {
         val user = requireUser()
         return api.getPolls(user.institutionId!!)

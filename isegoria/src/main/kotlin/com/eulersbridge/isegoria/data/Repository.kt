@@ -97,6 +97,7 @@ interface Repository {
 
     fun getInstitution(institutionId: Long): Single<Optional<Institution>>
     fun getInstitutionName(institutionId: Long): Single<Optional<String>>
+    fun getInstitutionURLs(): Single<List<ClientInstitution>>
 
     fun getPolls(): Single<List<Poll>>
     fun answerPoll(pollId: Long, answerId: Long): Completable

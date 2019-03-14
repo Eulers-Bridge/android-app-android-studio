@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.text.Editable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,12 +25,19 @@ import com.eulersbridge.isegoria.util.extension.observeBoolean
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
+import android.widget.ArrayAdapter
+import com.eulersbridge.isegoria.network.api.model.ClientInstitution
+import com.eulersbridge.isegoria.network.api.model.Institution
+
 
 class LoginFragment : Fragment() {
 
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: LoginViewModel
+
+    private lateinit var institutionAdapter: ArrayAdapter<ClientInstitution?>
+
 
     private val authViewModel: AuthViewModel by lazy {
         ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
@@ -50,6 +58,17 @@ class LoginFragment : Fragment() {
             val params = logoImage.layoutParams as ConstraintLayout.LayoutParams
             params.topMargin += Math.round(22.0f * resources.displayMetrics.density)
         }
+
+//        // Spinner click listener
+//        institutionSpinner.setOnItemSelectedListener
+//
+
+        viewModel.getAllInstitutionUrlsAndNames()
+        Log.w("Institution data", viewModel.institutionLiveData.value.toString())
+        // Spinner Drop down elements
+        institutionAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item, viewModel.institutionLiveData.value)
+        institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        loginInstitutionSpinner.adapter = institutionAdapter
 
         emailField.onTextChanged { viewModel.setEmail(it) }
         passwordField.onTextChanged { viewModel.setPassword(it) }
