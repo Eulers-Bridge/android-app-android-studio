@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.election.candidates.ticket
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -18,6 +19,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import com.bumptech.glide.Priority
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -113,12 +115,22 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
         repository.getUserSupportedTicket(ticketId)
                 .subscribeSuccess {userSupportsTicket ->
                     runOnUiThread {
-                        ticketSupportButton.text =
-                            if (userSupportsTicket)
-                                getString(R.string.candidate_ticket_detail_button_supporting)
-                            else
-                                getString(R.string.candidate_ticket_detail_button_not_supporting)
+                        ticketSupportButton.apply {
+                            text =
+                                    if (userSupportsTicket)
+                                        getString(R.string.candidate_ticket_detail_button_supporting)
+                                    else
+                                        getString(R.string.candidate_ticket_detail_button_not_supporting)
 
+
+                            setBackgroundResource(
+                                    if (userSupportsTicket)
+                                        R.color.election_ticket_supporting
+                                    else
+                                        R.color.election_ticket_not_supporting
+                            )
+
+                        }
                     }
                 }
                 .addTo(compositeDisposable)
@@ -163,9 +175,9 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
     }
 
-    override fun onPause() {
+    override fun onDestroy() {
         compositeDisposable.dispose()
-        super.onPause()
+        super.onDestroy()
     }
 
     private fun addCandidates(candidates: List<Candidate>) {
@@ -200,7 +212,13 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
             )
 
             scaleType = ScaleType.FIT_CENTER
-            setImageResource(R.drawable.account_circle_24dp)
+
+            GlideApp.with(this.context)
+                    .load(candidate.userProfile.profilePhotoURL)
+                    .transform(CircleCrop())
+                    .placeholder(R.drawable.account_circle_24dp)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(this)
 
             setOnClickListener {
 
@@ -212,23 +230,35 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
             }
         }
 
-        val candidatePartyImage = TextView(activity)
-        candidatePartyImage.apply {
-            layoutParams = LinearLayout.LayoutParams(
-                    200 ,
-                    150
-            )
+        val textViewParty = TextView(activity)
+        textViewParty.apply {
+            setTextColor(Color.parseColor("#FFFFFF"))
+            textSize = 12.0f
             text = partyCode
-
-            setOnClickListener {
-
-                val profileFragment = ProfileOverviewFragment()
-                profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to candidate.userId)
-
-
-                (activity as MainActivity).presentContent(profileFragment)
-            }
+            layoutParams = LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT
+            )
+            gravity = Gravity.CENTER
+            setTypeface(null, Typeface.BOLD)
+            setBackgroundColor(Color.parseColor(partyColour))
         }
+
+        val partyLayout = LinearLayout(activity)
+        partyLayout.orientation = LinearLayout.VERTICAL
+        val params = LinearLayout.LayoutParams(
+                TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        53.toFloat(), resources.displayMetrics
+                ).toInt() ,
+                TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        27.toFloat(), resources.displayMetrics
+                ).toInt()
+        )
+        params.gravity = Gravity.CENTER_VERTICAL
+        partyLayout.layoutParams = params
+        partyLayout.addView(textViewParty)
 
         val candidateProfileLink = ImageView(activity)
         candidateProfileLink.apply {
@@ -306,7 +336,7 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
         }
 
         layout.addView(candidateProfileImage)
-        layout.addView(candidatePartyImage)
+        layout.addView(partyLayout)
         layout.addView(linLayout)
         layout.layoutParams = relativeParamsLeft
 
