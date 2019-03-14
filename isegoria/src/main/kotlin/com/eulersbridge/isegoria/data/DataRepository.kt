@@ -215,7 +215,6 @@ class DataRepository @Inject constructor(
         return httpClient.newCall(request).execute()
                 .toCompletable()
                 .andThen { login(user.email, user.email, getSavedApiBaseUrl()!!) }
-        // TODO: handle baseurl properly on signup
     }
 
     private fun updateUser(updatedUser: User): Completable {

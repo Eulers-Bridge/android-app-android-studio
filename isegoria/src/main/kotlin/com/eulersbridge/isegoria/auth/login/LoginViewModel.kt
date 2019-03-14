@@ -103,7 +103,6 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
                 }
                 .doOnError {
                     refreshInstitutionsServers()
-                    // TODO: fix this
                 }
                 .subscribe()
                 .addToDisposable()

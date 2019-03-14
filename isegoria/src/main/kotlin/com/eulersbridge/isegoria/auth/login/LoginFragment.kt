@@ -37,7 +37,6 @@ class LoginFragment : Fragment() {
 
     private lateinit var institutionServerAdapter: ArrayAdapter<InstitutionServer>
 
-
     private val authViewModel: AuthViewModel by lazy {
         ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
     }
@@ -57,7 +56,6 @@ class LoginFragment : Fragment() {
             val params = logoImage.layoutParams as ConstraintLayout.LayoutParams
             params.topMargin += Math.round(22.0f * resources.displayMetrics.density)
         }
-
 
         emailField.onTextChanged { viewModel.setEmail(it) }
         passwordField.onTextChanged { viewModel.setPassword(it) }
@@ -128,7 +126,6 @@ class LoginFragment : Fragment() {
                     passwordLayout.isErrorEnabled = false
                 }
             }
-
 
             observe(loginError) {
                 when (loginError.value) {

@@ -9,6 +9,7 @@ import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.BaseViewModel
 import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveEvent
+import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
 import javax.inject.Inject
@@ -27,11 +28,7 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
 
     init {
         repository.getSignUpCountries()
-                .doOnSuccess { countries = it }
-                .doOnError {
-                    // TODO: handle error
-                }
-                .subscribe()
+                .subscribeSuccess { countries = it }
                 .addToDisposable()
 
         repository.getLoginState()

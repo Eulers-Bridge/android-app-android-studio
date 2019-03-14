@@ -75,7 +75,6 @@ class CandidateProfileFragment : Fragment(), TitledFragment {
 
         observe(viewModel.candidateLikedByUser) {
             if (it != null && it) {
-                //TODO: replace with more compatible API
                 likeButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context!!, R.color.gold))
                 likeButton.setOnClickListener {
                     viewModel.onCandidateUnliked()
