@@ -5,10 +5,8 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.annotation.ColorInt
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -117,12 +115,22 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
         repository.getUserSupportedTicket(ticketId)
                 .subscribeSuccess {userSupportsTicket ->
                     runOnUiThread {
-                        ticketSupportButton.text =
-                            if (userSupportsTicket)
-                                getString(R.string.candidate_ticket_detail_button_supporting)
-                            else
-                                getString(R.string.candidate_ticket_detail_button_not_supporting)
+                        ticketSupportButton.apply {
+                            text =
+                                    if (userSupportsTicket)
+                                        getString(R.string.candidate_ticket_detail_button_supporting)
+                                    else
+                                        getString(R.string.candidate_ticket_detail_button_not_supporting)
 
+
+                            setBackgroundResource(
+                                    if (userSupportsTicket)
+                                        R.color.election_ticket_supporting
+                                    else
+                                        R.color.election_ticket_not_supporting
+                            )
+
+                        }
                     }
                 }
                 .addTo(compositeDisposable)

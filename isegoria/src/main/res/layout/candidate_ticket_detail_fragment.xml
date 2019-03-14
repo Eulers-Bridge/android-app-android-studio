@@ -132,10 +132,11 @@
                             android:layout_weight="1"
                             android:background="@color/election_ticket_not_supporting"
                             android:gravity="center"
-                            android:text="@string/candidate_ticket_detail_button_supporting"
+                            android:text=""
                             android:textAlignment="gravity"
                             android:textColor="@color/white"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Supporting" />
 
                     </LinearLayout>
 
