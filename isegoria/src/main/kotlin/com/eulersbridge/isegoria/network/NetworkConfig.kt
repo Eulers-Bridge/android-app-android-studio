@@ -9,7 +9,7 @@ data class NetworkConfig(
 ) {
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        internal const val DEFAULT_BASE_URL = "http://54.79.70.241:8080/dbInterface/api/"
+        internal const val DEFAULT_BASE_URL = "http://54.79.70.241:8080/dbInterface/"
     }
 
     fun resetBaseUrl() {

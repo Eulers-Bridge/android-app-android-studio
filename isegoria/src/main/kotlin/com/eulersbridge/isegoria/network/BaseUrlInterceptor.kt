@@ -1,5 +1,6 @@
 package com.eulersbridge.isegoria.network
 
+import com.eulersbridge.isegoria.PLACEHOLDER_BASE_URL
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -16,19 +17,10 @@ class BaseUrlInterceptor(private val networkConfig: NetworkConfig) : Interceptor
 
         val newBaseUrl = HttpUrl.parse(networkConfig.baseUrl)!!
         val originalHost = request.url().host()
+        val placeholderHost = HttpUrl.parse(PLACEHOLDER_BASE_URL)!!.host()
 
-        // TODO: Not an ideal solution
-        if (originalHost != newBaseUrl.host() && !originalHost.contains("www.isegoria.com.au", true)) {
-
-            /* Rewrite the host and port of the request URL, and add the new encoded path
-            to the start of the request URL's encoded path. */
-
-            val firstPathSegments = if (newBaseUrl.encodedPath().last().toString() == "/") {
-                newBaseUrl.encodedPath().dropLast(1)
-            } else {
-                newBaseUrl.encodedPath()
-            }
-            val newEncodedPath = "$firstPathSegments${request.url().encodedPath()}"
+        if (originalHost == placeholderHost) {
+            val newEncodedPath = "${newBaseUrl.encodedPath().dropLast(1)}${request.url().encodedPath()}"
 
             val newUrl = request.url().newBuilder()
                     .host(newBaseUrl.host())

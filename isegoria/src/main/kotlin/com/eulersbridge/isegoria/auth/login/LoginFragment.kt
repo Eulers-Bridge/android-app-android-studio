@@ -15,18 +15,18 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
+import com.eulersbridge.isegoria.network.api.model.InstitutionServer
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.observeBoolean
+import com.eulersbridge.isegoria.util.extension.onItemSelected
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.login_fragment.*
 import javax.inject.Inject
-import android.widget.ArrayAdapter
-import com.eulersbridge.isegoria.network.api.model.ClientInstitution
-import com.eulersbridge.isegoria.util.extension.onItemSelected
 
 
 class LoginFragment : Fragment() {
@@ -35,7 +35,7 @@ class LoginFragment : Fragment() {
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: LoginViewModel
 
-    private lateinit var clientInstitutionAdapter: ArrayAdapter<ClientInstitution>
+    private lateinit var institutionServerAdapter: ArrayAdapter<InstitutionServer>
 
 
     private val authViewModel: AuthViewModel by lazy {
@@ -62,17 +62,17 @@ class LoginFragment : Fragment() {
         emailField.onTextChanged { viewModel.setEmail(it) }
         passwordField.onTextChanged { viewModel.setPassword(it) }
 
-        clientInstitutionSpinner.onItemSelected { viewModel.setClientInstitutionIndex(it) }
+        institutionServerSpinner.onItemSelected { viewModel.setInstitutionServer(it) }
 
         loginButton.setOnClickListener { onLoginClicked() }
         forgotPassword.setOnClickListener { showForgotPasswordDialog() }
         signUpButton.setOnClickListener { authViewModel.signUpVisible.value = true }
 
-        clientInstitutionAdapter = ArrayAdapter(activity,R.layout.institution_spinner_item)
-        clientInstitutionAdapter.setDropDownViewResource(R.layout.institution_spinner_dropdown_item)
+        institutionServerAdapter = ArrayAdapter(activity,R.layout.institution_spinner_item)
+        institutionServerAdapter.setDropDownViewResource(R.layout.institution_spinner_dropdown_item)
 
-        clientInstitutionSpinner.apply {
-            adapter = clientInstitutionAdapter
+        institutionServerSpinner.apply {
+            adapter = institutionServerAdapter
             isEnabled = false
         }
 
@@ -151,14 +151,14 @@ class LoginFragment : Fragment() {
                 }
             }
 
-            observe(institutionLiveData) {clientInstitutions ->
+            observe(institutionServersLiveData) { clientInstitutions ->
 
-                clientInstitutionAdapter.apply {
+                institutionServerAdapter.apply {
                     clear()
                     addAll(clientInstitutions)
                 }
 
-                clientInstitutionSpinner.apply {
+                institutionServerSpinner.apply {
                     isEnabled = true
                 }
             }
