@@ -175,10 +175,6 @@ class CandidateTicketDetailFragment : Fragment(), TabbedFragment, TitledFragment
 
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
