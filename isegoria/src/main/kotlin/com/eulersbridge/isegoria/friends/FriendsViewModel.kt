@@ -3,13 +3,11 @@ package com.eulersbridge.isegoria.friends
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.eulersbridge.isegoria.AppRouter
-import com.eulersbridge.isegoria.auth.login.LoginViewModel
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.*
 import com.eulersbridge.isegoria.util.BaseViewModel
-import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveEvent
-import com.eulersbridge.isegoria.util.extension.map
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.extension.toBooleanSingle
 import com.eulersbridge.isegoria.util.extension.toLiveData
@@ -45,7 +43,7 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
     internal val sentRequestsVisible = MutableLiveData<Boolean>()
     internal val receivedRequestsVisible = MutableLiveData<Boolean>()
     internal val friendsVisible = MutableLiveData<Boolean>()
-    internal val toastMessage =  SingleLiveEvent<String>()
+    internal val toastMessage =  SingleLiveEvent<Int>()
 
     init {
         searchSectionVisible.value = false
@@ -99,17 +97,17 @@ class FriendsViewModel @Inject constructor(private val appRouter: AppRouter, pri
 
     internal fun addFriend(newFriendEmail: String) {
         if (newFriendEmail.isBlank()) {
-            toastMessage.postValue("Unable to add friend")
+            toastMessage.postValue(R.string.friend_add_unsuccessful)
         } else {
             repository.addFriend(newFriendEmail)
-                .doOnError { toastMessage.postValue("Unable to add friend") }
+                .doOnError { toastMessage.postValue(R.string.unknown_error_occurred) }
                 .subscribe { success ->
                     if (success) {
                         refreshSentFriendRequests()
                         refreshFriends()
-                        toastMessage.postValue("Friend added")
+                        toastMessage.postValue(R.string.friend_add_successful)
                     } else {
-                        toastMessage.postValue("Unable to add friend")
+                        toastMessage.postValue(R.string.friend_add_unsuccessful)
                     }
                  }
                 .addToDisposable()

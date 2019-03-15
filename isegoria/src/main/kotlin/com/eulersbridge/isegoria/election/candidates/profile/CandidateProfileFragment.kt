@@ -93,7 +93,7 @@ class CandidateProfileFragment : Fragment(), TitledFragment {
             activity?.invalidateOptionsMenu()
         }
 
-        observe(viewModel.toastMessage) { showMessage(it ?: "") }
+        observe(viewModel.toastMessage) { if (it != null) showMessage(it) }
 
         // setup menu options
         activity?.invalidateOptionsMenu()
@@ -141,6 +141,6 @@ class CandidateProfileFragment : Fragment(), TitledFragment {
     override fun getTitle(context: Context?) = getString(R.string.section_title_candidate_profile)
 
 
-    private fun showMessage(message: String)
-            = Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+    private fun showMessage(stringResourceId: Int)
+            = Toast.makeText(activity, getString(stringResourceId), Toast.LENGTH_LONG).show()
 }

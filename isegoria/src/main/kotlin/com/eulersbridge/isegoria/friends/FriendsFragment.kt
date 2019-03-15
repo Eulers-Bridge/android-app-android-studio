@@ -82,7 +82,7 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
             searchAdapter.submitList(friendSearchResults!!
         )}
 
-        observe(viewModel.toastMessage) { showMessage(it ?: "") }
+        observe(viewModel.toastMessage) { if (it != null) showMessage(it) }
 
         mainActivity = activity as? MainActivity
 
@@ -219,6 +219,9 @@ class FriendsFragment : Fragment(), TitledFragment, TabbedFragment,
 
     private fun showMessage(message: String)
             = Toast.makeText(activity, message, Toast.LENGTH_LONG).show()
+
+    private fun showMessage(resourceId: Int)
+            = showMessage(getString(resourceId))
 
     private fun showAcceptedMessage(friendName: String)
             = showMessage(getString(R.string.friend_request_accepted_message, friendName))

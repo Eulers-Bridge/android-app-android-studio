@@ -93,6 +93,9 @@
 
     <string name="election_candidate_profile_add_friend">Add candidate as friend</string>
     <string name="election_candidate_profile_remove_friend">Remove candidate as friend</string>
+    <string name="election_candidate_profile_friend_request_sent">Friend request sent to candidate</string>
+    <string name="election_candidate_profile_friend_request_revoked">Friend request to candidate revoked</string>
+    <string name="election_candidate_profile_friend_removed">Candidate removed as friend</string>
 
     <!-- Voting -->
     <string name="vote_location_hint">I will be voting in the next community election at</string>
@@ -163,6 +166,8 @@
     <string name="friends_subheading_friend_requests_received">Friend Requests</string>
     <string name="friends_subheading_friend_requests_sent">Pending Friend Requests</string>
     <string name="friends_subheading_all_friends">Friends</string>
+    <string name="friend_add_successful">Friend Added</string>
+    <string name="friend_add_unsuccessful">Unable to add friend</string>
 
     <!-- User profile page -->
     <string name="profile_badges_section_title">Badges</string>
@@ -214,6 +219,8 @@
     <string name="about_thanks_people">The Euler\'s Bridge Advisory Network Members</string>
 
     <!-- Misc -->
+    <string name="unknown_error_occurred">Unknown error occurred</string>
+
     <string name="shortcut_view_latest_election_label_short">Latest Election</string>
     <string name="shortcut_view_latest_election_label_long">View the latest election</string>
 
