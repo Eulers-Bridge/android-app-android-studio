@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.election
+package com.eulersbridge.isegoria.election.overview
 
 
 import android.animation.LayoutTransition
@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.election.ElectionViewModel
 import com.eulersbridge.isegoria.network.api.model.Election
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.toDateString

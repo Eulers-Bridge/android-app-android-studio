@@ -1,4 +1,4 @@
-package com.eulersbridge.isegoria.election.candidates
+package com.eulersbridge.isegoria.election.candidates.all
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -18,6 +18,7 @@ import android.widget.*
 import android.widget.ImageView.ScaleType
 import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.FRAGMENT_EXTRA_USER
 import com.eulersbridge.isegoria.GlideApp
@@ -174,6 +175,7 @@ class CandidateAllFragment : Fragment() {
                     it.photos.firstOrNull()?.let {
                         GlideApp.with(this@CandidateAllFragment)
                                 .load(it.getPhotoUrl())
+                                .transform(CircleCrop())
                                 .transition(DrawableTransitionOptions.withCrossFade())
                                 .into(candidateProfileView)
                     }
@@ -185,6 +187,7 @@ class CandidateAllFragment : Fragment() {
                     it.photos.firstOrNull()?.let {
                         GlideApp.with(this@CandidateAllFragment)
                             .load(it.getPhotoUrl())
+                            .transform(CircleCrop())
                             .transition(DrawableTransitionOptions.withCrossFade())
                             .into(candidateProfileView)
                     }

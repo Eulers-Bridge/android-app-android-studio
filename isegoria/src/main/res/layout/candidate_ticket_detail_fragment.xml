@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,8 +24,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="bottom"
                 android:orientation="vertical"
-                android:paddingLeft="12dp"
-                android:paddingStart="12dp">
+                android:paddingStart="12dp"
+                android:paddingLeft="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -33,14 +33,18 @@
                     android:layout_weight="1"
                     android:gravity="bottom"
                     android:orientation="vertical"
+                    android:paddingTop="6dp"
                     android:paddingEnd="6dp"
-                    android:paddingRight="6dp"
-                    android:paddingTop="6dp">
+                    android:paddingRight="6dp">
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="18dp" />
 
                     <ImageView
                         android:id="@+id/partyDetailLogoImageView"
-                        android:layout_width="114dp"
-                        android:layout_height="108dp"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:adjustViewBounds="true"
                         android:contentDescription="@null"
@@ -82,8 +86,8 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
+                        android:layout_alignParentLeft="true"
                         android:layout_gravity="center_vertical"
                         android:orientation="vertical">
 
@@ -112,7 +116,7 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="142dp"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
@@ -121,17 +125,18 @@
 
                         <Button
                             android:id="@+id/ticketSupportButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1"
-                            android:gravity="center_vertical"
-                            android:paddingEnd="10dp"
-                            android:paddingRight="10dp"
-                            android:text="@string/candidate_ticket_detail_button_support"
-                            android:textColor="@color/white" />
+                            android:background="@color/election_ticket_not_supporting"
+                            android:gravity="center"
+                            android:text=""
+                            android:textAlignment="gravity"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            tools:text="Supporting" />
 
                     </LinearLayout>
 
@@ -155,26 +160,20 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/offGrey">
+            android:background="@color/white">
 
             <TextView
                 android:id="@+id/taskLevelField"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:paddingTop="5dp"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/candidate_ticket_detail_election_ticket"
-                android:textSize="@dimen/profileTextSizeLabel" />
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="1dip"
-                android:layout_alignLeft="@+id/taskLevelField"
-                android:layout_alignStart="@+id/taskLevelField"
-                android:layout_below="@+id/taskLevelField"
-                android:background="@color/offGrey" />
+                android:textAllCaps="true"
+                android:textSize="20sp" />
 
         </RelativeLayout>
 

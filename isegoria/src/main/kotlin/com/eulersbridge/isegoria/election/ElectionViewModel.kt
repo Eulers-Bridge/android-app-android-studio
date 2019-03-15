@@ -23,7 +23,7 @@ class ElectionViewModel @Inject constructor(repository: Repository) : BaseViewMo
         repository.getUser()
                 .doOnSuccess { user ->
                     // If the user has not completed the questions, show a prompt for them
-                    surveyPromptVisibleSubject.onNext(!user.hasPPSEQuestions)
+                      surveyPromptVisibleSubject.onNext(!user.hasPPSEQuestions)
                 }
                 .subscribe()
                 .addToDisposable()

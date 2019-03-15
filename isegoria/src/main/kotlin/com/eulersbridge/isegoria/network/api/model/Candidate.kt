@@ -17,7 +17,9 @@ data class Candidate (
     val familyName: String?,
     val givenName: String?,
     val policyStatement: String?,
-    val information: String?
+    val information: String?,
+    val userProfile: User
+
 ) : Parcelable {
     val name: String
         get() = "$givenName $familyName"

@@ -14,12 +14,15 @@ interface Repository {
 
     fun getSavedEmail(): String?
     fun getSavedPassword(): String?
+    fun getSavedApiBaseUrl(): String?
+
+    fun setApiBaseUrl(url: String)
 
     fun getUserFromLoginState(): User
     fun getUser(): Single<User>
 
     fun resendVerificationEmail(): Completable
-    fun login(email: String, password: String)
+    fun login(email: String, password: String, apiBaseUrl: String)
     fun logOut(): Completable
     fun signUp(user: SignUpUser): Completable
 
@@ -58,6 +61,11 @@ interface Repository {
     fun getTicket(id: Long): Single<Optional<Ticket>>
     fun getTicketCandidates(ticketId: Long): Single<List<Candidate>>
 
+    fun getCandidate(candidateId: Long): Single<Candidate>
+    fun getCandidateLikes(candidateId: Long): Single<List<Like>>
+    fun likeCandidate(candidateId: Long): Completable
+    fun unlikeCandidate(candidateId: Long): Completable
+
     fun getVoteLocations(): Single<List<VoteLocation>>
     fun createUserVoteReminder(electionId: Long, voteLocation: String, date: Long): Completable
     fun getLatestUserVoteReminder(): Single<Optional<VoteReminder>>
@@ -80,13 +88,18 @@ interface Repository {
     fun getFriends(): Single<List<Contact>>
     fun getSentFriendRequests(): Single<List<FriendRequest>>
     fun getReceivedFriendRequests(): Single<List<FriendRequest>>
+    fun getUserAddedAsFriend(userEmail: String): Single<Boolean>
     fun addFriend(newFriendEmail: String): Single<Boolean>
+    fun removeFriend(friendEmail: String): Completable
     fun acceptFriendRequest(requestId: Long): Completable
     fun rejectFriendRequest(requestId: Long): Completable
+    fun revokeFriendRequest(requestId: Long): Completable
+    fun getFriendStatusAndPendingFriendRequest(targetUserEmail: String): Single<Pair<Boolean, FriendRequest?>>
     fun searchForUsers(query: String): Single<List<User>>
 
     fun getInstitution(institutionId: Long): Single<Optional<Institution>>
     fun getInstitutionName(institutionId: Long): Single<Optional<String>>
+    fun getInstitutionServers(): Single<List<InstitutionServer>>
 
     fun getPolls(): Single<List<Poll>>
     fun answerPoll(pollId: Long, answerId: Long): Completable

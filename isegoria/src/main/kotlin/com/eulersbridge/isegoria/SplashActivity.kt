@@ -22,9 +22,10 @@ class SplashActivity : DaggerAppCompatActivity() {
 
         val savedEmail = repository.getSavedEmail()
         val savedPassword = repository.getSavedPassword()
+        val savedApiBaseUrl = repository.getSavedApiBaseUrl()
 
-        if (savedEmail != null && savedPassword != null) {
-            repository.login(savedEmail, savedPassword)
+        if (savedEmail != null && savedPassword != null && savedApiBaseUrl != null) {
+            repository.login(savedEmail, savedPassword, savedApiBaseUrl)
 
         } else {
             showLoginActivity()

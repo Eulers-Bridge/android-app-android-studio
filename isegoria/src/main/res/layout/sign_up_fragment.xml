@@ -198,7 +198,7 @@
             tools:listitem="@android:layout/simple_spinner_item" />
 
         <Spinner
-            android:id="@+id/institutionSpinner"
+            android:id="@+id/loginInstitutionSpinner"
             android:layout_width="0dp"
             android:layout_height="40dp"
             app:layout_constraintTop_toBottomOf="@id/countrySpinner"
@@ -212,7 +212,7 @@
             android:id="@+id/nextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/institutionSpinner"
+            app:layout_constraintTop_toBottomOf="@id/loginInstitutionSpinner"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
             app:layout_constraintStart_toStartOf="@id/guidelineStart"

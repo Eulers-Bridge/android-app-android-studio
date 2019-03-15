@@ -17,14 +17,12 @@ import android.widget.TableRow.LayoutParams
 import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.eulersbridge.isegoria.FRAGMENT_EXTRA_PROFILE_ID
-import com.eulersbridge.isegoria.GlideApp
-import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.election.candidates.FRAGMENT_EXTRA_CANDIDATE_POSITION
+import com.eulersbridge.isegoria.election.candidates.profile.CandidateProfileFragment
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.network.api.model.Position
-import com.eulersbridge.isegoria.profile.ProfileOverviewFragment
 import com.eulersbridge.isegoria.util.extension.runOnUiThread
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
 import com.eulersbridge.isegoria.util.ui.TabbedFragment
@@ -33,7 +31,6 @@ import dagger.android.support.AndroidSupportInjection
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import kotlinx.android.synthetic.main.candidate_position_fragment.*
-import kotlinx.android.synthetic.main.candidate_position_fragment.view.*
 import javax.inject.Inject
 
 /**
@@ -141,14 +138,10 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
             setPadding(paddingMargin, 0, paddingMargin, 0)
             setOnClickListener {
 
-                val profileOverviewFragment = ProfileOverviewFragment()
-                profileOverviewFragment.arguments = bundleOf(FRAGMENT_EXTRA_PROFILE_ID to candidate.userId)
+                val candidateProfileFragment = CandidateProfileFragment()
+                candidateProfileFragment.arguments = bundleOf(FRAGMENT_EXTRA_CANDIDATE_ID to candidate.id)
 
-                childFragmentManager
-                    .beginTransaction()
-                    .addToBackStack(null)
-                    .replace(android.R.id.content, profileOverviewFragment)
-                    .commit()
+                (activity as MainActivity).presentContent(candidateProfileFragment)
             }
         }
 

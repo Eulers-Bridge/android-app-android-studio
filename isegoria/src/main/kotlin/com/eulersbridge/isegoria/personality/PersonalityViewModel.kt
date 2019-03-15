@@ -23,7 +23,9 @@ class PersonalityViewModel @Inject constructor(private val repository: Repositor
 
         repository.addUserPersonality(userPersonality)
                 .subscribeBy(
-                        onComplete = { questionsComplete.call() },
+                        onComplete = {
+                            repository.getUserFromLoginState().hasPersonality = true
+                            questionsComplete.call() },
                         onError = { }
                 )
                 .addToDisposable()

@@ -20,6 +20,10 @@ const val SHORTCUT_ACTION_FRIENDS = "SHORTCUT_FRIENDS"
 const val FRAGMENT_EXTRA_USER = "user"
 const val FRAGMENT_EXTRA_CONTACT = "contact"
 const val FRAGMENT_EXTRA_PROFILE_ID = "profileId"
+const val FRAGMENT_EXTRA_CANDIDATE_ID = "candidateId"
 
 const val NOTIFICATION_CHANNEL_FRIENDS = "Friends"
 const val NOTIFICATION_CHANNEL_VOTE_REMINDERS = "Vote Reminder"
+
+// Used for network configuration
+const val PLACEHOLDER_BASE_URL = "http://base-url.placeholder/"

@@ -8,6 +8,7 @@
     <color name="profileImageBackground">#AAAAAA</color>
     <color name="grey">#8A898A</color>
     <color name="offGrey">#F4F4F4</color>
+    <color name="gold">#F1C017</color>
     <color name="lightGrey">#8694A3</color>
     <color name="darkBlue">#3C7EC9</color>
     <color name="lightBlue">#4A90E2</color>
@@ -19,14 +20,20 @@
 
     <color name="slider_text">#738192</color>
 
+    <!-- Login Page -->
+    <color name="institution_spinner_dropdown_background">#d5686868</color>
+
     <color name="self_efficacy_slider_2">#647EC7</color>
     <color name="self_efficacy_slider_3">#B4629A</color>
 
     <color name="election_efficacy_overlay">#E6FFFFFF</color> <!-- 90% opacity white -->
+    <color name="election_ticket_supporting">#14b54a</color>
+    <color name="election_ticket_not_supporting">#535353</color>
 
     <color name="about_background">#262e3b</color>
 
     <color name="divider">#1f000000</color>
+
 
     <color name="profile_circle_ring_base">#64d3d3d3</color>
 

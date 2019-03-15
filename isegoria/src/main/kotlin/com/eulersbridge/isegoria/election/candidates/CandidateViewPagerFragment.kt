@@ -7,14 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.eulersbridge.isegoria.R
+import com.eulersbridge.isegoria.election.candidates.all.CandidateAllFragment
 import com.eulersbridge.isegoria.election.candidates.positions.CandidatePositionsFragment
+import com.eulersbridge.isegoria.election.candidates.ticket.CandidateTicketFragment
 import kotlinx.android.synthetic.main.candidate_fragment.*
 
 /**
  * This is the master fragment for candidates. Holds the view pager and tab indicator for the
  * positions, tickets and all candidates fragments.
  */
-class CandidateFragment : Fragment() {
+class CandidateViewPagerFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
