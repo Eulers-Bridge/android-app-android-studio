@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import com.bumptech.glide.Glide
 import com.bumptech.glide.Priority
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.*
 import com.eulersbridge.isegoria.data.Repository
@@ -152,6 +153,7 @@ class ProfileOverviewFragment : Fragment(), TitledFragment {
             it?.let { user ->
                 GlideApp.with(this)
                         .load(user.profilePhotoURL)
+                        .transform(CircleCrop())
                         .priority(Priority.HIGH)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(smallPhotoImageView)

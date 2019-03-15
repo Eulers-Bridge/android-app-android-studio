@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Priority
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.eulersbridge.isegoria.GlideApp
 import com.eulersbridge.isegoria.R
@@ -97,6 +98,7 @@ class SettingsActivity : DaggerAppCompatActivity() {
         viewModel.profilePhotoUrl?.let {
             GlideApp.with(this)
                     .load(it)
+                    .transform(CircleCrop())
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(smallImageView)
         }
