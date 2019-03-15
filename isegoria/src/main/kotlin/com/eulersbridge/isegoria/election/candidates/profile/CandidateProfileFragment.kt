@@ -75,12 +75,12 @@ class CandidateProfileFragment : Fragment(), TitledFragment {
 
         observe(viewModel.candidateLikedByUser) {
             if (it != null && it) {
-                likeButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context!!, R.color.gold))
+                likeButton.setImageResource(R.drawable.star)
                 likeButton.setOnClickListener {
                     viewModel.onCandidateUnliked()
                 }
             } else {
-                likeButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context!!, R.color.grey))
+                likeButton.setImageResource(R.drawable.default_star)
 
                 likeButton.setOnClickListener {
                     viewModel.onCandidateLiked()
