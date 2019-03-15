@@ -68,9 +68,6 @@ class PhotoDetailActivity : DaggerAppCompatActivity(), ViewPager.OnPageChangeLis
                 dateTextView.text = dateStr?.toUpperCase()
 
                 likesTextView.text = it?.likeCount?.toString()
-
-                @DrawableRes val flagImage = if (it?.hasInappropriateContent == true) R.drawable.flag else R.drawable.flag_default
-                flagImageView.setImageResource(flagImage)
             }
         }
 

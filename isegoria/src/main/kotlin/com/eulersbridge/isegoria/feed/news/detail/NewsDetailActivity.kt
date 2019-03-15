@@ -94,11 +94,6 @@ class NewsDetailActivity : DaggerAppCompatActivity() {
             authorNameTextView.text = article.creator.fullName
             dateTextView.text = article.date.toDateString(this)
 
-            flagImageView.setOnClickListener { flagImageView.setImageResource(R.drawable.flag) }
-
-            if (article.hasInappropriateContent)
-                flagImageView.setImageResource(R.drawable.flag_default)
-
             starImageView.setOnClickListener { view ->
                 userLikedArticle = !userLikedArticle
 
