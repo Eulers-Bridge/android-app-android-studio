@@ -87,17 +87,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/likesTextView" />
 
-        <ImageView
-            android:id="@id/flagImageView"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="@string/photo_detail_view_flag"
-            android:src="@drawable/flag_default"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/starImageView" />
     </android.support.constraint.ConstraintLayout>
 
 </merge>

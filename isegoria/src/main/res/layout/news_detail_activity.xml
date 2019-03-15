@@ -56,27 +56,20 @@
             android:id="@+id/starImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="40dp"
-            android:layout_toLeftOf="@+id/flagImageView"
-            android:layout_toStartOf="@+id/flagImageView"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:contentDescription="@string/news_article_star_content_description"
-            app:srcCompat="@drawable/star_24dp"
-            app:layout_constraintEnd_toStartOf="@+id/flagImageView"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/flagImageView"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="40dp"
-            android:contentDescription="@string/news_article_flag_content_description"
-            android:src="@drawable/flag_default"
+            app:layout_constraintBottom_toTopOf="@+id/titleTextView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintHorizontal_bias="0.879"
+            app:layout_constraintStart_toEndOf="@+id/backButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/star_24dp" />
 
         <TextView
             android:id="@+id/titleTextView"
