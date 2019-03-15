@@ -2,6 +2,7 @@ package com.eulersbridge.isegoria.election.candidates.profile
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Candidate
 import com.eulersbridge.isegoria.network.api.model.Like
@@ -10,10 +11,8 @@ import com.eulersbridge.isegoria.util.extension.toLiveData
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.processors.BehaviorProcessor
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.android.synthetic.main.candidate_profile_fragment.*
 import javax.inject.Inject
 
 class CandidateProfileViewModel @Inject constructor(
@@ -38,7 +37,7 @@ class CandidateProfileViewModel @Inject constructor(
     internal var candidateLikedByUser = candidateLikedByUserSubject.toLiveData(BackpressureStrategy.LATEST)
     internal var candidateAddedAsFriend = candidateAddedAsFriendSubject.toLiveData(BackpressureStrategy.LATEST)
 
-    internal val toastMessage =  SingleLiveEvent<String>()
+    internal val toastMessage =  SingleLiveEvent<Int>() // string resource ID for toast message
 
     init {
         createCandidateIdObserver()
@@ -52,7 +51,7 @@ class CandidateProfileViewModel @Inject constructor(
         if (candidateId != null) {
             this.candidateIdSubject.onNext(candidateId)
         } else {
-            toastMessage.postValue("Error occurred")
+            toastMessage.postValue(R.string.unknown_error_occurred)
         }
     }
 
@@ -65,7 +64,7 @@ class CandidateProfileViewModel @Inject constructor(
                         refreshCandidateLikes(candidateId)
                     }
                     .doOnError {
-                        toastMessage.postValue("Error Occurred")
+                        toastMessage.postValue(R.string.unknown_error_occurred)
                     }
                     .subscribe()
                     .addTo(compositeDisposable)
@@ -83,7 +82,7 @@ class CandidateProfileViewModel @Inject constructor(
                         refreshCandidateLikes(candidateId)
                     }
                     .doOnError {
-                        toastMessage.postValue("Error Occurred")
+                        toastMessage.postValue(R.string.unknown_error_occurred)
                     }
                     .subscribe()
                     .addTo(compositeDisposable)
@@ -94,11 +93,11 @@ class CandidateProfileViewModel @Inject constructor(
     internal fun onAddCandidateAsFriend() {
         repository.addFriend(candidateSubject.value!!.userProfile.email)
                 .doOnSuccess {
-                    toastMessage.postValue("Added as friend")
+                    toastMessage.postValue(R.string.election_candidate_profile_friend_request_sent)
                     refreshFriendStatus(candidateSubject.value!!.userProfile.email)
                 }
                 .doOnError {
-                    toastMessage.postValue("Error Occurred")
+                    toastMessage.postValue(R.string.unknown_error_occurred)
                 }
                 .subscribe()
                 .addTo(compositeDisposable)
@@ -118,26 +117,26 @@ class CandidateProfileViewModel @Inject constructor(
                         val completable: Completable = if (candidateIsFriend) {
                             repository.removeFriend(candidateEmail)
                                     .doOnComplete {
-                                        toastMessage.postValue("Candidate removed as friend")
+                                        toastMessage.postValue(R.string.election_candidate_profile_friend_removed)
                                     }
                         } else {
                             repository.revokeFriendRequest(friendRquest!!.id)
                                     .doOnComplete {
-                                        toastMessage.postValue("Friend request revoked")
+                                        toastMessage.postValue(R.string.election_candidate_profile_friend_request_revoked)
                                     }
                         }
 
                         completable
                                 .doOnComplete {refreshFriendStatus(candidateSubject.value!!.userProfile.email) }
                                 .doOnError {
-                                    toastMessage.postValue("Error Occurred")
+                                    toastMessage.postValue(R.string.unknown_error_occurred)
                                 }
                                 .subscribe()
                                 .addTo(compositeDisposable)
                     }
                 }
                 .doOnError {
-                    toastMessage.postValue("Error Occurred")
+                    toastMessage.postValue(R.string.unknown_error_occurred)
                 }
                 .subscribe()
                 .addTo(compositeDisposable)
@@ -178,7 +177,7 @@ class CandidateProfileViewModel @Inject constructor(
                 refreshFriendStatus(candidate.userProfile.email)
             }
             .doOnError {
-                toastMessage.postValue("Error occurred")
+                toastMessage.postValue(R.string.unknown_error_occurred)
             }
             .subscribe()
             .addTo(compositeDisposable)
@@ -195,7 +194,7 @@ class CandidateProfileViewModel @Inject constructor(
                         )
             }
             .doOnError {
-                toastMessage.postValue("Error occurred")
+                toastMessage.postValue(R.string.unknown_error_occurred)
             }
             .subscribe()
             .addTo(compositeDisposable)

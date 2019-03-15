@@ -93,6 +93,9 @@
 
     <string name="election_candidate_profile_add_friend">Add candidate as friend</string>
     <string name="election_candidate_profile_remove_friend">Remove candidate as friend</string>
+    <string name="election_candidate_profile_friend_request_sent">Friend request sent to candidate</string>
+    <string name="election_candidate_profile_friend_request_revoked">Friend request to candidate revoked</string>
+    <string name="election_candidate_profile_friend_removed">Candidate removed as friend</string>
 
     <!-- Voting -->
     <string name="vote_location_hint">I will be voting in the next community election at</string>
