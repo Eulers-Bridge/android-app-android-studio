@@ -24,7 +24,6 @@ import com.eulersbridge.isegoria.auth.verification.EmailVerificationFragment
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.util.extension.ifTrue
 import com.eulersbridge.isegoria.util.extension.observe
-import com.eulersbridge.isegoria.util.extension.observeBoolean
 import com.eulersbridge.isegoria.util.transformation.BlurTransformation
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
@@ -80,26 +79,21 @@ class AuthActivity : DaggerAppCompatActivity() {
         }
 
         ifTrue(viewModel.signUpConsentGiven) {
-            observeBoolean(viewModel.signUp()) { signUpSuccess ->
-                if (signUpSuccess) {
-                    presentRootContent(LoginFragment())
-                    presentContent(EmailVerificationFragment())
+            viewModel.signUp()
+        }
 
-                } else {
-                    presentRootContent(LoginFragment())
-                    presentContent(SignUpFragment())
+        observe(viewModel.signRequestComplete) { signUpSuccess ->
+            if (signUpSuccess == true) {
+                presentContent(EmailVerificationFragment())
+            } else {
+                presentContent(SignUpFragment())
 
-                    AlertDialog.Builder(this)
+                AlertDialog.Builder(this)
                         .setTitle(getString(R.string.user_sign_up_error_title))
                         .setMessage(getString(R.string.user_sign_up_error_message))
                         .setPositiveButton(android.R.string.ok, null)
                         .show()
-                }
             }
-        }
-
-        ifTrue(viewModel.verificationComplete) {
-            presentRootContent(LoginFragment())
         }
     }
 

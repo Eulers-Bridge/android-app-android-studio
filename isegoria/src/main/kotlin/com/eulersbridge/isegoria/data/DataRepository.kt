@@ -100,9 +100,8 @@ class DataRepository @Inject constructor(
         return api.getUser(user.email)
     }
 
-    override fun resendVerificationEmail(): Completable {
-        val user = requireUser()
-        return api.resendVerificationEmail(user.email)
+    override fun resendVerificationEmail(email: String): Completable {
+        return api.resendVerificationEmail(email)
     }
 
     private fun getDeviceToken(): Single<String> {
@@ -206,7 +205,7 @@ class DataRepository @Inject constructor(
         val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
-                .url(networkConfig.baseUrl + "signUp")
+                .url(networkConfig.baseUrl + "api/signUp")
                 .addAppHeaders()
                 .post(requestBody)
                 .build()
@@ -214,7 +213,6 @@ class DataRepository @Inject constructor(
         // Create new HTTP client rather than using application's, as no auth is required
         return httpClient.newCall(request).execute()
                 .toCompletable()
-                .andThen { login(user.email, user.email, getSavedApiBaseUrl()!!) }
     }
 
     private fun updateUser(updatedUser: User): Completable {

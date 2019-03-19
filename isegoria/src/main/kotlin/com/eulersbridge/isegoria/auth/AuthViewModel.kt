@@ -1,17 +1,16 @@
 package com.eulersbridge.isegoria.auth
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.os.AsyncTask
+import com.eulersbridge.isegoria.R
 import com.eulersbridge.isegoria.auth.signup.SignUpUser
 import com.eulersbridge.isegoria.data.LoginState
 import com.eulersbridge.isegoria.data.Repository
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.util.BaseViewModel
-import com.eulersbridge.isegoria.util.data.SingleLiveData
 import com.eulersbridge.isegoria.util.data.SingleLiveEvent
 import com.eulersbridge.isegoria.util.extension.subscribeSuccess
-import com.eulersbridge.isegoria.util.extension.toBooleanSingle
-import com.eulersbridge.isegoria.util.extension.toLiveData
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 
@@ -24,7 +23,8 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
     val signUpVisible = MutableLiveData<Boolean>()
     val signUpUser = MutableLiveData<SignUpUser>()
     val signUpConsentGiven = MutableLiveData<Boolean>()
-    val verificationComplete = MutableLiveData<Boolean>()
+    val signRequestComplete = MutableLiveData<Boolean>()
+    val toasMessage = SingleLiveEvent<Int>()
 
     init {
         repository.getSignUpCountries()
@@ -35,6 +35,7 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
                 .filter { it is LoginState.LoggedIn }
                 .subscribe { authFinished.call() }
                 .addToDisposable()
+
     }
 
     fun onSignUpBackPressed() {
@@ -42,9 +43,11 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
         signUpUser.value = null
     }
 
-    fun signUp(): LiveData<Boolean> {
-        if (countries == null)
-            return SingleLiveData(false)
+    fun signUp() {
+        if (countries == null) {
+            signRequestComplete.postValue(false)
+            return
+        }
 
         // Not possible for signUpUser's value to be null,
         // as sign-up process is linear and gated.
@@ -59,11 +62,39 @@ class AuthViewModel @Inject constructor(private val repository: Repository) : Ba
             signUpUser.value = updatedUser
         }
 
-        return repository.signUp(updatedUser)
-                .doOnComplete{
-                    signUpUser.postValue(null)
-                }
-                .toBooleanSingle()
-                .toLiveData()
+        AsyncTask.execute {
+            repository.signUp(updatedUser)
+                    .subscribeBy(
+                            onComplete = {
+                                signRequestComplete.postValue(true)
+                            },
+                            onError = {
+                                signRequestComplete.postValue(false)
+                            }
+                    )
+                    .addToDisposable()
+        }
+    }
+
+    internal fun onResendVerification() {
+        if (signUpUser.value != null) {
+            repository.resendVerificationEmail(signUpUser.value!!.email)
+                    .subscribeBy(
+                            onComplete = {
+                                toasMessage.postValue(R.string.email_verification_resend_toast_message)
+                            },
+                            onError = {
+                                toasMessage.postValue(R.string.unknown_error_occurred)
+                            }
+                    )
+                    .addToDisposable()
+        }
+    }
+
+    internal fun onEmailVerified() {
+        if (signUpUser.value != null) {
+            repository.login(signUpUser.value!!.email, signUpUser.value!!.password, repository.getSavedApiBaseUrl()!!)
+        }
+
     }
 }

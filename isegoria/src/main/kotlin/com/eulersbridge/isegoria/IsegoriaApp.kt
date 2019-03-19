@@ -123,6 +123,7 @@ class IsegoriaApp : Application(), AppRouter, HasActivityInjector, HasSupportFra
         var threadPolicy = StrictMode.ThreadPolicy.Builder()
                 .detectCustomSlowCalls()
                 .detectNetwork()
+                .penaltyLog()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             threadPolicy = threadPolicy.detectResourceMismatches()

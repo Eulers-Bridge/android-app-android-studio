@@ -46,7 +46,7 @@ interface API {
     fun logOut(): Completable
 
 
-    @GET("api/emailVerification/{userEmail}/resend")
+    @GET("api/emailVerification/{userEmail}/resendEmail")
     fun resendVerificationEmail(@Path("userEmail") userEmail: String): Completable
 
     @POST("api/requestPwdReset/{userEmail}/")
