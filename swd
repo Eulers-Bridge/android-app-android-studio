@@ -1,0 +1,2311 @@
+[33mcommit fd1934c7fe8cdb60bcf286bbf3a3a29ffab9d1ec[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 77e4173 d5bd020
+Author: James Margenberg <jmargenberg@ourveryown.com.au>
+Date:   Tue Mar 5 03:28:59 2019 +0000
+
+    Merged in bugfix/vote (pull request #4)
+    
+    Fixed vote plan flow (Issue 8)
+    
+    Approved-by: Errol Hassall <ehassall@ourveryown.com.au>
+
+[33mcommit d5bd02057892e81c4112ef772b13d70f8e466db6[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Mar 5 14:21:12 2019 +1100
+
+    Manual merge confilct resolution
+
+[33mcommit ef08dbc20e00cfc337740d38166f1038ecf57378[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Mar 5 13:45:36 2019 +1100
+
+    Removed stub vote reminder since backend has been fixed.
+
+[33mcommit adcf8ad277f36d8a595b87e7df782edcedc8a1ec[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Mar 5 13:15:27 2019 +1100
+
+    Fixed add vote plan to calendar button; Fixed get vote reminders api call; Added toast messages for error handling.
+    
+    Temporary hardcoded vote reminders has been added whilst backend issues
+    are getting sorted.
+    
+    There was a special case to return null for paginated api calls with 0
+    records, this was the cause of this bug and had no clear purpose so was
+    removed.
+    
+    Also, changed how toasts are created in friends fragment for wider
+    compatibility.
+
+[33mcommit 7453bac427fd6c818d39398cb87f78bb61abbe56[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Mar 4 13:57:53 2019 +1100
+
+    Fixed time selection and vote plan next button.
+    
+    Also, further refactored to use private rx subjects and added stub api
+    call error handler.
+
+[33mcommit 340a884a026b63dc0bc333f3323b0a9c98c64610[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Fri Mar 1 16:21:01 2019 +1100
+
+    WIP COMMIT
+
+[33mcommit 64f25d0dcc056a9e70571eb6a06d167e2adbf56e[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Fri Mar 1 14:37:48 2019 +1100
+
+    Added the spinners for dates. Fixed the next button
+    
+    Added the spinners on the date and time. Fixed the next button on the vote page so that you can now get to the last page. This didn't work because it had null data in the voteLocations variable.
+
+[33mcommit e0a0f83e9e50e442dae109027f931d05a7e5f961[m
+Merge: c7f427c 6b52bb1
+Author: Errol Hassall <errol.hassall99@gmail.com>
+Date:   Tue Feb 26 23:47:04 2019 +0000
+
+    Merge branch 'bugfix/friends' into 'master'
+    
+    Bugfix/friends
+    
+    See merge request ourveryown/isegoria-android!3
+
+[33mcommit 6b52bb1850caa4f5ffe077de801e8037b4e577ee[m
+Author: Errol Hassall <errol.hassall99@gmail.com>
+Date:   Tue Feb 26 23:47:04 2019 +0000
+
+    Changed the UI icons for friend requests
+    
+    Changed the pending icon to make more sense as it is now a pending icon. Added friends now has a new icon to indicate that the friend is in fact added. When you don't have a profile picture it gives you a default one, rather than a white image
+
+[33mcommit 77e4173ad8967a82c35fa294947e713b8f40984c[m
+Author: Yikai Gong <yikaig@student.unimelb.edu.au>
+Date:   Tue Feb 26 23:42:17 2019 +1100
+
+    Untrack ./idea and keystore.properties
+
+[33mcommit 4f276178691362e909053a0b469d49eb9a57ef04[m
+Merge: c7f427c 8da62e0
+Author: James Margenberg <jmargenberg@ourveryown.com.au>
+Date:   Tue Feb 26 06:58:06 2019 +0000
+
+    Merged in bugfix/friends (pull request #3)
+    
+    Bugfix/friends
+
+[33mcommit 8da62e0e6cb60ba4cca7860c448bd2d2f4b1e21d[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Tue Feb 26 15:26:04 2019 +1100
+
+    Fixed bug
+    
+    Bug was introduced when navigating to a users profile. It would create a button to redo your survey then would crash the app if you clicked on it. This has been removed.
+
+[33mcommit c6b08c760ebe61a6b1c38694ce9c8e08a950f311[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Tue Feb 26 14:58:01 2019 +1100
+
+    Removed cache, refresh of add friends, tidy up of warnings
+    
+    Removed the caching as this should never be done on the api, this was causing a lot of problems. Forced the fragment to refresh when you add a friend or request to add a friend. Cleaned up a few easy warnings such as unused variables and the unused argument of the UserViewHolder.kt.
+
+[33mcommit 18852693e745765a0a9943d9ff8f5620d83e86bc[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Tue Feb 26 13:55:43 2019 +1100
+
+    Added action icon options to user view holder
+
+[33mcommit ede143f290097b273d4435026c05269e1799f30d[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Tue Feb 26 12:17:43 2019 +1100
+
+    Changed search results to indicate user's friend status
+    
+    Introduced FriendStatus enum and FriendSearchResult data class for use in searchResultsSubject and searchResults live data.
+
+[33mcommit 7b2312f3e213a6bf9fc071b029d9a37cfdc376e6[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Tue Feb 26 10:13:16 2019 +1100
+
+    Separated subject observing and initialisation
+
+[33mcommit 043f41177b3c6453dd4825a1a058e61cc97e1f15[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 25 17:41:51 2019 +1100
+
+    Separated LiveData posting and Single subscriptions with subjects.
+    
+    This will enable more powerful usage of the observable streams.
+
+[33mcommit 8e58a1bb06706b9ab39468b00bae10220658e351[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 25 16:46:09 2019 +1100
+
+    Filtered out accepted and rejected friend requests
+
+[33mcommit 1c0610566261e0975bda5c436d283963cfae627e[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Mon Feb 25 15:55:27 2019 +1100
+
+    Pending friend request profile click
+    
+    When you click on a pending friend request it previously went to your profile. We changed it to navigate to the profile that you clicked, the same as when you click on the profile of a user you are already friends with
+
+[33mcommit 4bd18a4611eac664ceb7dcade5b6c8120f4b822c[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Mon Feb 25 14:32:20 2019 +1100
+
+    Removed code
+    
+    Removed the code to set the institution that wasn't being used. Changed the pending friends to display the email rather than the institution as they can only friend people in their institution anyway.
+
+[33mcommit a23f3b06a70be6d894adc87ebedfa32437b4f1de[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Mon Feb 25 14:03:16 2019 +1100
+
+    Changed the UI icons for friend requests
+    
+    Changed the pending icon to make more sense as it is now a pending icon. Added friends now has a new icon to indicate that the friend is in fact added. When you don't have a profile picture it gives you a default one, rather than a white image
+
+[33mcommit c7f427cdc0a8563692fb1fe26170fd5b32f09cf4[m
+Merge: 469fc94 35ead50
+Author: James Margenberg <jmargenberg@ourveryown.com.au>
+Date:   Tue Feb 19 00:44:18 2019 +0000
+
+    Merged in bug-fixes (pull request #2)
+    
+    Bug fixes undertaken during first week of OVO involvement.
+    
+    Approved-by: Errol Hassall <ehassall@ourveryown.com.au>
+
+[33mcommit 35ead504f3d86b67ad89848da3e8be976b44cb1e[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Feb 19 10:06:06 2019 +1100
+
+    Removed unused code and added Android Studio version to readme
+
+[33mcommit dd64cc0a6acf440e5030775e4e62e6e602a10457[m
+Merge: 799933e 44dcbaf
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 18 11:52:30 2019 +1100
+
+    Merged git ignore into bug-fixes
+
+[33mcommit 799933e2bd7c5edaaefff465c3737faf3879305a[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 18 11:45:58 2019 +1100
+
+    Fixed launching of ticket candidates fragment.
+    
+    Also, added missing docstring for all candidates fragment.
+
+[33mcommit 7b731671d3be27a941f744c7a045e70211a40173[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 18 11:44:44 2019 +1100
+
+    Fixed launching of position candidates fragments.
+
+[33mcommit 060d797c708e09828b4d5ad29ca2663ea21d2418[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 18 11:43:40 2019 +1100
+
+    Added short docstring to each fragment in election candidates.
+
+[33mcommit 44dcbafa1ce4afb907ce8ec21a88872e188cb2c3[m
+Author: Errol Hassall <Errol.Hassall99@gmail.com>
+Date:   Fri Feb 15 16:05:48 2019 +1100
+
+    Git ignore to remove android studio settings
+
+[33mcommit 0a9cc4a52fbc247564f1029dc1eb562cd6715b12[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Thu Feb 14 12:06:37 2019 +1100
+
+    Change way photo album opens; Remove tabs from voting screen; Clean up how tabs are managed between Fragments;
+
+[33mcommit 6e4aa7a108ef9e9783e5fca9e7fb7a095bba6e20[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Feb 12 16:58:10 2019 +1100
+
+    Ensure all fragments are removed from backstack.
+    
+    Fixed bug where changing tabs would occasionally lead to fragments
+     from the previous screen being overlaid on the new screen.
+
+[33mcommit 1cfc114abff3fc74ea04f2e68ea5b13f2e29839b[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Feb 12 14:26:39 2019 +1100
+
+    Changed loginError to SingleLiveEvent
+
+[33mcommit fa3e1201318d50e0544ccfd0940fa7c150030232[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Tue Feb 12 14:13:49 2019 +1100
+
+    Ensure input is not lost on login and signup page if app is hidden.
+
+[33mcommit df1a8d5a8eda8cfc0b7295db52e97b94d4f215b9[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 11 17:31:27 2019 +1100
+
+    Added email to friend search result.
+
+[33mcommit a44d7a044c5176c7a4dc998b38c02c59b3978134[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Mon Feb 11 17:24:15 2019 +1100
+
+    Add different error message if login failed.
+    
+    Change LoginViewModel to use an enum to track login failures rather than
+     a boolean
+
+[33mcommit c664de820d8e6d9578cca9669443cac49d5e50e2[m
+Author: James Margenberg <james@margenberg.com.au>
+Date:   Thu Feb 7 16:42:29 2019 +1100
+
+    Updated Gradle for Android 3.2.1
+
+[33mcommit 469fc942adcdc1a87d930073362526323e17f7cf[m
+Merge: e723579 1b48112
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri May 4 00:19:16 2018 +0100
+
+    Merge branch 'release-1.0.24'
+
+[33mcommit 1b481128f8f069e35218fa6014724da3dc45fd2e[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri May 4 00:18:47 2018 +0100
+
+    Bump version number to 1.0.24, VC #25
+
+[33mcommit 4c4deff9b6f8139ecabe88ce8c6be83ae3f3fc47[m
+Merge: f6cce9f 0a50239
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu May 3 23:45:32 2018 +0100
+
+    Merge branch 'fix-profile-navigation-crash' into dev
+
+[33mcommit 0a50239c430094b9d028223059d6896f3a36af42[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu May 3 23:45:19 2018 +0100
+
+    Fix crash after visiting Profile, Friends, then tapping any other navigation tab
+
+[33mcommit f6cce9f9c594c3decd10e15e5b51e5502e4338db[m
+Merge: c9a1baf 4615318
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu May 3 12:02:38 2018 +0100
+
+    Merge branch 'poll-fix-refactor-tests' into dev
+
+[33mcommit 46153189f7eefde53f49dadcda8f0b0452fc37ce[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu May 3 12:02:08 2018 +0100
+
+    Fix voting enabled on already-voted/closed poll; refactor some poll vote logic; update Google Gradle plugin to fix fatal build error; add NetworkConfig & PollsViewModel unit tests
+
+[33mcommit c9a1bafb90d6b130ee3183e01669fb03bffaf223[m
+Merge: 9dd5821 341b8b3
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed May 2 15:29:34 2018 +0100
+
+    Merge branch 'fix-ppse-slider-height' into dev
+
+[33mcommit 341b8b393a67e9385d7a76c05fc31658c20881cc[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed May 2 15:25:42 2018 +0100
+
+    Only multidex for debug, not release
+
+[33mcommit ffbf7bebf0d5d9c8c56e5337b5a18949392cebad[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed May 2 14:48:12 2018 +0100
+
+    Fix PPSE slider bar heights; add profile view model unit test for viewing contacts; misc tidying
+
+[33mcommit 9dd5821822044982261f1e1f05b797f01b76222a[m
+Merge: 91aab88 4c08879
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 22:43:22 2018 +0100
+
+    Merge branch 'release-1.0.23' into dev
+
+[33mcommit e7235790590cc2aaca26ddc51779e2219e432361[m
+Merge: 09b6b16 4c08879
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 22:43:13 2018 +0100
+
+    Merge branch 'release-1.0.23'
+
+[33mcommit 4c08879bbf3e7a83742761f496ef772d5875f27a[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 22:43:01 2018 +0100
+
+    Bump version number to 1.0.23, VC #24
+
+[33mcommit 91aab88e5ef649912426ebd6273c5806677f9cdb[m
+Merge: 1c5fb79 b2988db
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 22:29:15 2018 +0100
+
+    Merge branch 'dispose-disposables' into dev
+
+[33mcommit b2988dbc997c2de4cf1027345f220ac18d842d37[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 22:29:03 2018 +0100
+
+    Fix some view model Rx disposables not being.. disposed; add profile view model test for total xp calculation
+
+[33mcommit 1c5fb79dac611cd192c91b105c40b98c2a9a1ab2[m
+Merge: 1812706 65f101a
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 21:10:56 2018 +0100
+
+    Merge branch 'fix-ppse-visibility-misc' into dev
+
+[33mcommit 65f101a0bebe163eb0bc40750449f4ced8d85d37[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue May 1 21:10:28 2018 +0100
+
+    Fix PPSE Qs always visible in Election tab; fix PPSE scores not recorded; add missing Android support test runner dep; update RxJava, Espresso, Gradle versions; fix several Lint warnings
+
+[33mcommit 1812706baf5a8bf4ed6cb64e4c45accee8ce960f[m
+Merge: 9f7ef77 896a1f3
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Apr 30 13:29:14 2018 +0100
+
+    Merge branch 'single-live-event' into dev
+
+[33mcommit 896a1f34d8fcd9fa64e2aea32e10fccf599bf79a[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Apr 30 12:18:46 2018 +0100
+
+    Use SingleLiveEvent for some one-time ViewModel events; bump Kotlin version
+
+[33mcommit 9f7ef774a20745ed32db4d80994e034e236cf358[m
+Merge: da4623f 83c4939
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 28 14:14:28 2018 +0100
+
+    Merge branch 'list-adapter' into dev
+
+[33mcommit 83c493998683f33e4b36409b1a7373de27137008[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 28 13:15:10 2018 +0100
+
+    Refactor some RecyclerView adapters to ListAdapters; bump Glide version
+
+[33mcommit da4623f19207ad76a3f241ba57ceadb91f79d9b6[m
+Merge: f94af5e 575c2cd
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Apr 27 13:56:57 2018 +0100
+
+    Merge branch 'release-1.0.22' into dev
+
+[33mcommit 09b6b16a141dfc6d8fcc011fca4d8dd44918de41[m
+Merge: be95e06 575c2cd
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Apr 27 13:56:27 2018 +0100
+
+    Merge branch 'release-1.0.22'
+
+[33mcommit 575c2cd722b199789ea5b3c456e79cd4cc939137[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Apr 27 13:48:55 2018 +0100
+
+    Bump version number to 1.0.22, VC #23
+
+[33mcommit f94af5ec7d0d81e3cbd70f94c3f0de2bae7c00f5[m
+Merge: ee2786e 7446063
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu Apr 26 19:53:29 2018 +0100
+
+    Merge branch 'kotlin-experimental' into dev
+
+[33mcommit 744606388b4c09ca7b71d19550eed0ff23f04b43[m[33m ([m[1;31morigin/kotlin-experimental[m[33m)[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu Apr 26 19:05:59 2018 +0100
+
+    Fix adding contact; fix crash after accepting contact req; misc login flow fixes; use Rx to efficiently debounce & get distinct changes of contact search query
+
+[33mcommit be95e06cefe5f3d17b10e55d83de8d71b0a40066[m
+Merge: e4aa3c2 ee2786e
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Apr 26 17:40:51 2018 +1000
+
+    Release 1.0.21
+    
+    - Switch to Firebase google-services.json with different API keys
+
+[33mcommit ee2786e1f61e41364174f769686fe154cf9c79b3[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Apr 26 17:40:23 2018 +1000
+
+    Bump version number to 1.0.21, VC #22
+
+[33mcommit b5629f5567db5e89c7c02ae4db5d9c23ee94a2bd[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Apr 25 19:56:13 2018 +0100
+
+    Fix MainActivity not opening after login; rename `java` folder to `kotlin`
+
+[33mcommit 72e04a245b32fcc4c25ebfcdf7bd7ce15c63177d[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Apr 25 18:49:02 2018 +0100
+
+    Fix profile screen not opening after tapping on a friend; enable StrictMode thread/VM policies for debug; add network security config to enforce HTTPS; further Rx refactoring, migration of logic into view models
+
+[33mcommit 98cf91a3268cd6541548dded4db5a90f1df132ee[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Tue Apr 24 19:23:04 2018 +0100
+
+    Fix DI regression for FeedFragment causing fatal error; add BaseViewModel class for VMs to extend from; add several unit tests and Espresso instrumentation test dependency
+
+[33mcommit 2dfbb126ebdc4f5d00669e861020363212c9fb3a[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Apr 22 21:42:20 2018 +0100
+
+    API/network method fixes and tidying; add unit testing dependencies
+
+[33mcommit 4b1aafb1a69a98f6c938a2b418145bc4ed1ef708[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 21 22:58:32 2018 +0100
+
+    Use buildSrc for better Gradle dependency management
+
+[33mcommit 3d76b137a075433c409ee88e1674c8895e1903c5[m
+Merge: 9d7f443 f2af9b8
+Author: Seb Jachec <sjachec@me.com>
+Date:   Sat Apr 21 19:26:54 2018 +0100
+
+    Merged rx into kotlin-experimental
+
+[33mcommit f2af9b82f97bc22d1581b1f244756dad499ac796[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 21 19:20:20 2018 +0100
+
+    Fix friends refresh and institution nullability regressions after Rx conversion
+
+[33mcommit 15b78a1ba2825a33b4e4bddf881e5f36745acd71[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 21 18:33:53 2018 +0100
+
+    Re-organise some files
+
+[33mcommit 55e86e4e5b62abb7cc0d9b7af6524d3b81a708bf[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Apr 20 23:48:08 2018 +0100
+
+    Heavily refactor app-wide dataflow with RxJava; update Kotlin, Gradle, ConstraintLayout & Firebase Messaging
+
+[33mcommit 523d5130314eb0bfbfc6d1bff3a1d91dcc917595[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Apr 16 00:12:44 2018 +0100
+
+    Convert most friends API methods/calls to Rx, fix Rx error states throughout app
+
+[33mcommit 97af6bdb983923a4e192c2665a754b5346f2b7c3[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 14 20:13:06 2018 +0100
+
+    Convert news detail and events screens data/API calls to Rx
+
+[33mcommit 3c7472fea03a985274a5ec7b851162a9ef55b602[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Apr 14 17:12:34 2018 +0100
+
+    Convert user photo upload, login & photo detail API methods to Rx; enable Multi-dex due to method count of additional Rx libraries
+
+[33mcommit 3bcfd78438ff75382bec4c8be56aa96b06b2463d[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu Apr 12 13:11:33 2018 +0100
+
+    Use @tools resources to provide sample names, dates, and images when previewing layouts in-editor
+
+[33mcommit de72b25f9c6f0643c20f2df843791b19e8719905[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Thu Apr 12 12:17:35 2018 +0100
+
+    Several fixes to friends screen; misc layout tweaks for better in-editor preview and to resolve Lint warnings
+
+[33mcommit 9d7f4437cd6f86b6ebc4dc3475c77af66fcb3047[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Apr 11 22:53:23 2018 +0100
+
+    Fix change photo button not being enabled after cancelling photo picker; update gitignore to ignore new Android Studio cache file; bump image cropper dependency
+
+[33mcommit 3832c4f0f7a15faa958b848444a89e9689491c32[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Apr 11 18:07:45 2018 +0100
+
+    Heavily refactor network/API code to allow better dependency injection and modularity; Add support-v4 dependency to fix missing attribute error; Fix several autofill/input type lint warnings
+
+[33mcommit 228d6bdc299a60fd52dd55a896f0dc488a639542[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Apr 8 20:29:31 2018 +0100
+
+    FIx several sign up flow regressions; fix personality questions screen not closing
+
+[33mcommit 41971e573d3d2ef285d49aef040014d91519749b[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Apr 4 19:27:07 2018 +0100
+
+    Update Android KTX to 0.3, fix errors based on breaking changes; update AWS+Firebase; compile using Android Studio 3.2 Preview
+
+[33mcommit 3dd290de7c6debb02c2d4f99acc41c8ee303fb2e[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 25 19:12:02 2018 +0100
+
+    Fix friends search label visible before searching; add extension functions & tidy code further
+
+[33mcommit 364e9571030a5e68a2d2acd16f6e300a716f4b31[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 25 16:42:52 2018 +0100
+
+    Fix @Json Moshi annotations not applying to fields in API models after Kotlin conversion; fix EventDetailActivity view model crash; rename 'di' package to 'inject'
+
+[33mcommit c567ce6082523f829f152b90f6bb87f89512ca14[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 25 12:31:11 2018 +0100
+
+    Bump Arch Components & Retrofit dependency versions; add several UI tooltips
+
+[33mcommit 31ab137918ebfdecf7a247737234e47f8abb83db[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 25 00:52:15 2018 +0000
+
+    Fixed sign up fragment countries not displaying; removed redundant CandidateFragmentsModule; misc tidying
+
+[33mcommit 4366b24f2e124a880671aabc1eb813288af0c891[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 24 19:58:52 2018 +0000
+
+    Fix DI issues with auth activity and Firebase notification service; bump ConstraintLayout and Firebase Messaging dependency versions
+
+[33mcommit c40233ee905fe10537b8467f72cb5e1c32a04821[m
+Merge: 21b4e76 37167f1
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 24 18:15:36 2018 +0000
+
+    Merge branch 'dagger' into kotlin-experimental
+
+[33mcommit 37167f1c26c66220ae074548253b09f4ec14abab[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 24 18:11:06 2018 +0000
+
+    First pass at DI modules for all activities and fragments; bump Kotlin version
+
+[33mcommit 21087b9cb015af36afedcf8ee1c1c95309628067[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 23 00:58:11 2018 +0000
+
+    Create Dagger modules per feature package, inject network service into view models, use ViewModel provider factory; refactor `BaseSliderBar` to fix fatal init error
+
+[33mcommit 8567396ba4e5f3860c5e4c7ff8e0f6290d7226e2[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 18 18:48:15 2018 +0000
+
+    Implement network service singleton with Dagger DI
+
+[33mcommit 2860b1371497ce3c875d99d2e7c975d8a001dbfc[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 18 01:49:49 2018 +0000
+
+    Add Dagger2 dependencies, implement app module
+
+[33mcommit 21b4e767fe77a69e986c5c7a1a243443057ba25a[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 17 22:10:46 2018 +0000
+
+    Remove skip button from personality questions screen
+
+[33mcommit ea8819df40df516a7eee204a67235a8d9792f022[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 17 20:36:54 2018 +0000
+
+    Fix many Lint warnings, move remaining strings to strings.xml, create plurals.xml, rename images to use underscores rather than spaces
+
+[33mcommit 68760890821e017bebc9271c65057ff2ad845b7a[m
+Merge: d4e04d0 d261a6c
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 22:00:45 2018 +0000
+
+    Merge branch 'firebase-google-services-json' into dev
+
+[33mcommit d261a6caa41dc7494bd45e8953efd10162a3c069[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 22:00:32 2018 +0000
+
+    Switch to Firebase google-services.json with different API keys
+
+[33mcommit d4e04d0bbd47089ce48e3a5dffbf762abfd3eb7f[m
+Merge: b37f5bd a8785d1
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 21:45:19 2018 +0000
+
+    Merge branch 'release-1.0.20' into dev
+
+[33mcommit e4aa3c220f3979a23559aa834e9ea5f17a894550[m
+Merge: ca06f70 a8785d1
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 21:45:11 2018 +0000
+
+    Merge branch 'release-1.0.20'
+
+[33mcommit a8785d180ad6b3b7d2a46cc55156f3cf10c0f8e0[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 21:38:40 2018 +0000
+
+    Bump version number to 1.0.20, VC #21
+
+[33mcommit b37f5bd6225d1aa0c987acc9c4fbdf10fd7139a3[m
+Merge: 0094ebb 5d91524
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 21:32:13 2018 +0000
+
+    Merge branch 'personality-qs-fixes' into dev
+
+[33mcommit 5d9152416a45509043d7ec23752a3617dfd2af52[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Mon Mar 12 21:24:04 2018 +0000
+
+    Several fixes for personality questions bugs
+
+[33mcommit 6ae954e4c4c4830e0afdc5db06d4ad6318bb18a3[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sun Mar 11 22:39:21 2018 +0000
+
+    Bring up to date with dev branch changes, several Kotlin porting fixes
+
+[33mcommit dd2e294f400468e7592fd11ac0f3f42a99d4ae03[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Sat Mar 3 21:42:15 2018 +0000
+
+    Update to match dev branch changes, fix several porting bugs, bump Kotlin and KTX versions
+
+[33mcommit 0094ebbd953fc42ca7412c3c78215931c012766a[m
+Merge: 1d05b71 94af872
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 2 13:02:51 2018 +0000
+
+    Merge branch 'dev' of https://bitbucket.org/eulersbridge/android-app-android-studio into dev
+
+[33mcommit 1d05b71f5a9e51672d864dceaee24b3e73695dde[m
+Merge: d23c43a 17ea18b
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 2 13:02:11 2018 +0000
+
+    Merge branch 'release-1.0.19' into dev
+
+[33mcommit ca06f706587eccf78fa79e1a27f6371501d6cb16[m
+Merge: 8b1eee7 17ea18b
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 2 13:01:46 2018 +0000
+
+    Merge branch 'release-1.0.19'
+
+[33mcommit 17ea18b26e03f858ac2093a8a7c1241877975660[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 2 13:00:49 2018 +0000
+
+    Bump version number to 1.0.19, VC #20
+
+[33mcommit 94af872ccf42e36c611f4b3e81ca7d0e1df0abd9[m
+Merge: d23c43a c84534d
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Mar 2 12:50:53 2018 +0000
+
+    Merged friends-profile-crash-fix into dev
+
+[33mcommit c84534d91ad755af32689e2c64fbd60954a243e4[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Fri Mar 2 12:48:22 2018 +0000
+
+    Hide tasks progress button on other users' profiles
+
+[33mcommit 856e7624df4543baefae973d8e1cfad2005af7dd[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Feb 28 23:16:22 2018 +0000
+
+    Update Gradle version and commit missing Gradle wrapper
+
+[33mcommit 1edd8f035ec51883615e6d62574c21444e807732[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Feb 28 01:40:56 2018 +0000
+
+    Fix OkHttp build error (mismatched logging dependency version), add OkHttp proguard rules; bump support library version & replace several `getActivity()` calls with more explicit `requireActivity()`
+
+[33mcommit 6ad687d22394633463a7f1b532db8d73db97b32a[m
+Author: Sebastian Jachec <sjachec@me.com>
+Date:   Wed Feb 28 00:40:35 2018 +0000
+
+    Fix crash fetching remaining badges for friend's profile; bump OkHtp & AWS SDK versions; add more comphrehensive .gitignore file
+
+[33mcommit 8b1eee795172c7beb96c9cb4d545480272b88742[m
+Merge: b35d8ad b8ebb20
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Feb 23 13:35:38 2018 +0000
+
+    Merge branch 'release-1.0.18'
+
+[33mcommit d23c43a03ffb7589ed4b910645fc1c9a45f02ab7[m
+Merge: d1ac249 b8ebb20
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Feb 23 13:35:27 2018 +0000
+
+    Merge branch 'release-1.0.18' into dev
+
+[33mcommit b8ebb20a2407741d8ea7ce245a07fee5139387df[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Feb 23 13:26:29 2018 +0000
+
+    Bump version number to 1.0.18, VC #19
+
+[33mcommit d1ac249698414aeba299a251518046f02546866b[m
+Merge: daac472 7f190d0
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Feb 23 11:49:59 2018 +0000
+
+    Merged auth-flow-fixes-recycler-refactoring into dev
+
+[33mcommit 7f190d01c8886c349a268ddbb662c441da04b360[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Feb 23 01:03:51 2018 +0000
+
+    Fixed forgot password dialog using wrong view, causing failed reset attempts
+
+[33mcommit 33e372c49d48b9ebca5b579d27c5b1984b9d7c81[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Feb 22 23:30:30 2018 +0000
+
+    Refactor some RecyclerView adapters and viewholders to avoid passing contexts/fragments, dispose of loaded images; fixed several potential crash sources in login/signup flow; misc fixes/tweaks
+
+[33mcommit daac47248ecedfeb59ff983ed2dddfbdd4ae36eb[m
+Merge: f79c902 e8730b9
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Feb 18 01:53:51 2018 +0000
+
+    Merge branch 'release-1.0.17' into dev
+
+[33mcommit b35d8ad467e2421c21c504618b818e5a7041687e[m
+Merge: 33daccb e8730b9
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Feb 18 01:53:42 2018 +0000
+
+    Merge branch 'release-1.0.17'
+
+[33mcommit e8730b9b3e3ed683b546a662a2c9d399ac1ca063[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Feb 18 01:53:09 2018 +0000
+
+    Bump version number to 1.0.17, VC #18
+
+[33mcommit f79c9024697a2217a27dbe781392ee2cd1443ffe[m
+Merge: 56f47e0 bca7604
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Feb 16 22:50:35 2018 +0000
+
+    Merged verification-auth-fixes into dev
+
+[33mcommit bca7604a947662e1128b7255e2aa5df8344ffb82[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Feb 16 22:41:48 2018 +0000
+
+    Fixes to sign up process, incl. email verification; fix setting LiveData value from background thread, misc UI fixes
+
+[33mcommit 56f47e009422377c48b8989ac071918d32db0507[m
+Merge: 6a78a8e 7dd3189
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 13:55:13 2018 +0000
+
+    Merge branch 'release-1.0.16' into dev
+
+[33mcommit 33daccb2143f0c488a16e36ff974cfe4209e848e[m
+Merge: a55c30e 7dd3189
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 13:55:06 2018 +0000
+
+    Merge branch 'release-1.0.16'
+
+[33mcommit 7dd31893850e23f9c302347f84b3fa597fac80c6[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 13:54:13 2018 +0000
+
+    Bump version number to 1.0.16, VC #17
+
+[33mcommit 6a78a8efdc0ef27ccfb2045f68cc8cb80481fc58[m
+Merge: 947b7eb f275b37
+Author: Seb Jachec <sjachec@me.com>
+Date:   Tue Feb 13 13:45:18 2018 +0000
+
+    Merged android-api-start-activity-fix into dev
+
+[33mcommit f275b37a7bb36ba5353fd2fda92b9fc185f9ddfb[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 13:44:35 2018 +0000
+
+    Fix crash on earlier Android SDK versions due to startActivity differences
+
+[33mcommit e30aa2af3fc764c464cadf4f5f34bca57124d7d7[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 12:45:03 2018 +0000
+
+    Update based on dev branch changes
+
+[33mcommit 947b7eb5b0629133efce8cbb06a2a14d096f7764[m
+Merge: dd358e3 d46120d
+Author: Seb Jachec <sjachec@me.com>
+Date:   Tue Feb 13 00:42:47 2018 +0000
+
+    Merged sign-up-flow-fix into dev
+
+[33mcommit d46120d04754ca4be1de6e68d0cf4bbc980d680e[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Feb 13 00:41:31 2018 +0000
+
+    Fix sign up API call format issue causing some failed sign ups; bump AWS SDK, ConstraintLayout, Glide versions
+
+[33mcommit d8f4fcc221ec092eaac09c531faba3e3d5a37544[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Feb 12 10:03:23 2018 +0000
+
+    Clean up most non-null assertion operators; add Google's Android-Kotlin Extensions as dependency; create several network extension functions to further clean up syntax across project; misc tidying and bringing up to date with state of `dev`
+
+[33mcommit dd358e30b01b9c66198ef7c11f6a9cebf248dc04[m
+Merge: 9596cd5 c6b9278
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Feb 8 23:42:59 2018 +0000
+
+    Merge branch 'release-1.0.15' into dev
+
+[33mcommit a55c30edaabd7f9b94108e89c3de710df33050a5[m
+Merge: 51192ac c6b9278
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Feb 8 23:41:26 2018 +0000
+
+    Merge branch 'release-1.0.15'
+
+[33mcommit c6b9278cbde9a1751f087e9dccfe55122f277335[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Feb 8 23:41:07 2018 +0000
+
+    Bump version number to 1.0.15, VC #16
+
+[33mcommit 9596cd5edc6b5ba9694ec9bb6a92700b91696b6f[m
+Merge: adc24d1 fe53b20
+Author: Seb Jachec <sjachec@me.com>
+Date:   Thu Feb 8 23:30:09 2018 +0000
+
+    Merged fix-signup-crash-auth into dev
+
+[33mcommit fe53b20f99a540bd89b090fd4c4ac1859dbeb23d[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Feb 8 23:28:45 2018 +0000
+
+    Fix several state/routing issues relating to sign up and login, fix consent agreement transparent background
+
+[33mcommit 4f86fdc549a2e3fc1a05db898b6a29f61a5a3ba2[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Jan 31 23:34:12 2018 +0000
+
+    Misc. syntax tidying
+
+[33mcommit d74ba7126095202b5dfbf0a015c097ffa9c1b5a6[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 29 01:21:30 2018 +0000
+
+    Complete Kotlin code conversion (all files, XML layout IDs tweaked for auto binding)
+
+[33mcommit 9f0bda8d578f017ac9d324b2256f9860dc64515c[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Jan 25 22:46:50 2018 +0000
+
+    Convert auth, feed, photos, news to Kotlin; update Gradle options to support Kotlin
+
+[33mcommit adc24d14df8e1c3e0fdb46d38f42fbb36c47636c[m
+Merge: 1ca2b0d 0fe46de
+Author: Seb Jachec <sjachec@me.com>
+Date:   Thu Jan 25 13:33:44 2018 +0000
+
+    Merged navigation-state-fix-refactoring into dev
+
+[33mcommit 0fe46de0f4b15304ebe71a097a9e5af8340a917f[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Jan 25 13:31:36 2018 +0000
+
+    Disable sign up consent agreement button after tap to avoid multiple presses
+
+[33mcommit 471cebc654d50d675a013eb6941103821985624a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Jan 25 11:52:09 2018 +0000
+
+    Fix indeterminate UI state after viewing friends then selecting tab; use login response cached news artices; replace several public main activity methods w/ observable state fields; bump Gradle version
+
+[33mcommit 1ca2b0daa672b642e89c540aeee1911450cc2c47[m
+Merge: 0bd6e0e fb866ef
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 22 15:31:02 2018 +0000
+
+    Merge branch 'release-1.0.14' into dev
+
+[33mcommit 51192ac47df1e61179a48337019e22ce9daca25a[m
+Merge: 6975bb7 fb866ef
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 22 15:30:45 2018 +0000
+
+    Merge branch 'release-1.0.14'
+
+[33mcommit fb866ef343553800df8131ce7a959646de94d0fd[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 22 15:28:58 2018 +0000
+
+    Bump version number to 1.0.14, VC #15
+
+[33mcommit 0bd6e0e65ac42a2835f928ed8aba16e7980f9b0e[m
+Merge: f440376 e707e30
+Author: Seb Jachec <sjachec@me.com>
+Date:   Mon Jan 22 15:12:44 2018 +0000
+
+    Merged package-view-model into dev
+
+[33mcommit e707e30a97ef74e9d1965269427048f312c6fd4a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 22 13:00:31 2018 +0000
+
+    Fixed crash viewing Election tab; fixed photos fragment not displaying loaded data; fixed several release build navigation bugs; bump AWS SDK & secure prefs library versions
+
+[33mcommit ba87367eb7043487f85e6da3aed805fb3f418dfd[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Jan 21 12:19:24 2018 +0000
+
+    LiveData wrappers for OkHttp requests & AWS transfers; observable LiveData for signup; FixedData => SingleLiveData
+
+[33mcommit 8ab798bdbcf8262b61a5449d1ac640cdb3b7209a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Jan 20 16:09:06 2018 +0000
+
+    Convert login/signup to activity w/ view models; components observe user state from app object; fix branch regression in loading profile overview stats; fix logic errors in email/pass validation.
+
+[33mcommit 4b36933f259dc1b35d42456ae27043247a02dd2b[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Jan 15 15:36:21 2018 +0000
+
+    Heavily refactor friends/contacts screen to use ViewModel, list adapters & view holders
+
+[33mcommit 7f0cbdf50dc44fa23045d2402d418e183fabc7b8[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Jan 13 20:24:14 2018 +0000
+
+    Fix 'Show Progress' button in profile overview (past branch regression)
+
+[33mcommit b47c85b9bd138bb210f82f5458b3724511fb9ce1[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Jan 13 02:24:02 2018 +0000
+
+    Added forgot password hint to login screen; added confirmation dialog after selecting log out menu item
+
+[33mcommit b91fd6466ee855e1726cbe62ec556850a7a7f40e[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Jan 12 22:48:53 2018 +0000
+
+    Reorganise to better package by feature, and heavily refactor to implement Google's ViewModel Android Architecture component
+
+[33mcommit f4403763d2b0d053504244fb0a171fcf8d78737b[m
+Merge: a267ac6 6cba9e6
+Author: Seb Jachec <sjachec@me.com>
+Date:   Tue Jan 9 19:16:05 2018 +0000
+
+    Merged cqc-1 into dev
+
+[33mcommit 6cba9e632ac183c80b5634253d888eb6314f5552[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Jan 9 19:14:58 2018 +0000
+
+    Removed unnecessary second line from README
+
+[33mcommit ae80837d653ac1289b0a218702a8937ddd4b8e7c[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Jan 9 19:11:09 2018 +0000
+
+    Improved README with repo, project, tooling, building information
+
+[33mcommit a267ac679a94c98e5e99c2eab3be220ae3a6bf58[m
+Merge: d2807a9 bee724f
+Author: Seb Jachec <sjachec@me.com>
+Date:   Tue Jan 9 16:12:31 2018 +0000
+
+    Merged image-pick-fragment-stack-refactor into dev
+
+[33mcommit bee724f999ddf6452cb4385fa4c70746a61a3629[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Jan 9 14:40:39 2018 +0000
+
+    Bump Glide version
+
+[33mcommit 77f973c17a61f7fc0380a933039f12cb2d56caa4[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Jan 9 00:22:36 2018 +0000
+
+    Add image picking/cropping library; Simplify fragment stack code; Convert some layouts to ConstraintLayout; Re-write/simplify circular progress bar; Refactor voting fragments; Bump dependency versions; Misc tidying
+
+[33mcommit 6975bb7f09a26203737025a64fbd47b2e812d8e1[m
+Merge: 8993616 75511c1
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Dec 15 19:40:11 2017 +0000
+
+    Merge branch 'release-1.0.13'
+
+[33mcommit d2807a983616fcf4230c1b98d9fe2eb890ee2d33[m
+Merge: 30acc36 75511c1
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Dec 15 19:39:45 2017 +0000
+
+    Merge branch 'release-1.0.13' into dev
+
+[33mcommit 75511c11fb3b4bf3776dec2927d3dd4a721016ad[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Dec 15 19:37:35 2017 +0000
+
+    Bump version number to 1.0.13, VC #14
+
+[33mcommit 30acc36727c857479daec58a8ff2b2f86c1ed152[m
+Merge: bd58534 1f078d5
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Dec 15 18:48:02 2017 +0000
+
+    Merged fix-friends-crash into dev
+
+[33mcommit 1f078d5ca62a3ce76c58ac49735939c83c649b08[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Dec 15 17:16:34 2017 +0000
+
+    Fixed crash viewing friends from profile page (added ProGuard rule)
+
+[33mcommit bd585345e4c28cf8a822ca344c9b47b74d7a3780[m
+Merge: 3910966 86fc3f2
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Dec 15 16:42:34 2017 +0000
+
+    Merged multi-client-switching into dev
+
+[33mcommit 86fc3f20c46c4044a14182d9f55fac325469c739[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Dec 15 16:21:37 2017 +0000
+
+    Add invalid input & connection issue error messages when logging in; move login/signup field validation into fragment classes; fixed error displaying profile badges; misc. tidying & Lint warning fixes
+
+[33mcommit 5967f636fef44b93c5d88d77b39714beb1e82cc2[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 13 02:43:11 2017 +0000
+
+    Tidy up API URL fetch; fix signup bug fetching institution ID; fix crash navigating to some profile sections; suppress some unnecessary Lint warnings
+
+[33mcommit 50873a83ad3ce772dae455840c08dfb506c37266[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 13 02:04:59 2017 +0000
+
+    Implement multi-client switching, fetching API base URL for institution after login
+
+[33mcommit 3910966894f1441ce428e68a91ffcf753f5cbb04[m
+Merge: 5479f33 060ecfd
+Author: Seb Jachec <sjachec@me.com>
+Date:   Wed Dec 13 01:10:07 2017 +0000
+
+    Merged fixes-news-liking-efficacy-misc into dev
+
+[33mcommit 060ecfd1581dd4276772c83a8e18d3e167ebf426[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 13 01:06:18 2017 +0000
+
+    Fix possible profile crash; bump dependencies & Gradle version
+
+[33mcommit 4d1e1c6f2ec15dc8cfdcd0ae40f6fbd8297427c4[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Dec 10 03:14:07 2017 +0000
+
+    Fix liking/unliking news articles; Fix user allowed to resubmit self-efficacy Qs; Fix some accessibility & internationalization/layout warnings, extracted more strings
+
+[33mcommit 5479f335a574c2497aa41ec91ad636926ae1b883[m
+Merge: 3778d78 fa6476f
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 6 01:02:37 2017 +0000
+
+    Merge branch 'release-1.0.12' into dev
+
+[33mcommit 8993616737cdf61d545467f820c9bdc911e750e1[m
+Merge: 4f4860e fa6476f
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 6 01:01:23 2017 +0000
+
+    Merge branch 'release-1.0.12'
+
+[33mcommit fa6476f994ace4726bb154ba507588000e2b1de1[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 6 01:00:41 2017 +0000
+
+    Bump version number to 1.0.12, VC #13
+
+[33mcommit 3778d7867aa70bb653a235104c62fd63507acdaa[m
+Merge: b1a33f8 87d983f
+Author: Seb Jachec <sjachec@me.com>
+Date:   Wed Dec 6 00:54:27 2017 +0000
+
+    Merged minor-fixes-photo-liking into dev
+
+[33mcommit 87d983f3c4a24b17ac36457a1afac2d41817eaa6[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Dec 6 00:53:23 2017 +0000
+
+    Fix photo likes count/liking; fix self-efficacy questions transparent background; fix crash tapping Pledge screen next button; check for active network connection when logging in; added more descriptive login/signup failed alert messages
+
+[33mcommit b1a33f80bd10f4210ffc42dad258208dfbab0d3f[m
+Merge: bbd0e1b 8400f19
+Author: Seb Jachec <sjachec@me.com>
+Date:   Mon Dec 4 02:01:02 2017 +0000
+
+    Merged release-1.0.11 into dev
+
+[33mcommit 4f4860ed8c47d47f5241632c0c758b863162ea67[m
+Merge: 7fa743d 8400f19
+Author: Seb Jachec <sjachec@me.com>
+Date:   Mon Dec 4 02:00:26 2017 +0000
+
+    Merged release-1.0.11 into master
+
+[33mcommit 8400f19dcb28d0ce2ef68958dc17bb73d9f4c0e2[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 01:57:31 2017 +0000
+
+    Bump version number to 1.0.11, VC #12 [mismatched Google Play version]
+
+[33mcommit bbd0e1b7302ed4848fafc78f30454ac07f372015[m
+Merge: 8110418 e60484d
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 01:46:28 2017 +0000
+
+    Merge branch 'release-1.0.10' into dev
+
+[33mcommit 7fa743d933429dfd46fe71bc635e359439a4edb4[m
+Merge: 7c8df31 e60484d
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 01:42:15 2017 +0000
+
+    Merge branch 'release-1.0.10'
+
+[33mcommit e60484d84111048de9f7ed1bd4e631dbb072986a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 01:31:54 2017 +0000
+
+    Bump version number to 1.0.10, VC #11
+
+[33mcommit 81104189f3f4fd76894cd91b7f2cbc9fc95c52c1[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 01:22:41 2017 +0000
+
+    Git Ignore keystore properties file
+
+[33mcommit af9d201595fcb5a85deb3121da7796ecca1080a8[m
+Merge: 344df30 155c0bb
+Author: Seb Jachec <sjachec@me.com>
+Date:   Mon Dec 4 00:33:11 2017 +0000
+
+    Merged minor-like-fixes-keystore into dev
+
+[33mcommit 155c0bbd299b5b3d7267119779bd32448a33fe14[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Dec 4 00:31:35 2017 +0000
+
+    Fix news article like count, liking/unliking; Fix unreadable 'Change Photo' settings button; Read keystore file location from properties file (ignored by git); Bump dependency versions
+
+[33mcommit 344df304fc3ff943f0c051ed824d76d798f96215[m
+Merge: 78dbea4 c441ae2
+Author: Seb Jachec <sjachec@me.com>
+Date:   Fri Nov 24 23:42:42 2017 +0000
+
+    Merged fix-missing-position-candidates-annotation into dev
+
+[33mcommit c441ae2c9b102433fa71ec6e91dcd0f7793e38c3[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Nov 24 23:41:44 2017 +0000
+
+    Fix a missing API annotation for /position/{..}/candidates
+
+[33mcommit 78dbea4595cf9ff1431f4d584c9e8a97508ff664[m
+Merge: ca47e8d d43a171
+Author: Seb Jachec <sjachec@me.com>
+Date:   Wed Nov 22 20:41:01 2017 +0000
+
+    Merged fix-loading-personality-questions-proguard into dev
+
+[33mcommit d43a171dfcaf085d3018d2651d1be51e989f7d99[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Nov 22 20:39:46 2017 +0000
+
+    Fix content loading by Proguard 'keep class' rule; convert personality questions fragment into activity, fix exiting fragment; tidy up personality questions layout slightly
+
+[33mcommit ca47e8d5609b4aca8ce60dcba05ade9feb749eb1[m
+Merge: b4427aa 7176819
+Author: Seb Jachec <sjachec@me.com>
+Date:   Mon Nov 20 20:55:54 2017 +0000
+
+    Merged fix-login-signup-crashes into dev
+
+[33mcommit 717681983dedabb94c1b38857d19268aa1fc5cd4[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Nov 20 20:53:49 2017 +0000
+
+    Fix Proguard rules to prevent some class member fields being removed during release build minification, fixing several crashes
+
+[33mcommit b4427aa8702c480735afb95e2946056f38514405[m
+Merge: 0a3b6ae bc12bea
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Nov 20 13:05:01 2017 +1100
+
+    Merge branch 'release-1.0.9' into dev
+
+[33mcommit 7c8df31dc9d8a394d9dc335cada0c692c3e394dc[m
+Merge: 9d32f66 bc12bea
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Nov 20 13:04:14 2017 +1100
+
+    Release 1.0.9
+    
+    - Update Proguard Rules for BottomNavigationView extensions to hopefully
+      fix launch crash
+    - Bump OkHttp and AWS Android SDK verions
+
+[33mcommit bc12bea69445ddd5f85316cda69c041945382669[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Nov 20 13:03:51 2017 +1100
+
+    Bump version number to 1.0.9, VC #10
+
+[33mcommit 0a3b6aeb4543b033324d28e08d14866dcfb5bd14[m
+Merge: 9e7c55d 5dbef58
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Nov 20 01:39:45 2017 +0000
+
+    Merge branch 'fix-launch-crash-bottom-nav-proguard' into dev
+
+[33mcommit 5dbef5874bc3bf8dad26d5dba008222c146d29aa[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Nov 20 01:38:28 2017 +0000
+
+    Bump OkHttp and AWS Android SDK versions
+
+[33mcommit 6d7709b7f38e981bdf3398aab54cc21735347c8a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Nov 20 01:26:39 2017 +0000
+
+    Update Proguard Rules for BottomNavigationView extensions to hopefully fix launch crash
+
+[33mcommit 9e7c55dbd8bbb360aefca329c86200146dd6f813[m
+Merge: 153989d b9d9dd3
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Nov 16 23:51:13 2017 +1100
+
+    Merge branch 'release-1.0.8' into dev
+
+[33mcommit 9d32f669a899599dc0d22969fd83122fb2f5a281[m
+Merge: f3c4ab2 b9d9dd3
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Nov 16 23:49:28 2017 +1100
+
+    Release 1.0.8
+    
+    -     Replace side navigation drawer with bottom navigation (tabbed);
+          relocate friends & settings to profile; fix error fetching polls
+    -     Convert event detail, news detail, settings fragments to
+          activities, adjust their layout margins/paddings closer to
+          Material, animate activity & fragment open/close; Add support for
+          home screen long-press app shortcuts on Android 7.1+; Add support
+          library for vector drawables
+    -     Grey out election tab with message to complete efficacy survey,
+          matching iOS
+    -     Convert photos, events, tasks & badges lists to RecyclerViews w/
+          cached reusable cells & XML layouts; Support photo pinch-to-zoom,
+          double-tap zoom; Fixed remaining tasks not showing in profile
+          Progress tab; Convert about fragment to activity; Update Glide &
+          Firebase Messaging to latest versions; Remove some unused
+          resources
+    -     Convert photo view pager/fragment to activity; fade in images as
+          they load (app-wide)
+    -     Convert election positions list view to RecyclerView; extract self
+          efficacy questions as XML strings; misc tidying of unused
+          methods/parameters
+    -     Convert poll options list view to RecyclerView; add password
+          visibility toggle to login form, convert login text fields to
+          Material Design; fix tab bar remaining after logout, fix
+          institution not displaying on profile; update Gradle, AWS SDK;
+          misc tidying
+    -     Bump min SDK from 14 to 16
+    -     Convert news feed grid view, photo albums list view to
+          RecyclerViews; Fix news feed article date appearing inside article
+          title; Update support libraries
+    -     Fix: profile progress fragment scrolling, 'Show Progress' profile
+          button not working, incorrect profile experience/level; Replace
+          lone blocking API call with async call; Add priority to some image
+          requests; Disable login form fields while attempting to login;
+          Hide bottom navigation text labels; misc Lint warning fixes
+
+[33mcommit b9d9dd33dbfd88b26ebaf5af99ebf456f0bcd07b[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Nov 16 23:49:20 2017 +1100
+
+    Bump version number to 1.0.9, VC #9
+
+[33mcommit 153989d96b6b4fb19ecd5191803870ada922d276[m
+Merge: 503a168 6f2ad9d
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 16 01:30:32 2017 +0000
+
+    Fix bottom-navigation - dev merge conflict
+
+[33mcommit 503a1687a0ea79d223cdc2a7400685885b490d97[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 16 01:24:09 2017 +0000
+
+    Fix: profile progress fragment scrolling, 'Show Progress' profile button not working, incorrect profile experience/level; Replace lone blocking API call with async call; Add priority to some image requests; Disable login form fields while attempting to login; Hide bottom navigation text labels; misc Lint warning fixes
+
+[33mcommit 2c5509e0a8bd4f12f925d1b506dd7aab761912c6[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Nov 15 21:28:00 2017 +0000
+
+    Convert news feed grid view, photo albums list view to RecyclerViews; Fix news feed article date appearing inside article title; Update support libraries
+
+[33mcommit a61edb67b3ae960807bb5d6c48963bdb51077623[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Nov 14 21:40:31 2017 +0000
+
+    Bump min SDK from 14 to 16
+
+[33mcommit f3bf14e34edf015b9a3ae1896befdeb0568e4f41[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Nov 14 21:31:40 2017 +0000
+
+    Convert poll options list view to RecyclerView; add password visibility toggle to login form, convert login text fields to Material Design; fix tab bar remaining after logout, fix institution not displaying on profile; update Gradle, AWS SDK; misc tidying
+
+[33mcommit f945be66b95e32281886796f0196449b37f332c3[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Nov 12 00:21:04 2017 +0000
+
+    Convert election positions list view to RecyclerView; extract self efficacy questions as XML strings; misc tidying of unused methods/parameters
+
+[33mcommit 2f66f79ed7ac1b104e731cbca9c2eda7ed04b307[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Nov 11 22:43:20 2017 +0000
+
+    Convert photo view pager/fragment to activity; fade in images as they load (app-wide)
+
+[33mcommit 980afae9db8c301a37f5014fbb07615ac105f63c[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Nov 11 18:39:06 2017 +0000
+
+    Convert photos, events, tasks & badges lists to RecyclerViews w/ cached reusable cells & XML layouts; Support photo pinch-to-zoom, double-tap zoom; Fixed remaining tasks not showing in profile Progress tab; Convert about fragment to activity; Update Glide & Firebase Messaging to latest versions; Remove some unused resources
+
+[33mcommit 6f2ad9d5abe91073848395669fe46fab8e614f27[m
+Merge: a3cc2d8 2b39e98
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Nov 9 21:53:49 2017 +1100
+
+    Merge branch 'release-1.0.7' into dev
+
+[33mcommit f3c4ab209db3b756fd5b0c88f5169d734e40bdad[m
+Merge: 00261b2 2b39e98
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Nov 9 21:52:38 2017 +1100
+
+    Release 1.0.7
+    
+    -    Add Retrofit, OkHTTP, Gson dependencies, convert almost all Network
+         code using new data model classes; Fix missing login notification
+         (submit ARN, device token); Add Glide dependency for image
+         loading/caching; Fix incorrect profile institution name, image
+         loading errors; Update to Gradle 4.3; Remove legacy Apache HTTP
+         library; Add Parceler dependency; Add white/transparent
+         notification icon
+    
+    -    Change Retrofit JSON converter from Gson to Moshi (w/ type
+         adapters); finished migration from Volley to Retrofit+OkHttp,
+         removed Volley dependency; moved all API, network setup/access code
+         into NetworkService; fixed some previous migration regressions
+
+[33mcommit 2b39e981c3e4d4e0e4c649fe5c140f4b6f6bb819[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Wed Nov 8 16:38:29 2017 +1100
+
+    Bump version number to 1.0.7, VC #8
+
+[33mcommit e6319be1e2b88267a8a78d8cfe98f90697d22da6[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 9 04:50:39 2017 +0000
+
+    Grey out election tab with message to complete efficacy survey, matching iOS
+
+[33mcommit 7d8ecdad2e300943168de35ce0b9d01bae26d963[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 9 03:56:17 2017 +0000
+
+    Convert event detail, news detail, settings fragments to activities, adjust their layout margins/paddings closer to Material, animate activity & fragment open/close; Add support for home screen long-press app shortcuts on Android 7.1+; Add support library for vector drawables
+
+[33mcommit f53e9419b9395f08870949acea87209d781f5cc1[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 9 01:29:54 2017 +0000
+
+    Replace side navigation drawer with bottom navigation (tabbed); relocate friends & settings to profile; fix error fetching polls
+
+[33mcommit a3cc2d89b66d4fb9af8e3264ef19c056f99bdca0[m
+Merge: 14892c5 8d9d609
+Author: Seb Jachec <sjachec@me.com>
+Date:   Thu Nov 9 00:10:14 2017 +0000
+
+    Merged retrofit into dev
+
+[33mcommit 8d9d60981a33b578dffdbb97ef26e14c127d47dc[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 9 00:06:52 2017 +0000
+
+    Change Retrofit JSON converter from Gson to Moshi (w/ type adapters); finished migration from Volley to Retrofit+OkHttp, removed Volley dependency; moved all API, network setup/access code into NetworkService; fixed some previous migration regressions
+
+[33mcommit 1acd9eeee8d133ccd2fbe9687bc99d80c2b6dc2b[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Nov 8 01:41:31 2017 +0000
+
+    Add Retrofit, OkHTTP, Gson dependencies, convert almost all Network code using new data model classes; Fix missing login notification (submit ARN, device token); Add Glide dependency for image loading/caching; Fix incorrect profile institution name, image loading errors; Update to Gradle 4.3; Remove legacy Apache HTTP library; Add Parceler dependency; Add white/transparent notification icon
+
+[33mcommit 14892c51a68852fd83ebe845332a6493b6178f98[m
+Merge: 4e3cb12 62fc9b4
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Wed Nov 8 00:02:53 2017 +1100
+
+    Merge branch 'release-1.0.6' into dev
+
+[33mcommit 00261b25b35b009daf7d38a9771f7cf2c5aa7446[m[33m ([m[1;33mtag: 1.0.6[m[33m)[m
+Merge: cbd4bda 62fc9b4
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Wed Nov 8 00:00:46 2017 +1100
+
+    Release 1.0.6
+    
+    - Fix styling of toolbar and toolbar overflow menu
+    - Replaced 2 possible crash causes for Friends screen and Feed screen
+    - Create data model classes to wrap JSON data
+    - Decouple Network class from all direct UI interaction
+    - Use callbacks for fragments
+    - Implement Parcelable in PollOption
+    - Remove unused SlidingUpPanel dependency
+
+[33mcommit 62fc9b419f799becbdd497ee57edac73856fcff7[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Tue Nov 7 23:59:52 2017 +1100
+
+    Bump version number to 1.0.6, VC #7
+
+[33mcommit 4e3cb12062723e4e00cc92485520e01c3a325c24[m
+Merge: dec6217 3b18d46
+Author: Seb Jachec <sjachec@me.com>
+Date:   Sat Nov 4 19:59:04 2017 +0000
+
+    Merged network-separation into dev
+
+[33mcommit 3b18d46ea5c890f41bd07ae2744014fd2a9c31b8[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Nov 4 19:55:15 2017 +0000
+
+    Create data model classes (Election, NewsArticle, PhotoAlbum, Poll, Task, Badge, etc.) to wrap JSON data; decouple Network class from all direct UI interaction, use callbacks for fragments; implement Parcelable in PollOption; remove unused SlidingUpPanel dependency
+
+[33mcommit dec621715fe2f26d41771911e5ff2f88c07d64b0[m
+Merge: 78793c0 bbfa18e
+Author: Seb Jachec <sjachec@me.com>
+Date:   Thu Nov 2 00:39:26 2017 +0000
+
+    Merged fix-friends into dev
+
+[33mcommit bbfa18e0fc471d710a8c6a6113e3338ec6f3d32a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 2 00:35:48 2017 +0000
+
+    Replaced 2 possible crash causes for Friends screen and Feed screen
+
+[33mcommit 78793c0d2e64c6a66de1d9e7f5ed1612c23e0393[m
+Merge: cbd4bda f37e9eb
+Author: Seb Jachec <sjachec@me.com>
+Date:   Thu Nov 2 00:05:17 2017 +0000
+
+    Fix styling of toolbar and toolbar overflow menu [Merged in fix-toolbar-menu-colour (pull request #1)]
+
+[33mcommit f37e9eb16bef9627a7c78dd8815065919e94225c[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Nov 2 00:00:25 2017 +0000
+
+    Fix styling of toolbar and toolbar overflow menu
+
+[33mcommit cbd4bdafbb39522ba2bb14d8f3f21ffaf17d19e2[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Oct 30 17:52:10 2017 +0000
+
+    Add logout button to user profile page; fix done button not exiting personality fragment
+
+[33mcommit cd7b153ce4dee8ccf0e5012fa05b37c60c075306[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Oct 30 22:59:14 2017 +1100
+
+    Release 1.0.5
+
+[33mcommit dc716d66d35f7463cdda3a165de802bcf0a5e59a[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Oct 30 00:55:15 2017 +0000
+
+    Share layout between user profile and other users; update FindAddContactFragment based on ProfileFragment; fix crash opening user profiles; add callback to getProfileStats to allow method to be reused
+
+[33mcommit d28af46e0ca0f73fb249b04f1827a475cbcae63d[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sun Oct 29 21:45:32 2017 +0000
+
+    Ported iOS friends section (friend requests, pending, friends); create FriendRequest model class; fixed bug where app may attempt to fetch non-existant profile picture for user; use enum to signify user type rather than undocumented integers; misc tidying
+
+[33mcommit a2dfb745aaacd07039da7ea3c021b81f73cb5b3f[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Sat Oct 28 21:02:01 2017 +0100
+
+    Create notification service to deliver notifications; setup notification channels on Android 8/Oreo+; use new CalendarContract to add event to calendar; re-write photoview, news article fragment layouts; other tidying
+
+[33mcommit 2cf5297183461bcfa9583bbc82432dc459aa8504[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 26 17:19:02 2017 +0100
+
+    Update to support Android Studio 3, Android 8.1 (API 27), Java 1.8, latest support libraries; fix many broken image tints/overlays; convert to Java 1.8 syntax where possible; fix missing NonNull annotations on LayoutInflators
+
+[33mcommit 635c0431d61ef2b7efc62b2cd10ad8bf55fcd3fb[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 26 15:06:13 2017 +0100
+
+    Fixes for issues searching/adding/listing friends; fixed searching for friends being limited to email; more nullability annotations on models; other tidying
+
+[33mcommit c324bd4b700a666e8e41dbeb7e136b6519aa4564[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Oct 26 22:07:13 2017 +1100
+
+    Release 1.0.4
+
+[33mcommit b9d98c40b41b5c2b02c9c1ef1e409eed8ab01b01[m
+Merge: 20e5f22 923c744
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Oct 26 21:58:39 2017 +1100
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit 923c744d51425173f1b3e5f55509eb46d4660938[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 25 16:13:17 2017 +0100
+
+    Save password, auto login if email/pass saved; fix Done not ending self-efficacy survey; Fix crash viewing photo; refactor some Network event fetching; hide unused bottom tabs in Election/Overview section; style Election/Overview typography a bit closer to Material
+
+[33mcommit 20e5f2298a91ac750c12a132a1d2aedbd5ef89b8[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Wed Oct 25 00:36:58 2017 +1100
+
+    Release 1.0.3
+
+[33mcommit 55856646f6a4491652effe2fe53c0f7733be6232[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 24 14:29:43 2017 +0100
+
+    Fix gitignore to add google-services.json; add proguard rules for AWS SDK; add missing vote fragment button for self efficacy questions
+
+[33mcommit 63dec38bce20fbabe08703e9a2c2102fdcfd44de[m
+Merge: 8ae57d3 ae831d4
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Tue Oct 24 14:30:10 2017 +1100
+
+    Merge branch 'dependency-toolchain-updates'
+
+[33mcommit ae831d4aa03b4ca11ad333fb1bed8ce70e3e84a2[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 24 04:26:21 2017 +0100
+
+    Fix duplicate layout IDs when building for release; enable minification for release
+
+[33mcommit fdc14d16dd184d8e9e55cb833016ac3b17dcc900[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 24 04:22:25 2017 +0100
+
+    Add image support to polls, fix poll details fetched; fix add friend functionality; Firebase Cloud Messaging/SNS endpoint support; organise more code into modules, structured more closely to iOS; store user login email; pass User model class around more instead of individual params; hide keyboard after login
+
+[33mcommit 8ae57d3ef440d18a2db386ebb353ed43f4c90257[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Tue Oct 24 08:27:25 2017 +1100
+
+    Bump versions for APK
+
+[33mcommit 7d1709687086a427f46bc7967408375f5222d850[m
+Merge: 9b996be 6936ff2
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Tue Oct 24 08:26:25 2017 +1100
+
+    Merge branch 'dependency-toolchain-updates'
+
+[33mcommit 6936ff20e017da41831d10de64fdae3d1bc2ac20[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Oct 20 22:02:56 2017 +0100
+
+    Add self efficacy questions screen; embed Friends search bar in toolbar, animate open/close; abstract slider bar view for reuse; add personality/self-efficacy question strings; match more dimensions to Material Design spec; replace add/accept friends Alerts with Toasts; & more..
+
+[33mcommit ef416014d4afd37ac1b6aa90809e84abedaf27cd[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Fri Oct 20 02:27:45 2017 +0100
+
+    Refactor Network & some fragments to use User data class; fixed profile experience/badges/tasks data fetching/output; extract some voting strings; add fields to User; reduce poorly nested 'LinearLayout/ScrollView/LinearLayout' instances; misc tidying
+
+[33mcommit 48593e5841fe79b6f1fc0df5866a5ed13a65c734[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 19 19:59:55 2017 +0100
+
+    Fixed vote section tabs/fragments; change toolbar title on section change; fix app crash if Network's getGeneralInfo completed as user exited app; extract most login/signup strings/styles into xml files
+
+[33mcommit bc3f60d87271744073defd76ef855e4b8164c57d[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 19 02:27:08 2017 +0100
+
+    Fixed login/signup back button bugs
+
+[33mcommit cba5015486ef1e6645a105f2cf7b5d58922dedcc[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 19 01:25:35 2017 +0100
+
+    Revert unintended change to bottom tab bar appearance from styles.xml
+
+[33mcommit 479b0aa386ea384d73a64540f691c665849f3c5e[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 19 01:11:26 2017 +0100
+
+    Fixed JSON error causing election candidate positions not to load
+
+[33mcommit fb74b00b2361ab18917691367e696a3017bd74af[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Thu Oct 19 01:05:09 2017 +0100
+
+    Fix news article data fetching, async Network method to fetch user info, fetch more user details for poll, create User data class
+
+[33mcommit d70ad369d84eb8fecd530db6bd9cb801eb16d8af[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 19:28:59 2017 +0100
+
+    Fix events listing and events detail screens not loading/displaying data correctly, adapt Network's getPicture to use asynchronous callback interface
+
+[33mcommit 385046a378c4a7b5cb2ae827b1ef0da9b1d0d33d[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 17:48:13 2017 +0100
+
+    Merge getRequestNoAuth with getRequest to avoid code duplication, use auth boolean parameter
+
+[33mcommit e03ed433551d890649c31c16e158f6faac843b76[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 17:41:17 2017 +0100
+
+    Rewrite Network's getRequest() to use HttpURLConnection instead of deprecated Apache HttpClient et al
+
+[33mcommit f28fd87f92627c7196e49757516d3878245600fc[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 17:23:37 2017 +0100
+
+    Migrate from deprecated AWS TransferManager to TransferUtility with service
+
+[33mcommit 03c890301502e30089fcd08100c7c0d4a4d88988[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 16:08:35 2017 +0100
+
+    Minor layout fixes to Profile, reuse Paints in CircularSeekBar to resolve performance warnings
+
+[33mcommit 2dfbf234dddee3645442491be0e928d6a6bd8ed8[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 15:49:28 2017 +0100
+
+    Fix setBackgroundDrawable deprecation warnings, remove unused imports
+
+[33mcommit 071b5041733068382f0ccc2a0918510cd1b1eb0b[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 15:42:28 2017 +0100
+
+    Fix Network profile endpoint URL, refactor Network slightly to reduce duplication of authorisation headers and socket timeout, create Utils class to avoid duplicated image handling methods in many classes
+
+[33mcommit 2251d5d23065db1e38621cb84b685cb8f79d6e04[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 01:15:39 2017 +0100
+
+    Migrate from deprecated Volley to latest official Volley, minor tidying elsewhere
+
+[33mcommit 08175045fe4f646fa3963b5bc8bea2b1397dc0db[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 01:00:42 2017 +0100
+
+    Update gitignore to filter more temp files
+
+[33mcommit 34cc1786fa3a34e950a432f9264b5293dc3d5535[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Wed Oct 18 00:57:18 2017 +0100
+
+    Extracted personality screens, settings strings to strings.xml, set 'supportsRtl' to true in manifest, more RTL work, text dp to sp, other tidying
+
+[33mcommit 1d758a4a4713beade7cb69d7f587cb71efcf51e0[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 17 23:30:45 2017 +0100
+
+    Extract signup and profile fragment strings into strings.xml, change more dp text sizes to sp, more start/end for better RTL support
+
+[33mcommit eae6add4321960b1e30e0fdb2e9d030b16c7c0cb[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 17 23:16:08 2017 +0100
+
+    Fix more deprecation warnings, add Android 8.0 autofill hints, use start/end instead of L/R for better RTL support, minor tidying
+
+[33mcommit 79af1edfcc664e6c2f80a74e410178ce9f2a6f80[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Tue Oct 17 22:47:30 2017 +0100
+
+    Change AWS, ViewPagerLibrary to Gradle dependencies. Remove ActionBarSherlock (deprecated) and old tab bar references, refactor to use AppCompat fragments, toolbar/appbar and TabLayout. Fix some deprecation warnings, remove some unused resources, migrate more strings to strings.xml, more..
+
+[33mcommit 9aa6f6300e7d80c84beebb550d906f0bff29193e[m
+Author: Sebastian Jachec <sjachec1@gmail.com>
+Date:   Mon Oct 16 21:09:38 2017 +0100
+
+    Update Gradle to 4.2.1, comment out debug signing config, update compile, target SDKs to 26, update build tools to match, update support-v4 library
+
+[33mcommit 9b996be2c832705fa4b664b31dd42c1dfcc71b80[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Oct 12 01:16:04 2017 +1100
+
+    Also set versionCode for Play Store release increment
+
+[33mcommit b71bf26009606f554c72199b7b0e8dee15fb6e00[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Oct 12 01:08:51 2017 +1100
+
+    Bump version to 1.0.1 for APK release
+
+[33mcommit 13adb4c508be457bebebb253af57662a4bdfd3a2[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Thu Oct 12 01:02:47 2017 +1100
+
+    Update package name and remove hardcoded test login
+
+[33mcommit 25af4a079f5d504302fac92371b26649cf16b75b[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Mar 20 00:22:17 2017 +1100
+
+    Update server URL ("/dbInterface" is hardcoded)
+
+[33mcommit 555d9377c26f4c31b33acd7487bdbe26f2263ee8[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Mar 20 00:21:57 2017 +1100
+
+    Update JVM version again?
+
+[33mcommit 5d031207989d0aa5f5ff0c3db9e60375e070e8a9[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Mar 20 00:21:33 2017 +1100
+
+    Use Alan's test account details as default for now
+
+[33mcommit 96687bfaf5fff22c0843b4b27de5d87899e84678[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Mon Mar 20 00:00:09 2017 +1100
+
+    Update base JDK version
+
+[33mcommit 48b6967e994f9e8a6529de762405a87d3186a1e9[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:59:53 2017 +1100
+
+    Remove deprecated build option
+
+[33mcommit 26cce8b5076b2c6164f76bec5f3849c319a3e2ad[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:54:22 2017 +1100
+
+    Add README
+
+[33mcommit 7fb09c504c7085ef5f7d5813702d78a83d332761[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:52:49 2017 +1100
+
+    Remove build files / intemediaries now .gitignored
+
+[33mcommit d562ebde57d72fc3145ea2e8a587b31739b8465b[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:51:14 2017 +1100
+
+    Point API HTTP calls at new server
+
+[33mcommit 76ec874d90caa70595cfffe8cff64694b92735ae[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:50:47 2017 +1100
+
+    Add .gitignore
+
+[33mcommit 4defa948caefd88d5ebe38b0f8f47c6a40e8a762[m
+Author: Jay Lynch <hi@jaylyn.ch>
+Date:   Sun Mar 19 23:49:55 2017 +1100
+
+    Update project for Android Studio 2.3 / API25
+
+[33mcommit 31181392a22d01c3b2e64039773917710191f987[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Wed Apr 29 19:04:02 2015 +1000
+
+    * Alpha commit for Google Play submitted
+
+[33mcommit ceb86ea268fdac9e4d1ced44a14fa29dc6ee6c7a[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 28 17:11:22 2015 +1000
+
+    * News articles and photos can now be liked and disliked
+
+[33mcommit bde2a7bdfb49c418c58413cd819839e35ff94bcd[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 23 13:18:39 2015 +1000
+
+    * Photo likes is integrated
+    * numOfAnswers now is intergrated into the poll
+
+[33mcommit 19ce596b74c1cdbd82f5888b983e088935660737[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Wed Apr 22 22:07:27 2015 +1000
+
+    * Added poll stats icons
+
+[33mcommit 53b86f42f9d746128b17b6085a3027b98687142a[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Wed Apr 22 15:01:24 2015 +1000
+
+    * UI Review #1 with Drew and Miguel 22/04/2015
+
+[33mcommit d16dc31bb3d6f523b28bfd66547606e1c74b56c4[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Wed Apr 22 00:26:15 2015 +1000
+
+    * Commit before UI Review
+
+[33mcommit 9385829ea1276c01c1796402f517e0ee25afe396[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 21 15:19:04 2015 +1000
+
+    * Fixed bug that caused crashing in events
+
+[33mcommit 38a1da49bd2cdb4fc1a9acf419a2f917c8b684c4[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 21 14:58:57 2015 +1000
+
+    * Badges now loads remainings and completed correctly
+
+[33mcommit aa05701fc75c3986f7041a158de13d4801a6b925[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 19 19:58:47 2015 +1000
+
+    * Badges now navigate through layers
+
+[33mcommit c23095a02203e04be7cd6aa8fab1320365ef6251[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 17 14:03:59 2015 +1000
+
+    * Started connecting contact profile
+
+[33mcommit 061bce88c1fe54461f426cdabfd2f466ba256efe[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 17 13:04:00 2015 +1000
+
+    * Fixed issue in election tab where it was not adding an odd number
+
+[33mcommit 19fe93c0cf8b93110b7b8ce2b9a0ae7f9dae2187[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 17 12:50:34 2015 +1000
+
+    * Fixed scrolling on election ticket details screen
+
+[33mcommit 4b5cc09e50784f719dd2b94e6f64e0212dafd7c3[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 17 11:56:32 2015 +1000
+
+    * Started connecting election tab correctly
+    * Fixing progress bar
+
+[33mcommit 3455003094a43d0fc62edaa0ee130fb9fc021b9e[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 14 18:40:20 2015 +1000
+
+    * Code now uses Greg's new code
+
+[33mcommit b8c4c1d5c653b7f13a85cfd7c117f4abf5da035d[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 12 13:42:35 2015 +1000
+
+    * Fixed scrolling
+
+[33mcommit 428865004313b18676bc1785549f3eabf267d09b[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 12 12:46:37 2015 +1000
+
+    * Minor UI Updates
+
+[33mcommit ed9041c62c1cc13860fc8ae1fb4d2ecc5d8c23cb[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sat Apr 11 21:51:40 2015 +1000
+
+    * Adding padding at the bottom of feed screens fix
+
+[33mcommit 0f287db62e92d722c689a7f3a85be78f301fae1e[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sat Apr 11 21:43:56 2015 +1000
+
+    * Adding padding at the bottom of feed screens
+
+[33mcommit e7e752ab039c89af86d0d875d76fd616a1748ea1[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sat Apr 11 21:16:22 2015 +1000
+
+    * Badges now load and display in main profile
+
+[33mcommit ea6d2bfdf95343ed3ad5a3e4e8aa293dfcf68028[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 10 16:34:11 2015 +1000
+
+    * Started connecting the badges
+
+[33mcommit 512fa856eae3a36b0654f78174cf438e55e55ba7[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 10 15:39:45 2015 +1000
+
+    * Progress bars now animate
+
+[33mcommit b6e548906c0845bfd25ae8f931dbfd02d0be3152[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 10 13:15:02 2015 +1000
+
+    * Friends screen all works
+
+[33mcommit a27dff2cc7d1e733bcd0e91c60519e5cd3f2f04c[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 9 23:02:42 2015 +1000
+
+    * Added more pending contact requests
+
+[33mcommit 16ea3d8dc8e3fcb1cd52b3a4a56d41d261fbdacc[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 9 22:25:48 2015 +1000
+
+    * Pending contacts now display
+
+[33mcommit ec7dfcbcb7c237134ff596ea1b67847d1ab8cb94[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 9 19:52:49 2015 +1000
+
+    * Contacts now show display picture
+    * Science icon updated
+
+[33mcommit b13fa00e2befe6b9caeb4c8c3f0e40fa5495774c[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 9 19:01:41 2015 +1000
+
+    * Profile Picture now uploads to server
+    * DP now shows in contacts
+    * DP now displays in news article
+    * News article now displays red flag if content is inappropriate
+    * Photos display red flag if content is inappropriate
+
+[33mcommit 8440978e3837c5d5bcde3ce28e0f6e9b88d2ad7b[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 9 18:24:28 2015 +1000
+
+    * Profile Picture now uploads to server
+    * DP now shows in contacts
+    * DP now displays in news article
+    * News article now displays red flag if content is inappropriate
+
+[33mcommit 13d7f5684e5145413392c546b930533ad58c2e99[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 17:35:05 2015 +1000
+
+    * Fixed bug where personality screen background was transparent when loading from profile
+    * Remaining tasks now display
+
+[33mcommit 1cbf0203b2196986c1bc51ac96e60ac212833388[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 16:03:14 2015 +1000
+
+    * User Layout should be worrked now
+
+[33mcommit bbf2285b98a498aa922d7bb4d5155fc66562a696[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 15:51:13 2015 +1000
+
+    * Poll screen now uses standard pixels
+
+[33mcommit cc4256e64fccd2c7f58d0879d057884dbfb2ac81[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 14:41:05 2015 +1000
+
+    * Started uploading DP process
+    * Vote fragment now checks if reminder was set
+    * Can add vote reminder to calendar
+
+[33mcommit 3f7b0850f5baa40b90e80fe4f3d1982b8dc06cc2[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 12:54:50 2015 +1000
+
+    * Moved most of the system to use a pixel independent system
+
+[33mcommit 05b383b15118fae992f9c182c753d54ba67ddd30[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Apr 7 00:24:10 2015 +1000
+
+    * White screen is now showed until network loads components from servers to prevent jumpy effect.
+
+[33mcommit 3c9c8bf812344a3ac061477e7ea8de10bc737b99[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Mon Apr 6 23:13:21 2015 +1000
+
+    * Can now support and unsupport tickets
+
+[33mcommit 69b8370a1a3715d80e0cff55c1c3d664ed497179[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Mon Apr 6 22:34:45 2015 +1000
+
+    * Candidates list all now filters
+
+[33mcommit d9dbdbbc075c37b5508fb536ca23ae37445efe3f[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Mon Apr 6 18:57:38 2015 +1000
+
+    * Implemented about screen
+    * Patched news screen layout
+
+[33mcommit 4dd4168934ebc70acab0385a18b27567d9567877[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Mon Apr 6 16:30:40 2015 +1000
+
+    * Candidate Detail Fragment now displays information.
+    * Ticket support now works.
+
+[33mcommit 892d6c1dd9e4a957d557627d714bd9ae64d08c59[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Mon Apr 6 14:47:31 2015 +1000
+
+    * PollFragmentSlider works now
+
+[33mcommit 9b01db9daf8ccbb81c0dd1cdf0dca5f9ae6d1bb9[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 5 19:08:40 2015 +1000
+
+    * Vote Reminder now sends to server
+
+[33mcommit cfb8180c4a9a19cd47b9e0f42d2600491128d59b[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 5 16:19:19 2015 +1000
+
+    * Screen now locks if account is not verified and allows to login after email is verified
+    * Still need API call to resend verification email
+
+[33mcommit 5a288234c1fc6d1cbef116568ca4622f343c56cc[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 5 13:03:30 2015 +1000
+
+    * Started adding meta data to photos
+
+[33mcommit 26a417e412e33fbd7da1462e9a1473dc91b28180[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Apr 5 12:17:55 2015 +1000
+
+    * Election tab navigation is now working correctly
+
+[33mcommit 7b95c6b9871532ddc336e499974bf6b2f87323ec[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Apr 3 13:27:50 2015 +1100
+
+    * Photo Alumbs now use a ViewPager for swiping
+
+[33mcommit 412c1eadfd9fa99a3d194db611b75e86693afc53[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 2 21:48:27 2015 +1100
+
+    * Added vote page into view pager
+
+[33mcommit 14d4a3a17eed5d7359f2b508fc4038621c412137[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Apr 2 16:13:22 2015 +1100
+
+    * Added custom personality component
+
+[33mcommit 09ca30e18511059c1ff5cef052abc1d8a0a37aa5[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Wed Apr 1 10:38:58 2015 +1100
+
+    * Personality is up to the point where the custom slider bar needs to be implemented.
+
+[33mcommit 6024d24dd93b61bcd525e0efaf57d858c5e9ce86[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 31 19:44:01 2015 +1100
+
+    * Started connecting friend requests
+
+[33mcommit 66122a8a2f7d76964c428e463aad295d52c87d7d[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 31 00:24:39 2015 +1100
+
+    * Locked circular progress bar so finger swipe does not effect it
+
+[33mcommit e48fad6dc3e60f87db4980889f668736c9564e4c[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 31 00:19:42 2015 +1100
+
+    * Circular progress bar now has labels on the inside.
+
+[33mcommit 34cbf5415f8a426131007178bbdb6bed28b01164[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Mar 29 15:35:27 2015 +1100
+
+    * Fixed progress bars
+
+[33mcommit ae9d0e3483cd963c8957489d8075efbfa781f46a[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Mar 27 20:31:04 2015 +1100
+
+    * Started adding tasks to profile page
+
+[33mcommit 22f9e6a80409dff9e71efcda7deba143575b54bd[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Mar 27 13:13:29 2015 +1100
+
+    * Cleaned up profile screen
+
+[33mcommit d5fdec8f8ffcdaa5a18840da004aadead357ae9e[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Mar 27 11:29:32 2015 +1100
+
+    * Fixed photos now
+
+[33mcommit 3e9a46f79062aadb97118130c55d4b18a5a69b3e[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 24 19:29:04 2015 +1100
+
+    * Started getting photos working
+
+[33mcommit 7d1045ea551d95998b0b621a461373c537b3977d[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 24 14:56:46 2015 +1100
+
+    * Started adding vote pledge, signature is signing
+
+[33mcommit 3bdebdf8d4cb17eeaf2bf5d03ac7dc90b7b92b91[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Tue Mar 24 11:26:06 2015 +1100
+
+    * Started noew profile page
+
+[33mcommit fa3609edde5aef1821c0cb4bfecf97939b4683d7[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sun Mar 22 17:09:41 2015 +1100
+
+    * Starting connecting profile screen
+
+[33mcommit e172418d8711489946457f74d6805905ee3d14ed[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Sat Mar 21 16:15:44 2015 +1100
+
+    * Election tab partially connected
+
+[33mcommit 04faf6e5eaed6507fdbfb5f26ef4d875253cd9f6[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Fri Mar 20 16:15:02 2015 +1100
+
+    * Started integrating the election tab
+
+[33mcommit 13a0d64516b9eefbba1826997ac57fe350f72270[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Thu Mar 19 13:35:45 2015 +1100
+
+    Poll Tab is now working
+
+[33mcommit 5ac1e8e6c0b43ce244bf0c3418868581a9d234d3[m
+Author: anthq <quattrone.anthony@gmail.com>
+Date:   Wed Mar 18 16:32:55 2015 +1100
+
+    Migrating network code to use Volley
+
+[33mcommit a27ef3c2249f5196a3832c1951f3ba72bd6acd3d[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Wed Mar 18 08:45:28 2015 +1100
+
+    * Adding module files.
+
+[33mcommit 7ab7b3ab4ce62a56ae66f1d11d30bd1a415c5461[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 23:23:17 2015 +1100
+
+    * Fixed file for Android studio
+
+[33mcommit 3e884d5dac1fd70f81a07f62fb6f592ad59a9080[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 23:18:30 2015 +1100
+
+    * All PNGs added
+
+[33mcommit c16cd3cba9ce3662edc91b7e14900dcfed5a6724[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 23:02:35 2015 +1100
+
+    * More files Android Studio needs
+
+[33mcommit 4a7ddfd0400b0e95c2df92302153e12947cc491b[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 22:58:43 2015 +1100
+
+    * Added iml files
+
+[33mcommit 0eab7bf85764e51c71fc91ac376ac4ffdf59a57f[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 22:43:27 2015 +1100
+
+    * Added needed manifests
+
+[33mcommit 102f0820bbb43da59a82e09f637f1e7ef5243a01[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 22:30:07 2015 +1100
+
+    * Added .idea file
+
+[33mcommit 9200094f2a4392cd63bc7a7ed5983eb41f355fe7[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 19:52:06 2015 +1100
+
+    Commiting Gradle Files needed to build project
+
+[33mcommit 1fa5c5ca6b87241134b25d64c0c0ac5f3348706e[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 19:35:14 2015 +1100
+
+    Added AndroidManifest to git
+
+[33mcommit c594414f07b6d0ddeb2e696981c3d03bd0c0a207[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Tue Mar 17 14:56:52 2015 +1100
+
+    * Added swipe layout
+
+[33mcommit 186df44460f24efa307c1f9213fca1e69bbe5e44[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Mon Mar 16 18:41:19 2015 +1100
+
+    Adding more files to new repo
+
+[33mcommit 2761eea80d41ed84f6ec73415175c8ba11a402db[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Mon Mar 16 18:40:23 2015 +1100
+
+    Adding source files to new repo
+
+[33mcommit f1935817973ded07bc5ca5f32f7a3ae9d69c4f42[m
+Author: Anthony Quattrone <quattrone.anthony@gmail.com>
+Date:   Mon Mar 16 18:39:18 2015 +1100
+
+    Gradle scripts for Android Studio project
