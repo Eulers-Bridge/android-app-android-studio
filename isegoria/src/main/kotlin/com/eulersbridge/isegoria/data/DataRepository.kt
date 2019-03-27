@@ -386,9 +386,9 @@ class DataRepository @Inject constructor(
     override fun getNewsArticles(): Single<List<NewsArticle>> {
         return cachedLoginArticles?.let {
             Single.just(it)
+                    .doOnSuccess { cachedLoginArticles = null }
         } ?: api.getNewsArticles(requireUser().institutionId!!)
                 .onErrorReturnItem(emptyList())
-                .doOnSuccess { cachedLoginArticles = null }
     }
 
     override fun getNewsArticleLikes(articleId: Long): Single<List<Like>> {

@@ -39,21 +39,20 @@ class FirebaseIDService : FirebaseInstanceIdService() {
             platformApplicationArn = SNS_PLATFORM_APPLICATION_ARN
         }
 
-        snsClient.createPlatformEndpoint(request)?.let { result ->
-            securePreferences.edit {
-                putString(ENDPOINT_ARN_KEY, result.endpointArn)
-            }
-        }
+//        snsClient.createPlatformEndpoint(request)?.let { result ->
+//            securePreferences.edit {
+//                putString(ENDPOINT_ARN_KEY, result.endpointArn)
+//            }
+//        }
     }
 
     companion object {
-        private const val ACCESS_KEY_ID = "AKIAJNFUHYIZGWPMIZWA"
-        private const val SECRET_KEY = "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"
 
-        private val snsClient by lazy {
-            val client = AmazonSNSClient(BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY))
-            client.setRegion(Region.getRegion(Regions.AP_SOUTHEAST_2))
-            client
-        }
+
+//        private val snsClient by lazy {
+//            val client = AmazonSNSClient(BasicAWSCredentials(ACCESS_KEY_ID, SECRET_KEY))
+//            client.setRegion(Region.getRegion(Regions.AP_SOUTHEAST_2))
+//            client
+//        }
     }
 }
