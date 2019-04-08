@@ -340,7 +340,7 @@ class DataRepository @Inject constructor(
         val requestBody = RequestBody.create(json, jsonObject.toString())
 
         val request = okhttp3.Request.Builder()
-                .url(networkConfig.baseUrl + "photo")
+                .url(networkConfig.baseUrl + "api/photo")
                 .addAppHeaders()
                 .post(requestBody)
                 .build()

@@ -98,7 +98,7 @@ class SignUpViewModel
 
         if (allFieldsValid)
             return SignUpUser(givenName!!, familyName!!, gender!!, selectedCountry!!.name, birthYear!!,
-                    email!!, password!!, selectedInstitution!!.getName())
+                    email!!, password!!, selectedInstitution!!.getName(), selectedInstitution!!.id)
 
         return null
     }

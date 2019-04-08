@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AlertDialog
 import com.bumptech.glide.Priority
@@ -98,16 +97,18 @@ class AuthActivity : DaggerAppCompatActivity() {
     }
 
     private fun presentRootContent(fragment: Fragment) =
-        supportFragmentManager
-                .beginTransaction()
+        supportFragmentManager.apply {
+            for (i in 0 until backStackEntryCount - 1) {
+                popBackStackImmediate()
+            }
+
+            beginTransaction()
                 .replace(R.id.activity_auth_container, fragment)
                 .commit()
+        }
 
     private fun presentContent(fragment: Fragment) {
         supportFragmentManager.apply {
-            if (backStackEntryCount > 0)
-                popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-
             beginTransaction()
                 .replace(R.id.activity_auth_container, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

@@ -157,6 +157,13 @@ class LoginFragment : Fragment() {
 
                 institutionServerSpinner.apply {
                     isEnabled = true
+
+                    // if a client institution has already been set, select it with the spinner.
+                    if (institutionServer.value != null
+                            && clientInstitutions != null
+                            && clientInstitutions.any { it.apiRoot == institutionServer.value!!.apiRoot }) {
+                        setSelection(clientInstitutions.indexOfFirst { it.apiRoot == institutionServer.value!!.apiRoot }, false)
+                    }
                 }
             }
         }

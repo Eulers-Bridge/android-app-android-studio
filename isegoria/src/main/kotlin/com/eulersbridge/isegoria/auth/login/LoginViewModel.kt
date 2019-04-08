@@ -32,6 +32,7 @@ class LoginViewModel @Inject constructor(private val repository: Repository, pri
     internal val institutionServersLiveData = institutionServersSubject.toLiveData(BackpressureStrategy.LATEST)
     
     private val institutionServerSubject = BehaviorSubject.create<InstitutionServer>()
+    internal val institutionServer = institutionServerSubject.toLiveData(BackpressureStrategy.LATEST)
     
     internal val passwordError = Transformations.switchMap(password) { SingleLiveData(it.isNullOrBlank()) }
 

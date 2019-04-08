@@ -8,6 +8,6 @@ data class SignUpUser (var givenName: String,
                       var email: String,
                       var password: String,
                       var institutionName: String?,
-                      var institutionId: Long? = null,
+                      var institutionId: Long,
                       var accountVerified: Boolean = false,
                       var hasPersonality: Boolean = false)
