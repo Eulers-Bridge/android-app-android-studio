@@ -122,6 +122,8 @@
     <string name="vote_tab_3">Done</string>
 
     <!-- Self Efficacy Questions -->
+    <string name="not_at_all">&lt;&lt; Not at all</string>
+    <string name="completely">Completely &gt;&gt;</string>
     <string name="section_title_self_efficacy_questions">Self-Efficacy Questions</string>
     <string name="self_efficacy_done_button">Done</string>
     <string name="self_efficacy_questions_message">The PPSE-S is composed of 4 items aimed to assess individuals’ beliefs in their capabilities to engage actively in politics. The 4 items are measured on a 5 point Likert scale, from 1 (not at all) to 5 (completely).</string>

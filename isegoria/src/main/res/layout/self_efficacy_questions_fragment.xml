@@ -1,80 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:orientation="vertical"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@color/white"
+  tools:ignore="Overdraw">
+
+  <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:ignore="Overdraw">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/self_efficacy_questions_message"/>
+
 
     <LinearLayout
-        android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_gravity="center_horizontal"
+      android:padding="@dimen/activity_horizontal_margin"
+      android:clipToPadding="false">
+
+      <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:text="@string/not_at_all"
+        android:layout_weight="0.5"
+        android:gravity="left"
+        android:textColor="@color/lightRed"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/self_efficacy_questions_message" />
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:gravity="right"
+        android:text="@string/completely"
+        android:textColor="@color/lightGreen"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/self_efficacy_statement_1"
-            android:layout_marginTop="24dp"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
-            android:id="@+id/sliderBar1"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/self_efficacy_statement_2"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
-            android:id="@+id/sliderBar2"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/self_efficacy_statement_3"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
-            android:id="@+id/sliderBar3"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/self_efficacy_statement_4"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
-            android:id="@+id/sliderBar4"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <Button
-            android:id="@+id/doneButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:minHeight="40dip"
-            android:text="@string/self_efficacy_done_button"
-            android:theme="@style/GreenButton"
-            android:layout_gravity="center" />
     </LinearLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/self_efficacy_statement_1"
+      android:layout_marginTop="24dp"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
+      android:id="@+id/sliderBar1"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/self_efficacy_statement_2"
+      android:layout_marginTop="16dp"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
+      android:id="@+id/sliderBar2"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/self_efficacy_statement_3"
+      android:layout_marginTop="16dp"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
+      android:id="@+id/sliderBar3"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/self_efficacy_statement_4"
+      android:layout_marginTop="16dp"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.election.efficacy.EfficacySliderBar
+      android:id="@+id/sliderBar4"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <Button
+      android:id="@+id/doneButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:minHeight="40dip"
+      android:text="@string/self_efficacy_done_button"
+      android:theme="@style/GreenButton"
+      android:layout_gravity="center"/>
+  </LinearLayout>
 </ScrollView>

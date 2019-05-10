@@ -17,10 +17,10 @@ class EfficacySliderBar(context: Context, attrs: AttributeSet) : BaseSliderBar(c
 
     init {
         val lineColours = intArrayOf(
-            ContextCompat.getColor(context, R.color.lightBlue),
-            ContextCompat.getColor(context, R.color.self_efficacy_slider_2),
-            ContextCompat.getColor(context, R.color.self_efficacy_slider_3),
-            ContextCompat.getColor(context, R.color.lightRed)
+            ContextCompat.getColor(context, R.color.lightRed),
+            ContextCompat.getColor(context, R.color.lightRed),
+            ContextCompat.getColor(context, R.color.lightGreen),
+            ContextCompat.getColor(context, R.color.lightGreen)
         )
 
         for (i in 0..lineColours.lastIndex) {
