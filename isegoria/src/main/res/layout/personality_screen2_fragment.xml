@@ -1,140 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <LinearLayout
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:clipToPadding="false">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_screen_2_description"/>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_gravity="center_horizontal"
+      android:padding="@dimen/activity_horizontal_margin"
+      android:clipToPadding="false">
+
+      <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:clipToPadding="false">
+        android:text="@string/disagree"
+        android:layout_weight="0.5"
+        android:gravity="left"
+        android:textColor="@color/lightRed"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_screen_2_description" />
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:gravity="right"
+        android:text="@string/agree"
+        android:textColor="@color/lightGreen"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_1"
-            android:layout_marginTop="16dp"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar1"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_2"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar2"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_3"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar3"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_4"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar4"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_5"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar5"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_6"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar6"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_7"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar7"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_8"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar8"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_9"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar9"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/personality_slider_description_10"
-            android:textAppearance="@style/QuestionSubheadingTextAppearance" />
-
-        <com.eulersbridge.isegoria.personality.PersonalitySliderBar
-            android:id="@+id/personalitySliderBar10"
-            android:layout_width="match_parent"
-            android:layout_height="72dp" />
-
-        <Button
-            android:id="@+id/doneButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/personality_questions_done_button"
-            android:layout_gravity="center"
-            android:theme="@style/GreenButton" />
     </LinearLayout>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_1"
+      android:layout_marginTop="16dp"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar1"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_2"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar2"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_3"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar3"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_4"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar4"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_5"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar5"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_6"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar6"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_7"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar7"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_8"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar8"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_9"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar9"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/personality_slider_description_10"
+      android:textAppearance="@style/QuestionSubheadingTextAppearance"/>
+
+    <com.eulersbridge.isegoria.personality.PersonalitySliderBar
+      android:id="@+id/personalitySliderBar10"
+      android:layout_width="match_parent"
+      android:layout_height="72dp"/>
+
+    <Button
+      android:id="@+id/doneButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:text="@string/personality_questions_done_button"
+      android:layout_gravity="center"
+      android:theme="@style/GreenButton"/>
+  </LinearLayout>
 </ScrollView>

@@ -8,8 +8,8 @@ object Versions {
     const val min_sdk = 16
     const val target_sdk = 27
     const val compile_sdk = 27
-    const val version_code = 28
-    const val version_name = "1.0.28"
+    const val version_code = 29
+    const val version_name = "1.0.29"
 
     const val ktx = "0.3"
     const val multidex = "1.0.3"
