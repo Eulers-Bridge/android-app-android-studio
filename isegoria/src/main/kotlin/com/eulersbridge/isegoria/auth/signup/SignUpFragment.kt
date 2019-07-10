@@ -18,6 +18,7 @@ import com.eulersbridge.isegoria.auth.AuthViewModel
 import com.eulersbridge.isegoria.auth.onTextChanged
 import com.eulersbridge.isegoria.network.api.model.Country
 import com.eulersbridge.isegoria.network.api.model.Institution
+import com.eulersbridge.isegoria.util.extension.HintAdapter
 import com.eulersbridge.isegoria.util.extension.observe
 import com.eulersbridge.isegoria.util.extension.onItemSelected
 import com.eulersbridge.isegoria.util.extension.setKeyboardVisible
@@ -31,6 +32,10 @@ class SignUpFragment : Fragment() {
     @Inject
     internal lateinit var modelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SignUpViewModel
+
+    final var gender_hint = "Gender"
+    final var yearOfBirth_hint = "Year of birth"
+    final var institution_hint = "Institution"
 
     private val authViewModel: AuthViewModel by lazy {
         ViewModelProviders.of(requireActivity())[AuthViewModel::class.java]
@@ -55,7 +60,19 @@ class SignUpFragment : Fragment() {
             container.updatePadding(top = container.paddingTop + additionalTopPadding)
         }
 
-        countryAdapter = ArrayAdapter(activity, android.R.layout.simple_spinner_item)
+//        val plants = arrayOf("Select an item...", "California sycamore", "Mountain mahogany", "Butterfly weed", "Carrot weed")
+//        val plantsList = ArrayList(Arrays.asList(plants))
+        val genderAdapter = HintAdapter<String>(view.context, android.R.layout.simple_spinner_item)
+        genderAdapter.add("Male")
+        genderAdapter.add("Female")
+        genderAdapter.add("Others")
+        genderAdapter.add(gender_hint)
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        genderSpinner.adapter = genderAdapter
+        genderSpinner.setSelection(genderAdapter.count)
+
+
+        countryAdapter = ArrayAdapter(view.context, android.R.layout.simple_spinner_item)
         countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         countrySpinner.apply {
             isEnabled = false
@@ -66,7 +83,7 @@ class SignUpFragment : Fragment() {
         institutionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         loginInstitutionSpinner.adapter = institutionAdapter
 
-        val spinnerYearOfBirthArrayAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item)
+        val spinnerYearOfBirthArrayAdapter = HintAdapter<String>(view.context, android.R.layout.simple_spinner_item)
 
         val year = Calendar.getInstance()[Calendar.YEAR]
 
@@ -77,10 +94,10 @@ class SignUpFragment : Fragment() {
             if (i == 1990)
                 birthYearSpinner.setSelection(i)
         }
-
+        spinnerYearOfBirthArrayAdapter.add(yearOfBirth_hint)
         spinnerYearOfBirthArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         birthYearSpinner.adapter = spinnerYearOfBirthArrayAdapter
-
+        birthYearSpinner.setSelection(spinnerYearOfBirthArrayAdapter.count)
         createViewListeners()
 
         observe(viewModel.countries) {
@@ -117,7 +134,12 @@ class SignUpFragment : Fragment() {
         email.onTextChanged { if (it != null) viewModel.setEmail(it) }
         newPassword.onTextChanged { if (it != null) viewModel.setPassword(it) }
         confirmNewPassword.onTextChanged { if (it != null) viewModel.setConfirmPassword(it) }
-        gender.onTextChanged { if (it != null) viewModel.setGender(it) }
+//        genderSpinner.onTextChanged { if (it != null) viewModel.setGender(it) }
+        genderSpinner.onItemSelected {
+            val gender = genderSpinner.selectedItem as String
+            if (gender != gender_hint)
+                viewModel.setGender(gender)
+        }
 
         countrySpinner.onItemSelected { position -> updateInstitutionSpinner(position) }
 
@@ -125,7 +147,8 @@ class SignUpFragment : Fragment() {
 
         birthYearSpinner.onItemSelected {
             val birthYear = birthYearSpinner.selectedItem as String
-            viewModel.setBirthYear(birthYear)
+            if (birthYear != yearOfBirth_hint)
+                viewModel.setBirthYear(birthYear)
         }
     }
 
