@@ -29,8 +29,13 @@ protected constructor(private val loadingItemCount: Int) : RecyclerView.Adapter<
 
         } else {
             items.clear()
+//            notifyItemRangeRemoved(0, oldItemCount)
+//            notifyItemRemoved(oldItemCount)
             items.addAll(newItems)
-            notifyItemRangeChanged(0, newItems.size)
+            //Fixme Not an optimized solution but the other solutions keep crash when there is only one news article -- by Yikai.G
+            notifyDataSetChanged()
+//            notifyItemRangeInserted(0, newItems.size)
+//            notifyItemInserted(newItems.size)
         }
 
         if (isLoading && BuildConfig.DEBUG)
