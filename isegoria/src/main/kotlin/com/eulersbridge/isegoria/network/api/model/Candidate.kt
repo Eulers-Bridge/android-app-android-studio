@@ -11,7 +11,7 @@ data class Candidate (
     @field:Json(name = "candidateId")
     val id: Long = 0,
 
-    val ticketId: Long = 0,
+    val ticketId: Long?,
     val positionId: Long = 0,
     val userId: Long = 0,
     val familyName: String?,

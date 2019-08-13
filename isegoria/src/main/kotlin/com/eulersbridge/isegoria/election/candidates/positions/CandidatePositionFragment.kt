@@ -56,14 +56,14 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.candidate_position_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val position =
-            arguments?.getParcelable<Position>(FRAGMENT_EXTRA_CANDIDATE_POSITION)
+                arguments?.getParcelable<Position>(FRAGMENT_EXTRA_CANDIDATE_POSITION)
 
         activity?.resources?.displayMetrics?.let {
             dpWidth = it.widthPixels / it.density
@@ -93,17 +93,17 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
         layout.orientation = LinearLayout.HORIZONTAL
 
         val paddingMargin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            6.5.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                6.5.toFloat(), resources.displayMetrics
         ).toInt()
         val imageSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            53.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                53.toFloat(), resources.displayMetrics
         ).toInt()
 
         val rowParams = TableRow.LayoutParams(
-            TableRow.LayoutParams.MATCH_PARENT,
-            TableRow.LayoutParams.WRAP_CONTENT
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
         )
         tr.layoutParams = rowParams
         tr.setPadding(0, paddingMargin, 0, paddingMargin)
@@ -128,9 +128,9 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.END.toFloat()
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.END.toFloat()
             )
 
             scaleType = ScaleType.CENTER_CROP
@@ -151,33 +151,38 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
             textSize = 12.0f
             text = ""
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
             )
             gravity = Gravity.CENTER
             setTypeface(null, Typeface.BOLD)
         }
 
-        repository.getTicket(candidate.ticketId)
-                .subscribeSuccess {
-                    it.value?.let { ticket ->
-                        runOnUiThread {
-                            textViewParty.text = ticket.code
-                            textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        if (candidate.ticketId != null) {
+            repository.getTicket(candidate.ticketId)
+                    .subscribeSuccess {
+                        it.value?.let { ticket ->
+                            runOnUiThread {
+                                textViewParty.text = ticket.code
+                                textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                            }
                         }
                     }
-                }
-                .addTo(compositeDisposable)
+                    .addTo(compositeDisposable)
+        } else {
+            textViewParty.text = "IND"
+            textViewParty.setBackgroundColor(Color.BLACK)
+        }
 
         val imageSize2 = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            27.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                27.toFloat(), resources.displayMetrics
         ).toInt()
 
         val partyLayout = LinearLayout(activity)
         partyLayout.orientation = LinearLayout.VERTICAL
         val params = LinearLayout.LayoutParams(
-            imageSize, imageSize2
+                imageSize, imageSize2
         )
         params.gravity = Gravity.CENTER_VERTICAL
         partyLayout.layoutParams = params
@@ -214,15 +219,15 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
 
         val relLayoutMaster = RelativeLayout(activity)
         val relLayoutMasterParam =
-            TableRow.LayoutParams(dpWidth.toInt(), TableRow.LayoutParams.WRAP_CONTENT)
+                TableRow.LayoutParams(dpWidth.toInt(), TableRow.LayoutParams.WRAP_CONTENT)
         relLayoutMaster.layoutParams = relLayoutMasterParam
 
         val relativeParamsLeft =
-            RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
 
         val relativeParamsRight =
-            RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
 
         val linLayout = LinearLayout(activity)

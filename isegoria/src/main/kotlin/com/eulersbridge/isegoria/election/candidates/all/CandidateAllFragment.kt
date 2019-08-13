@@ -62,9 +62,9 @@ class CandidateAllFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         rootView = inflater.inflate(R.layout.candidate_all_fragment, container, false)
 
@@ -87,11 +87,9 @@ class CandidateAllFragment : Fragment() {
         candidateAllTable.addView(dividerView)
 
         searchViewCandidatesAll.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(query: String)
-                    =  handleSearchQueryTextChange(query)
+            override fun onQueryTextChange(query: String) = handleSearchQueryTextChange(query)
 
-            override fun onQueryTextSubmit(query: String)
-                    = handleSearchQueryTextChange(query)
+            override fun onQueryTextSubmit(query: String) = handleSearchQueryTextChange(query)
         })
 
         repository.getLatestElectionCandidates()
@@ -110,7 +108,7 @@ class CandidateAllFragment : Fragment() {
                 val lastName = lastNames[i]
 
                 if (!firstName.contains(query.toLowerCase(), true)
-                    && !lastName.contains(query.toLowerCase(), true))
+                        && !lastName.contains(query.toLowerCase(), true))
                     candidateAllTable.removeView(view)
             }
 
@@ -143,27 +141,27 @@ class CandidateAllFragment : Fragment() {
         layout.orientation = LinearLayout.HORIZONTAL
 
         val paddingMargin = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            6.5.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                6.5.toFloat(), resources.displayMetrics
         ).toInt()
 
         val rowParams = TableRow.LayoutParams(
-            TableRow.LayoutParams.MATCH_PARENT,
-            TableRow.LayoutParams.WRAP_CONTENT
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
         )
         tr.layoutParams = rowParams
         tr.setPadding(0, paddingMargin, 0, paddingMargin)
 
         val imageSize = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            53.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                53.toFloat(), resources.displayMetrics
         ).toInt()
 
         val candidateProfileView = ImageView(activity)
         candidateProfileView.apply {
             layoutParams = TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
             )
 
             layoutParams = LinearLayout.LayoutParams(imageSize, imageSize)
@@ -186,10 +184,10 @@ class CandidateAllFragment : Fragment() {
                 .subscribeSuccess {
                     it.photos.firstOrNull()?.let {
                         GlideApp.with(this@CandidateAllFragment)
-                            .load(it.getPhotoUrl())
-                            .transform(CircleCrop())
-                            .transition(DrawableTransitionOptions.withCrossFade())
-                            .into(candidateProfileView)
+                                .load(it.getPhotoUrl())
+                                .transform(CircleCrop())
+                                .transition(DrawableTransitionOptions.withCrossFade())
+                                .into(candidateProfileView)
                     }
                 }
                 .addTo(compositeDisposable)
@@ -199,9 +197,9 @@ class CandidateAllFragment : Fragment() {
         val candidateProfileImage = ImageView(activity)
         candidateProfileImage.apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.END.toFloat()
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.END.toFloat()
             )
 
             scaleType = ScaleType.CENTER_CROP
@@ -214,10 +212,10 @@ class CandidateAllFragment : Fragment() {
             profileFragment.arguments = bundleOf(FRAGMENT_EXTRA_USER to candidate)
 
             childFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .replace(R.id.candidateFrame, profileFragment)
-                .commit()
+                    .beginTransaction()
+                    .addToBackStack(null)
+                    .replace(R.id.candidateFrame, profileFragment)
+                    .commit()
         }
 
         val textViewParty = TextView(activity)
@@ -229,23 +227,28 @@ class CandidateAllFragment : Fragment() {
             text = "GRN"
 
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
             )
             gravity = Gravity.CENTER
             setTypeface(null, Typeface.BOLD)
         }
 
-        repository.getTicket(candidate.ticketId)
-                .subscribeSuccess {
-                    it.value?.let { ticket ->
-                        runOnUiThread {
-                            textViewParty.text = ticket.code
-                            textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+        if (candidate.ticketId != null) {
+            repository.getTicket(candidate.ticketId)
+                    .subscribeSuccess {
+                        it.value?.let { ticket ->
+                            runOnUiThread {
+                                textViewParty.text = ticket.code
+                                textViewParty.setBackgroundColor(Color.parseColor(ticket.getColour()))
+                            }
                         }
                     }
-                }
-                .addTo(compositeDisposable)
+                    .addTo(compositeDisposable)
+        } else {
+            textViewParty.text = "IND"
+            textViewParty.setBackgroundColor(Color.BLACK)
+        }
 
         val rect = RectShape()
         val rectShapeDrawable = ShapeDrawable(rect)
@@ -257,8 +260,8 @@ class CandidateAllFragment : Fragment() {
         }
 
         val imageSize2 = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            27.toFloat(), resources.displayMetrics
+                TypedValue.COMPLEX_UNIT_DIP,
+                27.toFloat(), resources.displayMetrics
         ).toInt()
 
         val partyLayout = LinearLayout(activity)
@@ -266,7 +269,7 @@ class CandidateAllFragment : Fragment() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_VERTICAL
             layoutParams = LinearLayout.LayoutParams(
-                imageSize, imageSize2
+                    imageSize, imageSize2
             )
         }
 
@@ -307,15 +310,15 @@ class CandidateAllFragment : Fragment() {
 
         val relLayoutMaster = RelativeLayout(activity)
         val relLayoutMasterParam =
-            TableRow.LayoutParams(dpWidth.toInt(), TableRow.LayoutParams.WRAP_CONTENT)
+                TableRow.LayoutParams(dpWidth.toInt(), TableRow.LayoutParams.WRAP_CONTENT)
         relLayoutMaster.layoutParams = relLayoutMasterParam
 
         val relativeParamsLeft =
-            RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         relativeParamsLeft.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
 
         val relativeParamsRight =
-            RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         relativeParamsRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
 
         val linLayout = LinearLayout(activity)

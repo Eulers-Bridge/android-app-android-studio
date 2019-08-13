@@ -477,7 +477,6 @@ class DataRepository @Inject constructor(
 
     override fun getPositionCandidates(positionId: Long): Single<List<Candidate>> {
         return api.getPositionCandidates(positionId)
-                .onErrorReturnItem(emptyList())
     }
 
     override fun getTicket(id: Long): Single<Optional<Ticket>> {
