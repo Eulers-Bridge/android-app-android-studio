@@ -245,9 +245,6 @@ class CandidateAllFragment : Fragment() {
                         }
                     }
                     .addTo(compositeDisposable)
-        } else {
-            textViewParty.text = "IND"
-            textViewParty.setBackgroundColor(Color.BLACK)
         }
 
         val rect = RectShape()

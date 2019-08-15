@@ -117,10 +117,12 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
         repository.getPhoto(candidate.userId)
                 .subscribeSuccess {
                     it.value?.let {
-                        GlideApp.with(this@CandidatePositionFragment)
-                                .load(it.getPhotoUrl())
-                                .transition(DrawableTransitionOptions.withCrossFade())
-                                .into(candidateProfileView)
+                        runOnUiThread {
+                            GlideApp.with(this@CandidatePositionFragment)
+                                    .load(it.getPhotoUrl())
+                                    .transition(DrawableTransitionOptions.withCrossFade())
+                                    .into(candidateProfileView)
+                        }
                     }
                 }
                 .addTo(compositeDisposable)
@@ -169,9 +171,6 @@ class CandidatePositionFragment : Fragment(), TabbedFragment, TitledFragment {
                         }
                     }
                     .addTo(compositeDisposable)
-        } else {
-            textViewParty.text = "IND"
-            textViewParty.setBackgroundColor(Color.BLACK)
         }
 
         val imageSize2 = TypedValue.applyDimension(
