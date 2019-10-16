@@ -3,8 +3,9 @@
     <base-config cleartextTrafficPermitted="false" />
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">54.79.70.241</domain>
-        <domain includeSubdomains="true">115.146.84.241</domain>
-        <domain includeSubdomains="true">115.146.86.241</domain>
+        <domain includeSubdomains="true">45.113.234.230</domain>
+        <domain includeSubdomains="true">45.113.235.11</domain>
+        <domain includeSubdomains="true">45.113.234.18</domain>
         <!--base-url.placeholder-->
     </domain-config>
 </network-security-config>
