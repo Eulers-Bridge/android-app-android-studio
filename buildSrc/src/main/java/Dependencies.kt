@@ -6,8 +6,8 @@ object Versions {
     const val google_gradle_plugin = "3.2.1"
 
     const val min_sdk = 16
-    const val target_sdk = 27
-    const val compile_sdk = 27
+    const val target_sdk = 28
+    const val compile_sdk = 28
     const val version_code = 33
     const val version_name = "1.0.33"
 
