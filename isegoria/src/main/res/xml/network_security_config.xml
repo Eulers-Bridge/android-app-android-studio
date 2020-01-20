@@ -6,6 +6,7 @@
         <domain includeSubdomains="true">45.113.234.230</domain>
         <domain includeSubdomains="true">45.113.235.11</domain>
         <domain includeSubdomains="true">45.113.234.18</domain>
+        <domain includeSubdomains="true">3.104.64.13</domain>
         <!--base-url.placeholder-->
     </domain-config>
 </network-security-config>
